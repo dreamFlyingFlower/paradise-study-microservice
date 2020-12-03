@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: paradise-study-microservice-server
+  profiles:
+    active: dev
+server: 
+  port: 55555
+  max-http-header-size: 10000000
+
+eureka:
+  instance:
+    hostname: localhost
+  client: 
+    # false表示不注册到其他server上,true表示是一个客户端,若是正式环境可开启多个服务,相互注册
+    register-with-eureka: false
+    # server:
+    # 是否开启自我保护模式,当15分钟内收到的心跳数少于一定比例的时候开启,默认是开启的
+    #enable-self-preservation: true
+    # 15分钟内应该收到的心跳数比例,若少于这个比例,将开启自我保护模式,不删除注册信息,默认是0.85
+    # renewal-percent-threshold: 0.8
+    # true表示从其他server上获取信息,若开启集群,可注册到其他服务上
+    fetch-registry: false
+    service-url:
+      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
