@@ -1,5 +1,26 @@
 # CloudConfig
 
+
+
+# Server配置
+
+* 可使用zk为配置中心,需要zk的包,可能会有冲突,需要将部分包排除.若不使用zk,需要注释掉zk包
+
+* 在启动类上添加注解EnableConfigServer,表明可以使用配置服务
+
+* 默认的配置是从git上获取,需要git帐号和密码,同时要在git上新建一个项目(原来的也可),该项目的第一层就放置配置文件,文件后缀无所谓.而配置git的uri的地址可以是如下形式
+
+  ```
+  # 直接写到项目名,则在config客户端只需要配置profile即可
+  https://github.com/username/projectname
+  # 项目名用通配符代替,在config客户端需要配置name和profile,更灵活
+  https://github.com/username/{name}
+  ```
+
+* 启动项目后,可在浏览器使用ip:port访问,见Server访问
+
+
+
 # Server访问
 
 * 服务端启动之后可通过ip:port或服务名加上指定后缀访问配置文件信息,有多种匹配模式
@@ -53,3 +74,19 @@
  * {label}/{appliction}-{profile}.yml:同{application}-{profile}.yml
 
  * {label}/{appliction}-{profile}.properties:同{application}-{profile}.properties
+
+
+
+# 手动刷新Config
+
+* 该方式需要每个项目都使用一次,不推荐使用
+* 需要在使用了config属性的类上加上注解@RefreshScope
+* 需要引用spring-boot-starter-actuator,并放开全部的监控端口,特别是refresh,否则无法刷新
+* 在控制台或其他地方调用接口http://客户端ip:port/actuator/refresh,post方式
+
+
+
+# 自动刷新Config
+
+* 使用spring-cloud-bus的自动刷新,需要使用github的设置页面的webhooks,并且需要使用amqp
+
