@@ -1,0 +1,27 @@
+spring:
+  cloud: 
+    config: 
+      server:
+        git: 
+          # 只需要些到仓库地址即可
+          uri: https://github.com/mygodness100/{application}
+          # 若配置文件有多个,或者不同开发团队用的git仓库不一样,可以如下形式
+          # application对应的是一个通配符,需要结合uri地址规则
+          # 假设有config-test1,config-test2的远程仓库,则http访问时应该为ip:port/config-test1/dev,而不能使用任意字符
+          # 若过是配置在项目中,则使用项目的spring.application.name的值来区分
+          # uri: https://github.com/mygodness100/{application}
+          # 还可以加上profile,同加上applicaiton
+          # uri: https://github.com/mygodness100/{application}-{profile}
+#      discovery:
+#        # 是否发现配置,默认false
+#        enabled: true
+#        # 配置服务器的名称,必须以zk中的name为准
+#        service-id: cloud-config
+
+# 对称加密,可以对值进行加密,需要用到JCE,要从JDK官网下载,详见SpringCloudConfig官网
+# 加密的时候需要开启服务端,使用命令行对需要进行加密的值加密,加密之后的值经过特殊处理写入配置文件
+# 如加密后的字符串为fdsfwetregtrehtgfdsgfhgfh,则写入到配置文件中的值为'{cipher}fdsfwetregtrehtgfdsgfhgfh'
+# 值会在读取时自动解密
+# 非对称加密需要用到key-tools,JDK自带,详见SpringBoot官网,
+#encrypt:
+#  key: jiamiyo

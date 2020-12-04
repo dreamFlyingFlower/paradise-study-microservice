@@ -8,14 +8,18 @@
 		<artifactId>paradise-study-microservice</artifactId>
 		<version>${project.version}</version>
 	</parent>
-	<artifactId>paradise-study-microservice-config</artifactId>
-	<name>paradise-study-microservice-config</name>
+	<artifactId>paradise-study-microservice-config-client</artifactId>
+	<name>paradise-study-microservice-config-client</name>
 	<description>study for spring cloud config</description>
 
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-config-server</artifactId>
+			<artifactId>spring-cloud-starter-config</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 		<!-- <dependency> -->
 		<!-- <groupId>org.springframework.cloud</groupId> -->

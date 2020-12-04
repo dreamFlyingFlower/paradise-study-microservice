@@ -38,5 +38,6 @@
 		<module>paradise-study-microservice-common</module>
 		<module>paradise-study-microservice-config</module>
 		<module>paradise-study-microservice-server</module>
+		<module>paradise-study-microservice-config-client</module>
 	</modules>
 </project>

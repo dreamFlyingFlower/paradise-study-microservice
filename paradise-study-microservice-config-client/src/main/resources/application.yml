@@ -1,0 +1,11 @@
+server:
+  port: 55557
+  servlet:
+    encoding:
+      charset: UTF-8
+      
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,refresh
