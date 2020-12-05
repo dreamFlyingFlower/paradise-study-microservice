@@ -1,0 +1,12 @@
+spring: 
+  profiles:
+    active: prod
+eureka: 
+  instance:
+    hostname: localhost
+    lease-renewal-interval-in-seconds: 30
+    instance-id: ${spring.application.name}:${server.port}
+    prefer-ip-address: true
+  client: 
+    service-url:
+      defaultZone: http://localhost:55555/eureka,http://localhost:55550/eureka

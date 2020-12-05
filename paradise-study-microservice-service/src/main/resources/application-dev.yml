@@ -1,0 +1,30 @@
+# 大部分配置只在单数据源有效
+mybatis:
+  mapper-locations: classpath:mappers/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+    
+spring:
+  datasource:
+    # 若数据库没有指定时区,连接还需要加上时区
+    url: jdbc:mysql://localhost:3306/simpleoa?autoReconnect=true&useUnicode=true&serverTimezone=GMT
+    username: root
+    password: 52LDforever
+    driverClassName: com.mysql.cj.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      min-idle: 5 
+      initial-size: 8
+      timeBetweenEvictionRunsMillis: 60000
+      minEvictableIdleTimeMillis: 300000
+      validationQuery: select 'x'
+      test-while-idle: true
+      testOnBorrow: false
+      testOnReturn: false
+      poolPreparedStatements: true
+      # 配置监控统计拦截的filters,去掉后监控界面sql无法统计,wall用于防火墙
+      filters: stat,wall,log4j
+    
+logging:
+  level: 
+    com.wy.mapper: debug

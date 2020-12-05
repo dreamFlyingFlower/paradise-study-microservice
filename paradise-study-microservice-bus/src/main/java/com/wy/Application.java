@@ -30,6 +30,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * 
  * @apiNote 自动刷新可以下载git专门的webhook在本地安装,可以确保安全,也可以在本地安装了git之后使用
  * 
+ * @apiNote bus可以开启一个trace的页面,但是好像有bug还是缺少条件,暂时无法开启,可能需要在集群中注册
+ * 
+ * @apiNote 开启config的自动刷新,实际上是请求了config的客户端,然后客户端1再通知amqp说配置发生了变化,
+ *          而amqp则通知其他客户端配置发生了变化,需要重新拉取配置,这里客户端1的职责就变了,不再是只接受消息,
+ *          同时要发送消息到amqp,而其他客户端只接收消息,所有比较合理的设计应该是git自动刷新的地址填写config服务端,
+ *          服务端中也加入bus-amqp,actuator,这样一旦配置改动,config服务端将需要刷新配置的消息写入到amqp中,
+ *          其他客户端只用接收消息,从config服务端拉取最新的配置即可
+ * 
  * @author ParadiseWY
  * @date 2020-12-04 09:29:28
  * @git {@link https://github.com/mygodness100}

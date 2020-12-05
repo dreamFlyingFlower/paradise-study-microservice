@@ -1,0 +1,41 @@
+spring: 
+  devtools: 
+    restart:
+      enabled: true
+      exclude: static/**,public/**,*.md
+  profiles: 
+    active: dev
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name:  com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/simpleoa?autoReconnect=true&useUnicode=true&useSSL=false&characterEncoding=UTF8
+    username: root
+    password: 52LDforever
+  #  使用cloudconfig的服务
+  cloud:
+    config:
+      # 该种方法属于硬编码,必须写死configserver的地址
+      # configserver的服务地址,本项目是cloudconfig的地址
+      uri: http://localhost:5600
+      # application后缀名,默认default
+      profile: default
+      # 只有当使用git的时候默认才会是master
+      label: master
+      # 推荐使用该方法,直接让configserver注册到服务发现的组件上,此处直接根据application.name来发现
+      discovery:
+        enabled: true
+        service-id: cloud-config
+     
+eureka: 
+  instance:
+    hostname: localhost
+    #设置心跳的间隔时间,默认30秒
+    lease-renewal-interval-in-seconds: 30
+    #在信息列表显示的主机名
+    instance-id: ${spring.application.name}:${server.port}
+    #访问的路径变为ip地址
+    prefer-ip-address: true
+  client: 
+    service-url:
+      #若有多个服务注册,可用逗号隔开,多服务注册是为了HA
+      defaultZone: http://localhost:55555/eureka,http://localhost:55550/eureka

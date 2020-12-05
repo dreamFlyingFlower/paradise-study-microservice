@@ -40,5 +40,7 @@
 		<module>paradise-study-microservice-server</module>
 		<module>paradise-study-microservice-config-client</module>
 		<module>paradise-study-microservice-bus</module>
+		<module>paradise-study-microservice-feign</module>
+		<module>paradise-study-microservice-service</module>
 	</modules>
 </project>

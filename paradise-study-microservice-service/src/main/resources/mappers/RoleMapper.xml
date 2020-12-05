@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wy.mapper.RoleMapper">
+  <resultMap id="BaseResultMap" type="com.wy.model.Role">
+    <id column="role_id" jdbcType="INTEGER" property="roleId" />
+    <result column="role_name" jdbcType="VARCHAR" property="roleName" />
+    <result column="role_state" jdbcType="TINYINT" property="roleState" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    role_id, role_name, role_state
+  </sql>
+  <select id="selectByExample" parameterType="com.wy.model.RoleExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from ts_role
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from ts_role
+    where role_id = #{roleId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from ts_role
+    where role_id = #{roleId,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.wy.model.RoleExample">
+    delete from ts_role
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" keyColumn="role_id" keyProperty="roleId" parameterType="com.wy.model.Role" useGeneratedKeys="true">
+    insert into ts_role (role_name, role_state)
+    values (#{roleName,jdbcType=VARCHAR}, #{roleState,jdbcType=TINYINT})
+  </insert>
+  <insert id="insertSelective" keyColumn="role_id" keyProperty="roleId" parameterType="com.wy.model.Role" useGeneratedKeys="true">
+    insert into ts_role
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="roleName != null">
+        role_name,
+      </if>
+      <if test="roleState != null">
+        role_state,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="roleName != null">
+        #{roleName,jdbcType=VARCHAR},
+      </if>
+      <if test="roleState != null">
+        #{roleState,jdbcType=TINYINT},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.wy.model.RoleExample" resultType="java.lang.Long">
+    select count(*) from ts_role
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update ts_role
+    <set>
+      <if test="record.roleId != null">
+        role_id = #{record.roleId,jdbcType=INTEGER},
+      </if>
+      <if test="record.roleName != null">
+        role_name = #{record.roleName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.roleState != null">
+        role_state = #{record.roleState,jdbcType=TINYINT},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update ts_role
+    set role_id = #{record.roleId,jdbcType=INTEGER},
+      role_name = #{record.roleName,jdbcType=VARCHAR},
+      role_state = #{record.roleState,jdbcType=TINYINT}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.wy.model.Role">
+    update ts_role
+    <set>
+      <if test="roleName != null">
+        role_name = #{roleName,jdbcType=VARCHAR},
+      </if>
+      <if test="roleState != null">
+        role_state = #{roleState,jdbcType=TINYINT},
+      </if>
+    </set>
+    where role_id = #{roleId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.wy.model.Role">
+    update ts_role
+    set role_name = #{roleName,jdbcType=VARCHAR},
+      role_state = #{roleState,jdbcType=TINYINT}
+    where role_id = #{roleId,jdbcType=INTEGER}
+  </update>
+  <insert id="inserts" parameterType="list">
+    insert into ts_role (role_id,role_name,role_state)  values <foreach collection="list" item="item" index="index" separator=",">(null,#{item.roleName,jdbcType=VARCHAR},<choose><when test="item.roleState!= null">role_state = #{item.roleState,jdbcType=TINYINT}</when><otherwise>1</otherwise></choose>)</foreach>
+  </insert>
+  <delete id="deleteByPrimaryKeys" parameterType="list">
+    delete from  ts_role where role_id in <foreach open="(" close=")" collection="list" item="roleId" separator=",">#{roleId,jdbcType=INT}</foreach>
+  </delete>
+  <delete id="deleteAll">
+    delete from  ts_role 
+  </delete>
+  <select id="selectEntitys" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List" /> from ts_role<where><if test = "roleId != null "> and role_id = #{roleId,jdbcType=INTEGER} </if><if test = "roleName != null "> and role_name = #{roleName,jdbcType=VARCHAR} </if><if test = "roleState != null "> and role_state = #{roleState,jdbcType=TINYINT} </if></where>
+  </select>
+  <select id="selectLists" resultType="map">
+    select <include refid="Base_Column_List" /> from ts_role<where><if test = "roleId != null "> and role_id = #{roleId,jdbcType=INTEGER} </if><if test = "roleName != null "> and role_name = #{roleName,jdbcType=VARCHAR} </if><if test = "roleState != null "> and role_state = #{roleState,jdbcType=TINYINT} </if></where>
+  </select>
+  <select id="countByEntity" resultType="java.lang.Long">
+    select count(*) from ts_role<where><if test = "roleId != null ">and role_id = #{roleId,jdbcType=INTEGER} </if><if test = "roleName != null ">and role_name = #{roleName,jdbcType=VARCHAR} </if><if test = "roleState != null ">and role_state = #{roleState,jdbcType=TINYINT} </if></where>
+  </select>
+  <select id="getMaxValue" resultType="java.lang.Long">
+    select <choose><when test="'roleId' == _parameter.column">max(role_id)</when><when test="'roleState' == _parameter.column">max(role_state)</when><otherwise>max(0)</otherwise>  </choose>  from ts_role
+  </select>
+  <select id="getMaxTime" resultType="java.util.Date">
+    select <choose><otherwise>1970-01-01 00:00:00</otherwise>  </choose>  from ts_role
+  </select>
+</mapper>

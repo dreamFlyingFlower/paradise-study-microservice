@@ -1,0 +1,30 @@
+server: 
+  servlet: 
+    encoding:
+      force: true
+      enabled: true
+      charset: UTF-8
+  
+spring:
+  application:
+    name: paradise-study-microservice-common
+  profiles:
+    active: dev
+  mvc:
+    async: 
+      request-timeout:
+        seconds: 180
+    format:
+      date-time: yyyy-MM-dd HH:mm:ss
+      date: yyyy-MM-dd
+    throw-exception-if-no-handler-found: true
+    servlet:
+      load-on-startup: 1
+  servlet: 
+    multipart: 
+      enabled: true
+      max-file-size: 10MB
+  transaction: 
+    rollback-on-commit-failure: true
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss

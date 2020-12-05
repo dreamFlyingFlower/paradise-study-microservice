@@ -19,6 +19,16 @@ import org.springframework.cloud.config.server.EnableConfigServer;
  * 
  * @apiNote 访问配置的形式,在ip:port或服务名后的资源链接,见paradise-study-microserver/notes/CloudConfig.md
  * 
+ * @apiNote Spring读取配置文件的顺序,先从外部读取,再读取内部,高优先级会覆盖低优先级属性,详见官方文档:
+ *          外部:和jar包同级目录的config目录下的配置->和jar同级目录的配置
+ *          内部:项目根目录下的config目录下的配置->项目根目录下的配置->classpath:/config->classpath:/
+ *          同目录配置文件顺序:bootstrap.yml->configserver->application->application-xxx
+ * 
+ *          在启动jar时指定的配置优先级最高,会覆盖所有其他同名配置.<br>
+ *          启动jar时,在启动参数上指定读取的配置文件和配置文件路径:<br>
+ *          指定配置文件:java -jar test.jar --spring.profiles.active=dev,config<br>
+ *          指定配置文件目录:java -jar test.jar --spring.config.location=/config
+ * 
  * @author ParadiseWY
  * @date 2020-12-04 09:29:28
  * @git {@link https://github.com/mygodness100}

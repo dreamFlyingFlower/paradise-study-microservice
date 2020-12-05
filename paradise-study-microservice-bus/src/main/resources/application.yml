@@ -16,5 +16,5 @@ spring:
   cloud:
     bus:
       trace: 
-        # 打开bus追踪,在页面上可以ip:port/trace访问
+        # 打开bus追踪,在页面上可以ip:port/trace访问,暂时无效
         enabled: true

@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wy.mapper.FileinfoMapper">
+  <resultMap id="BaseResultMap" type="com.wy.model.Fileinfo">
+    <id column="fileinfo_id" jdbcType="INTEGER" property="fileinfoId" />
+    <result column="local_name" jdbcType="VARCHAR" property="localName" />
+    <result column="original_name" jdbcType="VARCHAR" property="originalName" />
+    <result column="file_type" jdbcType="TINYINT" property="fileType" />
+    <result column="file_size" jdbcType="DOUBLE" property="fileSize" />
+    <result column="file_time" jdbcType="VARCHAR" property="fileTime" />
+    <result column="file_suffix" jdbcType="VARCHAR" property="fileSuffix" />
+    <result column="createtime" jdbcType="TIMESTAMP" property="createtime" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    fileinfo_id, local_name, original_name, file_type, file_size, file_time, file_suffix, 
+    createtime
+  </sql>
+  <select id="selectByExample" parameterType="com.wy.model.FileinfoExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from ts_fileinfo
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from ts_fileinfo
+    where fileinfo_id = #{fileinfoId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from ts_fileinfo
+    where fileinfo_id = #{fileinfoId,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.wy.model.FileinfoExample">
+    delete from ts_fileinfo
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" keyColumn="fileinfo_id" keyProperty="fileinfoId" parameterType="com.wy.model.Fileinfo" useGeneratedKeys="true">
+    insert into ts_fileinfo (local_name, original_name, file_type, 
+      file_size, file_time, file_suffix, 
+      createtime)
+    values (#{localName,jdbcType=VARCHAR}, #{originalName,jdbcType=VARCHAR}, #{fileType,jdbcType=TINYINT}, 
+      #{fileSize,jdbcType=DOUBLE}, #{fileTime,jdbcType=VARCHAR}, #{fileSuffix,jdbcType=VARCHAR}, 
+      #{createtime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" keyColumn="fileinfo_id" keyProperty="fileinfoId" parameterType="com.wy.model.Fileinfo" useGeneratedKeys="true">
+    insert into ts_fileinfo
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="localName != null">
+        local_name,
+      </if>
+      <if test="originalName != null">
+        original_name,
+      </if>
+      <if test="fileType != null">
+        file_type,
+      </if>
+      <if test="fileSize != null">
+        file_size,
+      </if>
+      <if test="fileTime != null">
+        file_time,
+      </if>
+      <if test="fileSuffix != null">
+        file_suffix,
+      </if>
+      <if test="createtime != null">
+        createtime,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="localName != null">
+        #{localName,jdbcType=VARCHAR},
+      </if>
+      <if test="originalName != null">
+        #{originalName,jdbcType=VARCHAR},
+      </if>
+      <if test="fileType != null">
+        #{fileType,jdbcType=TINYINT},
+      </if>
+      <if test="fileSize != null">
+        #{fileSize,jdbcType=DOUBLE},
+      </if>
+      <if test="fileTime != null">
+        #{fileTime,jdbcType=VARCHAR},
+      </if>
+      <if test="fileSuffix != null">
+        #{fileSuffix,jdbcType=VARCHAR},
+      </if>
+      <if test="createtime != null">
+        #{createtime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.wy.model.FileinfoExample" resultType="java.lang.Long">
+    select count(*) from ts_fileinfo
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update ts_fileinfo
+    <set>
+      <if test="record.fileinfoId != null">
+        fileinfo_id = #{record.fileinfoId,jdbcType=INTEGER},
+      </if>
+      <if test="record.localName != null">
+        local_name = #{record.localName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.originalName != null">
+        original_name = #{record.originalName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.fileType != null">
+        file_type = #{record.fileType,jdbcType=TINYINT},
+      </if>
+      <if test="record.fileSize != null">
+        file_size = #{record.fileSize,jdbcType=DOUBLE},
+      </if>
+      <if test="record.fileTime != null">
+        file_time = #{record.fileTime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.fileSuffix != null">
+        file_suffix = #{record.fileSuffix,jdbcType=VARCHAR},
+      </if>
+      <if test="record.createtime != null">
+        createtime = #{record.createtime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update ts_fileinfo
+    set fileinfo_id = #{record.fileinfoId,jdbcType=INTEGER},
+      local_name = #{record.localName,jdbcType=VARCHAR},
+      original_name = #{record.originalName,jdbcType=VARCHAR},
+      file_type = #{record.fileType,jdbcType=TINYINT},
+      file_size = #{record.fileSize,jdbcType=DOUBLE},
+      file_time = #{record.fileTime,jdbcType=VARCHAR},
+      file_suffix = #{record.fileSuffix,jdbcType=VARCHAR},
+      createtime = #{record.createtime,jdbcType=TIMESTAMP}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.wy.model.Fileinfo">
+    update ts_fileinfo
+    <set>
+      <if test="localName != null">
+        local_name = #{localName,jdbcType=VARCHAR},
+      </if>
+      <if test="originalName != null">
+        original_name = #{originalName,jdbcType=VARCHAR},
+      </if>
+      <if test="fileType != null">
+        file_type = #{fileType,jdbcType=TINYINT},
+      </if>
+      <if test="fileSize != null">
+        file_size = #{fileSize,jdbcType=DOUBLE},
+      </if>
+      <if test="fileTime != null">
+        file_time = #{fileTime,jdbcType=VARCHAR},
+      </if>
+      <if test="fileSuffix != null">
+        file_suffix = #{fileSuffix,jdbcType=VARCHAR},
+      </if>
+      <if test="createtime != null">
+        createtime = #{createtime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where fileinfo_id = #{fileinfoId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.wy.model.Fileinfo">
+    update ts_fileinfo
+    set local_name = #{localName,jdbcType=VARCHAR},
+      original_name = #{originalName,jdbcType=VARCHAR},
+      file_type = #{fileType,jdbcType=TINYINT},
+      file_size = #{fileSize,jdbcType=DOUBLE},
+      file_time = #{fileTime,jdbcType=VARCHAR},
+      file_suffix = #{fileSuffix,jdbcType=VARCHAR},
+      createtime = #{createtime,jdbcType=TIMESTAMP}
+    where fileinfo_id = #{fileinfoId,jdbcType=INTEGER}
+  </update>
+  <insert id="inserts" parameterType="list">
+    insert into ts_fileinfo (fileinfo_id,local_name,original_name,file_type,file_size,file_time,file_suffix,createtime)  values <foreach collection="list" item="item" index="index" separator=",">(#{item.fileinfoId,jdbcType=INTEGER},#{item.localName,jdbcType=VARCHAR},#{item.originalName,jdbcType=VARCHAR},<choose><when test="item.fileType!= null">file_type = #{item.fileType,jdbcType=TINYINT},</when><otherwise>5,</otherwise></choose>#{item.fileSize,jdbcType=DOUBLE},#{item.fileTime,jdbcType=VARCHAR},#{item.fileSuffix,jdbcType=VARCHAR},<choose><when test="item.createtime!= null">createtime = #{item.createtime,jdbcType=TIMESTAMP}</when><otherwise>CURRENT_TIMESTAMP</otherwise></choose>)</foreach>
+  </insert>
+  <delete id="deleteByPrimaryKeys" parameterType="list">
+    delete from  ts_fileinfo where fileinfo_id in <foreach open="(" close=")" collection="list" item="fileinfoId" separator=",">#{fileinfoId,jdbcType=INT}</foreach>
+  </delete>
+  <delete id="deleteAll">
+    delete from  ts_fileinfo 
+  </delete>
+  <select id="selectEntitys" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List" /> from ts_fileinfo<where><if test = "fileinfoId != null "> and fileinfo_id = #{fileinfoId,jdbcType=INTEGER} </if><if test = "localName != null "> and local_name = #{localName,jdbcType=VARCHAR} </if><if test = "originalName != null "> and original_name = #{originalName,jdbcType=VARCHAR} </if><if test = "fileType != null "> and file_type = #{fileType,jdbcType=TINYINT} </if><if test = "fileSize != null "> and file_size = #{fileSize,jdbcType=DOUBLE} </if><if test = "fileTime != null "> and file_time = #{fileTime,jdbcType=VARCHAR} </if><if test = "fileSuffix != null "> and file_suffix = #{fileSuffix,jdbcType=VARCHAR} </if><if test = "createtime != null "> and createtime = #{createtime,jdbcType=TIMESTAMP} </if></where>
+  </select>
+  <select id="selectLists" resultType="map">
+    select <include refid="Base_Column_List" /> from ts_fileinfo<where><if test = "fileinfoId != null "> and fileinfo_id = #{fileinfoId,jdbcType=INTEGER} </if><if test = "localName != null "> and local_name = #{localName,jdbcType=VARCHAR} </if><if test = "originalName != null "> and original_name = #{originalName,jdbcType=VARCHAR} </if><if test = "fileType != null "> and file_type = #{fileType,jdbcType=TINYINT} </if><if test = "fileSize != null "> and file_size = #{fileSize,jdbcType=DOUBLE} </if><if test = "fileTime != null "> and file_time = #{fileTime,jdbcType=VARCHAR} </if><if test = "fileSuffix != null "> and file_suffix = #{fileSuffix,jdbcType=VARCHAR} </if><if test = "createtime != null "> and createtime = #{createtime,jdbcType=TIMESTAMP} </if></where>
+  </select>
+  <select id="countByEntity" resultType="java.lang.Long">
+    select count(*) from ts_fileinfo<where><if test = "fileinfoId != null ">and fileinfo_id = #{fileinfoId,jdbcType=INTEGER} </if><if test = "localName != null ">and local_name = #{localName,jdbcType=VARCHAR} </if><if test = "originalName != null ">and original_name = #{originalName,jdbcType=VARCHAR} </if><if test = "fileType != null ">and file_type = #{fileType,jdbcType=TINYINT} </if><if test = "fileSize != null ">and file_size = #{fileSize,jdbcType=DOUBLE} </if><if test = "fileTime != null ">and file_time = #{fileTime,jdbcType=VARCHAR} </if><if test = "fileSuffix != null ">and file_suffix = #{fileSuffix,jdbcType=VARCHAR} </if><if test = "createtime != null ">and createtime = #{createtime,jdbcType=TIMESTAMP} </if></where>
+  </select>
+  <select id="getMaxValue" resultType="java.lang.Long">
+    select <choose><when test="'fileinfoId' == _parameter.column">max(fileinfo_id)</when><when test="'fileType' == _parameter.column">max(file_type)</when><when test="'fileSize' == _parameter.column">max(file_size)</when><otherwise>max(0)</otherwise>  </choose>  from ts_fileinfo
+  </select>
+  <select id="getMaxTime" resultType="java.util.Date">
+    select <choose><when test="createtime == ${column}">max(createtime)</when><otherwise>1970-01-01 00:00:00</otherwise>  </choose>  from ts_fileinfo
+  </select>
+</mapper>
