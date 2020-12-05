@@ -3,19 +3,27 @@ package com.wy;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.ContextIdApplicationContextInitializer;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
- * 客户端配置自动刷新,需要使用cloud-bus和mq或kafka,仍然需要添加{@link RefreshScope}
+ * 客户端配置自动刷新,需要使用cloud-bus和mq或kafka,仍然需要添加{@link RefreshScope},看到42分钟,trace页面无法打开
  * 
  * @apiNote 添加依赖actuator,bus-amqp,安装rabbitmq,详见paradise-study-microservice/notes/MQ.md
  * 
- * @apiNote 仍然可以手动刷新,关闭actuator的拦截,发送post请求到客户端ip:port/actuator/bus-refresh
- *          自动刷新:需要在git配置的项目中添加webhooks,从项目的settings中进入->Webhooks->add webhook:
- *          payload url:添加客户端需要发送post请求的地址,如客户端ip:port/actuator/bus-refresh,<br>
+ * @apiNote 手动刷新,关闭actuator的拦截,发送post请求到客户端ip:port/actuator/bus-refresh.
+ *          若只想刷新某个client客户端,而不是全部都刷新,可以在url后添加destination=applictionname:port,
+ *          也可以使用通配符,如destination=applictionname:**.
+ *          但是该方法在集群中有bug,因为集群中的applicationname:port是相同的,这样并不会刷新.
+ *          其实destination是一个applicaitonid,详见{@link ContextIdApplicationContextInitializer#initialize},
+ *          在新的版本中可能destination会修改,需要去官方文档查看
+ * 
+ * @apiNote 自动刷新:需要在git配置的项目中添加webhooks,从项目的settings中进入->Webhooks->add webhook:
+ *          payload url:添加客户端需要发送post请求的地址,如客户端ip:port/actuator/bus-refresh,
+ *          只需要添加一个客户端地址即可,因为使用了amqp,其他client客户端会自动从amqp中后去信息.
  *          content-type:发送post请求的类型<br>
  *          secret:若访问有密码,可添加密码,没有密码可不填<br>
  *          选择发送的信息:可根据情况选择,只发送push事件,所有事件,自定义不发送事件,最后点击添加即可

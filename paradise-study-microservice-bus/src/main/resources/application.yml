@@ -5,16 +5,16 @@ server:
       charset: UTF-8
       
 management:
-  endpoint:
-    health:
-      enabled: true
-    mappings:
-      enabled: true
   endpoints: 
     web:
       exposure:
         include: "*"
-        
+
 spring:
   rabbitmq:
     host: 192.168.0.150
+  cloud:
+    bus:
+      trace: 
+        # 打开bus追踪,在页面上可以ip:port/trace访问
+        enabled: true
