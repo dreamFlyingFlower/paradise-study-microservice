@@ -39,5 +39,6 @@
 		<module>paradise-study-microservice-config</module>
 		<module>paradise-study-microservice-server</module>
 		<module>paradise-study-microservice-config-client</module>
+		<module>paradise-study-microservice-bus</module>
 	</modules>
 </project>
