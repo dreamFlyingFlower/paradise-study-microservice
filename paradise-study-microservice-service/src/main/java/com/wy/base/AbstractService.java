@@ -196,13 +196,13 @@ public abstract class AbstractService<T> implements BaseService<T> {
 
 	@Override
 	@Transactional
-	public int delete(String id) {
+	public int delete(Integer id) {
 		return baseMapper.deleteByPrimaryKey(id);
 	}
 
 	@Override
 	@Transactional
-	public int deletes(List<String> ids) {
+	public int deletes(List<Integer> ids) {
 		return baseMapper.deleteByPrimaryKeys(ids);
 	}
 
@@ -232,7 +232,7 @@ public abstract class AbstractService<T> implements BaseService<T> {
 	}
 
 	@Override
-	public Object getById(String id) {
+	public Object getById(Integer id) {
 		return baseMapper.selectByPrimaryKey(id);
 	}
 
@@ -244,7 +244,7 @@ public abstract class AbstractService<T> implements BaseService<T> {
 	 * @return 树形结果集
 	 */
 	@Override
-	public List<T> getTree(String id, Boolean self, Map<String, Object> params) {
+	public List<T> getTree(Integer id, Boolean self, Map<String, Object> params) {
 		List<T> trees = getLeaf(id, self == null ? false : self.booleanValue(), params);
 		getLeaf(trees, params);
 		return trees;
@@ -262,7 +262,7 @@ public abstract class AbstractService<T> implements BaseService<T> {
 	 * @return 树形结果集
 	 */
 	@Override
-	public List<T> getLeaf(String id, boolean self, Map<String, Object> params) {
+	public List<T> getLeaf(Integer id, boolean self, Map<String, Object> params) {
 		return null;
 	}
 

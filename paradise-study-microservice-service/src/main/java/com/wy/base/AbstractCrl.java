@@ -53,14 +53,14 @@ public abstract class AbstractCrl<T> extends QueryCrl<T> {
 
 	@ApiOperation("根据主键删除表中单条数据,主键类型是数字类型")
 	@GetMapping("remove/{id}")
-	public Result<?> remove(@PathVariable String id) {
+	public Result<?> remove(@PathVariable Integer id) {
 		int row = abstractService.delete(id);
 		return row > 0 ? Result.ok(row) : Result.error("删除失败");
 	}
 
 	@ApiOperation("根据主键批量删除表中数据,主键类型是数字类型")
 	@PostMapping("removes")
-	public Result<?> removes(@RequestBody List<String> ids) {
+	public Result<?> removes(@RequestBody List<Integer> ids) {
 		if (ListUtils.isBlank(ids)) {
 			return Result.error("集合数据为空");
 		}

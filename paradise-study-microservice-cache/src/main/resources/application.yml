@@ -1,0 +1,16 @@
+server:
+  port: 55558
+  
+spring:
+  application:
+    name: paradise-study-microservice-cache
+  devtools:
+    restart:
+      enabled: true
+  profiles:
+    active:
+    - dev
+  mvc:
+    format: 
+      date-time: yyyy-MM-dd HH:mm:ss
+      date: yyyy-MM-dd

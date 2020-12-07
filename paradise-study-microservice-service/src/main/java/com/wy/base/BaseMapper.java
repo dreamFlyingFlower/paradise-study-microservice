@@ -44,7 +44,7 @@ public interface BaseMapper<T> {
 	 * @param id 主键id
 	 * @return 影响行数
 	 */
-	int deleteByPrimaryKey(String id);
+	int deleteByPrimaryKey(Integer id);
 
 	/**
 	 * 根据id批量删除数据,自定义方法,每个xml中必须手动添加
@@ -52,7 +52,7 @@ public interface BaseMapper<T> {
 	 * @param ids 主键集合
 	 * @return 影响行数
 	 */
-	int deleteByPrimaryKeys(List<String> list);
+	int deleteByPrimaryKeys(List<Integer> list);
 
 	/**
 	 * 删除表中所有数据
@@ -83,7 +83,7 @@ public interface BaseMapper<T> {
 	 * @param id 主键id
 	 * @return 详情
 	 */
-	T selectByPrimaryKey(String id);
+	T selectByPrimaryKey(Integer id);
 
 	/**
 	 * 根据实体中的非null参数进行分页或不分页查询,条件只能是相等

@@ -1,9 +1,9 @@
 server:
-  port: 12301
+  port: 55559
 
 spring:
   application:
-    name: paradise-study-java-service
+    name: paradise-study-microservice-service
   profiles:
     active:
     - dev

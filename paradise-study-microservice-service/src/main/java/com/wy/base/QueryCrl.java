@@ -51,7 +51,7 @@ public abstract class QueryCrl<T> {
 	 */
 	@ApiOperation("根据主键获得数据详情,主键类型是数字类型")
 	@GetMapping("getById/{id}")
-	public Result<?> getById(@ApiParam("数字主键编号") @PathVariable String id) {
+	public Result<?> getById(@ApiParam("数字主键编号") @PathVariable Integer id) {
 		return Result.ok(abstractService.getById(id));
 	}
 
@@ -65,7 +65,7 @@ public abstract class QueryCrl<T> {
 	 */
 	@ApiOperation("查询单表中的树形接口数据")
 	@GetMapping("getTree/{id}")
-	public Result<?> getTree(@ApiParam("该API实体类参数") @PathVariable String id,
+	public Result<?> getTree(@ApiParam("该API实体类参数") @PathVariable Integer id,
 			@ApiParam("是否查询本级数据,true获取,false直接获取下级,默认false") @RequestParam(required = false) Boolean self,
 			@ApiParam("其他基本类型参数") @RequestParam(required = false) Map<String, Object> params) {
 		return Result.ok(abstractService.getTree(id, self, params));

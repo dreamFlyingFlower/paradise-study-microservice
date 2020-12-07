@@ -10,20 +10,20 @@ spring:
     url: jdbc:mysql://localhost:3306/simpleoa?autoReconnect=true&useUnicode=true&serverTimezone=GMT
     username: root
     password: 52LDforever
-    driverClassName: com.mysql.cj.jdbc.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
     type: com.alibaba.druid.pool.DruidDataSource
     druid:
       min-idle: 5 
       initial-size: 8
       timeBetweenEvictionRunsMillis: 60000
       minEvictableIdleTimeMillis: 300000
-      validationQuery: select 'x'
+      validationQuery: select  1 from dual
       test-while-idle: true
       testOnBorrow: false
       testOnReturn: false
       poolPreparedStatements: true
       # 配置监控统计拦截的filters,去掉后监控界面sql无法统计,wall用于防火墙
-      filters: stat,wall,log4j
+      filters: stat,wall,slf4j
     
 logging:
   level: 

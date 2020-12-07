@@ -22,7 +22,7 @@ public class Tree<T> extends AbstractModel {
 	/**
 	 * 树形结构唯一标识符
 	 */
-	private String treeId;
+	private Integer treeId;
 
 	/**
 	 * 树形结构需要展示的名称

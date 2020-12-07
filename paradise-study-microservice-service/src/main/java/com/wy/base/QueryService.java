@@ -30,7 +30,7 @@ public interface QueryService<T> {
 	 * @param id 主键编号
 	 * @return 单实体类结果集
 	 */
-	Object getById(String id);
+	Object getById(Integer id);
 
 	/**
 	 * 根据上级编号递归获得表中树形结构数据
@@ -40,7 +40,7 @@ public interface QueryService<T> {
 	 * @param params 其他基本类型参数
 	 * @return 树形结果集
 	 */
-	List<T> getTree(String id, Boolean self, Map<String, Object> params);
+	List<T> getTree(Integer id, Boolean self, Map<String, Object> params);
 
 	/**
 	 * 该方法根据上级编号查询本级数据或下级数据
@@ -50,7 +50,7 @@ public interface QueryService<T> {
 	 * @param params 其他基本类型参数
 	 * @return 多行结果集
 	 */
-	List<T> getLeaf(String id, boolean parent, Map<String, Object> params);
+	List<T> getLeaf(Integer id, boolean parent, Map<String, Object> params);
 
 	/**
 	 * 分页/不分页查询实体类中数据,实体类中非null以及非""字段值才可作为查询条件,条件只能是等于

@@ -40,7 +40,7 @@ public interface BaseService<T> extends QueryService<T> {
 	 * @param id 主键编号
 	 * @return 影响条数
 	 */
-	int delete(String id);
+	int delete(Integer id);
 
 	/**
 	 * 根据表中主键删除批量数据
@@ -48,7 +48,7 @@ public interface BaseService<T> extends QueryService<T> {
 	 * @param ids 主键编号列表
 	 * @return 影响条数
 	 */
-	int deletes(List<String> ids);
+	int deletes(List<Integer> ids);
 
 	/**
 	 * 删除表中所有数据

@@ -1,0 +1,67 @@
+server:
+  port: 5580
+spring:
+  application:
+    name: cloudMQ
+  rabbitmq: 
+    host: 192.168.1.146
+    port: 5672
+    username: admin
+    password: admin
+    connection-timeout: 0
+    listener:
+      simple:
+        # Ack是否手动确认,manual手动,none不确认,auto自动,默认自动
+        # 若在开启手动确认消息,则必须在消费者中手动确认消息,否则生产者会不停的发消息
+#        acknowledge-mode: manual
+        retry:
+          # 是否开启重试机制,默认不开启
+          enabled: true
+          # 最大重试次数,默认3次
+          max-attempts: 5
+      direct:
+        retry:
+          enabled: true
+          max-attempts: 5
+  activemq:
+    broker-url: tcp://192.168.1.146:61616
+    user: admin
+    password: admin
+    # 最大连接池数
+    pool:
+      max-connections: 10
+  jms: 
+    # 默认目的地
+    template:
+      default-destination: global_destination
+    listener:
+      # 消费者监听消息确认机制
+      acknowledge-mode: auto
+      # 自动启动
+      auto-startup: true
+    # 配置session的缓存大小为3
+    cache:
+      session-cache-size: 3
+  cloud:
+    stream:
+      bindings:
+        msgClient: 
+          group: test
+      
+#在程序需要直接从配置文件取,不可用定义自动配置类的方式配置
+mq: 
+  direct: 
+    queue: queue_info
+    exchange: exchange_info
+    routing:
+      key: routing_key_info
+  top: 
+    queue: 
+      info: queue_top_info
+      error: queue_top_error
+      logs: queue_top_logs
+    exchange: exchange_top
+  fanout:
+    queue: queue_fanout_info
+    exchange: exchange_fanout
+    
