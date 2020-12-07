@@ -42,5 +42,6 @@
 		<module>paradise-study-microservice-bus</module>
 		<module>paradise-study-microservice-feign</module>
 		<module>paradise-study-microservice-service</module>
+		<module>paradise-study-microservice-cache</module>
 	</modules>
 </project>
