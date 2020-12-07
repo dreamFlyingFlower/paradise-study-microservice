@@ -1,0 +1,16 @@
+# amqp队列名称
+mq: 
+  direct: 
+    queue: queue_info
+    exchange: exchange_info
+    routing:
+      key: routing_key_info
+  top: 
+    queue: 
+      info: queue_top_info
+      error: queue_top_error
+      logs: queue_top_logs
+    exchange: exchange_top
+  fanout:
+    queue: queue_fanout_info
+    exchange: exchange_fanout
