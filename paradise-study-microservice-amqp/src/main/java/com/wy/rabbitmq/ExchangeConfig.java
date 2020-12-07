@@ -6,19 +6,22 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * @apiNote 声明一个交换机的bean
+ * 声明一个全局的默认交换器
+ * 
  * @author ParadiseWY
- * @date 2020年2月17日 下午4:10:59
+ * @date 2020-02-17 16:10:59
+ * @git {@link https://github.com/mygodness100}
  */
 @Configuration
 public class ExchangeConfig {
 
 	/**
-	 * durable:rabbitmq重启之后队列不消失,即持久化
-	 * @return 一个交换机
+	 * durable:rabbitmq重启之后队列不消失,即是否持久化,默认持久化
+	 * 
+	 * @return 一个交换器
 	 */
 	@Bean
 	public Exchange exchange() {
-		return ExchangeBuilder.topicExchange("exchange-test").durable(true).build();
+		return ExchangeBuilder.topicExchange("exchange-default").durable(true).build();
 	}
 }

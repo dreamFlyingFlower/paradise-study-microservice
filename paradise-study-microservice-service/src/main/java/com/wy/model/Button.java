@@ -18,15 +18,14 @@ import lombok.ToString;
 @AllArgsConstructor
 @Builder
 public class Button extends AbstractModel {
+    private static final long serialVersionUID = 1L;
 
-	private static final long serialVersionUID = 1L;
+    @ApiModelProperty("按钮编号")
+    private Integer buttonId;
 
-	@ApiModelProperty("按钮编号")
-	private Integer buttonId;
+    @ApiModelProperty("按钮名称")
+    private String buttonName;
 
-	@ApiModelProperty("按钮名称")
-	private String buttonName;
-
-	@ApiModelProperty("菜单编号")
-	private Integer menuId;
+    @ApiModelProperty("菜单编号")
+    private Integer menuId;
 }

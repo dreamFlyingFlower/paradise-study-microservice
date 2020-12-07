@@ -1,12 +1,18 @@
 spring: 
   profiles:
     active: prod
-eureka: 
-  instance:
-    hostname: localhost
-    lease-renewal-interval-in-seconds: 30
-    instance-id: ${spring.application.name}:${server.port}
-    prefer-ip-address: true
-  client: 
-    service-url:
-      defaultZone: http://localhost:55555/eureka,http://localhost:55550/eureka
+  
+# 暴露所有的spring的监控信息,页面上访问路径ip:port/actuator
+management:
+  endpoints: 
+    web:
+      exposure:
+        # *表示暴露info,health所有端点
+        include: "*"
+  endpoint:
+    health:
+      # 默认是never
+      show-details: always
+info:
+  test: test
+  version: 0.0.1

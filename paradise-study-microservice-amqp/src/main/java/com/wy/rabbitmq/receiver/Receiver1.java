@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
  * @apiNote exchange注解:value交换器的名称,type交换器的类型,autoDelete当所有绑定队列都不使用时,是否删除队列
  *              若是需要实现数据持久化,则autoDelete需要设置为false
  * @author ParadiseWY
- * @date 2019年4月16日 下午1:40:22
+ * @date 2019-04-16 13:40:22
  * @git {@link https://github.com/mygodness100}
  */
 @RabbitListener(

@@ -14,11 +14,13 @@ import org.springframework.stereotype.Component;
 import com.rabbitmq.client.Channel;
 
 /**
- * @apiNote 广播模式,不需要路由key,只需要交换器相同即可,每个队列中的消费者实例都会消费一次消息,多个队列多次消费
- *          ACK手动确认消息被消费,若是开启了全局手动确认,即在配置文件中配置,则必须每条消息都手动确认ACK返回true,
- *          否则生产者会不停发送消息
+ * fanout:广播模式,不需要routingkey,只需要交换器相同即可,每个队列中的消费者实例都会消费一次消息,多个队列多次消费
+ * 
+ * 若开启了全局手动确认ACK,即在配置文件中配置,则必须每条消息都手动确认ACK返回true, 否则生产者会不停发送消息
+ * 
  * @author ParadiseWY
- * @date 2019年4月16日 下午5:07:26
+ * @date 2019-04-16 17:07:26
+ * @git {@link https://github.com/mygodness100}
  */
 @RabbitListener(bindings = @QueueBinding(value = @Queue(value = "${mq.fanout.queue}", autoDelete = "true"),
 		exchange = @Exchange(value = "${mq.fanout.exchange}", type = ExchangeTypes.FANOUT)))

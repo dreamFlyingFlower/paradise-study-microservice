@@ -31,7 +31,7 @@ import org.springframework.jms.annotation.EnableJms;
  * topic:主题模式,根据路由键的匹配规则接收消息,类似于正则,其中#表示0个及以上字符,*表示单个字符<br
  * headers:匹配AMQP消息的header而不是路由键,和direct交换器一样,但是性能差,几乎不用
  * 
- * AmqpAdmin:Amqp管理组件
+ * AmqpAdmin:RabbitMQ系统管理组件,负责exchange,queue,binding的增删改查
  * 
  * @author ParadiseWY
  * @date 2020-12-07 16:56:43
