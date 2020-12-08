@@ -33,6 +33,8 @@ import org.springframework.jms.annotation.EnableJms;
  * 
  * AmqpAdmin:RabbitMQ系统管理组件,负责exchange,queue,binding的增删改查
  * 
+ * Kafka:需要配置zk集群的地址
+ * 
  * @author ParadiseWY
  * @date 2020-12-07 16:56:43
  * @git {@link https://github.com/mygodness100}

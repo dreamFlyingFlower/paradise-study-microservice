@@ -10,6 +10,8 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
+import zipkin.server.internal.EnableZipkinServer;
+
 /**
  * 通用信息
  * 
@@ -31,17 +33,21 @@ import org.springframework.scheduling.annotation.Scheduled;
  * 自定义一个健康状态检测器:<br>
  * 需要实现{@link HealthIndicator}接口,指示器的名称只能是xxxHealthIndicator,并将指示器加入到Spring上下文中
  * 
- * @apiNote sharding数据库分库分表技术:https://blog.csdn.net/shijiemozujiejie/article/details/80786231
+ * sharding数据库分库分表技术:https://blog.csdn.net/shijiemozujiejie/article/details/80786231
+ * 
+ * sleuth:链路追踪,主要用来测试系统中各部分的性能以及改善系统
+ * 
+ * zipkin:是slenth的web端,可在网页查看sleuth的链路,需要配置sleuth的服务器,需开启@EnableZipkinServer注解
  *
  * @author ParadiseWY
  * @date 2020-12-05 23:58:47
  * @git {@link https://github.com/mygodness100}
  */
 @SpringBootApplication
+@EnableZipkinServer
 public class Application {
 
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
 	}
-
 }

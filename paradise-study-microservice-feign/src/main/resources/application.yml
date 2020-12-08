@@ -1,0 +1,42 @@
+server: 
+  port: 55561
+
+spring:
+  application:
+    name: cloud-feigin
+    
+turbine:
+  aggregator:
+    # 访问页面的应用名,默认default可直接访问ip:port/turbine.stream
+    cluster-config: default
+  # 需要进行监控的应用名
+  app-config: cloud-server,cloud-client1
+  # 在hystrix.dashboard中访问的时候的后缀名
+  cluster-name-expression: "'default'"
+    
+eureka: 
+  instance:
+    hostname: localhost
+  client: 
+    service-url:
+      defaultZone: http://localhost:5500/eureka,http://localhost:5501/eureka
+
+# actuator的info信息,必须是配置文件中以info开头的自定义信息
+management: 
+  endpoints:
+    web: 
+      exposure: 
+        #*表示暴露info,health所有端点
+        include: "*"
+  endpoint:
+    health: 
+      #默认是never
+      show-details: always
+
+#feign连接超时设置      
+feign: 
+  client:
+    config: 
+      default: 
+        connect-timeout: 5000
+        read-timeout: 5000
