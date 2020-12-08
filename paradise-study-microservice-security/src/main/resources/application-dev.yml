@@ -1,0 +1,41 @@
+user:
+  security: 
+    permit-sources: /images/**,/user/save,/user/hasSame,/user/getCode/**,/html/**,/plugins/**,/actuator/**,/oauth/authorize**
+    code: 
+      image:
+        width: 100
+  verify: 
+    enabled: true
+  social:
+    qq:
+      app-id: test
+    
+server:
+  servlet:
+    session:
+      # session超时时间,单位为妙,但是默认程序的最小超时时间是1min
+      timeout: 
+        600
+    
+security:
+  oauth2: 
+    client:
+      client-id: test
+      client-secret: test
+      registered-redirect-uri: 
+      - http://example.com
+      
+management: 
+  endpoints: 
+    web:
+      exposure: 
+        include: "*"
+        
+logging:
+  level:
+    org.springframework.boot.actuate: trace
+    org.springframework.security.oauth2: trace
+    
+spring:
+  main:
+    allow-bean-definition-overriding: false

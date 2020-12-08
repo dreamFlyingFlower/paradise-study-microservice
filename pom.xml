@@ -44,5 +44,6 @@
 		<module>paradise-study-microservice-service</module>
 		<module>paradise-study-microservice-cache</module>
 		<module>paradise-study-microservice-amqp</module>
+		<module>paradise-study-microservice-security</module>
 	</modules>
 </project>
