@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.web.access.ExceptionTranslationFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
@@ -27,8 +28,11 @@ import com.wy.verify.VerifyFilter;
  * 重写security的configure方法,见官网
  * {@link https://docs.spring.io/spring-security/site/docs/current/guides/html5//helloworld-boot.html#creating-your-spring-security-configuration}
  * 
- * @apiNote ExceptionTranslationFilter:认证异常处理类
- * @author paradiseWy
+ * {@link ExceptionTranslationFilter}:认证异常处理类
+ * 
+ * @author ParadiseWY
+ * @date 2020-12-08 10:23:47
+ * @git {@link https://github.com/mygodness100}
  */
 @Configuration
 @EnableWebSecurity
@@ -83,11 +87,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	/**
 	 * 解决异常找不到authenticationManager,不能在初始化其他spring组件的时候调用security,否则找不到authenticationManager会报错
 	 */
-//	@Bean(name = BeanIds.AUTHENTICATION_MANAGER)
-//	@Override
-//	public AuthenticationManager authenticationManagerBean() throws Exception {
-//		return super.authenticationManagerBean();
-//	}
+	// @Bean(name = BeanIds.AUTHENTICATION_MANAGER)
+	// @Override
+	// public AuthenticationManager authenticationManagerBean() throws Exception {
+	// return super.authenticationManagerBean();
+	// }
 
 	/**
 	 * 使用数据库中的数据来判断登录是否成功,在登录请求时会自动拦截请求,并进入验证
@@ -107,14 +111,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	 *              fullAuthenticated:当前用户既不是anonymous也不是rememberme时通过 hasRole:用户拥有指定的权限时才通过
 	 *              hasAnyRole:拥有指定的任意一种权限时就可以通过 hasAnyAuthority:用户有任意一个指定的权限时才通过
 	 *              hasIpAddress:请求发送的ip匹配时才通过 anyrequest.authenticated:所有的请求登录后才可访问
-	 *              formlogin:表示允许表单登录,httpbasic:表示允许http请求登录 loginPage:拦截未登录的请求到指定页面,只能是内置的页面,默认/login
+	 *              formlogin:表示允许表单登录,httpbasic:表示允许http请求登录
+	 *              loginPage:拦截未登录的请求到指定页面,只能是内置的页面,默认/login
 	 *              loginProcessingUrl:自定义的登录请求url,程序会从该url中读取登录参数,注意开头必须有/,默认是/login
 	 *              usernameParameter:自定义用户名的请求字段,默认username.可写在配置文件中
 	 *              passwordParameter:自定义密码的请求字段,默认password,可写在配置文件中
 	 *              successHandler:登录成功后的处理方法,要实现AuthenticationFailureHandler或重写其子类
 	 *              failureHandler:登录失败后的处理方法,要实现AuthenticationSuccessHandler或重写其子类
 	 *              exceptionHandling:异常处理 authenticationEntryPoint:开始一个验证的时候,验证失败的时候不跳到默认的登录界面
-	 *              AuthLoginConfig:自定义的未登录拦截类,不跳转到默认的未登录页面,而是自定义返回json csrf.disabled:禁用csrf防御机制,即可跨域请求
+	 *              AuthLoginConfig:自定义的未登录拦截类,不跳转到默认的未登录页面,而是自定义返回json
+	 *              csrf.disabled:禁用csrf防御机制,即可跨域请求
 	 */
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
