@@ -1,3 +1,17 @@
 logging: 
   level: 
     com.wy.mapper: debug
+spring:
+  cache:
+    # 指定缓存类型
+    type: redis
+    redis:
+      # 是否使用缓存前缀,默认使用
+      use-key-prefix: true
+      # 缓存前缀,最好不指定,不指定时默认是缓存的命名空间为前缀
+#      key-prefix: redis_cache_
+      # 是否缓存null,默认是,解决缓存穿透
+      cache-null-values: true
+      # 统一设置缓存过期时间
+      time-to-live:
+        seconds: 600

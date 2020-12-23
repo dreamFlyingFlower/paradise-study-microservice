@@ -52,6 +52,19 @@ import org.springframework.cache.interceptor.KeyGenerator;
  *          beforeInvocation():是否在方法执行完之前清除缓存,默认false,之后清除
  * 
  * @apiNote {@link Caching}:该注解在复杂情况下使用,是上述3个注解的集合,可配置多种情况下的缓存操作
+ * 
+ * @apiNote spring-cache的不足:<br>
+ *          读模式:<br>
+ *          缓存穿透:在配置文件配置可以存储null数据,解决缓存穿透<br>
+ *          缓存击穿:大量并发同时查询正好过期的数据,配置sync=true减少缓存击穿,分布式下不能完全解决<br>
+ *          缓存雪崩:大量的key同时过期,加上随机的过期时间即可,最好是自定义缓存配置<br>
+ *          写模式,缓存数据一致性,spring没有加任何锁:<br>
+ *          读写加锁<br>
+ *          引入Canal,感知到MySQL的更新去更新数据库<br>
+ *          读多写多,直接去数据库查询即可<br>
+ * 
+ *          常规数据(读多写少,即时性,一致性要求不高的数据),完全可以使用spring-cache,写模式下只要缓存有过期时间即可<br>
+ *          特殊数据需要特殊设计
  *
  * @author ParadiseWY
  * @date 2020-12-05 22:55:02
