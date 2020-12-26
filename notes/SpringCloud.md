@@ -1,74 +1,101 @@
 # Springcloud
 -------
-# 一.项目结构
+# 项目结构
 
-## 1.1 CloudServer-5500
+
+
+## paradise-microservice-server
 
 	服务端,注册服务,监听注册了服务的程序是否存活,同时也可以注册在别的server上,利用eureke或zookeeper进行注册.在整个模块中,各个模块都是以项目的名字来做标识的,即spring.applicaton.name的值,他们只是ip和端口不同,这样可以更好的进行分布式部署,只需要name相同,可很简单的实现内部负载均衡
 
-## 1.2CloudConfig-5600
+
+
+## paradise-microservice-config
+
 	分布式配置管理,可以将自定义配置放在github或者gitlab上,自动刷新配置
 	config:config的服务端配置
 
-## 1.3 CloudClient1-5510
-	各种业务程序,其他组件的演示
+
+
+## paradise-microservice-client
+
+	微服务组件,同CloudClient1
+	config:客户端的使用,server端在cloudconfig组件中示例
 	mybatis
 	activiti:流程,和jbpm一样
 	webservice
 	redis
 
-## 1.4 CloudClient-5511
-	微服务组件,同CloudClient1
-	config:客户端的使用,server端在cloudconfig组件中示例
-	nutz:使用CloudServer2的控制层代码
 
-## 1.5 CloudService2
+
+## paradise-microservice-service
+
 	业务代码分拆,将service层拆分出去,可供其他组件使用
-	nutz:nutz的service层
 
-## 1.6 CloudFeign-5520
+
+
+## paradise-microservice-feign
+
 	ribbon:负载均衡,api被调用的几率可根据需要自由配置
 	Feign负载均衡,保证某个微服务挂掉,仍然维持服务的正常运行.Feign集成了ribbon以及hystrix
 	Hystrix则保证其中一个微服务挂掉时,大量请求不会因为该服务挂掉而不停的消耗资源,以至于拖跨整个服务
 	actuator
 
-## 1.7 CloudGateway-5530
+
+
+## paradise-microservice-gateway
+
 	路由配置,url统一转发,拦截等.有2中方式:gateway是spring亲儿子,zuul是springcloud2.0版本以前使用的
 	spring-gateway
 	zuul
 
-## 1.8 CloudZipkin-5540
+
+
+## paradise-microservice-zipkin
+
 	链路追踪,用来分析接口在每个调用阶段所用的时间以及调用情况,更好的改造程序
 	spring-sleuth
 
-## 1.9 CloudKafka
-	kafka的消息队列管理,跟ActiveMQ,RabbitMQ是一样的功能,只是在实现上有所不同.
-* 使用kafka必须先配置[zookeeper](https://www.cnblogs.com/shanyou/p/3221990.html)
-
-## 1.10 CloudSecuriy-5550
+## 
+## paradise-microservice-security
 	spring自带的安全组件,利用session来验证用户是否登录,以及角色权限等
 	security
 	social:第三方登录
 	oauth2:登录协议
 
-## 1.11 CloudWsdl-5570
+
+
+## paradise-microservice-wsdl
+
 	各种调用别人的接口以及调用webservice接口,自己写的服务端因为需要连接数据库,放在CloudClient1中
 
-## 1.12 CloudMQ-5580
+
+
+## paradise-microservice-amqp
+
 	rabbitmq消息队列,高并发限流,请求处理,类似kafuka,可分布式部署
 	rabbitmq
 	activemq
 	stream
+	kafka的消息队列管理,跟ActiveMQ,RabbitMQ是一样的功能,只是在实现上有所不同.
 
-## 1.13 CloudSearch-5590
+* 使用kafka必须先配置[zookeeper](https://www.cnblogs.com/shanyou/p/3221990.html)
+
+
+
+## paradise-microservice-search
+
 	Solr以及Elasticsearch搜索功能,Solr是传统企业级搜索,Elasticsearch是实时搜索
 
-## 1.14 CloudOAuthServer-5610
+
+
+## paradise-microservice-oauth
+
 	OAuth2
 
 
 
-# 二.分布式的优缺点
+# 分布式
 
 1. 测试容易
 2. 可伸缩性强,可靠性强
@@ -82,7 +109,7 @@
 
 
 
-# 三.微服务设计原则
+# 微服务设计原则
 
 1. 尽量不要A服务中的sql连接查询到B服务中的表等情况,这样在A服务与B服务进行垂直拆库时会报错
 2. 服务子系统间避免出席那环状的依赖调用
@@ -95,15 +122,16 @@
 
 
 
-# 四.分布式事务
+# 分布式事务
 
 1. TCC:分布式事务框架,比较复杂
 2. 消息队列,利用ACK机制和定时任务机制
 3. 可靠事务的补偿机制
+4. 阿里的seata
 
 
 
-# 五.各种监控以及文档
+# 各种监控
 
 * server:当开启了server服务端的时候,可在网页上打开ip:port直接查看相关信息
 * actuator:需添加spring-boot-starter-actuator包,在浏览器上查看的方式是ip:port/actuator,需要相关配置
@@ -121,27 +149,27 @@
 
 
 
-# 六.学习
+# 学习
 
-## 6.1 sharding
+## Sharding
 
 数据库分库分表解决方案,见CloudClient2或SimpleOA项目
 
 
 
-## 6.2 javaagent
+## Javaagent
 
 直接对底层字节码文件修改,在类加载时动态拦截并重新修改class字节码,插入监听指令
 
 
 
-## 6.3 javassist
+## Javassist
 
 直接对底层字节码文件修改,在类加载时动态拦截并重新修改class字节码,插入监听指令
 
 
 
-## 6.4 swagger2
+## Swagger2
 
 在线文档生成,访问地址为ip:port/swagger-ui.html#/
 
@@ -176,15 +204,15 @@
 
 
 
-## 6.5 Jenkins
+## Jenkins
 
 持续继承,自动化部署,需要先安装git,maven
 
-# 七.其他技巧
+# 其他技巧
 
 
 
-## 7.1 更换maven镜像
+## 更换maven镜像
 
 ```java
 <mirror>
@@ -197,7 +225,7 @@
 
 
 
-## 7.2 Spring样例下载
+## Spring样例下载
 
 1. spring需要先在官网上下载依赖以及相关的配置,如果已经有过相同的代码,则不需要再下载[样例下载地址](https://start.spring.io/)
 2. 在下载样例的网页上,选择依赖的时候,可以点击下方的switch to the full version来查看spring关联的主流依赖,也可直接搜索
@@ -206,9 +234,9 @@
 
 
 
-## 7.3 springboot
+## Springboot
 
-### 7.3.1 目录结构
+### 目录结构
 
 1. src/mian/java:主要的代码书写资源文件夹,源码目录
 2. src/main/resouces:资源配置文件存放目录
@@ -219,17 +247,7 @@
 
 
 
-### 7.3.2 配置文件
-
-1. 若需要详细查看配置文件有那些固定属性,可查看[文档](https://docs.spring.io/spring-boot/docs/2.0.4.BUILD-SNAPSHOT/reference/htmlsingle)
-2. springboot的配置文件只能是application.properties或application.yml.可安装yml文件提示插件,点开eclipse的help->about eclipse查看eclipse的版本号
-3. 打开[eclipse的下载地址](https://spring.io/tools/sts/legacy),下载已经集成了sts的eclipse
-4. 也可以直接下载[sts的插件](https://spring.io/tools/sts/all),需要根据相应的版本来选择,否则插件会出错
-5. 在配置文件中,可以使用---表示一种情况,profiles表示配置多种启动环境
-
-
-
-### 7.3.3 配置文件加载
+### 配置文件加载
 
 1. 默认是加载application.yml,找不到application.yml会报错
 2. 若在resources目录下有bootstrap.yml,那么先加载bootstrap.yml
@@ -239,7 +257,7 @@
 
 
 
-### 7.3.4 jar运行
+### Jar运行
 
 1. 直接运行
 
@@ -252,17 +270,15 @@
 
    ```shell
    # 加上配置文件中的参数运行,需要以--开头,值则是配置文件的值
-   # 开发环境运行,dev为applicaiton-dev.yml
-   java -jar xxx.jar --spring.profiles.active=dev
-   # 生产环境,prod为application-prod.yml
+   # 生成环境运行,prod为applicaiton-prod.yml
    java -jar xxx.jar --spring.profiles.active=prod
-   # linux后台运行
-   nohup java -jar xxx.jar --spring.profiles.active=prod & 表示后台运行jar
+   # linux后台运行,&表示后台运行,nohup会在当前目录产生一个日志文件
+   nohup java -jar xxx.jar --spring.profiles.active=prod &
    ```
 
 
 
-## 7.4 导入本地jar包
+## 导入本地jar包
 
 ```java
 // 需要在控制台输入命令,先要配置环境变量
@@ -273,9 +289,29 @@ mvn install:install-file -DgroupId=com.wy -DartifactId=java-utils -Dversion=0.1 
 
 
 
-## 7.5 mysql时区错误
+## MySQL时区错误
 
-1. 直接在url连接的后面加上serverTimezone=GMT或加上serverTimezone=GMT%2B8(加8个时区)
-2. 修改mysql的配置文件my.ini,在mysqld结点加上default-time-zone='+08:00',之后重启mysql
-3. 进入mysql的控制台,直接sql语句set global time_zone='+8:00'
+* 在url后加上serverTimezone=GMT或serverTimezone=GMT%2B8(加8个时区)或serverTimezone=Asia/ShangHai
+* 修改mysql配置文件my.ini,在mysqld节点加上default-time-zone='+08:00',重启mysql
+* 进入mysql的控制台,直接sql语句set global time_zone='+8:00'
 
+
+
+## 接口幂等性
+
+* 用于对于同一操作发起的一次请求或多次请求的结果是相同的,不会因为多次点击而产生副作用,例如支付,银行业务等
+* token机制:服务端提供发送token的接口
+  * 分析哪些业务是存在幂等性的,这些业务就必须在执行之前,先去获取token,服务器会把token保存到缓存中
+  * 之后调用业务接口请求时,把token携带过去,一般放在请求头中
+  * 服务器判断token是否存在于缓存中,存在则表示第一次请求,然后删除token
+  * 如果token不存在,表示是重复操作,直接返回重复标记给客户端
+  * 若先删除token,可能会出现业务确实没有执行,重试还是之前的token,业务不能继续
+  * 后删除token可能存在服务异常,没有删除缓存中的token,仍然会请求2次业务
+  * 若对幂等性要求不高,可以先删除token,客户端业务调用失败,可以给提示,让客户端重新获取token,进行二次提交
+  * token的获取,比较,删除必须都是原子性才能完全保证幂等性.若缓存使用的redis,可以使用set方式设置值,删除时用lua脚本,详见redis官网的set方法,非setnx
+* 数据库悲观锁:select 1 from tablename where id=1 for update;这种查询方式会进行锁行,同时id字段必须是主键或索引字段,否则可能造成锁表
+* 数据库乐观锁:更新某个字段的状态值,更新成功表示执行正确的操作,更新失败表示已经执行
+* 业务层分布式锁:处理数据之前需要先判断数据是否被处理过
+* 数据库的各种唯一约束:如主键约束,但是必须保证在分布式下全局唯一
+* redis set防重:计算数据的MD5放入redis的set集合中,每次处理数据查看MD5是否存在
+* 全局请求唯一id:接口被调用时,生成一个唯一id,redis将数据保存到set中,存在即处理过
