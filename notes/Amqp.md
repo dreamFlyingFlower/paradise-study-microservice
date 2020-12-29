@@ -28,7 +28,6 @@
 
 * Amqp中消息的路由过程和JMS存在一些差别,Amqp中增加了Exchange和Binding
 * 生产者把消息发布到Exchange上,消息最终到达队列并被消费者消费,而Binding决定交互器的消息应该发送到那个队列
-* 
 
 
 
@@ -136,6 +135,24 @@
 
 
 
+## 集群
+
+### 普通集群
+
+* 多台服务器中,只有一台服务器上有queue的元数据和真实数据,元数据相当于配置文件.其他服务器只有元数据
+* 当消费数据时,若是请求到只有元数据的服务器,该服务器将和主服务器通讯请求数据,再将数据返回
+* 若主服务器挂了,那么该集群就不可用了,只能用做高并发的访问
+* 该模式适用于消息无需持久化的场景,如日志队列
+
+
+
+### 镜像集群
+
+* 每台服务器上都有queue的元数据以及真实数据
+* 该集群模式实现了高可用,但是并不是分布式的,因为每个服务器的数据都是一样的
+
+
+
 ## Docker中使用
 
 1. docker安装可网上搜索,因为国内安装erlang和rabbitmq太慢,直接在docker中安装更快
@@ -225,7 +242,7 @@ public class EmailReceiver {
 
 
 
-# 二.ActiveMQ
+# ActiveMQ
 
 	1.Destination:相比于RabbitMQ多了一个Destination,由JMS Provider(消息中间件)负责维护,用于管理Message.而Producer需要指定Destination才能发送消息,Consumer也需要指定Destination才能接收消息.
 	2.Producer:消息的生产者,发送message到目的地,应用接口为MessageProducer
@@ -244,6 +261,6 @@ public class EmailReceiver {
 
 
 
-# 三.springcloud stream
+# springcloud stream
 
 	主要是对rabbit和kafuka的简化使用,不必配置更多的配置来使用中间件
