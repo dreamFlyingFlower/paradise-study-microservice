@@ -24,9 +24,10 @@ import org.springframework.cache.interceptor.KeyGenerator;
  * 
  * {@link EnableCaching}:若需要使用缓存,需要开启该注解,将缓存纳入到spring上下文中
  * 
- * @apiNote{@link CacheConfig}:类上注解,指定类中通用属性.若方法上的属性和类上的属性重复,使用方法上的属性值
+ * {@link CacheConfig}:类上注解,指定类中通用属性.若方法上的属性和类上的属性重复,使用方法上的属性值
  * 
  * @apiNote {@link Cacheable}:该注解的value/cacheNames类似于命名空间,若不写,则默认为类的完整路径名+方法名
+ *          value():当缓存使用ehcache时,该值表示使用哪种缓存策略,是配置文件中的cache标签的name属性
  *          key():缓存key值,可用SpEl表达式,不可用#result作为key,会有异常冲突.默认是所有参数的实际值
  *          methodName:当前被调用的方法名,如#root.methodName,可直接为#methodName,root固定写法
  *          method:当前被调用的方法,和methodName类似,#root.method;<br>

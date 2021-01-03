@@ -1,0 +1,29 @@
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="http://ehcache.org/ehcache.xsd">
+	<!-- 磁盘存储路径,当内存缓存满了就可以写入磁盘.java.io.tmpdir是操作系统缓存目录,不同系统不同 -->
+	<diskStore path="java.io.tmpdir" />
+	<!--defaultCache:echcache的默认缓存策略 -->
+	<!-- maxElementsInMemory:内存缓存中最大缓存数量,若超过该值,根据overflowToDisk而定 -->
+	<!-- overflowToDisk:缓存是否保存到磁盘.true:将超出内存的缓存放入磁盘;false:根据memoryStoreEvictionPolicy策略删除 -->
+	<!-- maxElementsOnDisk:磁盘缓存中最多可以存放的元素数量,0表示无穷大 -->
+	<!-- overflowToDisk:内存不足时,是否启用磁盘缓存 -->
+	<!-- eternal:缓存中对象是否永久有效 -->
+	<!-- timeToIdleSeconds:缓存在失效前的允许闲置时间,单位秒,仅当eternal=false时使用 -->
+	<!-- 默认值0表示可闲置时间无穷大;若设置值,则超过该时间没有访问此Cache中的某个元素,那么此元素将被清除 -->
+	<!-- timeToLiveSeconds:缓存的总的存活时间,单位秒,仅当eternal=false时使用,从创建开始计时,失效结束 -->
+	<!-- diskPersistent:否缓存虚拟机重启期数据,默认false -->
+	<!-- diskSpoolBufferSizeMB:设置diskStore的缓存区大小,默认是30MB,每个Cache都应该有自己的一个缓冲区 -->
+	<!-- diskExpiryThreadIntervalSeconds:磁盘缓存的清理线程运行间隔,默认是120秒 -->
+	<!-- memoryStoreEvictionPolicy:内存释放策略,即达到maxElementsInMemory限制时,Ehcache的缓存清理策略 -->
+	<!-- 共有三种策略:默认LRU->最近最少使用,LFU->较少使用,FIFO->先进先出 -->
+	<!-- clearOnFlush:内存数量最大时是否清除 -->
+	<defaultCache maxElementsInMemory="10000" eternal="false" timeToIdleSeconds="120" timeToLiveSeconds="120"
+		maxElementsOnDisk="10000000" diskExpiryThreadIntervalSeconds="120" memoryStoreEvictionPolicy="LRU">
+		<persistence strategy="localTempSwap" />
+	</defaultCache>
+	<!-- 自定义缓存策略,可以有多个,同时存在默认配置和自定义配置,自定义配置优先使用 -->
+	<cache name="users" maxElementsInMemory="10000" eternal="false" timeToIdleSeconds="120" timeToLiveSeconds="120"
+		maxElementsOnDisk="10000000" diskExpiryThreadIntervalSeconds="120" memoryStoreEvictionPolicy="LRU">
+		<persistence strategy="localTempSwap" />
+	</cache>
+</ehcache>

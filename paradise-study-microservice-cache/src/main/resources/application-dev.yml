@@ -1,6 +1,6 @@
 logging: 
   level: 
-    com.wy.mapper: debug
+    com.wy.service: debug
 spring:
   cache:
     # 指定缓存类型
@@ -15,3 +15,5 @@ spring:
       # 统一设置缓存过期时间
       time-to-live:
         seconds: 600
+    ehcache:
+      config: classpath:ehcache.xml
