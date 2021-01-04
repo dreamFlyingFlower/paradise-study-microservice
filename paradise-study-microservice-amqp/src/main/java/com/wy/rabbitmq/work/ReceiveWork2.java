@@ -1,0 +1,48 @@
+package com.wy.rabbitmq.work;
+
+import java.io.IOException;
+
+import com.rabbitmq.client.AMQP;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.DefaultConsumer;
+import com.rabbitmq.client.Envelope;
+import com.wy.rabbitmq.util.ConnectionUtil;
+
+/**
+ * 工作模式消费者2
+ *
+ * @author 飞花梦影
+ * @date 2021-01-04 21:59:47
+ * @git {@link https://github.com/mygodness100}
+ */
+public class ReceiveWork2 {
+
+	private final static String QUEUE_NAME = "test_work_queue";
+
+	public static void main(String[] argv) throws Exception {
+		// 获取到连接
+		Connection connection = ConnectionUtil.getConnection();
+		// 获取通道
+		final Channel channel = connection.createChannel();
+		// 声明队列
+		channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+		// 设置每个消费者同时只能处理一条消息
+		channel.basicQos(1);
+		// 定义队列的消费者
+		DefaultConsumer consumer = new DefaultConsumer(channel) {
+
+			@Override
+			public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties,
+					byte[] body) throws IOException {
+				// body 即消息体
+				String msg = new String(body);
+				System.out.println(" [消费者2] received:" + msg + "!");
+				// 手动ACK
+				channel.basicAck(envelope.getDeliveryTag(), false);
+			}
+		};
+		// 监听队列
+		channel.basicConsume(QUEUE_NAME, false, consumer);
+	}
+}

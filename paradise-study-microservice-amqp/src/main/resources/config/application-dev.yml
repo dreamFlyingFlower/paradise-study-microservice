@@ -7,6 +7,9 @@ spring:
     username: guest
     password: guest
     connection-timeout: 0
+    template:
+      # 默认的交换机名称
+      exchange: default-exchange
     listener:
       simple:
         # Ack是否手动确认,manual手动,none不确认,auto自动,默认自动
@@ -18,6 +21,8 @@ spring:
           # 最大重试次数,默认3次
           max-attempts: 5
       direct:
+        # NONE:不确认消息;AUTO:自动确认消息;MANUAL:手动确认消息
+        acknowledge-mode: manual
         retry:
           enabled: true
           max-attempts: 5
