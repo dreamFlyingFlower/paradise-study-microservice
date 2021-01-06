@@ -122,6 +122,16 @@
 
 
 
+# 版本号
+
+* BUILD-XXX,SNAP:开发版本
+* GA:稳定版,基本可以使用
+* PRE(M1,M2):里程碑版,主要是修复了GA版本的一些bug
+* RC:候选发布版,基本定型,处于最终发行前的一个观察期,只对一些高级bug进行修复
+* SR:正式发布版
+
+
+
 # 分布式事务
 
 1. TCC:分布式事务框架,比较复杂
@@ -134,13 +144,31 @@
 # 各种监控
 
 * server:当开启了server服务端的时候,可在网页上打开ip:port直接查看相关信息
-* actuator:需添加spring-boot-starter-actuator包,在浏览器上查看的方式是ip:port/actuator,需要相关配置
+* actuator:需添加spring-boot-starter-actuator包,在浏览器上查看的方式是ip:port/actuator,需要相关配置,各url含义
+  * actuator:为其他端点提供"发现页面",要求Spring HATEOAS 在 classpath 路径上
+  * actuator/auditevents:陈列当前应用程序的审计事件信息
+  * actuator/autoconfig:展示自动配置信息并且显示所有自动配置候选人
+  * actuator/beans:显示应用程序中所有 Spring bean 的完整列表
+  * actuator/configprops:显示所有配置信息
+  * actuator/dump:dump所有线程
+  * actuator/env:陈列所有的环境变量
+  * actuator/flyway:Shows any Flyway database migrations that have been applied
+  * actuator/health:显示应用程序运行状况信息
+  * actuator/info:显示应用信息
+  * actuator/loggers:显示和修改应用程序中的loggers配置
+  * actuator/liquibase:显示已经应用的任何Liquibase数据库迁移
+  * actuator/metrics:显示当前应用程序的指标信息
+  * actuator/mappings:显示所有@RequestMapping的url整理列表
+  * actuator/shutdown:关闭应用,默认情况下不启用
+  * actuator/trace:显示跟踪信息,默认最后100个HTTP请求
+  * 
 
->
-	2.0版本访问actuator相关url地址时,若需要在控制台看到相关可访问url,需要重新指定日志级别
+>2.0版本访问actuator相关url地址时,若需要在控制台看到相关可访问url,需要重新指定日志级别
 	logging.level.org.springframework.boot.actuate=trace
 	若是同时使用了spring-security,则同时需要开启spring-security的配置,否则访问需要权限
 	spring.security.filter.dispatcher-types= include
+
+* spring-boot-admin:actuator的web版本
 
 * hystrix:断路器接口信息,查看方式ip:port/hystrix,填写相关信息
 * druid:ip:port/druid,若配置了loginusername和loginpassword,则登录该网站的时候需要用户名和密码
