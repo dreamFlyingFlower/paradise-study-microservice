@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.wy.rabbitmq.provider.Provider3;
+import com.wy.rabbitmq.provider.ProviderFanout;
 
 /**
  *  测试不同模式的时候不能用同样的exchange
@@ -15,7 +15,7 @@ import com.wy.rabbitmq.provider.Provider3;
 @SpringBootTest(classes = Application.class)
 public class QueueTest3 {
 	@Autowired
-	private Provider3 provider3;
+	private ProviderFanout provider3;
 
 	@Autowired
 

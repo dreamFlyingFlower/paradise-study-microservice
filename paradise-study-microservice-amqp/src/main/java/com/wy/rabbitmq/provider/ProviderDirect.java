@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
  * @git {@link https://github.com/mygodness100}
  */
 @Component
-public class Provider1 {
+public class ProviderDirect {
 
 	/** spring对rabbitmq,activeqm等消息队列的封装类 */
 	@Autowired

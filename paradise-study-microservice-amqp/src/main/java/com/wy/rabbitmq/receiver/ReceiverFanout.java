@@ -25,7 +25,7 @@ import com.rabbitmq.client.Channel;
 @RabbitListener(bindings = @QueueBinding(value = @Queue(value = "${mq.fanout.queue}", autoDelete = "true"),
 		exchange = @Exchange(value = "${mq.fanout.exchange}", type = ExchangeTypes.FANOUT)))
 @Component
-public class Receiver3 {
+public class ReceiverFanout {
 
 	@RabbitHandler
 	public void receiveMsg(Channel channel, Message message, String msg) {

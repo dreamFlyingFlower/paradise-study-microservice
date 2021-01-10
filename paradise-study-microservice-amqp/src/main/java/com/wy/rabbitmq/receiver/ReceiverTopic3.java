@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * @apiNote 将listener写在类上,而放上中需要使用队列的方法上加上RabbitHandler注解
- * @apiNote bindings注解:value:绑定队列,队列名称,exchange:配置交互器,key:路由键
+ * @apiNote @instruction bindings注解:value:绑定队列,队列名称,exchange:配置交互器,key:路由键
  * @apiNote queue注解:value队列的名称,autoDelete是否是一个可删除的临时队列
  * @apiNote exchange注解:value交换器的名称,type交换器的类型
  * @author ParadiseWY
@@ -18,11 +18,11 @@ import org.springframework.stereotype.Component;
  * @git {@link https://github.com/mygodness100}
  */
 @RabbitListener(bindings = @QueueBinding(
-		value = @Queue(value = "${mq.top.queue.error}", autoDelete = "true"),
+		value = @Queue(value = "${mq.top.queue.logs}", autoDelete = "true"),
 		exchange = @Exchange(value = "${mq.top.exchange}", type = ExchangeTypes.TOPIC),
-		key = "*.error.log"))
+		key = "*.log.*"))
 @Component
-public class Receiver2_2 {
+public class ReceiverTopic3 {
 
 	@RabbitHandler
 	public void receiveMsg(String msg) {

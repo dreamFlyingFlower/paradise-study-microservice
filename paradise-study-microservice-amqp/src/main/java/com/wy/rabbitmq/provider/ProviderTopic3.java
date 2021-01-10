@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
  * @git {@link https://github.com/mygodness100}
  */
 @Component
-public class Provider2_3 {
+public class ProviderTopic3 {
 
 	@Autowired
 	private AmqpTemplate rabbitAmqpTemplate;

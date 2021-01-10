@@ -6,14 +6,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
- * 主题模式(topic),路由键可由通配符匹配
+ * 主题模式(topic),交换器完全匹配,路由键可由通配符匹配
  * 
  * @author ParadiseWY
  * @date 2019年4月15日 下午1:19:49
  * @git {@link https://github.com/mygodness100}
  */
 @Component
-public class Provider2_2 {
+public class ProviderTopic1 {
 
 	@Autowired
 	private AmqpTemplate rabbitAmqpTemplate;
@@ -23,9 +23,9 @@ public class Provider2_2 {
 
 	public void sendMsg(String msg) {
 		// 向消息队列发送消息;交换器名称,路由键,消息
-		rabbitAmqpTemplate.convertAndSend(exchange, "provider2_2.info.log", msg);
-		rabbitAmqpTemplate.convertAndSend(exchange, "provider2_2.error.log", msg);
-		rabbitAmqpTemplate.convertAndSend(exchange, "provider2_2.warn.log", msg);
-		rabbitAmqpTemplate.convertAndSend(exchange, "provider2_2.debug.log", msg);
+		rabbitAmqpTemplate.convertAndSend(exchange, "provider2_1.info.log", msg);
+		rabbitAmqpTemplate.convertAndSend(exchange, "provider2_1.error.log", msg);
+		rabbitAmqpTemplate.convertAndSend(exchange, "provider2_1.warn.log", msg);
+		rabbitAmqpTemplate.convertAndSend(exchange, "provider2_1.debug.log", msg);
 	}
 }

@@ -10,10 +10,9 @@ import com.rabbitmq.client.Envelope;
 import com.wy.rabbitmq.util.ConnectionUtil;
 
 /**
- * 消费者,手动进行ACK
- */
-/**
- * 基本消息模型消费者,手动进行ACK(消息确认,默认情况是自动确认)
+ * 基本消息模型消费者,手动进行ACK(消息确认,默认情况是自动确认).
+ * 
+ * 手动确认ACK模式下必须设置消息失败的重发次数.若不确认ACK,生产者将不停发送消息到队列中,造成内存溢出
  *
  * @author 飞花梦影
  * @date 2021-01-04 21:46:15

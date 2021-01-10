@@ -7,3 +7,11 @@ spring:
   profiles:
     active:
     - dev
+    
+eureka:
+  client:
+    service-url:
+      # 向服务的注册中心注册的地址
+      defaultZone: http://localhost:55555/eureka/
+      # 当注册中心开启了密码验证,则需要将用户名和密码拼接在url前面,用户名和密码用冒号分割,和url用@分割
+      # defaultZone: http://user:123456@localhost:55555/eureka/

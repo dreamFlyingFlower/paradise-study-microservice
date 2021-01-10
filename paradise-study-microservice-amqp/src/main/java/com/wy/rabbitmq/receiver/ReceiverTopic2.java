@@ -18,11 +18,11 @@ import org.springframework.stereotype.Component;
  * @git {@link https://github.com/mygodness100}
  */
 @RabbitListener(bindings = @QueueBinding(
-		value = @Queue(value = "${mq.top.queue.info}", autoDelete = "true"),
+		value = @Queue(value = "${mq.top.queue.error}", autoDelete = "true"),
 		exchange = @Exchange(value = "${mq.top.exchange}", type = ExchangeTypes.TOPIC),
-		key = "*.info.log"))
+		key = "*.error.log"))
 @Component
-public class Receiver2_1 {
+public class ReceiverTopic2 {
 
 	@RabbitHandler
 	public void receiveMsg(String msg) {
