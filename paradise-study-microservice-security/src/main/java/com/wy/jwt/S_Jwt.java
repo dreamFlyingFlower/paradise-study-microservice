@@ -1,4 +1,4 @@
-package com.wy;
+package com.wy.jwt;
 
 import java.util.Date;
 import java.util.Map;

@@ -21,8 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.ServletWebRequest;
 
 import com.google.common.collect.ImmutableMap;
-import com.wy.S_Jwt;
 import com.wy.entity.UserSocial;
+import com.wy.jwt.S_Jwt;
 import com.wy.entity.User;
 import com.wy.result.Result;
 import com.wy.result.ResultException;

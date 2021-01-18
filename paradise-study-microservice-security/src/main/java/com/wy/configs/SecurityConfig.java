@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.access.ExceptionTranslationFilter;
@@ -59,6 +60,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
 	private VerifyFilter verifyFilter;
+
+	// @Autowired
+	// private JwtTokenFilter jwtTokenFilter;
 
 	/**
 	 * session失效策略
@@ -131,6 +135,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				// .apply(penguinSocialConfigurer).and()
 				// 在用户名和密码校验之后进行拦截
 				.addFilterBefore(verifyFilter, UsernamePasswordAuthenticationFilter.class)
+				// 添加jwt校验
+				// .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
 				// 对session的操作
 				// .sessionManagement()
 				// session失效之后跳转的地址,若是jsp则是页面,不是则为api接口地址,不需要安全验证
@@ -173,5 +179,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.logoutSuccessHandler(logoutSuccessHandler).and()
 				// 自定义拦截未登录请求,若不定义则跳转到loginForm自定义地址或默认的/login
 				.exceptionHandling().authenticationEntryPoint(new LoginAuthEntryPoint(null)).and().csrf().disable();
+	}
+
+	public void configure(WebSecurity web) throws Exception {
+		// 配置需要忽略检查的web url
+		web.ignoring().antMatchers(new String[5]);
 	}
 }
