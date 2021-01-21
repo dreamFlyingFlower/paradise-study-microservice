@@ -9,6 +9,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.web.ProviderSignInUtils;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -139,5 +141,12 @@ public class UserCrl {
 	@ResponseStatus(code = HttpStatus.UNAUTHORIZED)
 	public Result<?> sessionValid() {
 		return Result.error();
+	}
+	
+//	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@PreAuthorize("@permissionService.hasRole('ADMIN')")
+	@PostAuthorize("returnObject.data.username == authenticaiton.name")
+	public Result<?> test(User user){
+		return Result.ok(user);
 	}
 }

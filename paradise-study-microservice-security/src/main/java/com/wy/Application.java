@@ -8,6 +8,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.expression.SecurityExpressionRoot;
+import org.springframework.security.access.expression.method.MethodSecurityExpressionOperations;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,6 +17,10 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
+
+import com.wy.configs.ExtraMethodSecurityExpressionHandler;
+import com.wy.configs.ExtraSecurityExpressionRoot;
+import com.wy.crl.UserCrl;
 
 /**
  * springsecurity默认的登录请求是/login,而且必须是post请求<br>
@@ -32,7 +37,16 @@ import org.springframework.session.data.redis.config.annotation.web.http.EnableR
  * {@link PreAuthorize}:该注解用来管理角色,权限等,值为SpringEL表达式,解析规则{@link SecurityExpressionRoot}
  * ->角色比较:在写入角色时需要在角色之前添加ROLE_,但是使用的时候是直接使用角色即可
  * -->如写入时为ROLE_ADMIN,拦截的时候写ADMIN即可,hasAnyRole('ADMIN','USER')或hasRole('ADMIN')
- * ->权限比较:在放入权限时直接放入即可,使用的时候直接写一样的即可,即hasAnyAuthority('create')或hasAuthority('create')
+ * -->若需要同时满足多个角色条件,可以使用AND,如hasRole('ADMIN') AND hasRole('USER')
+ * ->权限比较:写入权限时和使用时写一样的即可,即hasAnyAuthority('create')或hasAuthority('create')
+ * 
+ * 自定义权限:<br>
+ * 1.直接使用@permissionService.methodname(args),其中@后面必须接一个spring中的组件标识,
+ * methodname是该组件中的方法名,args是传入其中的参数,返回值必须是boolean,详见{@link UserCrl#test}
+ * 2.继承{@link SecurityExpressionRoot},实现{@link MethodSecurityExpressionOperations},
+ * 所有需要实现的方法可以直接从MethodSecurityExpressionRoot中复制,该类是私有的,
+ * 详见{@link ExtraSecurityExpressionRoot}和{@link ExtraMethodSecurityExpressionHandler}
+ * 
  * {@link PostAuthorize}:该注解在方法执行完之后判断是否有权限,可以用returnObject表示返回值对象
  * 
  * {@link PreFilter}:对Collection类型的方法参数进行拦截,只能用在实现了Collection的类型上,数组也不行
