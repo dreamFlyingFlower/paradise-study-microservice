@@ -39,6 +39,7 @@ import com.wy.crl.UserCrl;
  * -->如写入时为ROLE_ADMIN,拦截的时候写ADMIN即可,hasAnyRole('ADMIN','USER')或hasRole('ADMIN')
  * -->若需要同时满足多个角色条件,可以使用AND,如hasRole('ADMIN') AND hasRole('USER')
  * ->权限比较:写入权限时和使用时写一样的即可,即hasAnyAuthority('create')或hasAuthority('create')
+ * ->在EL表达式中可以直接使用的变量有:authentication,principal,都是在登录时存入的信息,authentication包含principal
  * 
  * 自定义权限:<br>
  * 1.直接使用@permissionService.methodname(args),其中@后面必须接一个spring中的组件标识,
