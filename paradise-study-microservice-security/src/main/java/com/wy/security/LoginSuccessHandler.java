@@ -15,12 +15,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wy.result.Result;
 
 /**
- * @apiNote 安全登录成功的处理
- * @author ParadiseWY
- * @date 2019年1月25日 下午3:41:58
+ * 安全登录成功的处理
+ * 
+ * 此处处理json返回值的方法需要根据框架中处理json的jar改变:<br>
+ * 若使用原生的jackson处理json,则此处需要使用objectmapper将结果转化为字符串,否则jackson的配置将无效,如忽略密码<br>
+ * 若使用fastjson处理json,则此处使用使用fastjson的相关方法转换结果,否则fastjson的配置将无效
+ * 
+ * @author 飞花梦影
+ * @date 2019-01-25 15:41:58
  */
 @Configuration
 public class LoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
+
 	@Autowired
 	private ObjectMapper objectMapper;
 
