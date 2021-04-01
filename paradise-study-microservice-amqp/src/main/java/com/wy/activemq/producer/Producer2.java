@@ -11,10 +11,11 @@ import javax.jms.Topic;
 import org.apache.activemq.ActiveMQConnectionFactory;
 
 /**
- * @description publish:Topic模式消息发布者,若是消息发布之后,没有订阅者,那么该消息将会直接丢弃,并不会存储
- * @author ParadiseWy
- * @date 2019年5月20日 下午8:59:26
- * @git {@link https://github.com/mygodness100}
+ * publish:Topic模式消息发布者,若是消息发布之后,没有订阅者,那么该消息将会直接丢弃,并不会存储
+ *
+ * @author 飞花梦影
+ * @date 2019-05-20 20:59:26
+ * @git {@link https://github.com/dreamFlyingFlower}
  */
 public class Producer2 {
 
@@ -25,8 +26,7 @@ public class Producer2 {
 
 	public void sendMsg(String msg) {
 		// 连接工厂,用户名,密码,url地址
-		ConnectionFactory factory = new ActiveMQConnectionFactory("admin", "admin",
-				"tcp://192.168.1.146:61616");
+		ConnectionFactory factory = new ActiveMQConnectionFactory("admin", "admin", "tcp://192.168.1.146:61616");
 		// 连接.若是建立工厂的时候不传用户名和密码,可在创建连接的时候传值
 		try (Connection conn = factory.createConnection();) {
 			// 建立连接,消息的发送者不是必须启动连接,但是消费者必须启动连接
@@ -46,6 +46,9 @@ public class Producer2 {
 			MessageProducer producer = session.createProducer(topic);
 			// 消息对象
 			TextMessage message = session.createTextMessage(msg);
+			// MapMessage message = session.createMapMessage();
+			// message.setString("username", "admin");
+			// message.setString("password", "123456");
 			// 使用producer发送消息到目的地中.若消息发送失败,则抛出异常
 			producer.send(message);
 		} catch (JMSException e) {

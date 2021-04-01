@@ -15,16 +15,16 @@ import javax.jms.TextMessage;
 import org.apache.activemq.ActiveMQConnectionFactory;
 
 /**
- * @description subscribe:Topic模式消息接收者.
- * @author ParadiseWy
- * @date 2019年5月20日 下午9:41:42
- * @git {@link https://github.com/mygodness100}
+ * subscribe:Topic模式消息接收者,即发布/订阅模式
+ *
+ * @author 飞花梦影
+ * @date 2019-05-20 21:41:42
+ * @git {@link https://github.com/dreamFlyingFlower}
  */
 public class Consumer2 {
 
 	public void handlerMsg() {
-		ConnectionFactory factory = new ActiveMQConnectionFactory("admin", "admin",
-				"tcp://192.168.1.146:61616");
+		ConnectionFactory factory = new ActiveMQConnectionFactory("admin", "admin", "tcp://192.168.1.146:61616");
 		try (Connection conn = factory.createConnection();) {
 			conn.start();
 			Session session = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
@@ -39,6 +39,7 @@ public class Consumer2 {
 			// 监听器一旦注册,永久有效,除非consumer关闭.监听器可注册多个,此时mq自动循环调用多个监听器,
 			// 处理队列中的消息,实现的是并行处理.
 			consumer.setMessageListener(new MessageListener() {
+
 				@Override
 				public void onMessage(Message message) {
 					// 若注册session的时候使用的是客户端确认模式,此处必须手动确认接收到消息

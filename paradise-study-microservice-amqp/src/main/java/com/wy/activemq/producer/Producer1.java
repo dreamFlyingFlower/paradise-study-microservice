@@ -11,10 +11,11 @@ import javax.jms.TextMessage;
 import org.apache.activemq.ActiveMQConnectionFactory;
 
 /**
- * @description 单个消息发送者
- * @author ParadiseWy
- * @date 2019年5月20日 下午8:59:26
- * @git {@link https://github.com/mygodness100}
+ * ActiveMQ单个消息发送者
+ *
+ * @author 飞花梦影
+ * @date 2019-05-20 20:59:26
+ * @git {@link https://github.com/dreamFlyingFlower}
  */
 public class Producer1 {
 
@@ -29,8 +30,7 @@ public class Producer1 {
 		// ConnectionFactory fac1 = new
 		// ActiveMQConnectionFactory("tcp://192.168.1.146:61616");
 		// 若是开启安全验证,则用户名和密码必传.若未开启,可用另外的构造
-		ConnectionFactory factory = new ActiveMQConnectionFactory("admin", "admin",
-				"tcp://192.168.1.146:61616");
+		ConnectionFactory factory = new ActiveMQConnectionFactory("admin", "admin", "tcp://192.168.1.146:61616");
 		// 若是开启了activemq的集群,那么可以这么写
 		// failover:失败转移,当任意节点宕机,自动转移
 		// ConnectionFactory factory1 = new ActiveMQConnectionFactory("admin", "admin",

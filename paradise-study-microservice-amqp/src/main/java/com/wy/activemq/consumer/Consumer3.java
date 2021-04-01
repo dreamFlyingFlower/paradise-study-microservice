@@ -6,17 +6,24 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.ObjectMessage;
+import javax.jms.TextMessage;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Component;
 
 /**
- * @description spring整合activemq,消费者
- * @author ParadiseWy
- * @date 2019年5月20日 下午9:41:42
- * @git {@link https://github.com/mygodness100}
+ * Spring整合activemq,消费者
+ * 
+ * @author 飞花梦影
+ * @date 2019-05-20 21:41:42
+ * @git {@link https://github.com/dreamFlyingFlower}
  */
 @Component
 public class Consumer3 implements MessageListener {
+
+	@Autowired
+	private JmsTemplate jmsTemplate;
 
 	@Override
 	public void onMessage(Message message) {
@@ -31,5 +38,11 @@ public class Consumer3 implements MessageListener {
 		} catch (JMSException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public void receive() throws JMSException {
+		// 一次接受一条消息,少用
+		TextMessage message = (TextMessage) jmsTemplate.receive("queue");
+		System.out.println(message.getText());
 	}
 }

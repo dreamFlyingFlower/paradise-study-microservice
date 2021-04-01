@@ -5,7 +5,6 @@ import java.io.Serializable;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
-import javax.jms.TextMessage;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
@@ -13,19 +12,25 @@ import org.springframework.jms.core.MessageCreator;
 import org.springframework.stereotype.Service;
 
 /**
- * @description spring整合activemq
- * @author ParadiseWy
- * @date 2019年5月20日 下午8:59:26
- * @git {@link https://github.com/mygodness100}
+ * Spring整合ActiveMQ消息发送者
+ *
+ * @author 飞花梦影
+ * @date 2019-05-20 20:59:26
+ * @git {@link https://github.com/dreamFlyingFlower}
  */
 @Service
 public class Producer3 {
 
+	/**
+	 * 不同模式的ActiveMQ应该用不同的jmsTemplate,默认的destination也应该不一样
+	 */
 	@Autowired
 	private JmsTemplate jmsTemplate;
 
 	public void sendMsg(String msg) {
-
+		// 修改JmsTemplate消息发布模式,默认是点对点模式,true表示发布/订阅模式
+		jmsTemplate.setPubSubDomain(false);
+		// 发送到默认的点对点队列
 		jmsTemplate.send(new MessageCreator() {
 
 			/**
@@ -40,7 +45,7 @@ public class Producer3 {
 	}
 
 	public void sendMsg(String queue, String msg) {
-
+		// 发送到指定队列名
 		jmsTemplate.send(queue, new MessageCreator() {
 
 			/**
@@ -55,6 +60,7 @@ public class Producer3 {
 	}
 
 	public void sendMsg() {
+		// 自定义消息
 		jmsTemplate.send(new MessageCreator() {
 
 			/**
@@ -70,10 +76,5 @@ public class Producer3 {
 				return message;
 			}
 		});
-	}
-
-	public void testQueueReceive() throws JMSException {
-		TextMessage message = (TextMessage) jmsTemplate.receive("queue");
-		System.out.println(message.getText());
 	}
 }
