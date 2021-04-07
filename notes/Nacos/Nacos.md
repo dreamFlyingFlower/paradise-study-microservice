@@ -44,6 +44,24 @@
 
 
 
+## 数据支持
+
+* 单机模式时Nacos默认使用嵌入式数据库存储数据,若想使用其他存储方式,需要进行配置
+* MySQL中新建nacos_config数据库,Nacos初始化MySQL的文件在nacos/conf/nacos-mysql.sql
+* 修改nacos/conf/application.properties,增加支持MySQL数据源配置
+
+```properties
+spring.datasource.platform=mysql
+db.num=1
+db.url.0=jdbc:mysql://localhost:3306/nacos_config?characterEncoding=utf8&connectTimeout=1000&socketTimeout=3000&autoReconnect=true
+db.username=root
+db.password=root
+```
+
+* 配置完成后重启Nacos
+
+
+
 # 注册中心
 
 首先创建两个工程:生产者->nacos-provider,消费者->nacos-consumer
