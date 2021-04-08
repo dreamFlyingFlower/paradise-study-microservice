@@ -224,7 +224,7 @@ public class ConsumerController {
 - prefix:默认为所属工程配置spring.application.name的值,即nacos-provider,也可以通过配置项spring.cloud.nacos.config.prefix来配置
 - spring.profile.active:当前环境对应的profile,详情可以参考 
 - 当spring.profile.active为空时,dataId变成${prefix}.${file-extension}
-- file-exetension:配置内容的数据格式,可以通过配置项spring.cloud.nacos.config.file-extension来配置
+- file-exetension:配置内容的数据格式,通过配置项spring.cloud.nacos.config.file-extension来配置
 
 
 
@@ -303,13 +303,15 @@ spring.cloud.nacos.config.namespace=7fd7e137-21c4-4723-a042-d527149e63e0
 
 ## 多配置文件
 
-偶尔情况下需要加载多个配置文件.假如现在dev名称空间下有三个配置文件:nacos-provider.properties,redis.properties,jdbc.properties
+* 加载多个配置文件,使用ext-config
+* 主配置文件优先级最高,即同属性以服务名开头的配置文件为准
 
 ![1567305611637](image09.png)
 
 nacos-provider.properties默认加载,在bootstrap.properties文件中添加如下配置:
 
 ```properties
+# 加载扩展配置,若配置中有属性相同,扩展配置config下标越大优先级越高
 spring.cloud.nacos.config.ext-config[0].data-id=redis.properties
 # 开启动态刷新配置,否则配置文件修改,工程无法感知
 spring.cloud.nacos.config.ext-config[0].refresh=true

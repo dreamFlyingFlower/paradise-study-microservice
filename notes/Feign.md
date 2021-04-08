@@ -21,3 +21,13 @@
 # Turbine
 
 * 类似actuator,但是turbine是做整个集群的监控,需要在application上添加EnableTurbine注解
+
+
+
+# Ribbon
+
+## 负载均衡
+
+* RoundRobinRule:,轮询,按顺序访问服务器
+* 随机:随机访问一台服务器
+* 
