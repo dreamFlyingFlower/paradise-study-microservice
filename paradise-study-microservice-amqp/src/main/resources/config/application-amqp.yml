@@ -14,3 +14,8 @@ mq:
   fanout:
     queue: queue_fanout_info
     exchange: exchange_fanout
+# rocketmq
+rocketmq:
+  name-server: 127.0.0.1:9876
+  producer:
+    group: test-producer-group

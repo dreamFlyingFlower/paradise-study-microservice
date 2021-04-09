@@ -46,9 +46,14 @@
 			<artifactId>spring-cloud-starter-zookeeper-discovery</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.github.mygodness100</groupId>
-			<artifactId>SimpleUtils</artifactId>
-			<version>1.0.4</version>
+			<groupId>org.apache.rocketmq</groupId>
+			<artifactId>rocketmq-spring-boot-starter</artifactId>
+			<version>2.2.0</version>
+		</dependency>
+		<dependency>
+			<groupId>dream.flying.flower</groupId>
+			<artifactId>dream-tool-core</artifactId>
+			<version>0.0.1</version>
 		</dependency>
 
 		<dependency>

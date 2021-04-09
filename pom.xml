@@ -46,5 +46,6 @@
 		<module>paradise-study-microservice-amqp</module>
 		<module>paradise-study-microservice-security</module>
 		<module>paradise-study-microservice-gateway</module>
+		<module>dream-study-microservice-oauth</module>
 	</modules>
 </project>
