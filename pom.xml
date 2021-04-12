@@ -35,17 +35,17 @@
 	</dependencyManagement>
 
 	<modules>
-		<module>paradise-study-microservice-common</module>
-		<module>paradise-study-microservice-config</module>
-		<module>paradise-study-microservice-server</module>
-		<module>paradise-study-microservice-config-client</module>
-		<module>paradise-study-microservice-bus</module>
-		<module>paradise-study-microservice-feign</module>
-		<module>paradise-study-microservice-service</module>
-		<module>paradise-study-microservice-cache</module>
-		<module>paradise-study-microservice-amqp</module>
-		<module>paradise-study-microservice-security</module>
-		<module>paradise-study-microservice-gateway</module>
+		<module>dream-study-microservice-common</module>
+		<module>dream-study-microservice-config</module>
+		<module>dream-study-microservice-server</module>
+		<module>dream-study-microservice-config-client</module>
+		<module>dream-study-microservice-bus</module>
+		<module>dream-study-microservice-feign</module>
+		<module>dream-study-microservice-service</module>
+		<module>dream-study-microservice-cache</module>
+		<module>dream-study-microservice-mq</module>
+		<module>dream-study-microservice-security</module>
+		<module>dream-study-microservice-gateway</module>
 		<module>dream-study-microservice-oauth</module>
 	</modules>
 </project>
