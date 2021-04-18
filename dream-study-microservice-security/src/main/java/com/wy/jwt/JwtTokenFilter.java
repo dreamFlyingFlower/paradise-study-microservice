@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.wy.utils.ListUtils;
+import com.wy.collection.ListTool;
 
 /**
  * token过滤器,验证token有效性
@@ -35,7 +35,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 		// 需要放过的url,必须SecurityConfig的WebSecurity的ignore中先配置才有效
 		List<String> permitUrl = new ArrayList<>();
 		// 放过其他web请求
-		if (ListUtils.isNotBlank(permitUrl)) {
+		if (ListTool.isNotEmpty(permitUrl)) {
 			AntPathMatcher pathMatcher = new AntPathMatcher();
 			for (String pattern : permitUrl) {
 				// 必须已经添加在WebSecurity的ignore列表中才有效

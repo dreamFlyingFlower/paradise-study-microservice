@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
-import com.wy.utils.StrUtils;
+import com.wy.lang.StrTool;
 
 /**
  * 使用redis缓存,防止缓存击穿
@@ -26,12 +26,12 @@ public class CacheHandlerService {
 	public <T> T getCahce(String key, long expire, TimeUnit unit, TypeReference<T> clazz,
 			CacheHandler<T> cacheHandler) {
 		String result = String.valueOf(redisTemplate.opsForValue().get(key));
-		if (StrUtils.isNotBlank(result)) {
+		if (StrTool.isNotBlank(result)) {
 			return JSON.parseObject(result, clazz);
 		} else {
 			synchronized (this) {
 				result = String.valueOf(redisTemplate.opsForValue().get(key));
-				if (StrUtils.isNotBlank(result)) {
+				if (StrTool.isNotBlank(result)) {
 					return JSON.parseObject(result, clazz);
 				} else {
 					T t = cacheHandler.handlerCache();

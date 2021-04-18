@@ -47,7 +47,7 @@ public class UserCrl {
 		// Authentication authentication =
 		// SecurityContextHolder.getContext().getAuthentication();
 		throw new ResultException("fdsfds");
-//		return "success";
+		// return "success";
 	}
 
 	@GetMapping("signup")
@@ -99,8 +99,7 @@ public class UserCrl {
 	 * @param response 响应
 	 */
 	@GetMapping("getCode/{type}")
-	public void getCode(@PathVariable String type, HttpServletRequest request,
-			HttpServletResponse response) {
+	public void getCode(@PathVariable String type, HttpServletRequest request, HttpServletResponse response) {
 		factory.getHandler(type).generate(new ServletWebRequest(request, response), type);
 	}
 
@@ -109,32 +108,33 @@ public class UserCrl {
 
 	/**
 	 * 通过providerSignUtils工具类拿到授权服务器返回的相关信息
+	 * 
 	 * @param request 请求
 	 * @return
 	 */
 	@GetMapping("/social/user")
 	public UserSocial getSocialUser(HttpServletRequest request) {
-		Connection<?> connection = providerSignUtils
-				.getConnectionFromSession(new ServletWebRequest(request));
+		Connection<?> connection = providerSignUtils.getConnectionFromSession(new ServletWebRequest(request));
 		return UserSocial.builder().providerId(connection.getKey().getProviderId())
-				.providerUserId(connection.getKey().getProviderUserId())
-				.nickname(connection.getDisplayName()).socialimage(connection.getImageUrl())
-				.build();
+				.providerUserId(connection.getKey().getProviderUserId()).nickname(connection.getDisplayName())
+				.socialimage(connection.getImageUrl()).build();
 	}
-	
+
 	/**
 	 * 注册,会将信息写入到数据库
+	 * 
 	 * @param request 请求
 	 * @param user 用户
 	 */
 	@PostMapping("register")
-	public void register(HttpServletRequest request,User user) {
-		String userId=  user.getUsername();
+	public void register(HttpServletRequest request, User user) {
+		String userId = user.getUsername();
 		providerSignUtils.doPostSignUp(userId, new ServletWebRequest(request));
 	}
-	
+
 	/**
 	 * session失效时的接口地址
+	 * 
 	 * @return
 	 */
 	@GetMapping("session/invalid")
@@ -142,11 +142,29 @@ public class UserCrl {
 	public Result<?> sessionValid() {
 		return Result.error();
 	}
-	
-//	@PreAuthorize("hasRole('ROLE_ADMIN')")
+
+	// @PreAuthorize("hasRole('ROLE_ADMIN')")
 	@PreAuthorize("@permissionService.hasRole('ADMIN')")
 	@PostAuthorize("returnObject.data.username == authenticaiton.name")
-	public Result<?> test(User user){
+	public Result<?> test(User user) {
+		return Result.ok(user);
+	}
+
+	/**
+	 * 可以直接使用请求参数做校验,前面要带上#,多个条件用and或or
+	 * 
+	 * <pre>
+	 * principal:登录时存储在内存中的用户信息,存什么,就取什么
+	 * returnObject:返回值,固定写法
+	 * </pre>
+	 * 
+	 * @param userId 用户编号
+	 * @param user 用户信息
+	 * @return
+	 */
+	@PreAuthorize("#userId<10 and principal.username.equals(#username) and #user.username.equals('abc')")
+	@PostAuthorize("returnObject.data.username == authenticaiton.name")
+	public Result<?> test1(Integer userId, String username, User user) {
 		return Result.ok(user);
 	}
 }

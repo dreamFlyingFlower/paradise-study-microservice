@@ -18,7 +18,7 @@ import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import com.alibaba.fastjson.JSONException;
-import com.wy.enums.TipsEnum;
+import com.wy.enums.TipFormatEnum;
 import com.wy.result.Result;
 import com.wy.result.ResultException;
 
@@ -69,7 +69,7 @@ public class ExceptionFilter {
 		}
 		// 必传参数为空异常
 		if (throwable instanceof MissingServletRequestParameterException) {
-			return Result.error(TipsEnum.TIP_PARAM_EMPTY
+			return Result.error(TipFormatEnum.TIP_PARAM_EMPTY
 					.getMsg(((MissingServletRequestParameterException) throwable).getParameterName()));
 		}
 		// 方法参数验证失败

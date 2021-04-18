@@ -1,10 +1,10 @@
 package com.wy.verify.sms;
 
-import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.request.ServletWebRequest;
 
 import com.wy.properties.UserProperties;
+import com.wy.util.RandomTool;
 import com.wy.verify.VerifyEntity;
 import com.wy.verify.VerifyGenerator;
 
@@ -21,8 +21,7 @@ public class SmsVerifyGenerator implements VerifyGenerator {
 	@Override
 	public VerifyEntity generateVerify(ServletWebRequest request) {
 		// 模拟短信验证码
-		String code = RandomStringUtils
-				.randomNumeric(userProperties.getVerify().getSms().getLength());
+		String code = RandomTool.randomNumeric(userProperties.getVerify().getSms().getLength());
 		System.out.println(code);
 		return new VerifyEntity(code, userProperties.getVerify().getSms().getExpireSeconds());
 	}

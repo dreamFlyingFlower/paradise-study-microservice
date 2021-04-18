@@ -2,7 +2,6 @@ package com.wy.social.qq;
 
 import java.nio.charset.Charset;
 
-import org.apache.commons.lang.StringUtils;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.social.oauth2.AccessGrant;
 import org.springframework.social.oauth2.OAuth2Template;
@@ -16,8 +15,7 @@ import org.springframework.web.client.RestTemplate;
  */
 public class QqTemplate extends OAuth2Template {
 
-	public QqTemplate(String clientId, String clientSecret, String authorizeUrl,
-			String accessTokenUrl) {
+	public QqTemplate(String clientId, String clientSecret, String authorizeUrl, String accessTokenUrl) {
 		super(clientId, clientSecret, authorizeUrl, accessTokenUrl);
 		/**
 		 * 在获得授权码之后再向授权服务器获得accesstoken的时候,需要传递client_id和client_secret参数
@@ -33,8 +31,7 @@ public class QqTemplate extends OAuth2Template {
 	@Override
 	protected RestTemplate createRestTemplate() {
 		RestTemplate restTemplate = super.createRestTemplate();
-		restTemplate.getMessageConverters()
-				.add(new StringHttpMessageConverter(Charset.forName("UTF-8")));
+		restTemplate.getMessageConverters().add(new StringHttpMessageConverter(Charset.forName("UTF-8")));
 		return restTemplate;
 	}
 
@@ -45,11 +42,10 @@ public class QqTemplate extends OAuth2Template {
 	 *          可从postForAccessGrant的源码中查看
 	 */
 	@Override
-	protected AccessGrant postForAccessGrant(String accessTokenUrl,
-			MultiValueMap<String, String> parameters) {
+	protected AccessGrant postForAccessGrant(String accessTokenUrl, MultiValueMap<String, String> parameters) {
 		// 若返回的是字符串,假设是利用某分隔符进行分割的
 		String result = getRestTemplate().postForObject(accessTokenUrl, parameters, String.class);
-		String[] tokens = StringUtils.splitByWholeSeparatorPreserveAllTokens(result, "&");
+		String[] tokens = result.split("&");
 		return new AccessGrant(tokens[0], tokens[1], tokens[2], Long.parseLong(tokens[3]));
 	}
 }

@@ -93,21 +93,33 @@ public class User implements UserDetails {
 		return username;
 	}
 
+	/**
+	 * 账户是否过期
+	 */
 	@Override
 	public boolean isAccountNonExpired() {
 		return accountNonExpired;
 	}
 
+	/**
+	 * 账户是否锁定
+	 */
 	@Override
 	public boolean isAccountNonLocked() {
 		return accountNonLocked;
 	}
 
+	/**
+	 * 证书是否过期
+	 */
 	@Override
 	public boolean isCredentialsNonExpired() {
 		return credentialsNonExpired;
 	}
 
+	/**
+	 * 账号是否有效
+	 */
 	@Override
 	public boolean isEnabled() {
 		return enabled;

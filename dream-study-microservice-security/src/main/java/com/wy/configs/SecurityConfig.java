@@ -108,23 +108,33 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	/**
 	 * 登录的请求必须是post请求
 	 * 
-	 * @instruction apply:进行另外的验证;authorizeRequests:开始请求权限配置
-	 *              antmatchers:匹配表达式的所有请求,若是资源文件目录,不可写/resources/**或/static/**,仍然会拦截
-	 *              permitall:只要匹配表达式,任意请求都可以访问,无需登录校验 denyAll:所有的请求都拦截 anonymous:匿名用户才通过
-	 *              rememberme:只有当前用户是记住用户时通过 authenticated:当前用户不是anonymous时通过
-	 *              fullAuthenticated:当前用户既不是anonymous也不是rememberme时通过 hasRole:用户拥有指定的权限时才通过
-	 *              hasAnyRole:拥有指定的任意一种权限时就可以通过 hasAnyAuthority:用户有任意一个指定的权限时才通过
-	 *              hasIpAddress:请求发送的ip匹配时才通过 anyrequest.authenticated:所有的请求登录后才可访问
-	 *              formlogin:表示允许表单登录,httpbasic:表示允许http请求登录
-	 *              loginPage:拦截未登录的请求到指定页面,只能是内置的页面,默认/login
-	 *              loginProcessingUrl:自定义的登录请求url,程序会从该url中读取登录参数,注意开头必须有/,默认是/login
-	 *              usernameParameter:自定义用户名的请求字段,默认username.可写在配置文件中
-	 *              passwordParameter:自定义密码的请求字段,默认password,可写在配置文件中
-	 *              successHandler:登录成功后的处理方法,要实现AuthenticationFailureHandler或重写其子类
-	 *              failureHandler:登录失败后的处理方法,要实现AuthenticationSuccessHandler或重写其子类
-	 *              exceptionHandling:异常处理 authenticationEntryPoint:开始一个验证的时候,验证失败的时候不跳到默认的登录界面
-	 *              AuthLoginConfig:自定义的未登录拦截类,不跳转到默认的未登录页面,而是自定义返回json
-	 *              csrf.disabled:禁用csrf防御机制,即可跨域请求
+	 * <pre>
+	 * apply:进行另外的验证;
+	 * authorizeRequests:开始请求权限配置
+	 * antmatchers:匹配表达式的所有请求,若是资源文件目录,不可写/resources/**或/static/**,仍然会拦截
+	 * permitall:只要匹配表达式,任意请求都可以访问,无需登录校验
+	 * denyAll:所有的请求都拦截 
+	 * anonymous:匿名用户才通过
+	 * rememberme:只有当前用户是记住用户时通过 
+	 * authenticated:当前用户不是anonymous时通过
+	 * fullAuthenticated:当前用户既不是anonymous也不是rememberme时通过 
+	 * hasRole:用户拥有指定的权限时才通过
+	 * hasAnyRole:拥有指定的任意一种权限时就可以通过 
+	 * hasAnyAuthority:用户有任意一个指定的权限时才通过
+	 * hasIpAddress:请求发送的ip匹配时才通过 
+	 * anyrequest.authenticated:所有的请求登录后才可访问
+	 * formlogin:表示允许表单登录
+	 * httpbasic:表示允许http请求登录
+	 * loginPage:拦截未登录的请求到指定页面,只能是内置的页面,默认/login
+	 * loginProcessingUrl:自定义的登录请求url,程序会从该url中读取登录参数,注意开头必须有/,默认是/login
+	 * usernameParameter:自定义用户名的请求字段,默认username.可写在配置文件中
+	 * passwordParameter:自定义密码的请求字段,默认password,可写在配置文件中
+	 * successHandler:登录成功后的处理方法,要实现AuthenticationFailureHandler或重写其子类
+	 * failureHandler:登录失败后的处理方法,要实现AuthenticationSuccessHandler或重写其子类
+	 * exceptionHandling:异常处理 authenticationEntryPoint:开始一个验证的时候,验证失败的时候不跳到默认的登录界面
+	 * AuthLoginConfig:自定义的未登录拦截类,不跳转到默认的未登录页面,而是自定义返回json
+	 * csrf.disabled:禁用csrf防御机制,即可跨域请求
+	 * </pre>
 	 */
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
@@ -183,6 +193,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	public void configure(WebSecurity web) throws Exception {
 		// 配置需要忽略检查的web url
-		web.ignoring().antMatchers(new String[5]);
+		web.ignoring().antMatchers("/js/**","/css/**","/images/**");
 	}
 }

@@ -7,9 +7,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.context.request.ServletWebRequest;
 
+import com.wy.lang.StrTool;
 import com.wy.properties.UserProperties;
 import com.wy.result.ResultException;
-import com.wy.utils.StrUtils;
 
 /**
  * @apiNote 手机存储验证
@@ -24,7 +24,7 @@ public class VerifyStoreMobile implements VerifyStore {
 
 	@Autowired
 	private RedisTemplate<Object, Object> redisTemplate;
-	
+
 	@Override
 	public String sourceType() {
 		return "mobile";
@@ -33,7 +33,7 @@ public class VerifyStoreMobile implements VerifyStore {
 	private String getDeviceId(ServletWebRequest webRequest) {
 		String deviceId = webRequest.getRequest()
 				.getParameter(userProperties.getVerify().getMobile().getDeviceIdParam());
-		if (StrUtils.isBlank(deviceId)) {
+		if (StrTool.isBlank(deviceId)) {
 			throw new ResultException("手机设备编号为空");
 		}
 		return deviceId;
@@ -41,8 +41,7 @@ public class VerifyStoreMobile implements VerifyStore {
 
 	@Override
 	public String generateKey(ServletWebRequest webRequest) {
-		return webRequest.getRequest()
-				.getParameter(userProperties.getVerify().getMobile().getDeviceIdParam());
+		return webRequest.getRequest().getParameter(userProperties.getVerify().getMobile().getDeviceIdParam());
 	}
 
 	@Override

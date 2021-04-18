@@ -3,14 +3,13 @@ package com.wy.verify;
 import java.util.Map;
 import java.util.Objects;
 
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.ServletRequestUtils;
 import org.springframework.web.context.request.ServletWebRequest;
 
 import com.wy.common.AuthException;
-import com.wy.utils.StrUtils;
+import com.wy.lang.StrTool;
 
 public abstract class AbstractVerify<C extends VerifyEntity> implements VerifyHandler {
 
@@ -65,9 +64,9 @@ public abstract class AbstractVerify<C extends VerifyEntity> implements VerifyHa
 	 */
 	private VerifyStore getVerifyStore(ServletWebRequest webRequest) {
 		String requestSource = webRequest.getRequest().getHeader("requestSource");
-		if (StrUtils.isBlank(requestSource)) {
+		if (StrTool.isBlank(requestSource)) {
 			requestSource = webRequest.getRequest().getParameter("requestSource");
-			if (StrUtils.isBlank(requestSource)) {
+			if (StrTool.isBlank(requestSource)) {
 				throw new AuthException("请求中缺少requestSource参数");
 			}
 		}
@@ -86,8 +85,7 @@ public abstract class AbstractVerify<C extends VerifyEntity> implements VerifyHa
 	 * @param validateCode 此处不可直接存入validateCode,因为bufferedimage没有序列化,开启redis之后会报错
 	 */
 	private void save(ServletWebRequest request, VerifyEntity verifyEntity) {
-		VerifyEntity entity = new VerifyEntity(verifyEntity.getVerityCode(),
-				verifyEntity.getExpireTime());
+		VerifyEntity entity = new VerifyEntity(verifyEntity.getVerityCode(), verifyEntity.getExpireTime());
 		getVerifyStore(request).store(request, entity);
 	}
 
@@ -101,12 +99,11 @@ public abstract class AbstractVerify<C extends VerifyEntity> implements VerifyHa
 		VerifyEntity verifyEntity = (VerifyEntity) sessionVerifyEntity;
 		String requestCode;
 		try {
-			requestCode = ServletRequestUtils.getStringParameter(request.getRequest(),
-					verifyType.getVerifyType());
+			requestCode = ServletRequestUtils.getStringParameter(request.getRequest(), verifyType.getVerifyType());
 		} catch (ServletRequestBindingException e) {
 			throw new AuthException("获取验证码的值失败");
 		}
-		if (StringUtils.isBlank(requestCode)) {
+		if (StrTool.isBlank(requestCode)) {
 			throw new AuthException("验证码的值不能为空");
 		}
 		if (verifyEntity.isExpried()) {

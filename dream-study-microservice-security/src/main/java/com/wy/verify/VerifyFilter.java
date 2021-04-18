@@ -18,10 +18,10 @@ import org.springframework.util.AntPathMatcher;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.wy.collection.ListTool;
 import com.wy.common.AuthException;
+import com.wy.lang.StrTool;
 import com.wy.properties.UserProperties;
-import com.wy.utils.ListUtils;
-import com.wy.utils.StrUtils;
 
 /**
  * 登录请求拦截器,主要是当加了验证之后拦截验证码是否正确
@@ -39,8 +39,7 @@ public class VerifyFilter extends OncePerRequestFilter implements InitializingBe
 	/**
 	 * 默认需要进行图片验证的url
 	 */
-	private List<String> defaultFilterUrls = new ArrayList<>(
-			Arrays.asList("/login", "/user/login"));
+	private List<String> defaultFilterUrls = new ArrayList<>(Arrays.asList("/login", "/user/login"));
 
 	/**
 	 * 校验码处理
@@ -79,21 +78,21 @@ public class VerifyFilter extends OncePerRequestFilter implements InitializingBe
 	 */
 	protected void handlerVerifyUrl() {
 		List<String> imageVerifyUrls = userProperties.getVerify().getImage().getUrls();
-		if (ListUtils.isNotBlank(imageVerifyUrls)) {
+		if (ListTool.isNotEmpty(imageVerifyUrls)) {
 			defaultFilterUrls.addAll(imageVerifyUrls);
 		}
 	}
 
 	@Override
-	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-			FilterChain chain) throws ServletException, IOException {
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+			throws ServletException, IOException {
 		if (userProperties.getVerify().isEnabled()) {
 			try {
 				VerifyType type = getVerifyType(request);
 				if (type != null) {
 					logger.info("校验请求(" + request.getRequestURI() + ")中的验证码,验证码类型" + type);
-					verifyHandlerFactory.getHandler(type)
-							.verify(new ServletWebRequest(request, response), type.getVerifyType());
+					verifyHandlerFactory.getHandler(type).verify(new ServletWebRequest(request, response),
+							type.getVerifyType());
 					logger.info("验证码校验通过");
 				}
 			} catch (AuthException e) {
@@ -114,7 +113,7 @@ public class VerifyFilter extends OncePerRequestFilter implements InitializingBe
 		for (String url : defaultFilterUrls) {
 			if (pathMatcher.match(url, request.getRequestURI())) {
 				String requestType = request.getParameter("verifyType");
-				if (StrUtils.isBlank(requestType)) {
+				if (StrTool.isBlank(requestType)) {
 					throw new AuthException("未指定登录验证类型verifyType");
 				}
 				VerifyType verifyType = verifyHandlerFactory.getVerifyType(requestType);
