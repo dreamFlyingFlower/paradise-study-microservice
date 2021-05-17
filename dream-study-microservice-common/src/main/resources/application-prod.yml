@@ -1,18 +1,3 @@
 spring: 
   profiles:
     active: prod
-  
-# 暴露所有的spring的监控信息,页面上访问路径ip:port/actuator
-management:
-  endpoints: 
-    web:
-      exposure:
-        # *表示暴露info,health所有端点
-        include: "*"
-  endpoint:
-    health:
-      # 默认是never
-      show-details: always
-info:
-  test: test
-  version: 0.0.1
