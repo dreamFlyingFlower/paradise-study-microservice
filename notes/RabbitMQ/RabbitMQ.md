@@ -1,6 +1,4 @@
-# Qmqp
-
-
+# RabbitMQ
 
 # AMQP和JMS
 
@@ -17,11 +15,7 @@
 
 
 
-# RabbitMQ
-
-
-
-## 概述
+概述
 
 * [官网](http://www.rabbitmq.com/)
 * Message:消息,不具名,由消息头,消息体组成,不透明,而消息头则由一系列可选属性组成,包括RoutingKey(路由键),priority(相对于其他消息的优先权),DeliveryMode(是否持久性)等
@@ -42,20 +36,20 @@
 
 
 
-## 运行机制
+# 运行机制
 
 * Amqp中消息的路由过程和JMS存在一些差别,Amqp中增加了Exchange和Binding
 * 生产者把消息发布到Exchange上,消息最终到达队列并被消费者消费,而Binding决定交互器的消息应该发送到那个队列
 
 
 
-## 消息模式
+# 消息模式
 
 ![](image06.png)
 
 
 
-### 基本消息模型
+## 基本消息模型
 
 * P:一个生产者,一个发送消息的用户应用程序
 * C:一个消费者,接收消息的用户应用程序
@@ -70,7 +64,7 @@
 
 
 
-### Work
+## Work
 
 * 工作模式或竞争模式,一个生产者,多个消费者,每条消息只能被消费一次
 
@@ -92,7 +86,7 @@
 
 
 
-### Publish/Subscribe
+## Publish/Subscribe
 
 * 发布/订阅,有多种模式,默认消息模式为ExchangeTypes.FANOUT(广播)
 * 一个生产者,多个消费者,每个队列的消费者实例可以消费一次消息,多个队列会消费多次消息
@@ -104,7 +98,7 @@
 
 
 
-### Fanout
+## Fanout
 
 * 广播模式,可以有多个消费者,每个消费者有自己的Queue
 * 每个队列都要绑定到Exchange(交换机),生产者和消费者的Exchange要完全匹配,不需要路由键
@@ -116,7 +110,7 @@
 
 
 
-### Direct
+## Direct
 
 * 路由模式,对应的消息模式为ExchangeTypes.DIRECT
 * 在交换机的基础上又增加了一个路由键(routingkey),即从广播中取出符合路由键的消息进行消费
@@ -126,7 +120,7 @@
 
 
 
-### Topic
+## Topic
 
 * 订阅模式,将路由键和特定的规则进行匹配
 * Topic类型的Exchange与Direct相比,只不过是routingkey可以使用通配符
@@ -137,7 +131,7 @@
 
 
 
-## 持久化
+# 持久化
 
 * 当消费者挂掉,但是生产者仍在发送消息的时候,若是队列只是一个临时队列,那么消息就会丢失
 
@@ -154,7 +148,7 @@
 
 
 
-## 死信队列
+# 死信队列
 
 * 死信队列是RabbitMQ中的一种消息机制,若队列里的消息出现以下情况被称为死信消息:
 * 消息被否定确认,使用channel.basicNack或channel.basicReject,并且此时requeue被设置为false
@@ -170,7 +164,7 @@
 
 
 
-## 延时队列
+# 延时队列
 
 * 消息的TTL就是消息的存活时间,RabbitMQ可以对队列和消息分别设置TTL
 
@@ -222,7 +216,7 @@
 
 
 
-## ACK
+# ACK
 
 * 消息确认机制,见**paradise-study-microsevice-amqp/com/wy/rabbitmq/simple**
 
@@ -268,7 +262,7 @@
 
 
 
-## 消息丢失
+# 消息丢失
 
 * 消息发送出去,由于网络或其他问题没有抵达服务器
   * 做好容错方法(try-catch),发送失败后要有重试机制,可记录到数据库,并且定期扫描重发
@@ -280,7 +274,7 @@
 
 
 
-## 消息重复
+# 消息重复
 
 * 消息消费成功,但是ACK时宕机,导致ACK不成功
 * 消费者的业务消费接口应该设置为幂等性的
@@ -289,7 +283,7 @@
 
 
 
-## 消息挤压
+# 消息挤压
 
 * 消费者宕机挤压
 * 消费者消费能力不足
@@ -299,9 +293,9 @@
 
 
 
-## 集群
+# 集群
 
-### 普通集群
+## 普通集群
 
 * 多台服务器中,只有一台服务器上有queue的元数据和真实数据,元数据相当于配置文件.其他服务器只有元数据
 * 当消费数据时,若是请求到只有元数据的服务器,该服务器将和主服务器通讯请求数据,再将数据返回
@@ -310,14 +304,14 @@
 
 
 
-### 镜像集群
+## 镜像集群
 
 * 每台服务器上都有queue的元数据以及真实数据
 * 该集群模式实现了高可用,但是并不是分布式的,因为每个服务器的数据都是一样的
 
 
 
-## Docker中使用
+# Docker
 
 * docker安装可网上搜索,因为国内安装erlang和rabbitmq太慢,直接在docker中安装更快
 
@@ -360,7 +354,7 @@
 
 
 
-### 添加用户
+## 添加用户
 
 * 如果不使用guest,可以自己创建一个用户:
 
@@ -374,7 +368,7 @@
 
  
 
-### 创建Virtual Hosts
+## 创建Virtual Hosts
 
 虚拟主机:类似于mysql中的database.他们都是以"/"开头
 
@@ -382,7 +376,7 @@
 
 
 
-### 设置权限
+## 设置权限
 
 ![](image03.png)
 
@@ -394,7 +388,7 @@
 
 
 
-## Springboot配置MQ
+# Springboot集成
 
 ```yaml
 spring: 
@@ -455,25 +449,6 @@ public class EmailReceiver {
 
 
 
-# ActiveMQ
-
-	1.Destination:相比于RabbitMQ多了一个Destination,由JMS Provider(消息中间件)负责维护,用于管理Message.而Producer需要指定Destination才能发送消息,Consumer也需要指定Destination才能接收消息.
-	2.Producer:消息的生产者,发送message到目的地,应用接口为MessageProducer
-	3.Consumer(Receiver):消息消费者,负责从目的地中(处理,监听,订阅)message,应用接口MessageConsumer
-	4.Message:消息内容.常见有StreamMessage,BytesMessage,TextMessage,ObjectMessage,MapMessage.若是要实现自己的消息接口,实体类就需要实现Serializable接口
-	5.ConnectionFactory:链接工厂,非jdbc的工厂.
-	6.Connection:链接,创建访问ActiveMQ连接,由工厂创建
-	7.Session:会话,一次持久有效有状态的访问,由链接创建
-	8.Queue:队列,是Destination的子接口,处在队列中的消息,只能由一个Consumer消费,消费完之后删除
-	9.Topic:主题,Destination的子接口,和RabbitMQ中的Topic差不多,可重复处理信息
-	
-	ActiveMQ安装
-	apache官网下载,解压.主要的配置文件有active的jar包,data是active数据默认存储文件夹,webapps是active网页端监控,配置文件都在conf文件夹中.
-	bin:该文件夹中有个active脚本,可用来start,stop,status当前active
-	conf:该文件中有active的各种配置文件,其中jetty.xml是启动webapps需要配置的,类似tomcat的settings.xml.还有一个jetty-realm.properties文件是登录网页端配置的用户名和密码等.groups和user.properties文件是jetty的权限配置文件.active.xml是active主要配置文件,集群,端口等在该文件配置.
-
-
-
-# springcloud stream
+# Springcloud stream
 
 	主要是对rabbit和kafuka的简化使用,不必配置更多的配置来使用中间件

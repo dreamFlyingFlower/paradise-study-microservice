@@ -10,11 +10,30 @@ spring:
     template:
       # 默认的交换机名称
       exchange: default-exchange
+      # 发送者重试机制
+      retry:
+        # 开启重试
+        enabled: true
+        # 首次重试的间隔时间,单位ms
+        initial-interval: 1000
+        # 最大重试次数
+        max-attempts: 3
+        # 重试时间间隔,单位ms
+        max-interval: 10000
+        # 每次重试的因子,1表示上次的1倍,2上次的2倍
+        multiplier: 1.0
     listener:
       simple:
         # Ack是否手动确认,manual手动,none不确认,auto自动,默认自动
         # 若在开启手动确认消息,则必须在消费者中手动确认消息,否则生产者会不停的发消息
 #        acknowledge-mode: manual
+        # 消费者数量
+        concurrency: 10
+        max-concurrency: 10
+        # 每次从队列中取出的消息数
+        prefetch: 1
+        # 消费失败后立刻将消息重新发送到队列中,true->是,false->否
+        default-requeue-rejected: true
         retry:
           # 是否开启重试机制,默认不开启
           enabled: true
