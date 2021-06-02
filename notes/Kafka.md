@@ -1,14 +1,17 @@
 # Kafka
 
-* kafka由多个broker组成,每个broker是一个节点
-* 创建一个topic,这个topic可以划分为多个partition,每个partition可以存在于不同的broker上,每个partition就放一部分数据
-* 这就是天然的分布式消息队列,一个topic的数据,是分散放在多个机器上的,每个机器就放一部分数据
-* kafka提供了HA机制,就是replica副本机制
-* 每个partition的数据都会同步到其他机器上,形成自己的多个replica副本
+* Kafka由多个broker组成,每个broker是一个节点,可以认为是一台服务器
+* 创建一个Topic,这个Topic可以划分为多个分区(Partition),每个Partition可以存在于不同的broker上,每个Partition就放一部分数据,数据是均匀地放在多个分区中的
+* 每个分区中数据是严格按照顺序排列的,但多个分区中的顺序并不是严格的按照生产者放入消息的顺序排列
+* 分区中的每条消息都会有一个唯一的offset做标识,只在当前分区中唯一
+* 消费者可以以任意顺序消费分区中的消息,不需要按照消息在分区中的顺序进行消费.可以重复消费消息
+* 这就是天然的分布式消息队列,一个Topic的数据,是分散放在多个机器上的,每个机器就放一部分数据
+* Kafka提供了HA机制,就是replica副本机制
+* 每个Partition的数据都会同步到其他机器上,形成自己的多个replica副本
 * 然后所有replica会选举一个leader出来,那么生产和消费都跟这个leader打交道,然后其他replica就是follower
 * 写数据的时候,leader会负责把数据同步到所有follower上去,读的时候就直接读leader上数据即可
 * 写数据时,生产者就写leader,其他follower主动从leader来pull数据,一旦所有follower同步好数据了,就会发送ack给leader,leader收到所有follower的ack之后,就会返回写成功的消息给生产者
-* kafka会均匀的将一个partition的所有replica分布在不同的机器上,这样才可以提高容错性
+* Kafka会均匀的将一个Partition的所有replica分布在不同的机器上,这样才可以提高容错性
 
 
 
