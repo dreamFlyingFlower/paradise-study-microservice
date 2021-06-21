@@ -125,7 +125,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	 * anyrequest.authenticated:所有的请求登录后才可访问
 	 * formlogin:表示允许表单登录
 	 * httpbasic:表示允许http请求登录
-	 * loginPage:拦截未登录的请求到指定页面,只能是内置的页面,默认/login
+	 * loginPage:拦截未登录的请求到指定页面,只能是内置的页面,默认/login.或者跳转到指定的url,进行其他处理
 	 * loginProcessingUrl:自定义的登录请求url,程序会从该url中读取登录参数,注意开头必须有/,默认是/login
 	 * usernameParameter:自定义用户名的请求字段,默认username.可写在配置文件中
 	 * passwordParameter:自定义密码的请求字段,默认password,可写在配置文件中

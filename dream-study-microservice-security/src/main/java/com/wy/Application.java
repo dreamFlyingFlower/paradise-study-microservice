@@ -19,7 +19,10 @@ import org.springframework.security.access.vote.AffirmativeBased;
 import org.springframework.security.access.vote.ConsensusBased;
 import org.springframework.security.access.vote.RoleVoter;
 import org.springframework.security.access.vote.UnanimousBased;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.CachingUserDetailsService;
+import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -34,6 +37,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter;
 import org.springframework.security.web.authentication.ui.DefaultLoginPageGeneratingFilter;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.context.SecurityContextPersistenceFilter;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter;
 import org.springframework.security.web.session.SessionManagementFilter;
@@ -50,12 +54,31 @@ import com.wy.crl.UserCrl;
  * https://blog.csdn.net/XlxfyzsFdblj/article/details/82083443 实现动态权限控制<br>
  * {@link https://www.cnblogs.com/softidea/p/7068149.html}<br>
  * 
+ * SpringSecurity请求流程,主要拦截器:
+ * 
+ * <pre>
+ * 用户登录
+ * ->{@link AbstractAuthenticationProcessingFilter#attemptAuthentication()}:默认调用UsernamePasswordAuthenticationFilter的实现
+ * ->{@link UsernamePasswordAuthenticationFilter#attemptAuthentication()}:默认的登录拦截器,使用用户名和密码登录
+ * -->{@link AuthenticationProvider#authenticate()}:不同登录方式验证.如用户名密码登录,第三方登录等
+ * -->{@link DaoAuthenticationProvider#authenticate()}:用户名密码默认使用该类进行登录验证,抽象父类验证.不同方式使用不同的验证类
+ * --->{@link DaoAuthenticationProvider#retrieveUser()}:使用自定义的 UserDetailsService 实现类获得数据库用户名和密码
+ * ---->{@link UserDetailsService}:用户自定义用户名和密码的登录校验接口,被{@link DaoAuthenticationProvider#retrieveUser()}调用
+ * --->{@link AbstractUserDetailsAuthenticationProvider.DefaultPreAuthenticationChecks#check}:前置检查数据库用户的权限,如锁定等
+ * --->{@link DaoAuthenticationProvider#additionalAuthenticationChecks}:检查数据库密码和前端密码是否匹配
+ * --->{@link AbstractUserDetailsAuthenticationProvider.DefaultPostAuthenticationChecks#check}:后置检查密码是否过期
+ * ->{@link AbstractAuthenticationProcessingFilter#successfulAuthentication}:认证成功的调用方法,会调用自定义的认证成功处理类
+ * ->{@link AbstractAuthenticationProcessingFilter#unsuccessfulAuthentication}:认证失败的处理方法,会调用自定义的认证失败处理类
+ * ->{@link BasicAuthenticationFilter}...
+ * ->{@link ExceptionTranslationFilter}->{@link FilterSecurityInterceptor}->REST API
+ * </pre>
+ * 
  * SpringSecurity的主要拦截器以及功能:
  * 
  * <pre>
  * {@link SecurityContextPersistenceFilter}:初始拦截器,拦截Session,创建SecurityContext,并保存到{@link SecurityContextHolder}中
  * {@link LogoutFilter}:登出拦截器,默认只拦截/logout请求
- * {@link AbstractAuthenticationProcessingFilter}:处理form登录过滤器,默认只拦截post方式的/login请求,{@link UsernamePasswordAuthenticationFilter}
+ * {@link AbstractAuthenticationProcessingFilter}:处理form登录过滤器,默认拦截post的/login请求,UsernamePasswordAuthenticationFilter
  * {@link DefaultLoginPageGeneratingFilter}:生成默认的登录页面,即使重新定义,也只能是内置页面,默认是/login页面
  * {@link RememberMeAuthenticationFilter}:若启用了rememberme功能,对该功能进行拦截,主要依赖cookie实现
  * {@link SecurityContextHolderAwareRequestFilter}:对SecurityContext进行包装,以便实现其他功能
@@ -78,7 +101,7 @@ import com.wy.crl.UserCrl;
  * {@link Authentication#getAuthorities()}:获取权限集合,由{@link UserDetails#getAuthorities()}注入
  * {@link Authentication#getDetails()}:获取认证的一些额外信息
  * {@link Authentication#getPrincipal()}:获取凭证,主要是在登录时存入到SecurityContext中的数据
- * {@link AbstractAccessDecisionManager}:自定义决策,可继承该抽象类,也可以实现接口,核心方法为supports.若有2个以上的权限时,就需要重写该方法
+ * {@link AbstractAccessDecisionManager}:自定义决策,可继承该抽象类,也可以实现接口,核心方法为supports.多权限时,需要重写该方法
  * {@link AccessDecisionVoter}:投票器,决定请求是否有权限访问资源
  * ->{@link RoleVoter}:角色投票器,根据角色判断是否有权限访问,主要方法为vote
  * ->{@link AffirmativeBased}:只要有一个投票器通过就允许访问,主要方法为decide
@@ -123,10 +146,7 @@ import com.wy.crl.UserCrl;
  * {@link EnableRedisHttpSession}:通过redis开启session的集群共享功能,或者通过配置文件的sorttype配置
  * 
  * SpringSecurity的权限设计不够精细,可以结合自定义权限,更精细控制权限:
- * 
- * <pre>
- * 部门表,人员表,权限模块表(菜单表),权限表(按钮表,要添加不是通过点击按钮产生的请求url访问字段),角色表,角色用户表,角色权限表,权限更新记录表
- * </pre>
+ * 部门,人员,权限模块(菜单),权限(按钮表,要添加不是通过点击按钮产生的请求url访问字段),角色,角色用户,角色权限,权限更新记录
  * 
  * @author 飞花梦影
  * @date 2019-01-31 00:09:33
