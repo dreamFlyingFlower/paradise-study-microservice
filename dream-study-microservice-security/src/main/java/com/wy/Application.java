@@ -54,10 +54,10 @@ import com.wy.crl.UserCrl;
  * https://blog.csdn.net/XlxfyzsFdblj/article/details/82083443 实现动态权限控制<br>
  * {@link https://www.cnblogs.com/softidea/p/7068149.html}<br>
  * 
- * SpringSecurity请求流程,主要拦截器:
+ * SpringSecurity请求流程,用户登录主要拦截器:
  * 
  * <pre>
- * 用户登录
+ * ->{@link SecurityContextPersistenceFilter}:进入时检查SecurityContext中是否有登录信息,离开时将登录信息存入到session中
  * ->{@link AbstractAuthenticationProcessingFilter#attemptAuthentication()}:默认调用UsernamePasswordAuthenticationFilter的实现
  * ->{@link UsernamePasswordAuthenticationFilter#attemptAuthentication()}:默认的登录拦截器,使用用户名和密码登录
  * -->{@link AuthenticationProvider#authenticate()}:不同登录方式验证.如用户名密码登录,第三方登录等
@@ -68,6 +68,7 @@ import com.wy.crl.UserCrl;
  * --->{@link DaoAuthenticationProvider#additionalAuthenticationChecks}:检查数据库密码和前端密码是否匹配
  * --->{@link AbstractUserDetailsAuthenticationProvider.DefaultPostAuthenticationChecks#check}:后置检查密码是否过期
  * ->{@link AbstractAuthenticationProcessingFilter#successfulAuthentication}:认证成功的调用方法,会调用自定义的认证成功处理类
+ * -->{@link SecurityContextHolder}:默认实现类{@link SecurityContextImpl},该类会将认证信息存入{@link SecurityContext}中
  * ->{@link AbstractAuthenticationProcessingFilter#unsuccessfulAuthentication}:认证失败的处理方法,会调用自定义的认证失败处理类
  * ->{@link BasicAuthenticationFilter}...
  * ->{@link ExceptionTranslationFilter}->{@link FilterSecurityInterceptor}->REST API
@@ -108,7 +109,7 @@ import com.wy.crl.UserCrl;
  * ->{@link ConsensusBased}:有一半以上的投票器通过就允许访问,主要方法为decide
  * ->{@link UnanimousBased}:所有投票器都通过才允许访问,主要方法为decide
  * 
- * {@link EnableGlobalMethodSecurity}:开启Security安全管理<br>
+ * {@link EnableGlobalMethodSecurity}:开启Security安全管理
  * {@link EnableGlobalMethodSecurity#prePostEnabled()}:是否开启{PreAuthorize PostAuthorize}注解,默认不开启
  * {@link PreAuthorize}:该注解用来管理角色,权限等,值为SpringEL表达式,解析规则{@link SecurityExpressionRoot}
  * ->角色比较:在写入角色时需要在角色之前添加ROLE_,但是使用的时候是直接使用角色即可
@@ -116,6 +117,8 @@ import com.wy.crl.UserCrl;
  * -->若需要同时满足多个角色条件,可以使用AND,如hasRole('ADMIN') AND hasRole('USER')
  * ->权限比较:写入权限时和使用时写一样的即可,即hasAnyAuthority('create')或hasAuthority('create')
  * ->在EL表达式中可以直接使用的变量有:authentication,principal,都是在登录时存入的信息,authentication包含principal
+ * {@link AuthenticationPrincipal}:不需要依托EnableGlobalMethodSecurity,修饰参数时直接取得Authentication中的用户信息,
+ * 		即直接取得在登录时存入session的实现了UserDetails的类信息
  * </pre>
  * 
  * 自定义权限:
