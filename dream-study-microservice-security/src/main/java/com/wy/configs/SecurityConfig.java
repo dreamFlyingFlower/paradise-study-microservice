@@ -16,6 +16,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 
+import com.wy.filters.VerifyFilter;
 import com.wy.properties.UserProperties;
 import com.wy.security.LoginAuthEntryPoint;
 import com.wy.security.LoginFailureHandler;
@@ -23,7 +24,6 @@ import com.wy.security.LoginSuccessHandler;
 import com.wy.security.LogoutSuccessHandler;
 import com.wy.security.UserAuthenticationProvider;
 import com.wy.service.UserService;
-import com.wy.verify.VerifyFilter;
 
 /**
  * 重写security的configure方法,见官网

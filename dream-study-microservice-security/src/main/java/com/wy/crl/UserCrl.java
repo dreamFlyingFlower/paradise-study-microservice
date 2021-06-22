@@ -92,7 +92,7 @@ public class UserCrl {
 	private VerifyHandlerFactory factory;
 
 	/**
-	 * 创建验证码，根据验证码类型不同，调用不同的 {@link VerifyHandler}接口实现
+	 * 创建验证码,根据验证码类型不同,调用不同的 {@link VerifyHandler}接口实现
 	 * 
 	 * @param type 验证的类型
 	 * @param request 请求

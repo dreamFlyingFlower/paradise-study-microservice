@@ -3,13 +3,16 @@ package com.wy.verify;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
 /**
- * @apiNote 校验参数实体类
- * @author ParadiseWY
- * @date 2019年9月24日
+ * 校验参数实体类,通用参数
+ * 
+ * @auther 飞花梦影
+ * @date 2019-09-24 22:58:19
+ * @git {@link https://github.com/dreamFlyingFlower}
  */
 @Getter
 @Setter
@@ -20,15 +23,18 @@ public class VerifyEntity implements Serializable {
 	/**
 	 * 校验码
 	 */
+	@ApiModelProperty("校验码")
 	private String verityCode;
 
 	/**
 	 * 过期时间
 	 */
+	@ApiModelProperty("过期时间")
 	private LocalDateTime expireTime;
 
 	/**
 	 * 构造函数
+	 * 
 	 * @param verityCode 验证码
 	 * @param expireSeconds 过期时间,单位秒
 	 */

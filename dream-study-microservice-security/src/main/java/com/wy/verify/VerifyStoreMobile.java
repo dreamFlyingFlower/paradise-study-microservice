@@ -26,7 +26,7 @@ public class VerifyStoreMobile implements VerifyStore {
 	private RedisTemplate<Object, Object> redisTemplate;
 
 	@Override
-	public String sourceType() {
+	public String requestSource() {
 		return "mobile";
 	}
 

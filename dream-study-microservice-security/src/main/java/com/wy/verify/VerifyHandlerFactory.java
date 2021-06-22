@@ -15,10 +15,10 @@ public class VerifyHandlerFactory {
 	private Map<String, VerifyHandler> verifyHandlers;
 
 	@Autowired
-	private Map<String, VerifyType> verifyTypes;
+	private Map<String, VerifyInfo> verifyTypes;
 
-	public VerifyType getVerifyType(String type) {
-		for (Map.Entry<String, VerifyType> entry : verifyTypes.entrySet()) {
+	public VerifyInfo getVerifyInfo(String type) {
+		for (Map.Entry<String, VerifyInfo> entry : verifyTypes.entrySet()) {
 			if (Objects.equals(type.toLowerCase(),
 					entry.getValue().getVerifyType().toLowerCase())) {
 				return entry.getValue();
@@ -28,10 +28,10 @@ public class VerifyHandlerFactory {
 	}
 
 	public VerifyHandler getHandler(String type) {
-		return getHandler(getVerifyType(type));
+		return getHandler(getVerifyInfo(type));
 	}
 
-	public VerifyHandler getHandler(VerifyType verifyType) {
+	public VerifyHandler getHandler(VerifyInfo verifyType) {
 		if (verifyType == null) {
 			throw new ResultException("验证方式不存在");
 		}

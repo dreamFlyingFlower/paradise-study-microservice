@@ -18,7 +18,7 @@ public class VerifyStorePc implements VerifyStore {
 	SessionStrategy sessionStraegy = new HttpSessionSessionStrategy();
 	
 	@Override
-	public String sourceType() {
+	public String requestSource() {
 		return "pc";
 	}
 

@@ -1,10 +1,11 @@
-package com.wy.verify;
+package com.wy.configs;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.wy.verify.image.ImageVerifyGenerator;
+import com.wy.verify.VerifyGenerator;
+import com.wy.verify.code.ImageVerifyGenerator;
 import com.wy.verify.sms.DefaultSmsSend;
 import com.wy.verify.sms.SmsSend;
 import com.wy.verify.sms.SmsVerifyGenerator;

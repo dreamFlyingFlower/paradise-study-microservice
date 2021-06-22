@@ -9,15 +9,23 @@ import org.springframework.web.bind.ServletRequestUtils;
 import org.springframework.web.context.request.ServletWebRequest;
 
 import com.wy.common.AuthException;
+import com.wy.enums.VerifyType;
 import com.wy.lang.StrTool;
 
+/**
+ * 验证码校验主要类,可以使用短信和验证码
+ * 
+ * @auther 飞花梦影
+ * @date 2021-06-22 23:25:32
+ * @git {@link https://github.com/dreamFlyingFlower}
+ */
 public abstract class AbstractVerify<C extends VerifyEntity> implements VerifyHandler {
 
 	@Autowired
 	private VerifyHandlerFactory verifyHandlerFactory;
 
 	/**
-	 * 系统所有 {@link VerifyGenerator} 的实现。
+	 * 系统所有 {@link VerifyGenerator} 的实现
 	 */
 	@Autowired
 	private Map<String, VerifyGenerator> verifyGenerators;
@@ -33,6 +41,10 @@ public abstract class AbstractVerify<C extends VerifyEntity> implements VerifyHa
 	 */
 	@Override
 	public void generate(ServletWebRequest servletWebRequest, String type) {
+		boolean check = VerifyType.check(type);
+		if (!check) {
+			throw new AuthException("验证码类型错误");
+		}
 		// 生成验证码
 		VerifyEntity entity = generateVerify(servletWebRequest, type);
 		// 将验证码存入到session中
@@ -48,7 +60,7 @@ public abstract class AbstractVerify<C extends VerifyEntity> implements VerifyHa
 	 * @return
 	 */
 	private VerifyEntity generateVerify(ServletWebRequest request, String type) {
-		String obtainVerify = verifyHandlerFactory.getVerifyType(type).getObtainVerify();
+		String obtainVerify = verifyHandlerFactory.getVerifyInfo(type).getObtainVerify();
 		VerifyGenerator verifyGenerator = verifyGenerators.get(obtainVerify);
 		if (verifyGenerator == null) {
 			throw new AuthException("验证码生成器" + obtainVerify + "不存在");
@@ -71,7 +83,7 @@ public abstract class AbstractVerify<C extends VerifyEntity> implements VerifyHa
 			}
 		}
 		for (Map.Entry<String, VerifyStore> entry : verifyStores.entrySet()) {
-			if (Objects.equals(entry.getValue().sourceType(), requestSource)) {
+			if (Objects.equals(entry.getValue().requestSource(), requestSource)) {
 				return entry.getValue();
 			}
 		}
@@ -82,7 +94,7 @@ public abstract class AbstractVerify<C extends VerifyEntity> implements VerifyHa
 	 * 保存校验码
 	 * 
 	 * @param request 请求头
-	 * @param validateCode 此处不可直接存入validateCode,因为bufferedimage没有序列化,开启redis之后会报错
+	 * @param verifyEntity 此处不可直接存入verifyEntity,因为bufferedimage没有序列化,开启redis之后会报错
 	 */
 	private void save(ServletWebRequest request, VerifyEntity verifyEntity) {
 		VerifyEntity entity = new VerifyEntity(verifyEntity.getVerityCode(), verifyEntity.getExpireTime());
@@ -91,7 +103,7 @@ public abstract class AbstractVerify<C extends VerifyEntity> implements VerifyHa
 
 	@Override
 	public boolean verify(ServletWebRequest request, String type) {
-		VerifyType verifyType = verifyHandlerFactory.getVerifyType(type);
+		VerifyInfo verifyInfo = verifyHandlerFactory.getVerifyInfo(type);
 		Object sessionVerifyEntity = getVerifyStore(request).getStore(request);
 		if (Objects.isNull(sessionVerifyEntity)) {
 			throw new AuthException("验证码不存在");
@@ -99,7 +111,7 @@ public abstract class AbstractVerify<C extends VerifyEntity> implements VerifyHa
 		VerifyEntity verifyEntity = (VerifyEntity) sessionVerifyEntity;
 		String requestCode;
 		try {
-			requestCode = ServletRequestUtils.getStringParameter(request.getRequest(), verifyType.getVerifyType());
+			requestCode = ServletRequestUtils.getStringParameter(request.getRequest(), verifyInfo.getVerifyType());
 		} catch (ServletRequestBindingException e) {
 			throw new AuthException("获取验证码的值失败");
 		}
@@ -120,9 +132,8 @@ public abstract class AbstractVerify<C extends VerifyEntity> implements VerifyHa
 	/**
 	 * 发送校验码,由子类实现
 	 * 
-	 * @param request
-	 * @param validateCode
-	 * @throws Exception
+	 * @param request 请求和响应
+	 * @param entity 验证实体对象
 	 */
 	protected abstract void handler(ServletWebRequest request, VerifyEntity entity);
 }

@@ -1,4 +1,4 @@
-package com.wy.verify;
+package com.wy.filters;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,16 +22,20 @@ import com.wy.collection.ListTool;
 import com.wy.common.AuthException;
 import com.wy.lang.StrTool;
 import com.wy.properties.UserProperties;
+import com.wy.verify.VerifyHandlerFactory;
+import com.wy.verify.VerifyInfo;
 
 /**
- * 登录请求拦截器,主要是当加了验证之后拦截验证码是否正确
+ * 登录请求验证码拦截器,拦截登录时的验证码
  * 
- * @apiNote 被拦截的登录请求中必须携带verifyType参数,该参数是用来表明验证的类型,如图片验证,短信验证或其他.
- *          该参数必须直接拼接在url后面,防止因为请求类型的不同而无法获得该参数.
- *          其他参数除了用户名和密码之外,还需要将verifyType的值作为参数,需要验证的值做为该参数的值传入请求中.
- *          如verifyType=image,则还需要参数image=需要验证的值
- * @author ParadiseWY
- * @date 2019年9月30日
+ * 被拦截的登录请求中必须携带verifyType参数,该参数是用来表明验证的类型,如图片验证,短信验证或其他.
+ * 该参数必须直接拼接在url后面,防止因为请求类型的不同而无法获得该参数.
+ * 其他参数除了用户名和密码之外,还需要将verifyType的值作为参数,需要验证的值做为该参数的值传入请求中.
+ * 如verifyType=image,则还需要参数image=需要验证的值
+ * 
+ * @auther 飞花梦影
+ * @date 2019-09-30 23:48:09
+ * @git {@link https://github.com/dreamFlyingFlower}
  */
 @Configuration
 public class VerifyFilter extends OncePerRequestFilter implements InitializingBean {
@@ -88,7 +92,7 @@ public class VerifyFilter extends OncePerRequestFilter implements InitializingBe
 			throws ServletException, IOException {
 		if (userProperties.getVerify().isEnabled()) {
 			try {
-				VerifyType type = getVerifyType(request);
+				VerifyInfo type = getVerifyType(request);
 				if (type != null) {
 					logger.info("校验请求(" + request.getRequestURI() + ")中的验证码,验证码类型" + type);
 					verifyHandlerFactory.getHandler(type).verify(new ServletWebRequest(request, response),
@@ -109,18 +113,18 @@ public class VerifyFilter extends OncePerRequestFilter implements InitializingBe
 	 * @param request
 	 * @return
 	 */
-	private VerifyType getVerifyType(HttpServletRequest request) {
+	private VerifyInfo getVerifyType(HttpServletRequest request) {
 		for (String url : defaultFilterUrls) {
 			if (pathMatcher.match(url, request.getRequestURI())) {
 				String requestType = request.getParameter("verifyType");
 				if (StrTool.isBlank(requestType)) {
 					throw new AuthException("未指定登录验证类型verifyType");
 				}
-				VerifyType verifyType = verifyHandlerFactory.getVerifyType(requestType);
-				if (verifyType == null) {
+				VerifyInfo verifyInfo = verifyHandlerFactory.getVerifyInfo(requestType);
+				if (verifyInfo == null) {
 					throw new AuthException("验证类型错误");
 				}
-				return verifyType;
+				return verifyInfo;
 			}
 		}
 		return null;

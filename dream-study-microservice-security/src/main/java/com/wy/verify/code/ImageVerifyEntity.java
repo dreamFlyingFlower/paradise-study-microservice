@@ -1,4 +1,4 @@
-package com.wy.verify.image;
+package com.wy.verify.code;
 
 import java.awt.image.BufferedImage;
 import java.time.LocalDateTime;

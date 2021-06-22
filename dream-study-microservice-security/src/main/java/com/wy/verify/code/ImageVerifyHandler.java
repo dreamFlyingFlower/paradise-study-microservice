@@ -1,4 +1,4 @@
-package com.wy.verify.image;
+package com.wy.verify.code;
 
 import java.io.IOException;
 
@@ -12,9 +12,11 @@ import com.wy.verify.AbstractVerify;
 import com.wy.verify.VerifyEntity;
 
 /**
- * @apiNote 图片验证码处理
- * @author ParadiseWY
- * @date 2019年9月24日
+ * 图片验证码处理,直接写到相应中即可
+ * 
+ * @auther 飞花梦影
+ * @date 2019-09-24 23:23:11
+ * @git {@link https://github.com/dreamFlyingFlower}
  */
 @Component
 public class ImageVerifyHandler extends AbstractVerify<ImageVerifyEntity> {

@@ -1,4 +1,4 @@
-package com.wy.verify.image;
+package com.wy.verify.code;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -7,6 +7,7 @@ import java.awt.image.BufferedImage;
 import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.ServletRequestUtils;
 import org.springframework.web.context.request.ServletWebRequest;
 
@@ -14,10 +15,13 @@ import com.wy.properties.UserProperties;
 import com.wy.verify.VerifyGenerator;
 
 /**
- * @apiNote 图形验证码
- * @author ParadiseWY
- * @date 2019年9月24日
+ * 生成图形验证码
+ * 
+ * @auther 飞花梦影
+ * @date 2019-09-24 23:20:34
+ * @git {@link https://github.com/dreamFlyingFlower}
  */
+@Component("imageVerifyGenerator")
 public class ImageVerifyGenerator implements VerifyGenerator {
 
 	@Autowired
@@ -30,11 +34,8 @@ public class ImageVerifyGenerator implements VerifyGenerator {
 		int height = ServletRequestUtils.getIntParameter(request.getRequest(), "height",
 				userProperties.getVerify().getImage().getHeight());
 		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-
 		Graphics g = image.getGraphics();
-
 		Random random = new Random();
-
 		g.setColor(getRandColor(200, 250));
 		g.fillRect(0, 0, width, height);
 		g.setFont(new Font("Times New Roman", Font.ITALIC, 20));
@@ -46,20 +47,15 @@ public class ImageVerifyGenerator implements VerifyGenerator {
 			int yl = random.nextInt(12);
 			g.drawLine(x, y, x + xl, y + yl);
 		}
-
 		String sRand = "";
 		for (int i = 0; i < userProperties.getVerify().getImage().getLength(); i++) {
 			String rand = String.valueOf(random.nextInt(10));
 			sRand += rand;
-			g.setColor(new Color(20 + random.nextInt(110), 20 + random.nextInt(110),
-					20 + random.nextInt(110)));
+			g.setColor(new Color(20 + random.nextInt(110), 20 + random.nextInt(110), 20 + random.nextInt(110)));
 			g.drawString(rand, 13 * i + 6, 16);
 		}
-
 		g.dispose();
-
-		return new ImageVerifyEntity(image, sRand,
-				userProperties.getVerify().getImage().getExpireSeconds());
+		return new ImageVerifyEntity(image, sRand, userProperties.getVerify().getImage().getExpireSeconds());
 	}
 
 	/**
