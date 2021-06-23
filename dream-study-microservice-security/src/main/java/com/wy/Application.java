@@ -21,6 +21,7 @@ import org.springframework.security.access.vote.RoleVoter;
 import org.springframework.security.access.vote.UnanimousBased;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.CachingUserDetailsService;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -36,8 +37,13 @@ import org.springframework.security.web.access.ExceptionTranslationFilter;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
+import org.springframework.security.web.authentication.rememberme.AbstractRememberMeServices;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter;
 import org.springframework.security.web.authentication.ui.DefaultLoginPageGeneratingFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
@@ -57,12 +63,13 @@ import com.wy.crl.UserCrl;
  * https://blog.csdn.net/XlxfyzsFdblj/article/details/82083443 实现动态权限控制<br>
  * {@link https://www.cnblogs.com/softidea/p/7068149.html}<br>
  * 
- * SpringSecurity请求流程,用户登录主要拦截器:
+ * SpringSecurity用户登录主要流程:
  * 
  * <pre>
  * ->{@link SecurityContextPersistenceFilter}:进入时检查SecurityContext中是否有登录信息,离开时将登录信息存入到session中
  * ->{@link AbstractAuthenticationProcessingFilter#attemptAuthentication()}:默认调用UsernamePasswordAuthenticationFilter的实现
  * ->{@link UsernamePasswordAuthenticationFilter#attemptAuthentication()}:默认的登录拦截器,使用用户名和密码登录
+ * ->{@link ProviderManager#authenticate()}:验证登录管理器进行验证,主要管理验证的方式,如用户名密码,第三方等
  * -->{@link AuthenticationProvider#authenticate()}:不同登录方式验证.如用户名密码登录,第三方登录等
  * -->{@link DaoAuthenticationProvider#authenticate()}:用户名密码默认使用该类进行登录验证,抽象父类验证.不同方式使用不同的验证类
  * --->{@link DaoAuthenticationProvider#retrieveUser()}:使用自定义的 UserDetailsService 实现类获得数据库用户名和密码
@@ -75,6 +82,21 @@ import com.wy.crl.UserCrl;
  * ->{@link AbstractAuthenticationProcessingFilter#unsuccessfulAuthentication}:认证失败的处理方法,会调用自定义的认证失败处理类
  * ->{@link BasicAuthenticationFilter}...
  * ->{@link ExceptionTranslationFilter}->{@link FilterSecurityInterceptor}->REST API
+ * </pre>
+ * 
+ * SpringSecurity记住我主要流程:
+ * 
+ * <pre>
+ * ->{@link UsernamePasswordAuthenticationFilter#attemptAuthentication()}:默认的登录拦截器,使用用户名和密码登录
+ * ->{@link AbstractAuthenticationProcessingFilter#successfulAuthentication}:认证成功的调用方法,会调用自定义的认证成功处理类
+ * ->{@link RememberMeServices#loginSuccess()}:当验证成功并将登录写入context之后,该方法将处理记住我
+ * -->{@link AbstractRememberMeServices#loginSuccess()}:RememberMeServices的实现类,真实调用方法
+ * --->{@link PersistentTokenBasedRememberMeServices#onLoginSuccess()}:将token持久化写入数据库,并将cookie写入浏览器中
+ * 
+ * ->{@link RememberMeAuthenticationFilter}:记住我拦截器,会根据请求中的session进行自动登录
+ * -->{@link AbstractRememberMeServices#autoLogin()}:自动登录
+ * --->{@link PersistentTokenBasedRememberMeServices#processAutoLoginCookie()}:将token从数据库取出并和请求中的token比对
+ * ---->之后的流程大部分同登录流程
  * </pre>
  * 
  * SpringSecurity的主要拦截器以及功能:
@@ -93,13 +115,15 @@ import com.wy.crl.UserCrl;
  * {@link FilterChainProxy}:对上述拦截器按照指定顺序完整功能
  * </pre>
  * 
- * SpringSecurity的主要类以及注解:
+ * SpringSecurity的主要接口类以及注解:
  * 
  * <pre>
  * {@link UserDetails}:具体的用户实现类需要实现该接口,权限方法等需要在该类中添加<br>
  * {@link UserDetails#getAuthorities()}:角色权限方法等需要在该类中添加,角色都要添加ROLE_前缀,权限不需要添加
  * {@link UserDetailsService#loadUserByUsername}:该方法定义登录时的具体行为
  * {@link CachingUserDetailsService}:从{@link UserDetailsService}中获取信息并放入到缓存中
+ * {@link AuthenticationSuccessHandler}:自定义登录成功处理接口
+ * {@link AuthenticationFailureHandler}:自定义登录失败处理接口
  * {@link Authentication}:SpringSecurity对权限信息的主要操作类
  * {@link Authentication#getCredentials()}:获取凭证,基本上相当于密码
  * {@link Authentication#getAuthorities()}:获取权限集合,由{@link UserDetails#getAuthorities()}注入
