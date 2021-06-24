@@ -17,9 +17,24 @@
 
 # OAuth2
 
+
+
+## 概述
+
 * OAuth2官网->OAuth2.0 Framework->Table of Contents->4.Obtaining Authorization可查看OAuth2相关信息
 * OAuth2启动时会打印相关可访问url日志,需开启日志打印级别为trace,同时需要指定打印日志级别的包
   * logging.level.org.springframework.security.oauth2=trace
+* 主要用于第三方应用从服务提供商获取资源所有者(通常是用户)资源,而不需要用户在第三方应用注册
+
+
+
+## 角色
+
+* 资源所有者:通常是用户
+* 第三方应用:需要使用资源所有者资源的应用
+* 服务提供商:拥有资源所有者相关资源的平台
+  * 认证服务器:对资源所有者进行认证,由OAuth2相关的4种协议进行验证
+  * 资源服务器:当资源所有者认证通过后,第三方应用可从资源服务器获得用户资源
 
 
 
@@ -33,7 +48,7 @@
 
 
 
-## 授权码模式流程
+## 授权码模式
 
 * 第三方登录固定流程,该方式为原始方式,使用Social更快捷
 * /oauth/authorize:获得授权码code,接口地址固定,不可配置,get或post请求都可
@@ -72,6 +87,18 @@
     * password:用户密码,非第三方服务的client_secret
     * scope:请求需要的权限
   * 成功结果集中参数:access_token,token_type,refresh_token,expires_in,scope
+
+
+
+## 客户端模式
+
+* 不常用
+
+
+
+## 简化模式
+
+* 不常用
 
 
 
