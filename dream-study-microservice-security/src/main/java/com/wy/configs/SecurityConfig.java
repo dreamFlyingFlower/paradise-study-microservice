@@ -74,7 +74,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	private LogoutSuccessHandler logoutSuccessHandler;
 
 	// @Autowired
-	// private PenguinSocialConfigurer penguinSocialConfigurer;
+	// private QqSocialConfigurer qqSocialConfigurer;
 
 	/**
 	 * 自定义数据库中的token实现,当有记住我的时候,将会将token存入数据库
@@ -142,7 +142,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				// 进行短信验证
 				// .apply(new SmsAuthenticationSecurityConfig()).and()
 				// 进行social验证
-				// .apply(penguinSocialConfigurer).and()
+				// .apply(qqSocialConfigurer).and()
 				// 在用户名和密码校验之后进行拦截
 				.addFilterBefore(verifyFilter, UsernamePasswordAuthenticationFilter.class)
 				// 添加jwt校验

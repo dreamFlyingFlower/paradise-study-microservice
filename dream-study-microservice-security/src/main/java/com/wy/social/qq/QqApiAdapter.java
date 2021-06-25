@@ -8,9 +8,11 @@ import com.wy.entity.UserQq;
 import com.wy.social.IToken;
 
 /**
- * @apiNote spring提供的适配器,构建参数连接服务器
- * @author ParadiseWY
- * @date 2019年9月23日
+ * spring提供的适配器,构建参数连接服务器
+ * 
+ * @auther 飞花梦影
+ * @date 2019-09-23 23:59:28
+ * @git {@link https://github.com/dreamFlyingFlower}
  */
 public class QqApiAdapter implements ApiAdapter<IToken<UserQq>> {
 
@@ -23,7 +25,7 @@ public class QqApiAdapter implements ApiAdapter<IToken<UserQq>> {
 	}
 
 	/**
-	 * 从api中构建连接参数
+	 * 从api中构建连接参数设置到ConnectionValues中
 	 */
 	@Override
 	public void setConnectionValues(IToken<UserQq> api, ConnectionValues values) {
@@ -34,7 +36,7 @@ public class QqApiAdapter implements ApiAdapter<IToken<UserQq>> {
 		values.setImageUrl(userInfo.getFigureurl_1());
 		// 设置个人主页
 		values.setProfileUrl(null);
-		//
+		// 用户在服务提供商里的唯一标识
 		values.setProviderUserId(userInfo.getOpenId());
 	}
 

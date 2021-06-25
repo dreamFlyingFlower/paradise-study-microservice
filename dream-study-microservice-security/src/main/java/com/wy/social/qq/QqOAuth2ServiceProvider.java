@@ -6,19 +6,21 @@ import com.wy.entity.UserQq;
 import com.wy.social.IToken;
 
 /**
- * @apiNote spring发送服务的一系列流程,从而获得服务端提供的token
- * @author ParadiseWY
- * @date 2019年9月23日
+ * spring发送服务的一系列流程,从服务提供商获取提供的access_token
+ * 
+ * @auther 飞花梦影
+ * @date 2019-09-23 23:33:22
+ * @git {@link https://github.com/dreamFlyingFlower}
  */
-public class QqProvider extends AbstractOAuth2ServiceProvider<IToken<UserQq>> {
+public class QqOAuth2ServiceProvider extends AbstractOAuth2ServiceProvider<IToken<UserQq>> {
 
-	// 是一个固定的appId,由第三方服务发放
+	/** 申请鹅厂的第三方app登录成功后,分配给app的appid,即在注册自己的应用时鹅厂给的appId */
 	private String appId;
 
-	// 引到用户跳转的地址,获得Authorization Code
+	/** 引到用户跳转的地址,获得Authorization Code */
 	private static final String URL_AUTHORIZE = "https://graph.qq.com/oauth2.0/authorize";
 
-	// 通过code获得accesstoken的url地址
+	/** 通过code获得access_token的url地址 */
 	private static final String URL_ACCESS_TOKEN = "https://graph.qq.com/oauth2.0/token";
 
 	/**
@@ -27,13 +29,13 @@ public class QqProvider extends AbstractOAuth2ServiceProvider<IToken<UserQq>> {
 	 * @param appId 固定appId
 	 * @param appSecret 申请app时给的密码
 	 */
-	public QqProvider(String appId, String appSecret) {
+	public QqOAuth2ServiceProvider(String appId, String appSecret) {
 		super(new QqTemplate(appId, appSecret, URL_AUTHORIZE, URL_ACCESS_TOKEN));
 		this.appId = appId;
 	}
 
 	@Override
 	public IToken<UserQq> getApi(String accessToken) {
-		return new QqTokenService(accessToken, appId);
+		return new QqOAuth2ApiBinding(accessToken, appId);
 	}
 }

@@ -7,8 +7,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * @apiNote oauth2登录第三方的信息,此处可能需要继承一个
- *          org.springframework.boot.autoconfigure.social.SocialProperties 的类
+ * oauth2登录第三方的信息,此处可能需要继承一个
+ * 
  * @author ParadiseWY
  * @date 2019年9月25日
  */
@@ -19,6 +19,6 @@ import lombok.Setter;
 public class SocialProperties {
 
 	private QQProperties qq = new QQProperties();
-	
+
 	private WeixinProperties wx = new WeixinProperties();
 }

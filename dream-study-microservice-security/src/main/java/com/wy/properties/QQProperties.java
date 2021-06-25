@@ -4,10 +4,11 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * @apiNote oauth2登录第三方的信息,此处可能需要继承一个
- *          org.springframework.boot.autoconfigure.social.SocialProperties 的类
- * @author ParadiseWY
- * @date 2019年9月25日
+ * QQ应用信息,此处可能需要继承#org.springframework.boot.autoconfigure.social.SocialProperties,需要降低Spring版本
+ * 
+ * @auther 飞花梦影
+ * @date 2019-09-25 01:04:59
+ * @git {@link https://github.com/dreamFlyingFlower}
  */
 @Getter
 @Setter

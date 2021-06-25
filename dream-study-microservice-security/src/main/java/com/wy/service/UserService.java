@@ -14,10 +14,11 @@ import com.wy.entity.User;
 
 /**
  * 配合security使用,userservice必须实现userdetailservice接口
+ * 
  * @author paradiseWy
  */
 @Service
-public class UserService implements UserDetailsService,SocialUserDetailsService {
+public class UserService implements UserDetailsService, SocialUserDetailsService {
 
 	/**
 	 * 参数为登录时的username,可通过该username查找用户的详细信息,前提是username唯一
@@ -25,7 +26,7 @@ public class UserService implements UserDetailsService,SocialUserDetailsService 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		// 需要根据用户名从数据库获取,此处演示直接写死
-		if(Objects.equal("admin", username)) {
+		if (Objects.equal("admin", username)) {
 			User user = new User();
 			user.setUsername(username);
 			user.setPassword("$2a$04$Qq9hGAnd7a7EcHh6UIovzeXLQ9O8KBBaaEPgkSefF89xxDIFlGPge");
@@ -44,6 +45,8 @@ public class UserService implements UserDetailsService,SocialUserDetailsService 
 
 	/**
 	 * 第三方登录时需要构建的user
+	 * 
+	 * @param userId 根据服务提供商提供的openid查询的userId,是存在UserConnection表中的id
 	 */
 	@Override
 	public SocialUserDetails loadUserByUserId(String userId) throws UsernameNotFoundException {
