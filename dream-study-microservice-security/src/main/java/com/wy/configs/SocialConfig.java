@@ -7,17 +7,28 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.encrypt.Encryptors;
 import org.springframework.social.UserIdSource;
 import org.springframework.social.config.annotation.ConnectionFactoryConfigurer;
 import org.springframework.social.config.annotation.EnableSocial;
 import org.springframework.social.config.annotation.SocialConfigurerAdapter;
+import org.springframework.social.connect.ConnectionFactory;
 import org.springframework.social.connect.ConnectionFactoryLocator;
 import org.springframework.social.connect.UsersConnectionRepository;
 import org.springframework.social.connect.jdbc.JdbcUsersConnectionRepository;
 import org.springframework.social.connect.web.ProviderSignInUtils;
 import org.springframework.social.security.SocialAuthenticationFilter;
+import org.springframework.social.security.SocialAuthenticationProvider;
+import org.springframework.social.security.SocialAuthenticationToken;
+import org.springframework.social.security.SocialUserDetails;
+import org.springframework.social.security.SocialUserDetailsService;
 import org.springframework.social.security.SpringSocialConfigurer;
+import org.springframework.social.security.provider.OAuth2AuthenticationService;
+import org.springframework.social.security.provider.SocialAuthenticationService;
 
 import com.wy.entity.UserQq;
 import com.wy.properties.UserProperties;
@@ -28,8 +39,34 @@ import com.wy.social.qq.SocialConnectionSignUp;
 /**
  * Social相关配置,必须要开启{@link EnableSocial}
  * 
+ * Spring Social登录相关类:
+ * 
+ * <pre>
+ * {@link SocialAuthenticationFilter}
+ * {@link SocialAuthenticationService}
+ * ->{@link OAuth2AuthenticationService#getAuthToken()}:从请求获取认证的令牌
+ * {@link ConnectionFactory}
+ * {@link Authentication}
+ * ->{@link SocialAuthenticationToken}
+ * {@link AuthenticationManager}
+ * ->{@link ProviderManager}
+ * {@link AuthenticationProvider}
+ * ->{@link SocialAuthenticationProvider}
+ * {@link UsersConnectionRepository}
+ * ->{@link JdbcUsersConnectionRepository}
+ * {@link SocialUserDetailsService}
+ * ->{@link SocialUserDetails}
+ * </pre>
+ * 
+ * Spring Social登录相关流程:
+ * 
+ * <pre>
  * {@link SocialAuthenticationFilter}:所有以/auth开头的请求都会被拦截,失败的请求都会被以/signin开头的请求拦截.
- * 若需要登录的服务提供商为qq,则前端访问的地址为/auth/qq,而qq则是由本程序定义的providerId,必须唯一
+ * 		若需要登录的服务提供商为qq,则前端访问的地址为/auth/qq,而qq则是由本程序定义的providerId,必须唯一.
+ * 		如果不想使用系统默认的拦截地址,可以重写SecurityConfigurerAdapter#postProcess()
+ * {@link SecurityConfigurerAdapter#postProcess()}:重写该方法可以自定义SocialAuthenticationFilter拦截的方法,默认是/auth
+ * {@link SpringSocialConfigurer#configure}:SecurityConfigurerAdapter实现类,将SocialAuthenticationFilter加入到拦截器中
+ * </pre>
  * 
  * @auther 飞花梦影
  * @date 2019-09-23 00:18:00
