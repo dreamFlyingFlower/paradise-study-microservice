@@ -62,6 +62,22 @@ import com.wy.crl.UserCrl;
  * https://blog.csdn.net/qq_29580525/article/details/79317969<br>
  * https://blog.csdn.net/XlxfyzsFdblj/article/details/82083443 实现动态权限控制<br>
  * {@link https://www.cnblogs.com/softidea/p/7068149.html}<br>
+ *
+ * SpringSecurity基本原理，过滤器链:
+ *
+ * <pre>
+ * ->{@link SecurityContextPersistenceFilter}:进入时检查SecurityContext中是否有登录信息,离开时将登录信息存入到session中
+ * ->{@link BasicAuthenticationFilter}:Basic登录认证,拦截请求头中的Authorization:Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==
+ * ->{@link UsernamePasswordAuthenticationFilter}:默认的登录拦截器,使用用户名和密码登录
+ * ->{@link RememberMeAuthenticationFilter}:记住我拦截器,会根据请求中的session进行自动登录
+ * ->{@link SocialAuthenticationFilter}:第三方服务登录，在新的SpringBoot版本中已经移到SpringOAuth项目中
+ * ->{@link OAuth2AuthenticationProcessingFilter}:
+ * ->{@link OAuth2ClientAuthenticationProcessingFilter}:
+ * ->{@link AnonymousAuthenticationFilter}:授权相关,匿名访问过滤器
+ * ->{@link ExceptionTranslationFilter}:异常拦截器，接收FilterSecurityInterceptor抛出的异常
+ * ->{@link FilterSecurityInterceptor}:授权相关,最终决定请求是否能通过各种过滤器访问到程序中的API
+ * ->REST API
+ * </pre>
  * 
  * SpringSecurity用户登录主要流程:
  * 
@@ -113,6 +129,21 @@ import com.wy.crl.UserCrl;
  * {@link SessionManagementFilter}:拦截回话伪造攻击,主要是在登录时销毁用户session,之后再重新生成一个session
  * {@link FilterSecurityInterceptor}:用户的权限过滤都包含在该拦截中 
  * {@link FilterChainProxy}:对上述拦截器按照指定顺序完整功能
+ * </pre>
+ *
+ * SpringSecurity控制授权:
+ * 
+ * <pre>
+ * ->{@link FilterSecurityInterceptor#invoke()}:权限过滤器,在登录验证成功之后才会调用,实际上是一个拦截器
+ * -->{@link AbstractSecurityInterceptor#beforeInvocation()}:
+ * ->{@link AccessDecisionManager}:权限管理接口，管理一组AccessDecisionVoter
+ * -->{@link AbstractAccessDecisionManager}:权限管理接口抽象实现类
+ * --->{@link AffirmativeBased}:一组投票中只要有一个投票通过,则请求通过,默认实现
+ * --->{@link ConsensusBased}:比较通过和不通过的票数多少,谁多就根据谁决定是否通过
+ * --->{@link UnanimousBased}:一组投票中只要有一个不通过,则请求不通过
+ * ->{@link AccessDecisionVoter}:对请求进行投票,根据不同策略决定请求是否能通过
+ * -->{@link WebExpressionVoter}:在Web环境下,所有投票器都由该类决定是否通过
+ * ->{@link ConfigAttribute}:权限配置信息
  * </pre>
  * 
  * SpringSecurity的主要接口类以及注解:
