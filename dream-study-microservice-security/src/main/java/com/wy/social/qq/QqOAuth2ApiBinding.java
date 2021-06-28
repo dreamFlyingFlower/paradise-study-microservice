@@ -67,6 +67,7 @@ public class QqOAuth2ApiBinding extends AbstractOAuth2ApiBinding implements ITok
 	public UserQq getUserInfo() {
 		UserQq penguin = getRestTemplate()
 				.getForEntity(String.format(URL_GET_USERINFO, appId, openId), UserQq.class, new Object[] {}).getBody();
+		penguin.setOpenId(openId);
 		return penguin;
 	}
 }

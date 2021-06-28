@@ -6,10 +6,13 @@ import javax.annotation.security.RolesAllowed;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.access.AccessDecisionVoter;
+import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.expression.SecurityExpressionRoot;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionOperations;
+import org.springframework.security.access.intercept.AbstractSecurityInterceptor;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,6 +28,8 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContext;
@@ -32,8 +37,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.oauth2.client.filter.OAuth2ClientAuthenticationProcessingFilter;
+import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationProcessingFilter;
 import org.springframework.security.web.FilterChainProxy;
 import org.springframework.security.web.access.ExceptionTranslationFilter;
+import org.springframework.security.web.access.expression.WebExpressionVoter;
+import org.springframework.security.web.access.intercept.DefaultFilterInvocationSecurityMetadataSource;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
@@ -51,6 +60,7 @@ import org.springframework.security.web.context.SecurityContextPersistenceFilter
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter;
 import org.springframework.security.web.session.SessionManagementFilter;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
+import org.springframework.social.security.SocialAuthenticationFilter;
 
 import com.wy.configs.ExtraMethodSecurityExpressionHandler;
 import com.wy.configs.ExtraSecurityExpressionRoot;
@@ -135,15 +145,19 @@ import com.wy.crl.UserCrl;
  * 
  * <pre>
  * ->{@link FilterSecurityInterceptor#invoke()}:权限过滤器,在登录验证成功之后才会调用,实际上是一个拦截器
- * -->{@link AbstractSecurityInterceptor#beforeInvocation()}:
- * ->{@link AccessDecisionManager}:权限管理接口，管理一组AccessDecisionVoter
- * -->{@link AbstractAccessDecisionManager}:权限管理接口抽象实现类
- * --->{@link AffirmativeBased}:一组投票中只要有一个投票通过,则请求通过,默认实现
+ * -->{@link AbstractSecurityInterceptor#beforeInvocation()}:调用真正的服务
+ * --->{@link DefaultFilterInvocationSecurityMetadataSource#getAttributes()}:获得所有配置的拦截,验证等URL匹配信息,
+ * 		即{@link WebSecurityConfigurerAdapter#configure(HttpSecurity)}中需要重写的URL拦截信息,封装到{@link ConfigAttribute}中
+ * --->{@link AbstractSecurityInterceptor#authenticateIfRequired()}:获得登录的验证信息
+ * ->{@link AccessDecisionManager#decide}:权限管理接口，管理一组AccessDecisionVoter
+ * -->{@link AbstractAccessDecisionManager#decide}:权限管理接口抽象实现类
+ * --->{@link AffirmativeBased#decide}:一组投票中只要有一个投票通过,则请求通过,默认实现
+ * ---->{@link AffirmativeBased#getDecisionVoters}:在web环境中,默认只有WebExpressionVoter投票器
+ * ---->{@link AccessDecisionVoter#vote()}:对请求进行投票,验证当前URL请求权限是否能通过
+ * ----->{@link WebExpressionVoter#vote()}:在Web环境下,所有投票器都由该类决定是否通过
  * --->{@link ConsensusBased}:比较通过和不通过的票数多少,谁多就根据谁决定是否通过
  * --->{@link UnanimousBased}:一组投票中只要有一个不通过,则请求不通过
- * ->{@link AccessDecisionVoter}:对请求进行投票,根据不同策略决定请求是否能通过
- * -->{@link WebExpressionVoter}:在Web环境下,所有投票器都由该类决定是否通过
- * ->{@link ConfigAttribute}:权限配置信息
+ * ->{@link ExceptionTranslationFilter}:若抛出异常,会被该类拦截,根据异常不同进行不同的操作,同时会对匿名操作进行验证
  * </pre>
  * 
  * SpringSecurity的主要接口类以及注解:

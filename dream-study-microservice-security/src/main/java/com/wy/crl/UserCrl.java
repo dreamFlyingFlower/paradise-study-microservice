@@ -121,7 +121,7 @@ public class UserCrl {
 	}
 
 	/**
-	 * 注册,会将信息写入到数据库
+	 * 注册,会将服务提供商的用户信息写入到数据库,该数据库为UserConnection
 	 * 
 	 * @param request 请求
 	 * @param user 用户
@@ -144,7 +144,7 @@ public class UserCrl {
 	}
 
 	// @PreAuthorize("hasRole('ROLE_ADMIN')")
-	@PreAuthorize("@permissionService.hasRole('ADMIN')")
+	@PreAuthorize("@permissionServices.hasRole('ADMIN')")
 	@PostAuthorize("returnObject.data.username == authenticaiton.name")
 	public Result<?> test(User user) {
 		return Result.ok(user);

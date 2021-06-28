@@ -9,24 +9,24 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 /**
- * @apiNote
- * @author ParadiseWY
- * @date 2019年9月26日
+ * 自定义OAuth2Template,重写创建restTemplate的方法,添加自定义的请求方式
+ * 
+ * @auther 飞花梦影
+ * @date 2019-09-26 12:29:52
+ * @git {@link https://github.com/dreamFlyingFlower}
  */
-public class QqTemplate extends OAuth2Template {
+public class QqOAuth2Template extends OAuth2Template {
 
-	public QqTemplate(String clientId, String clientSecret, String authorizeUrl, String accessTokenUrl) {
+	public QqOAuth2Template(String clientId, String clientSecret, String authorizeUrl, String accessTokenUrl) {
 		super(clientId, clientSecret, authorizeUrl, accessTokenUrl);
 		/**
-		 * 在获得授权码之后再向授权服务器获得accesstoken的时候,需要传递client_id和client_secret参数
-		 * 详见OAuth2Template#exchangeForAccess方法,但是必须是useParametersForClientAuthentication为true
-		 * 若不重写exchangeForAccess方法,则需要将useParametersForClientAuthentication设为true
+		 * 将useParametersForClientAuthentication设为true,可自动传递client_id和client_secret.也可重写exchangeForAccess()
 		 */
 		setUseParametersForClientAuthentication(true);
 	}
 
 	/**
-	 * 重写本方服务器接收授权服务器返回的请求头类型
+	 * 重写本方服务器接收授权服务器返回的请求头类型.默认是表单,文件上传,json,但是缺少text/plain,需自定添加
 	 */
 	@Override
 	protected RestTemplate createRestTemplate() {
@@ -36,10 +36,11 @@ public class QqTemplate extends OAuth2Template {
 	}
 
 	/**
-	 * @apiNote 重写resttemplate解析授权服务器返回的信息的方式,默认授权服务器返回的是json格式
-	 *          若授权服务器返回的结果是json,则不需要重写,若不是json,则需要根据授权服务器返回的方式进行解析
-	 * @apiNote 默认授权服务器返回的accesstoken结果中含有以下参数:access_token,scope,refresh_token,expires_in
-	 *          可从postForAccessGrant的源码中查看
+	 * 重写restTemplate解析授权服务器返回的信息的方式,默认授权服务器返回的是json格式
+	 * 若授权服务器返回的结果是json,则不需要重写,若不是json,则需要根据授权服务器返回的方式进行解析
+	 * 
+	 * {@link OAuth2Template#extractAccessGrant}:授权服务器默认返回access_token的结果中含有以下参数:<br>
+	 * access_token,scope,refresh_token,expires_in
 	 */
 	@Override
 	protected AccessGrant postForAccessGrant(String accessTokenUrl, MultiValueMap<String, String> parameters) {

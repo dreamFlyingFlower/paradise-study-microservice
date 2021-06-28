@@ -2,6 +2,7 @@ package com.wy.entity;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -13,7 +14,9 @@ import lombok.Setter;
 /**
  * 配合security登录,并且使用数据库的数据,必须实现UserDetails接口
  * 
- * @author paradiseWy
+ * @auther 飞花梦影
+ * @date 2021-06-29 00:08:06
+ * @git {@link https://github.com/dreamFlyingFlower}
  */
 @Getter
 @Setter
@@ -64,6 +67,10 @@ public class User implements UserDetails {
 	private boolean credentialsNonExpired;
 
 	private boolean enabled;
+
+	private List<Role> roles;
+
+	private List<PermissionVo> permissions;
 
 	@Override
 	public String toString() {

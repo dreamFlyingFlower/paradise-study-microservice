@@ -21,6 +21,7 @@ import org.springframework.social.connect.ConnectionFactoryLocator;
 import org.springframework.social.connect.UsersConnectionRepository;
 import org.springframework.social.connect.jdbc.JdbcUsersConnectionRepository;
 import org.springframework.social.connect.web.ProviderSignInUtils;
+import org.springframework.social.oauth2.OAuth2Template;
 import org.springframework.social.security.SocialAuthenticationFilter;
 import org.springframework.social.security.SocialAuthenticationProvider;
 import org.springframework.social.security.SocialAuthenticationToken;
@@ -30,11 +31,13 @@ import org.springframework.social.security.SpringSocialConfigurer;
 import org.springframework.social.security.provider.OAuth2AuthenticationService;
 import org.springframework.social.security.provider.SocialAuthenticationService;
 
+import com.wy.crl.UserCrl;
 import com.wy.entity.UserQq;
 import com.wy.properties.UserProperties;
 import com.wy.social.qq.QqConnectionFactory;
+import com.wy.social.qq.QqOAuth2Template;
 import com.wy.social.qq.QqSocialConfigurer;
-import com.wy.social.qq.SocialConnectionSignUp;
+import com.wy.social.qq.QqConnectionSignUp;
 
 /**
  * Social相关配置,必须要开启{@link EnableSocial}
@@ -42,16 +45,22 @@ import com.wy.social.qq.SocialConnectionSignUp;
  * Spring Social登录相关类:
  * 
  * <pre>
- * {@link SocialAuthenticationFilter}
- * {@link SocialAuthenticationService}
- * ->{@link OAuth2AuthenticationService#getAuthToken()}:从请求获取认证的令牌
+ * {@link SocialAuthenticationFilter#attemptAuthentication}:拦截第三方登录请求
+ * ->{@link SocialAuthenticationService}:Social登录验证服务
+ * -->{@link OAuth2AuthenticationService#getAuthToken()}:从请求获取认证的令牌,失败会跳到默认的/signin页面
+ * --->{@link OAuth2Template#exchangeForAccess()}:获得access_token,同时可重写该方法自动传递client_id和client_secret
+ * ---->{@link OAuth2Template#postForAccessGrant()}:发送请求获取access_token,请求类型必须是application/json
+ * ----->{@link OAuth2Template#createRestTemplate()}:创建restTemplate请求,该请求默认添加了3中请求类型,没有text/plain这种方式.
+ * 			若需要添加自定义的请求方式,需要重写,见{@link QqOAuth2Template}
+ * ----->{@link OAuth2Template#postForAccessGrant()}:解析结果,默认是Map,qq默认是拼接在url后面.见{@link QqOAuth2Template}
  * {@link ConnectionFactory}
  * {@link Authentication}
  * ->{@link SocialAuthenticationToken}
  * {@link AuthenticationManager}
  * ->{@link ProviderManager}
- * {@link AuthenticationProvider}
- * ->{@link SocialAuthenticationProvider}
+ * {@link AuthenticationProvider#authenticate()}:登录认证
+ * ->{@link SocialAuthenticationProvider#authenticate()}:根据Connection中的信息从本地数据库获取用户id,若获取不到,跳转signup
+ * -->{@link SocialAuthenticationProvider#toUserId()}:从本地数据库获取用户id
  * {@link UsersConnectionRepository}
  * ->{@link JdbcUsersConnectionRepository}
  * {@link SocialUserDetailsService}
@@ -84,7 +93,7 @@ public class SocialConfig extends SocialConfigurerAdapter {
 	private DataSource dataSource;
 
 	@Autowired(required = false)
-	private SocialConnectionSignUp signUp;
+	private QqConnectionSignUp signUp;
 
 	/**
 	 * 添加服务提供商链接,可添加多个
@@ -111,7 +120,7 @@ public class SocialConfig extends SocialConfigurerAdapter {
 				new JdbcUsersConnectionRepository(dataSource, connectionFactoryLocator, Encryptors.noOpText());
 		// 设置表前缀,也可不设置
 		connectionRepository.setTablePrefix("third_");
-		// 若是不需要在登录第三方服务器之后强制注册,则可以注册一个ConnectionSignUp实现类
+		// 若是不需要在登录服务提供商之后强制注册,则可以注册一个ConnectionSignUp实现类
 		if (signUp != null) {
 			connectionRepository.setConnectionSignUp(signUp);
 		}
@@ -125,16 +134,14 @@ public class SocialConfig extends SocialConfigurerAdapter {
 	public SpringSocialConfigurer userSocialConfigurer() {
 		QqSocialConfigurer configurer = new QqSocialConfigurer("filterUrl");
 		/**
-		 * 设置注册页面,默认是/singin,可以自定义.此处为强制跳转注册页面
-		 * 若不需要注册,则可查看SocialAuthenticationProvider#authenticate,#toUserId方法知晓原因
-		 * 在自定义上文的getUsersConnectionRepository方法中设置ConnectionSignUp的实现类即可
+		 * 自定义注册页面,默认是/signin.在自定义上文的getUsersConnectionRepository方法中设置ConnectionSignUp的实现类即可
 		 */
 		configurer.signupUrl("自定义的登录页面,默认的是/signin");
 		return configurer;
 	}
 
 	/**
-	 * spring提供的注册工具类,会将授权服务器的信息提供给自定义的注册接口
+	 * spring提供的注册工具类,会将授权服务器的信息提供给自定义的注册接口,见{@link UserCrl#getSocialUser()}
 	 * 
 	 * @param connectionFactoryLocator 连接
 	 */

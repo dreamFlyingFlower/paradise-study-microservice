@@ -30,7 +30,7 @@ public class QqOAuth2ServiceProvider extends AbstractOAuth2ServiceProvider<IToke
 	 * @param appSecret 申请app时给的密码
 	 */
 	public QqOAuth2ServiceProvider(String appId, String appSecret) {
-		super(new QqTemplate(appId, appSecret, URL_AUTHORIZE, URL_ACCESS_TOKEN));
+		super(new QqOAuth2Template(appId, appSecret, URL_AUTHORIZE, URL_ACCESS_TOKEN));
 		this.appId = appId;
 	}
 
