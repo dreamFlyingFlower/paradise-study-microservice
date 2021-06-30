@@ -23,9 +23,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.ServletWebRequest;
 
 import com.google.common.collect.ImmutableMap;
+import com.wy.entity.User;
 import com.wy.entity.UserSocial;
 import com.wy.jwt.S_Jwt;
-import com.wy.entity.User;
+import com.wy.oauth2.AppSignUpUtils;
 import com.wy.result.Result;
 import com.wy.result.ResultException;
 import com.wy.verify.VerifyHandler;
@@ -120,6 +121,23 @@ public class UserCrl {
 				.socialimage(connection.getImageUrl()).build();
 	}
 
+	@Autowired
+	private AppSignUpUtils appSignUpUtils;
+
+	/**
+	 * 该类为第三方登录为APP时调用
+	 */
+	@GetMapping("/social/app/signUp")
+	@ResponseStatus(HttpStatus.UNAUTHORIZED)
+	public UserSocial socialAppSign(HttpServletRequest request) {
+		Connection<?> connection = providerSignUtils.getConnectionFromSession(new ServletWebRequest(request));
+		UserSocial userSocial = UserSocial.builder().providerId(connection.getKey().getProviderId())
+				.providerUserId(connection.getKey().getProviderUserId()).nickname(connection.getDisplayName())
+				.socialimage(connection.getImageUrl()).build();
+		appSignUpUtils.saveData(new ServletWebRequest(request), connection.createData());
+		return userSocial;
+	}
+
 	/**
 	 * 注册,会将服务提供商的用户信息写入到数据库,该数据库为UserConnection
 	 * 
@@ -129,7 +147,10 @@ public class UserCrl {
 	@PostMapping("register")
 	public void register(HttpServletRequest request, User user) {
 		String userId = user.getUsername();
-		providerSignUtils.doPostSignUp(userId, new ServletWebRequest(request));
+		// 只有web登录时才使用providerSignUtils
+		// providerSignUtils.doPostSignUp(userId, new ServletWebRequest(request));
+		// app注册时需要使用appSignUpUtils
+		appSignUpUtils.doPostSignUp(userId, new ServletWebRequest(request));
 	}
 
 	/**

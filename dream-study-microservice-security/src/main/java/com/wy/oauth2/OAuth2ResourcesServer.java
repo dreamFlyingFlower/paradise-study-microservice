@@ -8,16 +8,17 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.R
 
 import com.wy.properties.UserProperties;
 import com.wy.security.LoginFailureHandler;
-import com.wy.security.LoginSuccessHandler;
 
 /**
  * OAuth2资源服务器,和认证服务器一样,只需要一个注解即可,他们可以放在一个类上
  * 
+ * 若直接使用SpringSecurity配置好的流程,可以不继承ResourceServerConfigurerAdapter,其他什么都不用动.
+ * 若使用自定义的授权,则需要继承ResourceServerConfigurerAdapter,重写configure()
  * 当使用授权码模式时,开启资源服务器,/oauth/authorize将不能访问
  * 
  * @auther 飞花梦影
  * @date 2019-09-26 22:58:54
- * @git {@link https://github.com/dreamFlyingFlower}
+ * @git {@link https://github.com/dreamFlyingFlower }
  */
 @Configuration
 @EnableResourceServer
@@ -27,7 +28,7 @@ public class OAuth2ResourcesServer extends ResourceServerConfigurerAdapter {
 	private UserProperties userProperties;
 
 	@Autowired
-	private LoginSuccessHandler loginSuccessHandler;
+	private ClientLoginSuccessHandler clientLoginSuccessHandler;
 
 	@Autowired
 	private LoginFailureHandler loginFailHandler;
@@ -36,7 +37,7 @@ public class OAuth2ResourcesServer extends ResourceServerConfigurerAdapter {
 	public void configure(HttpSecurity http) throws Exception {
 		http.authorizeRequests().antMatchers(userProperties.getSecurity().getPermitSources()).permitAll().anyRequest()
 				.authenticated().and().formLogin().loginProcessingUrl("/user/login").usernameParameter("username")
-				.passwordParameter("password").successHandler(loginSuccessHandler).failureHandler(loginFailHandler)
-				.and().csrf().disable();
+				.passwordParameter("password").successHandler(clientLoginSuccessHandler)
+				.failureHandler(loginFailHandler).and().csrf().disable();
 	}
 }
