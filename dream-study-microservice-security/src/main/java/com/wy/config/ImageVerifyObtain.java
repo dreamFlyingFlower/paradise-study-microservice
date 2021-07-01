@@ -1,4 +1,4 @@
-package com.wy.configs;
+package com.wy.config;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -18,7 +18,7 @@ import com.wy.verify.code.ImageVerifyEntity;
 /**
  * @apiNote 自定义更高级的验证码生成器,需要配置验证器的相关参数,如name,conditiononmissbean等
  * @apiNote 当spring扫包的时候,若是先扫到当前类,那么就会直接将该类实例加入到上下文中,
- *          如本类和{@link com.wy.configs.VerifyConfig#imageVerifyGenerator}中的同名方法,
+ *          如本类和{@link com.wy.config.VerifyConfig#imageVerifyGenerator}中的同名方法,
  *          若是先扫本类,会先加载本类实例到上下文中,再继续扫到VerifyConfig类,
  *          由于VerifyConfig中的同名方法有@ConditionalOnMissingBean注解,而且上下文中已经有了实例,将不再加载.
  *          但是若是先扫了VerifyConfig的同名方法,那么就会先加载VerifyConfig的到上下文中,再继续扫到本类,

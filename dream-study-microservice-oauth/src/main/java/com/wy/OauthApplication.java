@@ -4,25 +4,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.security.oauth2.provider.endpoint.AuthorizationEndpoint;
 import org.springframework.security.oauth2.provider.endpoint.TokenEndpoint;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.context.SecurityContextPersistenceFilter;
-import org.springframework.social.ApiBinding;
-import org.springframework.social.ServiceProvider;
-import org.springframework.social.connect.ApiAdapter;
-import org.springframework.social.connect.Connection;
-import org.springframework.social.connect.ConnectionFactory;
-import org.springframework.social.connect.UsersConnectionRepository;
-import org.springframework.social.connect.jdbc.JdbcUsersConnectionRepository;
-import org.springframework.social.connect.support.OAuth2Connection;
-import org.springframework.social.connect.support.OAuth2ConnectionFactory;
-import org.springframework.social.oauth2.AbstractOAuth2ApiBinding;
-import org.springframework.social.oauth2.AbstractOAuth2ServiceProvider;
-import org.springframework.social.oauth2.OAuth2Operations;
-import org.springframework.social.oauth2.OAuth2Template;
-import org.springframework.social.security.SocialAuthenticationFilter;
-import org.springframework.social.security.SocialUserDetails;
-import org.springframework.social.security.SocialUserDetailsService;
-import org.springframework.social.security.provider.SocialAuthenticationService;
 
 /**
  * OAuth2.0:允许用户授权第三方应用访问用户存储在其他服务提供者上的信息,而不需要提供用户名和密码给第三方服务
@@ -66,41 +47,6 @@ import org.springframework.social.security.provider.SocialAuthenticationService;
  * --->scope:同/oauth/authorize中的参数
  * 
  * -->认证服务器返回令牌(access_token)
- * </pre>
- * 
- * 从服务提供商获得需要登录的用户信息,登录拦截social的流程:
- * 
- * <pre>
- * ->{@link SecurityContextPersistenceFilter}:通过请求获得用户登录信息,并在拦截器离开时将登录信息再次存入到session中
- * ->{@link UsernamePasswordAuthenticationFilter}:真正的登录请求拦截与验证
- * ->{@link SocialAuthenticationFilter}:第三方登录请求验证
- * ->{@link SocialAuthenticationService (OAuth2AuthenticationService)}:
- * ->{@link Authentication(SocialAuthenticationToken)}
- * ->{@link AuthenticationManager(ProviderManager)}
- * ->{@link AuthenticationProvider(SocialAuthenticationProvider)}
- * ->{@link UsersConnectionRepository(JdbcUsersConnectionRepository)}
- * ->{@link SocialUserDetailsService}
- * ->{@link SocialUserDetails}
- * ->{@link Authentication(SocialAuthenticationToken)}
- * </pre>
- * 
- * Spring Social相关接口,抽象类,类:
- * 
- * <pre>
- * {@link ServiceProvider}:服务器提供者需要实现的接口
- * {@link AbstractOAuth2ServiceProvider}:ServiceProvider的抽象实现,自定义类可以继承该抽象类,实现服务提供商
- * {@link OAuth2Operations}:封装了从用户请求第三方应用,到第三方应用请求服务提供商获得令牌的全部操作
- * {@link OAuth2Template}:完成OAuth2协议执行的流程
- * {@link ApiBinding}:SpringSocial提供的第三用应用获取服务提供商数据的接口
- * {@link AbstractOAuth2ApiBinding}:ApiBinding的抽象实现,自定义类可以继承该抽象类,实现对服务提供商数据的调用
- * ->{@link AbstractOAuth2ApiBinding#accessToken}:验证完成后由服务提供商发放的令牌,实现该抽象类的类不能是单例
- * {@link Connection}:非数据库链接,是封装第三方应用从服务提供商获取的用户信息
- * {@link ConnectionFactory}:创建Connection的链接工厂,包含ServiceProvider的实例
- * {@link OAuth2Connection}:Connection的抽象实现类
- * {@link OAuth2ConnectionFactory}:ConnectionFactory的抽象实现
- * {@link ApiAdapter}:在Connection和ServiceProvider之间做适配,用来自定义服务提供商返回的用户信息对象
- * {@link UsersConnectionRepository}:用来在Connection和第三方(本地)数据库进行交互的接口
- * {@link JdbcUsersConnectionRepository}:UsersConnectionRepository的实现类
  * </pre>
  * 
  * SpringSocial已经不维护了,只能直接使用SpringSecurity进行Social相关操作,详见

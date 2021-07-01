@@ -19,11 +19,20 @@ server:
     
 security:
   oauth2: 
+    
     client:
       client-id: test
       client-secret: test
+      # 认证服务器校验用户的接口地址
+      user-authorization-uri: http://127.0.0.1:12345/oauth/authorize
+      # 认证服务器获取令牌的接口地址
+      access-token-uri: http://127.0.0.1:12345/oauth/token
       registered-redirect-uri: 
       - http://example.com
+    resource:
+      jwt:
+        # 认证服务器上获取JWT加密密钥的接口
+        key-uri: http://127.0.0.1:12345/oauth/token_key
       
 management: 
   endpoints: 

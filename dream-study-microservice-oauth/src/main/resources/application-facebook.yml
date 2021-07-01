@@ -1,0 +1,8 @@
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          # 登录到facebook的clientId          clientId: test_clientId
+          # 登录到facebook的clientSecret
+          clientSecret: test_clientSecret

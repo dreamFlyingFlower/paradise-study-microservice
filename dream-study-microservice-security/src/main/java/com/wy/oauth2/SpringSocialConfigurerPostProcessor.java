@@ -5,7 +5,7 @@ import java.util.Objects;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 
-import com.wy.configs.SocialConfig;
+import com.wy.config.SocialConfig;
 import com.wy.social.qq.QqSocialConfigurer;
 
 /**

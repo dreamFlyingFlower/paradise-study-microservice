@@ -1,0 +1,15 @@
+spring:
+  security:
+    # 进行登录验证的用户名和密码,由用户自行输入
+    user:
+      name: admin
+      password: 123456
+          oauth2:
+      resourceserver:        jwt:
+          # 认证服务器解析token令牌的密钥地址          jwk-set-uri: http://127.0.0.1:8080/oauth/token_key      client:
+        provider:
+          # 认证服务器认证地址          authorizationUri: http://127.0.0.1:8080/oauth/authorize
+          # 认证服务器获取令牌地址
+          tokenUri: http://127.0.0.1:8080/oauth/token
+        registration:          clientId: test_client
+          clientSecret: test_secret

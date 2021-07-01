@@ -6,6 +6,7 @@ import javax.annotation.security.RolesAllowed;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth2Sso;
 import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.access.AccessDecisionVoter;
 import org.springframework.security.access.ConfigAttribute;
@@ -62,8 +63,8 @@ import org.springframework.security.web.session.SessionManagementFilter;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 import org.springframework.social.security.SocialAuthenticationFilter;
 
-import com.wy.configs.ExtraMethodSecurityExpressionHandler;
-import com.wy.configs.ExtraSecurityExpressionRoot;
+import com.wy.config.ExtraMethodSecurityExpressionHandler;
+import com.wy.config.ExtraSecurityExpressionRoot;
 import com.wy.crl.UserCrl;
 
 /**
@@ -229,6 +230,7 @@ import com.wy.crl.UserCrl;
  */
 @EnableRedisHttpSession
 @SpringBootApplication
+@EnableOAuth2Sso
 public class Application {
 
 	public static void main(String[] args) {

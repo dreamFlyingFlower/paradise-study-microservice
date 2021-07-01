@@ -1,4 +1,4 @@
-package com.wy.configs;
+package com.wy.config;
 
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;

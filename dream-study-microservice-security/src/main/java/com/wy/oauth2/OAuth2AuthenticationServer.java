@@ -1,5 +1,7 @@
 package com.wy.oauth2;
 
+import java.util.ArrayList;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,7 +25,10 @@ import org.springframework.security.oauth2.provider.endpoint.TokenEndpoint;
 import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenEnhancer;
+import org.springframework.security.oauth2.provider.token.TokenEnhancerChain;
 import org.springframework.security.oauth2.provider.token.TokenStore;
+import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
+import org.springframework.security.oauth2.provider.token.store.redis.RedisTokenStore;
 
 /**
  * OAuth2认证服务器
@@ -78,15 +83,25 @@ public class OAuth2AuthenticationServer extends AuthorizationServerConfigurerAda
 	@Autowired
 	private UserDetailsService userDetailsService;
 
+	@Autowired
+	private RedisTokenStore redisTokenStore;
+
+	@Autowired
+	private JwtAccessTokenConverter jwtAccessTokenConverter;
+
+	@Autowired
+	private TokenEnhancer jwtTokenEnhancer;
+
 	@Override
 	public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
-		// TODO Auto-generated method stub
 		super.configure(security);
 	}
 
 	/**
 	 * 客户端相关配置,如有那些客户端会访问服务器,认证服务器会给那些客户端发令牌等信息.
 	 * 重写该方法后,写在配置文件中的security.oauth2.client.client-id和client-secret都将无效
+	 * 
+	 * 最好的方法是从数据库取数据
 	 */
 	@Override
 	public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
@@ -98,9 +113,11 @@ public class OAuth2AuthenticationServer extends AuthorizationServerConfigurerAda
 				// 设置过期时间
 				.accessTokenValiditySeconds(7200)
 				// 支持的授权模式
-				.authorizedGrantTypes("refresh_token","authorization_code")
-				// 访问权限
-				.scopes("all");
+				.authorizedGrantTypes("refresh_token", "authorization_code")
+				// 客户端请求权限.如果客户端不传scope,则直接给服务配置的权限;如果传了,则必须在配置的权限集合内
+				.scopes("all")
+				// 使用and()可以添加多个客户端授权
+				.and().withClient("test_config1");
 	}
 
 	/**
@@ -108,6 +125,17 @@ public class OAuth2AuthenticationServer extends AuthorizationServerConfigurerAda
 	 */
 	@Override
 	public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-		endpoints.authenticationManager(authenticationManager).userDetailsService(userDetailsService);
+		endpoints
+				// 使用redis存储第三方客户端相关信息
+				.tokenStore(redisTokenStore).authenticationManager(authenticationManager)
+				.userDetailsService(userDetailsService);
+		if (null != jwtAccessTokenConverter && null != jwtTokenEnhancer) {
+			TokenEnhancerChain chain = new TokenEnhancerChain();
+			ArrayList<TokenEnhancer> enhancers = new ArrayList<>();
+			enhancers.add(jwtTokenEnhancer);
+			enhancers.add(jwtAccessTokenConverter);
+			chain.setTokenEnhancers(enhancers);
+			endpoints.tokenEnhancer(chain).accessTokenConverter(jwtAccessTokenConverter);
+		}
 	}
 }

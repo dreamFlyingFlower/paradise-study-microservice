@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.web.ProviderSignInUtils;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -54,6 +55,19 @@ public class UserCrl {
 	@GetMapping("signup")
 	public String signup() {
 		return "signup";
+	}
+
+	/**
+	 * 可直接将Authentication当作参数传入,前端不需要传任何参数
+	 * 
+	 * 使用JWT令牌的时候,额外添加的信息不会被authentication获取,需要使用JWT相关工具解析请求头
+	 * 
+	 * @param authentication
+	 * @return
+	 */
+	@GetMapping("getAuthentication")
+	public Result<?> getAuthentication(Authentication authentication) {
+		return Result.ok(authentication);
 	}
 
 	/**
