@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.wy.model.facebook.FacebookBrief;
 import com.wy.model.facebook.FacebookBriefs;
-import com.wy.model.facebook.ProfileFacebook;
+import com.wy.model.facebook.FacebookProfile;
 import com.wy.oauth.ApiBinding;
 
 /**
@@ -22,8 +22,8 @@ public class FacebookApiBinding extends ApiBinding {
 		super(accessToken);
 	}
 
-	public ProfileFacebook getProfile() {
-		return restTemplate.getForObject(GRAPH_API_BASE_URL + "/me", ProfileFacebook.class);
+	public FacebookProfile getProfile() {
+		return restTemplate.getForObject(GRAPH_API_BASE_URL + "/me", FacebookProfile.class);
 	}
 
 	public List<FacebookBrief> getFacebookBriefs() {

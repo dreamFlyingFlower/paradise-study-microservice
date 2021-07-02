@@ -28,6 +28,12 @@ public abstract class ApiBinding {
 		}
 	}
 
+	/**
+	 * 拦截每个到资源服务器的请求,若请求中含有accessToken则执行请求
+	 * 
+	 * @param accessToken accessToken
+	 * @return ClientHttpRequestInterceptor
+	 */
 	private ClientHttpRequestInterceptor getBearerTokenInterceptor(String accessToken) {
 		return new ClientHttpRequestInterceptor() {
 
@@ -40,6 +46,11 @@ public abstract class ApiBinding {
 		};
 	}
 
+	/**
+	 * 拦截每个到资源服务器的请求,若请求中不含有accessToken则抛异常
+	 * 
+	 * @return ClientHttpRequestInterceptor
+	 */
 	private ClientHttpRequestInterceptor getNoTokenInterceptor() {
 		return new ClientHttpRequestInterceptor() {
 

@@ -94,7 +94,8 @@ public class OAuth2AuthenticationServer extends AuthorizationServerConfigurerAda
 
 	@Override
 	public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
-		super.configure(security);
+		// 获得签名的signkey,需要身份验证才行,默认是denyAll(),这是SpringSecurity的权限表达式
+		security.tokenKeyAccess("isAuthenticated()");
 	}
 
 	/**

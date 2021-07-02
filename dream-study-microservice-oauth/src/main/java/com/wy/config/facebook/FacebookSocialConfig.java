@@ -25,6 +25,7 @@ public class FacebookSocialConfig {
 	@RequestScope
 	public FacebookApiBinding facebook(OAuth2AuthorizedClientService clientService) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
 		String accessToken = null;
 		if (authentication.getClass().isAssignableFrom(OAuth2AuthenticationToken.class)) {
 			OAuth2AuthenticationToken oauthToken = (OAuth2AuthenticationToken) authentication;
