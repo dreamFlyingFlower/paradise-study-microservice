@@ -17,6 +17,5 @@ public class SecurityProperties {
 	/**
 	 * 不需要验证的资源,url
 	 */
-	private String[] permitAllSources = { "/images/**", "/user/getCode/**", "/user/login/**", "/html/**", "/plugins/**",
-			"/actuator/**", "/oauth/authorize**", "/oauth/token_key" };
+	private String[] permitAllSources = { "/messages/**" };
 }

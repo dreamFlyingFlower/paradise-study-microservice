@@ -18,7 +18,7 @@ import org.springframework.security.oauth2.provider.token.store.KeyStoreKeyFacto
  */
 public class JwtUtil {
 
-	private static final String KEY_STORE_FILE = ".keystore-oauth2-demo";
+	private static final String KEY_STORE_FILE = "keystore-oauth2-demo";
 
 	private static final String KEY_STORE_PASSWORD = "admin1234";
 
@@ -27,14 +27,14 @@ public class JwtUtil {
 	private static KeyStoreKeyFactory KEY_STORE_KEY_FACTORY =
 			new KeyStoreKeyFactory(new ClassPathResource(KEY_STORE_FILE), KEY_STORE_PASSWORD.toCharArray());
 
-	static final String VERIFIER_KEY_ID =
+	public static final String VERIFIER_KEY_ID =
 			new String(Base64.getEncoder().encode(KeyGenerators.secureRandom(32).generateKey()));
 
-	static RSAPublicKey getVerifierKey() {
+	public static RSAPublicKey getVerifierKey() {
 		return (RSAPublicKey) getKeyPair().getPublic();
 	}
 
-	static RSAPrivateKey getSignerKey() {
+	public static RSAPrivateKey getSignerKey() {
 		return (RSAPrivateKey) getKeyPair().getPrivate();
 	}
 

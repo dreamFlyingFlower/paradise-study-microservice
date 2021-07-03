@@ -47,9 +47,9 @@ public class OAuth2AuthenticationServer extends AuthorizationServerConfigurerAda
 	public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
 		clients.inMemory().withClient(config.getOauth2().getClientIdGuest())
 				.secret(config.getOauth2().getClientSecretGuest())
-				.authorizedGrantTypes(config.getOauth2().getAuthorizationModes())
-				.scopes(config.getOauth2().getScopes());
-		// .redirectUris("http://localhost:8080/authorized");
+				.authorizedGrantTypes(config.getOauth2().getGrantTypes())
+				.scopes(config.getOauth2().getScopes())
+		 .redirectUris("http://127.0.0.1:55300/oauthClient/authorized");
 	}
 
 	@Override

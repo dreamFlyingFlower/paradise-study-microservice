@@ -3,15 +3,8 @@ spring:
     # 进行登录验证的用户名和密码,由用户自行输入
     user:
       name: admin
-      password: 123456
+      # 123456
+      password: $2a$10$vN5dYR542V03tOvLs4ep6.W8MAMBUqm2feSGxxOLZKoGKPumM.w0y
     oauth2:
       resourceserver:        jwt:
-          # 认证服务器解析token令牌的密钥地址          jwk-set-uri: http://127.0.0.1:8080/oauth/token_key      client:
-        provider:
-          # 认证服务器认证地址          authorizationUri: http://127.0.0.1:8080/oauth/authorize
-          # 认证服务器获取令牌地址
-          tokenUri: http://127.0.0.1:8080/oauth/token
-        registration:
-          facebook: 
-            # 本方请求facebook的clientId和clientSecret,由facebook发放            client-id: test_client
-            client-secret: test_secret
+          # 资源服务器解析token令牌的密钥地址          jwk-set-uri: http://127.0.0.1:55200/oauthResource/oauth/token_key

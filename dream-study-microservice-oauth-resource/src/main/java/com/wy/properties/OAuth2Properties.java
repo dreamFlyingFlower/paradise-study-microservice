@@ -24,7 +24,7 @@ public class OAuth2Properties {
 	private String[] grantTypes = { "authorization_code", "refresh_token", "password" };
 
 	/** 第三方游客登录本系统的访问权限 */
-	private String[] scopes = { "message.read", "message.write", "guest", "openId" };
+	private String[] scopes = { "guest", "openId" };
 
 	/** token令牌存储方式 */
 	private String storeType = "jwt";

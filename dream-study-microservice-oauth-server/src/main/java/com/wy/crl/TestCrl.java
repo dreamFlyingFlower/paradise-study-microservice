@@ -28,7 +28,7 @@ public class TestCrl {
 		return Result.ok(authentication);
 	}
 
-	@GetMapping(value = "/oauth2/keys", produces = "application/json; charset=UTF-8")
+	@GetMapping(value = "/oauth/token_key", produces = "application/json; charset=UTF-8")
 	public String keys() {
 		return this.jwkSet.toString();
 	}

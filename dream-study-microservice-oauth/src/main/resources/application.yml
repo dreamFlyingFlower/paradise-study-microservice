@@ -1,7 +1,18 @@
+server:
+  port: 55300
+  servlet:
+    context-path: /oauthClient
+    
+spring:
+  profiles:
+    active: dev
+
 logging: 
   level: 
     # 指定oauth2打印日志级别
     org.springframework.security.oauth2: trace
+    '[org.springframework.web]': INFO
+    '[org.springframework.security]': INFO
 security:
   oauth2:
     client:

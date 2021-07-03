@@ -15,20 +15,17 @@ import com.wy.result.Result;
  * @git {@link https://github.com/dreamFlyingFlower }
  */
 @RestController
-@RequestMapping("/test")
+@RequestMapping("test")
 public class TestCrl {
 
 	@GetMapping("getAuthenticaiton")
 	public Result<?> getAuthenticaiton(Authentication authentication) {
 		return Result.ok(authentication);
 	}
-	
-	@GetMapping("/getTest")
-	public Result<?> getTest(){
-		return Result.ok();
-	}
-	
-	public Result<?> name() {
-		return Result.ok();
+
+	@GetMapping("/messages")
+	public String[] getMessages() {
+		String[] messages = new String[] { "Message 1", "Message 2", "Message 3" };
+		return messages;
 	}
 }

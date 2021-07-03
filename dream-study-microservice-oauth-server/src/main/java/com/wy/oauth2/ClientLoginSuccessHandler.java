@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
@@ -39,6 +40,7 @@ import com.wy.lang.StrTool;
  * @date 2019-09-29 16:55:39
  * @git {@link https://github.com/dreamFlyingFlower}
  */
+@Configuration
 public class ClientLoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
 
 	@Autowired
@@ -53,7 +55,6 @@ public class ClientLoginSuccessHandler extends SavedRequestAwareAuthenticationSu
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
 			Authentication authentication) throws ServletException, IOException {
-		super.onAuthenticationSuccess(request, response, authentication);
 
 		String header = request.getHeader("Authorization");
 		if (header == null) {

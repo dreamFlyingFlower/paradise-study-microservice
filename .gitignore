@@ -39,3 +39,5 @@ logs
 /nbdist/
 /.nb-gradle/
 /node_modules/
+
+rebel.xml

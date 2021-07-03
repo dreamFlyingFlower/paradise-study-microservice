@@ -12,14 +12,14 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.3.6.RELEASE</version>
+		<version>2.3.9.RELEASE</version>
 		<relativePath />	<!-- lookup parent from repository -->
 	</parent>
 
 	<properties>
 		<java.version>1.8</java.version>
 		<project.version>0.0.1</project.version>
-		<spring.cloud-version>Hoxton.SR8</spring.cloud-version>
+		<spring.cloud-version>Hoxton.SR11</spring.cloud-version>
 	</properties>
 
 	<dependencyManagement>
@@ -35,18 +35,19 @@
 	</dependencyManagement>
 
 	<modules>
+		<module>dream-study-microservice-bus</module>
+		<module>dream-study-microservice-cache</module>
 		<module>dream-study-microservice-common</module>
 		<module>dream-study-microservice-config</module>
-		<module>dream-study-microservice-server</module>
 		<module>dream-study-microservice-config-client</module>
-		<module>dream-study-microservice-bus</module>
 		<module>dream-study-microservice-feign</module>
-		<module>dream-study-microservice-service</module>
-		<module>dream-study-microservice-cache</module>
-		<module>dream-study-microservice-mq</module>
-		<module>dream-study-microservice-security</module>
 		<module>dream-study-microservice-gateway</module>
+		<module>dream-study-microservice-mq</module>
 		<module>dream-study-microservice-oauth</module>
+		<module>dream-study-microservice-oauth-resource</module>
 		<module>dream-study-microservice-oauth-server</module>
+		<module>dream-study-microservice-security</module>
+		<module>dream-study-microservice-server</module>
+		<module>dream-study-microservice-service</module>
 	</modules>
 </project>

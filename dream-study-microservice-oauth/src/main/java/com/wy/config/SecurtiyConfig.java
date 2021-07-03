@@ -1,9 +1,8 @@
 package com.wy.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.User;
@@ -12,29 +11,30 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
-import com.wy.properties.ConfigProperties;
-
 /**
- * Security配置类
- *
- * @author 飞花梦影
- * @date 2021-07-02 16:36:46
- * @git {@link https://github.com/dreamFlyingFlower }
+ * 
+ * 
+ * @auther 飞花梦影
+ * @date 2021-07-03 11:00:36
+ * @git {@link https://github.com/dreamFlyingFlower}
  */
 @EnableWebSecurity
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+public class SecurtiyConfig extends WebSecurityConfigurerAdapter {
 
-	@Autowired
-	private ConfigProperties config;
+	@Override
+	public void configure(WebSecurity web) {
+		web.ignoring().antMatchers("/webjars/**");
+
+	}
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.authorizeRequests().antMatchers(config.getSecurity().getPermitAllSources()).permitAll().anyRequest()
-				.authenticated().and().formLogin();
+		http.authorizeRequests().anyRequest().authenticated().and().formLogin().loginPage("/login")
+				.failureUrl("/login-error").permitAll();
 	}
 
 	@Bean
-	public UserDetailsService users() throws Exception {
+	public UserDetailsService users() {
 		User.UserBuilder users = User.builder();
 		users.passwordEncoder(t -> {
 			BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -49,11 +49,5 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Bean
 	public PasswordEncoder bCryptPasswordEncoder() {
 		return new BCryptPasswordEncoder();
-	}
-
-	@Bean
-	@Override
-	public AuthenticationManager authenticationManagerBean() throws Exception {
-		return super.authenticationManagerBean();
 	}
 }
