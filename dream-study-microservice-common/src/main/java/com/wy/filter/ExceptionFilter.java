@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.NoHandlerFoundException;
+import org.yaml.snakeyaml.constructor.DuplicateKeyException;
 
 import com.alibaba.fastjson.JSONException;
 import com.wy.enums.TipFormatEnum;
@@ -36,16 +37,18 @@ public class ExceptionFilter {
 
 	@ExceptionHandler(Throwable.class)
 	public Result<?> handleException(HttpServletRequest request, Throwable throwable) {
-		log.error(request.getRemoteHost(), request.getRequestURL(), throwable.getMessage());
+		throwable.printStackTrace();
+		log.error("主机Host:{},请求URL:{},异常原因:{}", request.getRemoteHost(), request.getRequestURL(),
+				throwable.getMessage());
 		// http请求中断
 		if (throwable instanceof ClientAbortException) {
 			return Result.error("客户端中断了请求");
 		}
-		// 接口不存在异常
+		// 接口不存在
 		if (throwable instanceof NoHandlerFoundException) {
 			return Result.error(-404, throwable.getMessage());
 		}
-		// http请求方式不支持异常
+		// http请求方式不支持
 		if (throwable instanceof HttpRequestMethodNotSupportedException) {
 			return Result.error(-500, throwable.getMessage());
 		}
@@ -59,15 +62,15 @@ public class ExceptionFilter {
 		if (throwable instanceof ConstraintViolationException) {
 			return Result.error("实体类字段序列化异常");
 		}
-		// 无法解析参数异常
+		// 无法解析参数
 		if (throwable instanceof HttpMessageNotReadableException) {
 			return Result.error("参数无法正常解析");
 		}
-		// 参数不合法异常
+		// 参数不合法
 		if (throwable instanceof IllegalArgumentException) {
 			return Result.error(throwable.getMessage());
 		}
-		// 必传参数为空异常
+		// 必传参数为空
 		if (throwable instanceof MissingServletRequestParameterException) {
 			return Result.error(TipFormatEnum.TIP_PARAM_EMPTY
 					.getMsg(((MissingServletRequestParameterException) throwable).getParameterName()));
@@ -88,13 +91,17 @@ public class ExceptionFilter {
 		if (throwable instanceof MultipartException) {
 			return Result.error("当前网络环境较差，文件上传失败");
 		}
+		// 数据库主键重复或unique字段重复值插入或更新
+		if (throwable instanceof DuplicateKeyException) {
+			return Result.error(throwable.getMessage());
+		}
 		return Result.error(throwable.getMessage());
 	}
 
 	@ExceptionHandler(BindException.class)
 	public Result<?> bindException(BindException e) {
 		StringBuilder sb = new StringBuilder();
-		// 解析原错误信息，封装后返回，此处返回非法的字段名称，原始值，错误信息
+		// 解析原错误信息,封装后返回,此处返回非法的字段名称,原始值,错误信息
 		for (FieldError error : e.getFieldErrors()) {
 			sb.append(error.getDefaultMessage() + ";");
 		}

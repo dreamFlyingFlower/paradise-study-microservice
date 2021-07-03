@@ -35,7 +35,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @RestControllerAdvice
 @Slf4j
-public class ExceptionFilter {
+public class SecurityExceptionFilter {
 	
 	@ExceptionHandler(Throwable.class)
 	public Result<?> handleException(HttpServletRequest request, Throwable throwable) {
@@ -45,11 +45,11 @@ public class ExceptionFilter {
 		if (throwable instanceof ClientAbortException) {
 			return Result.error("客户端中断了请求");
 		}
-		// 接口不存在异常
+		// 接口不存在
 		if (throwable instanceof NoHandlerFoundException) {
 			return Result.error(-404, throwable.getMessage());
 		}
-		// http请求方式不支持异常
+		// http请求方式不支持
 		if (throwable instanceof HttpRequestMethodNotSupportedException) {
 			return Result.error(-500, throwable.getMessage());
 		}

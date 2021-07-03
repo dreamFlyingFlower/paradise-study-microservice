@@ -6,6 +6,7 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.bind.ServletRequestUtils;
@@ -28,6 +29,7 @@ import com.wy.verify.code.ImageVerifyEntity;
  * @date 2019年9月23日
  */
 @Configuration
+@ConditionalOnMissingBean(name = "imageVerifyGenerator")
 public class ImageVerifyObtain {
 
 	@Bean
