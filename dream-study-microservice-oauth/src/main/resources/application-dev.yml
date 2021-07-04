@@ -1,30 +1,24 @@
 spring:
   thymeleaf:    cache: false
-            
-security:
-  oauth2:
-    client:
-      messaging-client-auth-code:
-        client-id: guest
-        client-secret: guest
-        grant-type: authorization_code
-        user-authorization-uri: http://127.0.0.1:55100/oauthServer/oauth/authorize
-        access-token-uri: http://127.0.0.1:55100/oauthServer/oauth/token
-        scope: message.read, message.write
-        pre-established-redirect-uri: http://localhost:55300/oauthClient/oauth/authorized
-        use-current-uri: false
-      messaging-client-client-creds:
-        client-id: guest
-        client-secret: guest
-        grant-type: client_credentials
-        access-token-uri: http://127.0.0.1:55100/oauthServer/oauth/token
-        scope: message.read, message.write
-      messaging-client-password:
-        client-id: guest
-        client-secret: guest
-        grant-type: password
-        access-token-uri: http://127.0.0.1:55100/oauthServer/oauth/token
-        scope: message.read, message.write
 
-messages:
-  base-uri: http://localhost:55200/oauthResource/messages
+  security:
+    # 进行登录验证的用户名和密码,由用户自行输入
+    user:
+      name: admin
+      # 123456
+      password: $2a$10$vN5dYR542V03tOvLs4ep6.W8MAMBUqm2feSGxxOLZKoGKPumM.w0y
+
+    oauth2:
+      resourceserver:
+        jwt:
+          # 认证服务器解析token令牌的密钥地址
+          jwk-set-uri: http://127.0.0.1:55100/oauthServer/oauth/token_key
+      client:
+        registration:
+          facebook: 
+            # 本方请求facebook的clientId和clientSecret,由facebook发放
+            client-id: test_client
+            client-secret: test_secret
+          guest: 
+            client-id: guest
+            client-secret: guest

@@ -1,12 +1,10 @@
 package com.wy.crl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nimbusds.jose.jwk.JWKSet;
 import com.wy.result.Result;
 
 /**
@@ -20,16 +18,14 @@ import com.wy.result.Result;
 @RequestMapping("test")
 public class TestCrl {
 
-	@Autowired
-	private JWKSet jwkSet;
-
 	@GetMapping("getAuthenticaiton")
 	public Result<?> getAuthenticaiton(Authentication authentication) {
 		return Result.ok(authentication);
 	}
 
-	@GetMapping(value = "/oauth/token_key", produces = "application/json; charset=UTF-8")
-	public String keys() {
-		return this.jwkSet.toString();
+	@GetMapping("messages")
+	public String[] getMessages() {
+		String[] messages = new String[] { "Message 1", "Message 2", "Message 3" };
+		return messages;
 	}
 }

@@ -21,7 +21,7 @@ public class OAuth2Properties {
 	private String clientSecretGuest = "guest";
 
 	/** 第三方游客登录本系统的授权模式 */
-	private String[] grantTypes = { "authorization_code", "refresh_token", "password" };
+	private String[] grantTypes = { "authorization_code", "refresh_token", "password","client_credentials" };
 
 	/** 第三方游客登录本系统的访问权限 */
 	private String[] scopes = { "message.read", "message.write", "guest", "openId" };

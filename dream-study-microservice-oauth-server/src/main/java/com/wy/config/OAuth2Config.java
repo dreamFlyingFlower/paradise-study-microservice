@@ -3,8 +3,8 @@ package com.wy.config;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.security.jwt.JwtHelper;
 import org.springframework.security.jwt.crypto.sign.RsaSigner;
 import org.springframework.security.jwt.crypto.sign.RsaVerifier;
@@ -35,8 +35,11 @@ import com.wy.util.JwtUtil;
  * @date 2021-07-02 16:51:40
  * @git {@link https://github.com/dreamFlyingFlower }
  */
-@Configuration
+//@Configuration
 public class OAuth2Config {
+	
+	@Autowired
+	private ClientDetailsService clientDetailsService;
 
 	/**
 	 * redisTokenStore存储令牌
@@ -127,7 +130,7 @@ public class OAuth2Config {
 	}
 
 	@Bean
-	public UserApprovalHandler userApprovalHandler(ClientDetailsService clientDetailsService) {
+	public UserApprovalHandler userApprovalHandler() {
 		ApprovalStoreUserApprovalHandler userApprovalHandler = new ApprovalStoreUserApprovalHandler();
 		userApprovalHandler.setApprovalStore(inMemoryApprovalStore());
 		userApprovalHandler.setClientDetailsService(clientDetailsService);

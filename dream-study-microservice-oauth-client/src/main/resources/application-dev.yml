@@ -1,0 +1,50 @@
+spring:
+  thymeleaf:    cache: false
+            
+security:
+  oauth2:
+    client:
+      messaging-client-auth-code:
+        client-id: guest
+        client-secret: guest
+        grant-type: authorization_code
+        user-authorization-uri: http://127.0.0.1:55100/oauthServer/oauth/authorize
+        access-token-uri: http://127.0.0.1:55100/oauthServer/oauth/token
+        scope: message.read, message.write
+        pre-established-redirect-uri: http://localhost:55300/oauthClient/oauth/authorized
+        use-current-uri: false
+      messaging-client-client-creds:
+        client-id: guest
+        client-secret: guest
+        grant-type: client_credentials
+        access-token-uri: http://127.0.0.1:55100/oauthServer/oauth/token
+        scope: message.read, message.write
+      messaging-client-password:
+        client-id: guest
+        client-secret: guest
+        grant-type: password
+        access-token-uri: http://127.0.0.1:55100/oauthServer/oauth/token
+        scope: message.read, message.write
+
+messages:
+  base-uri: http://127.0.0.1:55100/oauthServer/test/messages
+  
+config:
+  oauth2-client-code:    client-id: guest
+    client-secret: guest    scope: message.read, message.write
+    access-token-uri: http://127.0.0.1:55100/oauthServer/oauth/token
+    user-authorization-uri: http://127.0.0.1:55100/oauthServer/oauth/authorize
+    pre-established-redirect-uri: http://localhost:55300/oauthClient/oauth/authorized
+    use-current-uri: false
+  oauth2-client-credentials:    client-id: guest
+    client-secret: guest
+    scope: message.read, message.write
+    access-token-uri: http://127.0.0.1:55100/oauthServer/oauth/token
+  oauth2-client-password:    client-id: guest
+    client-secret: guest
+    scope: message.read, message.write
+    access-token-uri: http://127.0.0.1:55100/oauthServer/oauth/token
+  oauth2-client-implicit:    client-id: guest
+    client-secret: guest
+    scope: message.read, message.write
+    access-token-uri: http://127.0.0.1:55100/oauthServer/oauth/token

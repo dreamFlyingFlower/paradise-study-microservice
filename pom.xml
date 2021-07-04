@@ -44,6 +44,7 @@
 		<module>dream-study-microservice-gateway</module>
 		<module>dream-study-microservice-mq</module>
 		<module>dream-study-microservice-oauth</module>
+		<module>dream-study-microservice-oauth-client</module>
 		<module>dream-study-microservice-oauth-resource</module>
 		<module>dream-study-microservice-oauth-server</module>
 		<module>dream-study-microservice-security</module>

@@ -21,7 +21,7 @@
 
 ## 概述
 
-* OAuth2官网->OAuth2.0 Framework->Table of Contents->4.Obtaining Authorization可查看OAuth2相关信息
+* OAuth2[官网](https://oauth.net/2/)->OAuth2.0 Framework->Table of Contents->4.Obtaining Authorization可查看OAuth2相关信息
 * OAuth2启动时会打印相关可访问url日志,需开启日志打印级别为trace,同时需要指定打印日志级别的包
   * logging.level.org.springframework.security.oauth2=trace
 * 主要用于第三方应用从服务提供商获取资源所有者(通常是用户)资源,而不需要用户在第三方应用注册

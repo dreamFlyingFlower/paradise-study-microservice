@@ -2,17 +2,53 @@ package com.wy;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.security.oauth2.client.OAuth2RestTemplate;
+import org.springframework.security.oauth2.client.filter.OAuth2ClientContextFilter;
 import org.springframework.security.oauth2.client.token.grant.code.AuthorizationCodeResourceDetails;
-import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
-import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.provider.endpoint.AuthorizationEndpoint;
 import org.springframework.security.oauth2.provider.endpoint.TokenEndpoint;
+import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
+import org.springframework.security.web.context.SecurityContextPersistenceFilter;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * OAuth2认证服务器和资源服务器,可以是2个工程,也可以是一个工程
+ * OAuth2:允许用户授权第三方应用访问用户存储在其他服务提供者上的信息,而不需要提供用户名和密码给第三方应用
+ * eg:登录A网站,可以用QQ登录,此时QQ就是服务提供者,A网站就是第三方应用.在QQ上登录后就授权A网站使用用户信息
  * 
- * OAuth2.0授权码模式发放授权码,令牌流程:
+ * OAuth2请求其他服务器资源中的角色:
+ * 
+ * <pre>
+ * ->资源拥有者:通常为用户,也可以使应用程序
+ * ->第三方应用:本身不存储资源,需要通过资源拥有者去请求资源服务器的资源
+ * ->授权服务器:也叫认证服务器,用于对资源拥有者身份认证,访问资源授权等,认证成功后发放授权码(access_token)给第三方
+ * ->资源服务器:存储拥有者资源的服务器,会给第三方应用一个客户端标识(client_id)和秘钥(client_secret),标识第三方的身份
+ * </pre>
+ * 
+ * OAuth2主要拦截器:
+ * 
+ * <pre>
+ * ->{@link SecurityContextPersistenceFilter}
+ * ->{@link AbstractAuthenticationProcessingFilter}
+ * ->{@link OAuth2ClientContextFilter}
+ * ->{@link OAuth2RestTemplate}
+ * ->{@link SecurityContextPersistenceFilter}
+ * </pre>
+ * 
+ * OAuth2有4种授权模式:授权码模式,用户名密码模式,简单模式,客户端模式,详情见notes/Security/OAuth2.0官方文档.pdf
+ * 
+ * OAuth2授权码模式请求服务提供商资源流程:
+ * 
+ * <pre>
+ * -> 用户在第三方客户端请求认证服务器服务授权
+ * -> 证服服务同意给第三方授权
+ * -> 第三方服务获得授权码
+ * -> 第三方服务利用授权码从认证服务器申请令牌
+ * -> 第三方服务获得证服服务器的响应令牌
+ * -> 第三方服务携带令牌从资源服务器获得用户资源
+ * -> 资源服务器返回用户信息
+ * </pre>
+ * 
+ * OAuth2.0授权码模式认证服务器原始方式发放授权码,令牌流程:
  * 
  * <pre>
  * ->{@link AuthorizationEndpoint#authorize}:固定请求/oauth/authorize,客户端获取授权码(code),此时会让用户授权登录.
@@ -41,21 +77,18 @@ import org.springframework.web.bind.annotation.RestController;
  * ->第三方从认证服务器获得令牌后,可用令牌请求资源服务器获得用户相关信息,令牌有时限,由认证服务器控制
  * </pre>
  * 
- * 认证服务器和资源服务器,可以时同一个类:
+ * SpringSocial已经不维护了,只能直接使用SpringSecurity进行Social相关操作,详见
  * 
- * <pre>
- * {@link EnableAuthorizationServer}:在类上只需要添加该注解即可注册为认证服务器
- * {@link EnableResourceServer}:在类上只需要添加该注解即可注册为资源服务器
- * </pre>
- * 
+ * @see <a
+ *      href="https://spring.io/blog/2018/03/06/using-spring-security-5-to-integrate-with-oauth-2-secured-services-such-as-facebook-and-github"
  * @author 飞花梦影
  * @date 2021-04-09 11:04:34
  * @git {@link https://github.com/dreamFlyingFlower}
  */
 @SpringBootApplication
-public class OauthServerApplication {
+public class OauthClientApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(OauthServerApplication.class, args);
+		SpringApplication.run(OauthClientApplication.class, args);
 	}
 }

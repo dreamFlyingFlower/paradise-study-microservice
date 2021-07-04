@@ -1,25 +1,23 @@
 server:
-  port: 55100
+  port: 55300
   servlet:
-    context-path: /oauthServer
+    context-path: /oauthClient
     
 spring:
   profiles:
     active: dev
   devtools:
-    restart:
+    livereload:
       enabled: true
-#      trigger-file: version
-    
+
 logging: 
   level: 
     # 指定oauth2打印日志级别
     org.springframework.security.oauth2: trace
+    '[org.springframework.web]': INFO
+    '[org.springframework.security]': INFO
 security:
   oauth2:
-    resource:
-      jwk:
-        key-set-uri: http://127.0.0.1:55100/oauthServer/oauth/token_key
     client:
       # 第三方获得认证服务器授权码code的跳转地址
       registered-redirect-uri:
