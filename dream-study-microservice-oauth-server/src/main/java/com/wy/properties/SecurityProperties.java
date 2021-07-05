@@ -19,5 +19,6 @@ public class SecurityProperties {
 	 */
 	private String[] permitAllSources = { "/images/**", "/user/getCode/**", "/user/login/**", "/html/**", "/plugins/**",
 			"/actuator/**", "/oauth/authorize**", "/oauth/**", "/oauth/token_key", "/messages/**", "/oauth/error",
+			"/swagger-ui.html", "/swagger-ui/*", "/swagger-resources/**", "/v2/api-docs", "/v3/api-docs", "/webjars/**",
 			"/login" };
 }

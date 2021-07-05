@@ -1,5 +1,6 @@
 package com.wy;
 
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.security.oauth2.client.token.grant.code.AuthorizationCodeResourceDetails;
@@ -53,6 +54,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @git {@link https://github.com/dreamFlyingFlower}
  */
 @SpringBootApplication
+@MapperScan(basePackages = "com.wy.mapper")
 public class OauthServerApplication {
 
 	public static void main(String[] args) {

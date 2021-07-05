@@ -68,9 +68,10 @@ public class OAuth2AuthenticationServer extends AuthorizationServerConfigurerAda
 	private PasswordEncoder passwordEncoder;
 
 	// guest:加密->$2a$10$dXULkWNhddYNVH9yQkzwQeJinGE0e22iL4CSEdkm7sRPwa.A27iEi
+	// 123456:加密->$2a$10$lg5hcqs13V3c6FVjr1/mjO31clz7fkjlIKnppDhNDdxJVaWxh/xB6
+	// password:加密->$2a$10$owjsydvplVmh0wI6f.xOM.4TKBc/CoKYTvX.HmnS6Yeu7qlyukAPO
 	@Override
 	public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-		System.out.println(passwordEncoder.encode(config.getOauth2().getClientSecretGuest()));
 		clients.inMemory().withClient(config.getOauth2().getClientIdGuest())
 				.secret(passwordEncoder.encode(config.getOauth2().getClientSecretGuest()))
 				.accessTokenValiditySeconds(100).authorizedGrantTypes(config.getOauth2().getGrantTypes())
