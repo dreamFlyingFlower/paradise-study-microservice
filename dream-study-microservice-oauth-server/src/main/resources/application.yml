@@ -4,12 +4,11 @@ server:
     context-path: /oauthServer
     
 spring:
-  profiles:
-    active: dev
   devtools:
+    livereload:
+      enabled: true
     restart:
       enabled: true
-#      trigger-file: version
     
 logging: 
   level: 
@@ -17,9 +16,9 @@ logging:
     org.springframework.security.oauth2: trace
 security:
   oauth2:
-    resource:
-      jwk:
-        key-set-uri: http://127.0.0.1:55100/oauthServer/oauth/token_key
+#    resource:
+#      jwk:
+#        key-set-uri: http://127.0.0.1:55100/oauthServer/oauth/token_key
     client:
       # 第三方获得认证服务器授权码code的跳转地址
       registered-redirect-uri:

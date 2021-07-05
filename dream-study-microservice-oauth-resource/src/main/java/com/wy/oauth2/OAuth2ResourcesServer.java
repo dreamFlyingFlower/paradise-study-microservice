@@ -1,4 +1,4 @@
-package com.wy.oauth2.server;
+package com.wy.oauth2;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -24,12 +24,6 @@ public class OAuth2ResourcesServer extends ResourceServerConfigurerAdapter {
 	@Autowired
 	private ConfigProperties config;
 
-	// @Autowired
-	// private ClientLoginSuccessHandler clientLoginSuccessHandler;
-	//
-	// @Autowired
-	// private LoginFailureHandler loginFailHandler;
-
 	@Autowired
 	private TokenStore jwtTokenStore;
 
@@ -42,6 +36,7 @@ public class OAuth2ResourcesServer extends ResourceServerConfigurerAdapter {
 	public void configure(HttpSecurity http) throws Exception {
 		http.authorizeRequests().antMatchers(config.getSecurity().getPermitAllSources()).permitAll().anyRequest()
 				.authenticated().and().formLogin();
+		// .antMatchers("/messages/**").access("#oauth2.hasScope('message.read')");
 		// .loginProcessingUrl("/user/login").usernameParameter("username")
 		// .passwordParameter("password").successHandler(clientLoginSuccessHandler)
 		// .failureHandler(loginFailHandler).and().csrf().disable();

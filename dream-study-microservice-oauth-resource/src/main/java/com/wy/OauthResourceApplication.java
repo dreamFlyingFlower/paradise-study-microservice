@@ -10,7 +10,7 @@ import org.springframework.security.oauth2.provider.endpoint.TokenEndpoint;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * OAuth2认证服务器.暂时无法和资源服务器放在同一个工程中,有问题暂时无法解决
+ * OAuth2认证服务器和资源服务器,最好不要将认证服务器和资源服务器放一起,会有各种问题需要解决
  * 
  * OAuth2.0授权码模式发放授权码,令牌流程:
  * 
@@ -53,9 +53,9 @@ import org.springframework.web.bind.annotation.RestController;
  * @git {@link https://github.com/dreamFlyingFlower}
  */
 @SpringBootApplication
-public class OauthServerApplication {
+public class OauthResourceApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(OauthServerApplication.class, args);
+		SpringApplication.run(OauthResourceApplication.class, args);
 	}
 }

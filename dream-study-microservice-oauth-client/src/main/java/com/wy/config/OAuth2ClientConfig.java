@@ -1,6 +1,5 @@
 package com.wy.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -13,8 +12,6 @@ import org.springframework.security.oauth2.client.token.grant.code.Authorization
 import org.springframework.security.oauth2.client.token.grant.password.ResourceOwnerPasswordResourceDetails;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableOAuth2Client;
 
-import com.wy.properties.ConfigProperties;
-
 /**
  * OAuth2 4种登录模式配置
  * 
@@ -25,20 +22,15 @@ import com.wy.properties.ConfigProperties;
 @Configuration
 @EnableOAuth2Client
 public class OAuth2ClientConfig {
-	
-	@Autowired
-	private ConfigProperties config;
 
 	/**
 	 * 授权码模式资源配置详情
 	 * 
 	 * @return 授权码模式资源配置详情对象
 	 */
-//	@ConfigurationProperties(prefix = "security.oauth2.client.messaging-client-auth-code")
 	@ConfigurationProperties(prefix = "config.oauth2-client-code")
 	@Bean
 	public OAuth2ProtectedResourceDetails authorizationCodeResourceDetails() {
-		System.out.println(config);
 		return new AuthorizationCodeResourceDetails();
 	}
 
@@ -47,7 +39,6 @@ public class OAuth2ClientConfig {
 	 * 
 	 * @return 客户端模式资源配置详情对象
 	 */
-//	@ConfigurationProperties(prefix = "security.oauth2.client.messaging-client-client-creds")
 	@ConfigurationProperties(prefix = "config.oauth2-client-credentials")
 	@Bean
 	public OAuth2ProtectedResourceDetails clientCredentialsResourceDetails() {
@@ -59,7 +50,6 @@ public class OAuth2ClientConfig {
 	 * 
 	 * @return 用户名密码模式资源配置详情对象
 	 */
-//	@ConfigurationProperties(prefix = "security.oauth2.client.messaging-client-password")
 	@ConfigurationProperties(prefix = "config.oauth2-client-password")
 	@Bean
 	public OAuth2ProtectedResourceDetails resourceOwnerPasswordResourceDetails() {
@@ -77,7 +67,6 @@ public class OAuth2ClientConfig {
 	public OAuth2RestTemplate oauth2ClientCodeRestTemplate(
 			@Qualifier("authorizationCodeResourceDetails") OAuth2ProtectedResourceDetails resourceDetails,
 			OAuth2ClientContext oauth2ClientContext) {
-		System.out.println(config.getOauth2ClientCode());
 		return new OAuth2RestTemplate(resourceDetails, oauth2ClientContext);
 	}
 

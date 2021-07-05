@@ -1,10 +1,0 @@
-spring:
-  security:
-    # 进行登录验证的用户名和密码,由用户自行输入
-    user:
-      name: admin
-      # 123456
-      password: $2a$10$vN5dYR542V03tOvLs4ep6.W8MAMBUqm2feSGxxOLZKoGKPumM.w0y
-    oauth2:
-      resourceserver:        jwt:
-          # 资源服务器解析token令牌的密钥地址          jwk-set-uri: http://127.0.0.1:55200/oauthResource/oauth/token_key

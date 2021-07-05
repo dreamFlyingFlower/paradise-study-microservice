@@ -1,0 +1,22 @@
+server:
+  port: 55200
+  servlet:
+    context-path: /oauthResource
+    
+spring:
+  devtools:
+    restart:
+      enabled: true
+      trigger-file: version
+    livereload:
+      enabled: true
+    
+logging: 
+  level: 
+    # 指定oauth2打印日志级别
+    org.springframework.security.oauth2: trace
+security:
+  oauth2:
+    resource:
+      jwk:
+        key-set-uri: http://127.0.0.1:55100/oauthServer/oauth/token_key

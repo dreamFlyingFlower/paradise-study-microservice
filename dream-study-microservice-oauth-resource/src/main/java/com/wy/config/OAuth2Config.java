@@ -3,7 +3,6 @@ package com.wy.config;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.jwt.JwtHelper;
@@ -12,13 +11,9 @@ import org.springframework.security.jwt.crypto.sign.RsaVerifier;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.common.util.JsonParser;
 import org.springframework.security.oauth2.common.util.JsonParserFactory;
-import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.approval.ApprovalStore;
-import org.springframework.security.oauth2.provider.approval.ApprovalStoreUserApprovalHandler;
 import org.springframework.security.oauth2.provider.approval.InMemoryApprovalStore;
-import org.springframework.security.oauth2.provider.approval.UserApprovalHandler;
-import org.springframework.security.oauth2.provider.request.DefaultOAuth2RequestFactory;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
@@ -38,9 +33,6 @@ import com.wy.util.JwtUtil;
  */
 @Configuration
 public class OAuth2Config {
-
-	@Autowired
-	private ClientDetailsService clientDetailsService;
 
 	/**
 	 * redisTokenStore存储令牌
@@ -115,13 +107,8 @@ public class OAuth2Config {
 		return jwtAccessTokenConverter;
 	}
 
-	@Bean
-	public ApprovalStore inMemoryApprovalStore() {
-		return new InMemoryApprovalStore();
-	}
-
 	/**
-	 * 生成JWT令牌加密
+	 * 第二种方式生成JWT令牌需要的方法
 	 * 
 	 * @return JWK令牌
 	 */
@@ -133,11 +120,7 @@ public class OAuth2Config {
 	}
 
 	@Bean
-	public UserApprovalHandler userApprovalHandler() {
-		ApprovalStoreUserApprovalHandler userApprovalHandler = new ApprovalStoreUserApprovalHandler();
-		userApprovalHandler.setApprovalStore(inMemoryApprovalStore());
-		userApprovalHandler.setClientDetailsService(clientDetailsService);
-		userApprovalHandler.setRequestFactory(new DefaultOAuth2RequestFactory(clientDetailsService));
-		return userApprovalHandler;
+	public ApprovalStore inMemoryApprovalStore() {
+		return new InMemoryApprovalStore();
 	}
 }

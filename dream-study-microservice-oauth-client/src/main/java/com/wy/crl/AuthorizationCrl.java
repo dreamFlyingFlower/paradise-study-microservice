@@ -11,6 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.client.RestTemplate;
 
 import com.wy.properties.ConfigProperties;
 
@@ -58,8 +59,8 @@ public class AuthorizationCrl {
 
 	@GetMapping(value = "/authorize", params = "grant_type=client_credentials")
 	public String client_credentials_grant(Model model) {
-		String[] messages = this.oauth2ClientCredsRestTemplate
-				.getForObject(this.config.getAuth2Resource().getUrlMessageResource(), String[].class);
+		String messages = this.oauth2ClientCredsRestTemplate
+				.getForObject(this.config.getAuth2Resource().getUrlMessageResource(), String.class);
 		model.addAttribute("messages", messages);
 		return "index";
 	}
@@ -77,5 +78,14 @@ public class AuthorizationCrl {
 		passwordResourceDetails.setUsername(null);
 		passwordResourceDetails.setPassword(null);
 		return "index";
+	}
+
+	@GetMapping("getTest")
+	public String getTest() {
+		RestTemplate restTemplate = new RestTemplate();
+		String string = restTemplate.getForObject("http://127.0.0.1:55100/oauthServer/oauth/token?"
+				+ "client_id=guest&client_secret=guest&grant_type=client_credentials", String.class);
+		System.out.println(string);
+		return string;
 	}
 }
