@@ -50,4 +50,5 @@ spring:
             client-id: guest
             client-secret: guest
             authorization-grant-type: implicit
+            redirect-uri: http://localhost:55300/oauthClient/authorized
             scope: message.read, message.write

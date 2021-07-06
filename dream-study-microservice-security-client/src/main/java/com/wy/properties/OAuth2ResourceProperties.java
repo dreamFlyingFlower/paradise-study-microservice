@@ -14,7 +14,7 @@ import lombok.Setter;
 @Setter
 public class OAuth2ResourceProperties {
 
-	private String ownResourceHost = "http://127.0.0.1:55100/";
+	private String ownResourceHost = "http://127.0.0.1:55200/";
 	
-	private String urlMessageResource = ownResourceHost + "oauthServer/test/messages"; 
+	private String urlMessageResource = ownResourceHost + "oauthResource/test/messages"; 
 }

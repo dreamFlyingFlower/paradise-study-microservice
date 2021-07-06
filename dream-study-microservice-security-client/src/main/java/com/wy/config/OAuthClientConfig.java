@@ -18,7 +18,6 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizedClientManager;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
 import org.springframework.security.oauth2.client.web.reactive.function.client.ServletOAuth2AuthorizedClientExchangeFilterFunction;
-import org.springframework.security.oauth2.config.annotation.web.configuration.EnableOAuth2Client;
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.util.StringUtils;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -31,7 +30,6 @@ import org.springframework.web.reactive.function.client.WebClient;
  * @git {@link https://github.com/dreamFlyingFlower }
  */
 @Configuration
-@EnableOAuth2Client
 public class OAuthClientConfig {
 
 	@Bean
@@ -50,12 +48,10 @@ public class OAuthClientConfig {
 		DefaultOAuth2AuthorizedClientManager authorizedClientManager =
 				new DefaultOAuth2AuthorizedClientManager(clientRegistrationRepository, authorizedClientRepository);
 		authorizedClientManager.setAuthorizedClientProvider(authorizedClientProvider);
-
 		// For the `password` grant, the `username` and `password` are supplied via
 		// request parameters,
 		// so map it to `OAuth2AuthorizationContext.getAttributes()`.
 		authorizedClientManager.setContextAttributesMapper(contextAttributesMapper());
-
 		return authorizedClientManager;
 	}
 
@@ -67,7 +63,6 @@ public class OAuthClientConfig {
 			String password = servletRequest.getParameter(OAuth2ParameterNames.PASSWORD);
 			if (StringUtils.hasText(username) && StringUtils.hasText(password)) {
 				contextAttributes = new HashMap<>();
-
 				// `PasswordOAuth2AuthorizedClientProvider` requires both attributes
 				contextAttributes.put(OAuth2AuthorizationContext.USERNAME_ATTRIBUTE_NAME, username);
 				contextAttributes.put(OAuth2AuthorizationContext.PASSWORD_ATTRIBUTE_NAME, password);

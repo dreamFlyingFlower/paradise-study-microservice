@@ -12,14 +12,13 @@
 	</parent>
 
 	<groupId>dream.flying.flower</groupId>
-	<artifactId>dream-study-microservice-oauth-resource</artifactId>
+	<artifactId>dream-study-microservice-security-resource</artifactId>
 	<version>0.0.1</version>
-	<name>dream-study-microservice-oauth-resource</name>
-	<description>oauth2-resource</description>
+	<name>dream-study-microservice-security-resource</name>
+	<description>oauth2</description>
 
 	<properties>
 		<java.version>1.8</java.version>
-		<version.social>1.1.6.RELEASE</version.social>
 		<spring-cloud.version>Hoxton.SR11</spring-cloud.version>
 	</properties>
 
@@ -34,23 +33,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.security.oauth.boot</groupId>
-			<artifactId>spring-security-oauth2-autoconfigure</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.nimbusds</groupId>
-			<artifactId>nimbus-jose-jwt</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-freemarker</artifactId>
+			<artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>dream.flying.flower</groupId>
@@ -74,6 +61,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-configuration-processor</artifactId>
@@ -84,16 +72,4 @@
 			<artifactId>spring-boot-devtools</artifactId>
 		</dependency>
 	</dependencies>
-
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>org.springframework.cloud</groupId>
-				<artifactId>spring-cloud-dependencies</artifactId>
-				<version>${spring-cloud.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
 </project>

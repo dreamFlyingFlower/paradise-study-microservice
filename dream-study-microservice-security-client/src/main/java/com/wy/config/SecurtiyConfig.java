@@ -29,7 +29,7 @@ public class SecurtiyConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.authorizeRequests().antMatchers("/oauth2/authorization/**").permitAll().anyRequest().authenticated().and()
+		http.authorizeRequests().anyRequest().authenticated().and()
 				.formLogin().loginPage("/login").failureUrl("/login-error").permitAll().and().oauth2Client();
 	}
 

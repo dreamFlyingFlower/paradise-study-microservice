@@ -22,13 +22,4 @@ public class TestCrl {
 	public Result<?> getAuthenticaiton(Authentication authentication) {
 		return Result.ok(authentication);
 	}
-	
-	@GetMapping("/getTest")
-	public Result<?> getTest(){
-		return Result.ok();
-	}
-	
-	public Result<?> name() {
-		return Result.ok();
-	}
 }

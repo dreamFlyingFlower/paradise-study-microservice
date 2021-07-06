@@ -20,6 +20,24 @@ import org.springframework.security.web.context.SecurityContextPersistenceFilter
  * OAuth2:允许用户授权第三方应用访问用户存储在其他服务提供者上的信息,而不需要提供用户名和密码给第三方应用
  * eg:登录A网站,可以用QQ登录,此时QQ就是服务提供者,A网站就是第三方应用.在QQ上登录后就授权A网站使用用户信息
  * 
+ * 搭建第三方应用登录的方式:SpringSocial和SpringOAuth都已经过时,现在直接使用SpringSecurity即可.
+ * 
+ * 使用SpringOAuth2搭建:
+ * 
+ * <pre>
+ * dream-study-microservice-oauth-server:认证服务器
+ * dream-study-microservice-oauth-client:客户端调用
+ * dream-study-microservice-oauth-resource:资源服务器
+ * </pre>
+ * 
+ * SpringSecurity搭建:
+ * 
+ * <pre>
+ * dream-study-microservice-oauth-server:认证服务器,可直接使用作为认证服务器
+ * dream-study-microservice-security-client:客户端调用,和OAuth2略有不同,更简洁,详见代码
+ * dream-study-microservice-security-resource:资源服务器,和OAuth2搭建略有不同,更简洁,详见代码
+ * </pre>
+ * 
  * OAuth2请求其他服务器资源中的角色:
  * 
  * <pre>

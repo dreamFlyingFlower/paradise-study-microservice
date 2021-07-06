@@ -1,0 +1,20 @@
+server:
+  port: 55200
+  servlet:
+    context-path: /oauthResource
+    
+spring:
+  profiles:
+    active: dev
+  devtools:
+    livereload:
+      enabled: true
+    restart:
+      enabled: true
+
+logging: 
+  level: 
+    # 指定oauth2打印日志级别
+    org.springframework.security.oauth2: trace
+    '[org.springframework.web]': INFO
+    '[org.springframework.security]': INFO

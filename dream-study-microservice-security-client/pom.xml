@@ -12,10 +12,10 @@
 	</parent>
 
 	<groupId>dream.flying.flower</groupId>
-	<artifactId>dream-study-microservice-oauth</artifactId>
+	<artifactId>dream-study-microservice-security-client</artifactId>
 	<version>0.0.1</version>
-	<name>dream-study-microservice-oauth</name>
-	<description>oauth2</description>
+	<name>dream-study-microservice-security-client</name>
+	<description>security-client</description>
 
 	<properties>
 		<java.version>1.8</java.version>
@@ -60,10 +60,10 @@
 			<groupId>org.webjars</groupId>
 			<artifactId>webjars-locator-core</artifactId>
 		</dependency>
-		<!-- <dependency> -->
-		<!-- <groupId>io.projectreactor.netty</groupId> -->
-		<!-- <artifactId>reactor-netty</artifactId> -->
-		<!-- </dependency> -->
+		<dependency>
+			<groupId>io.projectreactor.netty</groupId>
+			<artifactId>reactor-netty</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.webjars</groupId>
 			<artifactId>bootstrap</artifactId>
@@ -101,6 +101,10 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-configuration-processor</artifactId>
 			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
 		</dependency>
 	</dependencies>
 </project>

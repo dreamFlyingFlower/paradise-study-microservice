@@ -1,6 +1,7 @@
 package com.wy.crl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.client.web.reactive.function.client.ServletOAuth2AuthorizedClientExchangeFilterFunction;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -8,6 +9,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.wy.lang.StrTool;
 import com.wy.properties.ConfigProperties;
 
 /**
@@ -42,7 +45,8 @@ public class AuthCrl {
 
 	@GetMapping(value = "/authorize", params = "grant_type=client_credentials")
 	public String client_credentials_grant(Model model) {
-		String[] messages = retrieveMessages("oauthServer-client-credentials");
+		// String[] messages = retrieveMessages("oauthServer-client-credentials");
+		String[] messages = retrieveMessage("oauthServer-client-credentials");
 		model.addAttribute("messages", messages);
 		return "index";
 	}
@@ -54,10 +58,37 @@ public class AuthCrl {
 		return "index";
 	}
 
+	@Autowired
+	private ObjectMapper objectMapper;
+
+	private String[] retrieveMessage(String clientRegistrationId) {
+		try {
+			String result =
+					this.webClient.get().uri(this.config.getAuth2Resource().getUrlMessageResource())
+							.header("content-type", MediaType.APPLICATION_JSON_VALUE)
+							.attributes(ServletOAuth2AuthorizedClientExchangeFilterFunction
+									.clientRegistrationId(clientRegistrationId))
+							.retrieve().bodyToMono(String.class).block();
+			if (StrTool.isNotBlank(result)) {
+				return objectMapper.readValue(result, String[].class);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 	private String[] retrieveMessages(String clientRegistrationId) {
-		return this.webClient.get().uri(this.config.getAuth2Resource().getUrlMessageResource())
-				.attributes(
-						ServletOAuth2AuthorizedClientExchangeFilterFunction.clientRegistrationId(clientRegistrationId))
-				.retrieve().bodyToMono(String[].class).block();
+		try {
+			String[] result =
+					this.webClient.get().uri(this.config.getAuth2Resource().getUrlMessageResource())
+							.attributes(ServletOAuth2AuthorizedClientExchangeFilterFunction
+									.clientRegistrationId(clientRegistrationId))
+							.retrieve().bodyToMono(String[].class).block();
+			return result;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 }
