@@ -1,5 +1,7 @@
 package com.wy.service;
 
+import org.springframework.security.core.userdetails.UserDetailsService;
+
 /**
  * 用户业务接口
  *
@@ -7,5 +9,5 @@ package com.wy.service;
  * @date 2021-07-05 12:14:03
  * @git {@link https://github.com/dreamFlyingFlower }
  */
-public interface UserService {
+public interface UserService extends UserDetailsService {
 }

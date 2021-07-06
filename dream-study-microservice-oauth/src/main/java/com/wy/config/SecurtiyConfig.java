@@ -12,7 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
 /**
- * 
+ * 客户端Security配置
  * 
  * @auther 飞花梦影
  * @date 2021-07-03 11:00:36
@@ -29,8 +29,8 @@ public class SecurtiyConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.authorizeRequests().anyRequest().authenticated().and().formLogin().loginPage("/login")
-				.failureUrl("/login-error").permitAll();
+		http.authorizeRequests().antMatchers("/oauth2/authorization/**").permitAll().anyRequest().authenticated().and()
+				.formLogin().loginPage("/login").failureUrl("/login-error").permitAll().and().oauth2Client();
 	}
 
 	@Bean
@@ -47,7 +47,7 @@ public class SecurtiyConfig extends WebSecurityConfigurerAdapter {
 	}
 
 	@Bean
-	public PasswordEncoder bCryptPasswordEncoder() {
+	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
 }

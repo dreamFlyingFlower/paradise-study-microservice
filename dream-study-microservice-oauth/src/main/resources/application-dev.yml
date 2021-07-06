@@ -7,22 +7,47 @@ spring:
       name: admin
       # 123456
       password: $2a$10$vN5dYR542V03tOvLs4ep6.W8MAMBUqm2feSGxxOLZKoGKPumM.w0y
-
     oauth2:
       resourceserver:
         jwt:
           # 认证服务器解析token令牌的密钥地址
           jwk-set-uri: http://127.0.0.1:55100/oauthServer/oauth/token_key
       client:
+        provider:
+          # 提供第三方应用获取code,token的服务名,可自定义,即服务提供商的通用信息          oauthServer: 
+            authorization-uri: http://127.0.0.1:55100/oauthServer/oauth/oauthrize
+            token-uri: http://127.0.0.1:55100/oauthServer/oauth/token
         registration:
-          # 本应用注册在facebook的参数
-          facebook: 
-            client-id: facebook_client_id
-            client-secret: facebook_client_secret
-          # 本应用注册在github上的参数
-          github:
-            client-id: github_client_id
-            client-secret: github_client_secret
-          guest: 
+          # 本应用注册在facebook的参数,系统已经内置,其他参数可不写
+#          facebook: 
+#            client-id: facebook_client_id
+#            client-secret: facebook_client_secret
+          # 本应用注册在github上的参数,系统已经内置,其他参数可不写
+#          github:
+#            client-id: github_client_id
+#            client-secret: github_client_secret
+          oauthServer-client-code: 
+            provider: oauthServer
             client-id: guest
             client-secret: guest
+            authorization-grant-type: authorization_code
+            redirect-uri: http://localhost:55300/oauthClient/authorized
+            scope: message.read, message.write
+          oauthServer-client-credentials:
+            provider: oauthServer
+            client-id: guest
+            client-secret: guest
+            authorization-grant-type: client_credentials
+            scope: message.read, message.write
+          oauthServer-client-password:
+            provider: oauthServer
+            client-id: guest
+            client-secret: guest
+            authorization-grant-type: password
+            scope: message.read, message.write
+          oauth2-client-implicit:
+            provider: oauthServer
+            client-id: guest
+            client-secret: guest
+            authorization-grant-type: implicit
+            scope: message.read, message.write

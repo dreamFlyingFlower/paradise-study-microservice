@@ -2,11 +2,11 @@ package com.wy.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.wy.mapper.UserMapper;
+import com.wy.service.UserService;
 
 /**
  * 用户业务实现类
@@ -16,7 +16,7 @@ import com.wy.mapper.UserMapper;
  * @git {@link https://github.com/dreamFlyingFlower}
  */
 @Service
-public class UserServiceImpl implements UserDetailsService {
+public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private UserMapper userMapper;

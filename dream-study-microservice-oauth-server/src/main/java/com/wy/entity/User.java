@@ -77,7 +77,8 @@ public class User implements UserDetails {
 	 */
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return AuthorityUtils.commaSeparatedStringToAuthorityList(role);
+		// 此处测试使用,真实需要通过role进行相关设置
+		return AuthorityUtils.commaSeparatedStringToAuthorityList("USER");
 	}
 
 	@Override

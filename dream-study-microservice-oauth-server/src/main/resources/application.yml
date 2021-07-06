@@ -9,6 +9,8 @@ spring:
       enabled: true
     restart:
       enabled: true
+  profiles:
+    active: dev
     
 logging: 
   level: 
