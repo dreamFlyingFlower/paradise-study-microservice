@@ -15,7 +15,7 @@
 
 
 
-概述
+# 概述
 
 * [官网](http://www.rabbitmq.com/)
 * Message:消息,不具名,由消息头,消息体组成,不透明,而消息头则由一系列可选属性组成,包括RoutingKey(路由键),priority(相对于其他消息的优先权),DeliveryMode(是否持久性)等
@@ -311,11 +311,57 @@
 
 
 
+# Linux安装
+
+* [官网](https://www.rabbitmq.com/install-rpm.html)下载RabbitMQ安装包,在同页面可找到对应版本的Erlang下载地址
+* 安装Erlang:rpm -Uvh erlang.noarch.rpm,安装完成后可修改sha加密值,也可不修改
+* 安装RabbitMQ Server
+* 启动RabbitMQ
+* 安装RabbitMQ Web管理界面
+* 设置RabbitMQ远程登录(可选)
+
+```shell
+# 下载Erlang并安装
+wget https://packages.erlang-solutions.com/erlang-solutions-2.0-1.noarch.rpm
+rpm -Uvh erlang-solutions-2.0-1.noarch.rpm
+# 修改sha值,可选
+cd /var/cache/yum/x86_64/6/erlang-solutions
+# 会得到一个sha值
+sha1sum primary.xml.gz 
+vim repomd.xml
+# 修改primary标签下的checksum
+# <data type="primary">
+# 	<checksum type="sha">结果为sha1sum命令结果</checksum>
+yum install erlang
+# 查看erlang版本
+erl -version
+# 下载安装RabbitMQ,在Centos8上安装
+wget https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.8.19/rabbitmq-server-3.8.19-1.el8.noarch.rpm
+rpm --import https://github.com/rabbitmq/signing-keys/releases/download/2.0/rabbitmq-release-signing-key.asc
+yum install rabbitmq-server-3.8.19-1.el8.noarch.rpm
+# 开机启动
+chkconfig rabbitmq-server on
+/sbin/service rabbitmq-server start/status/stop
+# 安装Web管理界面插件
+rabbitmq-plugins enable rabbitmq_management
+# 设置RabbitMQ远程ip登录,专门设置一个账号
+rabbitmqctl add_user rabbitmq_test 123456
+# 设置角色
+rabbitmqctl set_user_tags rabbitmq_test administrator
+# 设置用户权限
+rabbitmqctl set_permissions -p "/" rabbitmq_test ".*" ".*" ".*"
+# 设置完成后可以查看当前用户和角色(需要开启服务)
+rabbitmqctl list_users
+# 浏览器输入:serverip:15672,其中serverip是RabbitMQ-Server所在主机的ip
+```
+
+
+
 # Docker
 
 * docker安装可网上搜索,因为国内安装erlang和rabbitmq太慢,直接在docker中安装更快
 
-* 需要下载rabbitmq:management,否则没有web管理页面,若不带management为latest版本,没有web页面
+* 下载rabbitmq:management,否则没有web管理页面,若不带management为latest版本,没有web页面
 
 * docker中运行rabbitmq:
 
