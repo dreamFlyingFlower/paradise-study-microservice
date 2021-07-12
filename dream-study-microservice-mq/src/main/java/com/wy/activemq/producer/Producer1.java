@@ -58,7 +58,7 @@ public class Producer1 {
 			producer.send(message);
 			// 事务开启的时候,需要手动提交,即创建session的第一个参数,false则不需要写
 			session.commit();
-			// 消息,持久化方式(NON_PERSISTENT:只存内存,PERSISTENT),优先级(越大越优先),消息有效期,毫秒
+			// 消息,持久化方式(NON_PERSISTENT:只存内存,PERSISTENT:持久化,存Active中),优先级(越大越优先),消息有效期,毫秒
 			// producer.send(message, DeliveryMode.PERSISTENT, 1, 3000);
 		} catch (JMSException e) {
 			e.printStackTrace();
