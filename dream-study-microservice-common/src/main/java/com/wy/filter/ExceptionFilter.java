@@ -1,5 +1,7 @@
 package com.wy.filter;
 
+import java.util.StringJoiner;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
 
@@ -21,15 +23,15 @@ import org.yaml.snakeyaml.constructor.DuplicateKeyException;
 import com.alibaba.fastjson.JSONException;
 import com.wy.enums.TipFormatEnum;
 import com.wy.result.Result;
-import com.wy.result.ResultException;
 
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * @description 异常统一处理拦截器
- * @author ParadiseWY
- * @date 2019年2月21日 上午11:26:27
- * @git {@link https://github.com/mygodness100}
+ * 异常统一处理拦截器
+ * 
+ * @auther 飞花梦影
+ * @date 2019-02-21 11:26:14
+ * @git {@link https://github.com/dreamFlyingFlower}
  */
 @RestControllerAdvice
 @Slf4j
@@ -52,19 +54,25 @@ public class ExceptionFilter {
 		if (throwable instanceof HttpRequestMethodNotSupportedException) {
 			return Result.error(-500, throwable.getMessage());
 		}
-		if (throwable instanceof ResultException) {
-			return Result.error(throwable.getMessage());
-		}
 		if (throwable instanceof JSONException) {
-			return Result.error("数据结构错误");
+			return Result.error("数据结构错误:" + throwable.getMessage());
+		}
+		// 参数绑定错误
+		if (throwable instanceof BindException) {
+			StringJoiner stringJoiner = new StringJoiner(";");
+			// 解析原错误信息,封装后返回,此处返回非法的字段名称,原始值,错误信息
+			for (FieldError error : ((BindException) throwable).getFieldErrors()) {
+				stringJoiner.add(error.getDefaultMessage());
+			}
+			return Result.error(stringJoiner.toString());
 		}
 		// 实体类字段序列化异常
 		if (throwable instanceof ConstraintViolationException) {
-			return Result.error("实体类字段序列化异常");
+			return Result.error("实体类字段序列化异常:" + throwable.getMessage());
 		}
 		// 无法解析参数
 		if (throwable instanceof HttpMessageNotReadableException) {
-			return Result.error("参数无法正常解析");
+			return Result.error("参数无法正常解析:" + throwable.getMessage());
 		}
 		// 参数不合法
 		if (throwable instanceof IllegalArgumentException) {
@@ -79,33 +87,23 @@ public class ExceptionFilter {
 		if (throwable instanceof MethodArgumentNotValidException) {
 			StringBuilder sb = new StringBuilder();
 			BindingResult bindingResult = ((MethodArgumentNotValidException) throwable).getBindingResult();
-			// 解析原错误信息,封装后返回,此处返回非法的字段名称，原始值，错误信息
+			// 解析原错误信息,封装后返回,此处返回非法的字段名称,原始值,错误信息
 			for (FieldError error : bindingResult.getFieldErrors()) {
-				sb.append("字段：" + error.getField() + "-" + error.getRejectedValue() + ";");
+				sb.append("字段:" + error.getField() + "-" + error.getRejectedValue() + ";");
 			}
 			return Result.error(sb.toString());
 		}
 		if (throwable instanceof MaxUploadSizeExceededException) {
-			return Result.error("当前上传文件太大，最大支持200M");
+			return Result.error("上传文件超大,最大支持:" + ((MaxUploadSizeExceededException) throwable).getMaxUploadSize());
 		}
 		if (throwable instanceof MultipartException) {
-			return Result.error("当前网络环境较差，文件上传失败");
+			return Result.error("当前网络环境较差,文件上传失败:" + throwable.getMessage());
 		}
 		// 数据库主键重复或unique字段重复值插入或更新
 		if (throwable instanceof DuplicateKeyException) {
 			return Result.error(throwable.getMessage());
 		}
 		return Result.error(throwable.getMessage());
-	}
-
-	@ExceptionHandler(BindException.class)
-	public Result<?> bindException(BindException e) {
-		StringBuilder sb = new StringBuilder();
-		// 解析原错误信息,封装后返回,此处返回非法的字段名称,原始值,错误信息
-		for (FieldError error : e.getFieldErrors()) {
-			sb.append(error.getDefaultMessage() + ";");
-		}
-		return Result.error(sb.toString());
 	}
 
 	/*-----------------需要springboot的spring-boot-starter-security包 -----------------*/

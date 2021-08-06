@@ -355,6 +355,16 @@ rabbitmqctl list_users
 # 浏览器输入:serverip:15672,其中serverip是RabbitMQ-Server所在主机的ip
 ```
 
+* IPV4 forwarding is disabled错误
+
+```shell
+vi  /usr/lib/sysctl.d/00-system.conf
+# 添加如下代码
+net.ipv4.ip_forward=1
+# 重启network服务
+systemctl restart network
+```
+
 
 
 # Docker
