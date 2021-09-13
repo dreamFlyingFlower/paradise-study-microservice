@@ -1,0 +1,13 @@
+spring:
+  jms:
+    # 默认目的地
+    template:
+      default-destination: global_destination
+    listener:
+      # 消费者监听消息确认机制
+      acknowledge-mode: auto
+      # 自动启动
+      auto-startup: true
+    # 配置session的缓存大小为3
+    cache:
+      session-cache-size: 3

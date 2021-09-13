@@ -7,6 +7,9 @@ spring:
     username: guest
     password: guest
     connection-timeout: 0
+    # 开启生产者ACK机制
+    # publisher-confirm-type: correlated
+    # publisher-returns: true
     template:
       # 默认的交换机名称
       exchange: default-exchange
@@ -45,25 +48,6 @@ spring:
         retry:
           enabled: true
           max-attempts: 5
-  activemq:
-    broker-url: tcp://192.168.1.146:61616
-    user: admin
-    password: admin
-    # 最大连接池数
-    pool:
-      max-connections: 10
-  jms: 
-    # 默认目的地
-    template:
-      default-destination: global_destination
-    listener:
-      # 消费者监听消息确认机制
-      acknowledge-mode: auto
-      # 自动启动
-      auto-startup: true
-    # 配置session的缓存大小为3
-    cache:
-      session-cache-size: 3
   cloud:
     stream:
       bindings: 

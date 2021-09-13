@@ -1,21 +1,8 @@
-# amqp队列名称
-mq: 
-  direct: 
-    queue: queue_info
-    exchange: exchange_info
-    routing:
-      key: routing_key_info
-  top: 
-    queue: 
-      info: queue_top_info
-      error: queue_top_error
-      logs: queue_top_logs
-    exchange: exchange_top
-  fanout:
-    queue: queue_fanout_info
-    exchange: exchange_fanout
-# rocketmq
-rocketmq:
-  name-server: 127.0.0.1:9876
-  producer:
-    group: test-producer-group
+spring:
+  activemq:
+    broker-url: tcp://192.168.1.146:61616
+    user: admin
+    password: admin
+    # 最大连接池数
+    pool:
+      max-connections: 10

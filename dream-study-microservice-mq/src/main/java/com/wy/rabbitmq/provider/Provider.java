@@ -6,6 +6,7 @@ import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.Binding.DestinationType;
 import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -13,9 +14,9 @@ import org.springframework.stereotype.Component;
 /**
  * 向消息队列发送消息,简单模式
  * 
- * @author ParadiseWY
- * @date 2019年4月15日 下午1:19:49
- * @git {@link https://github.com/mygodness100}
+ * @author 飞花梦影
+ * @date 2019-04-15 13:19:49
+ * @git {@link https://github.com/dreamFlyingFlower}
  */
 @Component
 public class Provider {
@@ -52,5 +53,17 @@ public class Provider {
 		// 创建一个绑定规则:绑定队列的名称;绑定类型,是queue,还是exchange;exchange名称;绑定的路由键,可自定义;其他参数
 		amqpAdmin.declareBinding(
 				new Binding("queue-declare", DestinationType.QUEUE, "exchange-declare", "routingKey-declare", null));
+		// 生产者消息确认.消息发送完成后回调此方法,ack代表此方法是否发送成功
+		rabbitTemplate.setConfirmCallback(new RabbitTemplate.ConfirmCallback() {
+
+			@Override
+			public void confirm(CorrelationData correlationData, boolean ack, String cause) {
+				// ack为true,代表MQ队列已经准确收到消息
+				if (!ack) {
+					return;
+				}
+				// do something
+			}
+		});
 	}
 }
