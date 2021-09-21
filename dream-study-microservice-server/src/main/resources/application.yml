@@ -10,6 +10,13 @@ server:
 eureka:
   instance:
     hostname: localhost
+    # 健康检查的页面
+    #status-page-url-path: ${management.context-path}/info
+    #health-check-url-path: ${management.context-path}/health
+    # 使用域名时候的检查页面
+    #status-page-url: https://${euraka.hostname}/info
+    #health-check-url: https://${euraka.hostname}/health
+    #home-page-url: https://${euraka.hostname}
   server: 
     # 清理已经停止的服务的时间间隔,默认是60秒
     eviction-interval-timer-in-ms: 60000
@@ -24,6 +31,11 @@ eureka:
     fetch-registry: false
     service-url:
       defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+    # 健康检查,只能写在application.yml中,不能写在bootstrap中
+    healthcheck:
+      enabled: true
+    # 是否允许重定向
+    #allow-redirects: false
 
 # 开启secutiry验证,此时注册到eureka注册中心的微服务都要带上用户名和密码
 #security: 
@@ -31,4 +43,16 @@ eureka:
 #    enabled: true
 #  user: 
 #    name: user
-    password: 123455
+#    password: 123455
+    
+# actuator的info信息,必须是配置文件中以info开头的自定义信息
+management: 
+  endpoints:
+    web: 
+      exposure: 
+        #*表示暴露info,health所有端点
+        include: "*"
+  endpoint:
+    health: 
+      #默认是never
+      show-details: always

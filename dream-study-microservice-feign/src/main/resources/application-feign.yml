@@ -1,0 +1,20 @@
+#feign连接超时设置      
+feign: 
+  client:
+    config: 
+      default: 
+        connect-timeout: 5000
+        read-timeout: 5000
+  # 压缩feign请求
+  compression:
+    request:
+      enabled: true
+      mime-types:
+      - application/json
+      - text/xml
+      - application/xml
+      min-request-size: 2048
+      
+hystrix:
+  # 是否将SpringSecurity的SecurityContext从主线程中传输到HystrixCommand注解标注的方法中使用
+  shareSecurityContext: true

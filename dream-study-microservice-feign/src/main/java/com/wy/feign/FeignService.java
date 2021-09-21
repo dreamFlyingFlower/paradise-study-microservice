@@ -1,4 +1,4 @@
-package com.wy.service;
+package com.wy.feign;
 
 import java.util.List;
 

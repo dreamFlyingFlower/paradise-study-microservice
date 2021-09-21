@@ -1,0 +1,7 @@
+# 指定服务名称
+dream-study-microservice-service: 
+  ribbon: 
+    # 指定服务使用的负载均衡方式,都是IRule的实现类
+    NFLoadBalancerRuleClassName: com.netflix.loadbalancer.WeightedResponseTimeRule
+    # 当没有使用eureka作为注册中心,或eureka被禁用了,需要配置被调用服务的ip地址.没有配置的服务,不会被调用
+    listOfServers: 127.0.0.1:55556,127.0.0.1:55557

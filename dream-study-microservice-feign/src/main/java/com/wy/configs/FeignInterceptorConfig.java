@@ -19,9 +19,9 @@ import feign.RequestTemplate;
  * 若远程请求异步调用Feign服务,并非在主线程中,则异步请求无法通过RequestContextHolder获取主县城请求头信息,
  * 此时需要在异步调用的线程代码中将主线程的RequestContextHolder.getRequestAttributes()的结果再set进去
  * 
- * @author ParadiseWY
+ * @author 飞花梦影
  * @date 2020-12-26 23:29:30
- * @git {@link https://github.com/mygodness100}
+ * @git {@link https://github.com/dreamFlyingFlower}
  */
 @Configuration
 public class FeignInterceptorConfig {
@@ -33,8 +33,8 @@ public class FeignInterceptorConfig {
 			@Override
 			public void apply(RequestTemplate requestTemplate) {
 				// 拿到刚进来的这个请求
-				ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder
-						.getRequestAttributes();
+				ServletRequestAttributes requestAttributes =
+						(ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
 				HttpServletRequest request = requestAttributes.getRequest();
 				// 同步请求头数据
 				requestTemplate.header("Cookie", request.getHeader("Cookie"));

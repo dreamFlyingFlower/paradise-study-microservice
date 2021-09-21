@@ -46,10 +46,12 @@
 		<module>dream-study-microservice-oauth-client</module>
 		<module>dream-study-microservice-oauth-resource</module>
 		<module>dream-study-microservice-oauth-server</module>
+		<module>dream-study-microservice-ribbon</module>
 		<module>dream-study-microservice-security</module>
 		<module>dream-study-microservice-security-client</module>
 		<module>dream-study-microservice-security-resource</module>
 		<module>dream-study-microservice-server</module>
 		<module>dream-study-microservice-service</module>
+		<module>dream-study-microservice-zuul</module>
 	</modules>
 </project>

@@ -4,7 +4,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
 import com.alibaba.fastjson.JSON;
-import com.wy.service.impl.FeignImpl;
+import com.wy.service.impl.FeignServiceImpl;
 
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @SuppressWarnings("unchecked")
-public abstract class FeignFallback<T extends FeignImpl> implements FallbackFactory<T> {
+public abstract class FeignFallback<T extends FeignServiceImpl> implements FallbackFactory<T> {
 
 	private Class<T> clazz;
 
