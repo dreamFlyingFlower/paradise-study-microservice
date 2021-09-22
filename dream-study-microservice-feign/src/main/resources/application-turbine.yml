@@ -3,6 +3,6 @@ turbine:
     # 访问页面的应用名,默认default可直接访问ip:port/turbine.stream
     cluster-config: default
   # 需要进行监控的应用名
-  app-config: cloud-server,cloud-client1
+  app-config: dream-study-microservice-server,dream-study-microservice-auth-client
   # 在hystrix.dashboard中访问的时候的后缀名
   cluster-name-expression: "'default'"

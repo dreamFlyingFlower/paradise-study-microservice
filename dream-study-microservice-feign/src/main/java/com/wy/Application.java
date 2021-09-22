@@ -44,11 +44,13 @@ import com.netflix.loadbalancer.ZoneAvoidanceRule;
  * Feigin接口实体类参数只能有一个,不管是何种请求类型;若传多个实体参数,需要封装到一个实体类或Map中
  * </pre>
  * 
- * Hystrix是断路器,{@link EnableHystrixDashboard}和{@link EnableHystrix}页面监控断路器,<br>
- * {@link EnableCircuitBreaker}是使用断路器需要的注解<br>
+ * Hystrix:断路器,{@link EnableHystrixDashboard},{@link EnableHystrix}页面监控,{@link EnableCircuitBreaker}是使用断路器需要的注解
+ * 可以打开使用了EnableHystrixDashboard的Web端ip:port/hystrix,输入需要监控的微服务地址ip:port/hystrix.stream,
+ * 点击监控之后可以实时监控被监控微服务的远程调用请求情况
+ * 
+ * Hystrix断路器有3种状态:
  * 
  * <pre>
- * Hystrix断路器有3种状态:
  * 服务正常时断路器是关闭的(closed)
  * 服务异常时打开(open),此时服务直接返回错误或自定义返回
  * 当一段时间后(可设置),异常服务会被设置为半开启(half open)状态,此时会允许一定数量的请求到达异常服务,
@@ -60,9 +62,15 @@ import com.netflix.loadbalancer.ZoneAvoidanceRule;
  * 发生熔断不代表服务停止,再次调用该方法的时候仍然会调用到异常的方法
  * </pre>
  * 
- * Turbine:类似hystrix.stream的监控,但是他监控的是整个集群的情况
+ * Turbine:类似hystrix.stream的监控,但是他监控的是整个集群的情况,参考application-turbine.yml
  * 
- * Ribbon:负载均衡,由Feign集成,有以下几种算法:<br>
+ * <pre>
+ * 当cluster-config的值为default时,Web页面可直接访问ip:port/turbine.stream,有请求时会显示请求详情,有延迟
+ * 当cluster-config的值不是default时,Web页面访问ip:port/turbine.stream?cluster=cluster-config的值
+ * 将ip:port/turbine.stream输入到Hystrix Dashboar的监控地址栏中,就可以在Web端监控整个服务集群
+ * </pre>
+ * 
+ * Ribbon:负载均衡,由Feign集成,有以下几种算法:
  * 
  * <pre>
  * {@link RoundRobinRule}:轮询,按顺序访问注册中心的服务器
@@ -76,9 +84,9 @@ import com.netflix.loadbalancer.ZoneAvoidanceRule;
  * {@link ZoneAvoidanceRule}:默认规则,复合判断服务所在区域性能和服务的可用性来选择服务器
  * </pre>
  * 
- * @author ParadiseWY
+ * @author 飞花梦影
  * @date 2020-12-08 10:52:37
- * @git {@link https://github.com/mygodness100}
+ * @git {@link https://github.com/dreamFlyingFlower}
  */
 @SpringBootApplication
 @EnableTurbine
