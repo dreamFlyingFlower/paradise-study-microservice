@@ -18,6 +18,10 @@ import com.wy.fallback.UserFallback;
  * 
  * {@link FeignClient#value()}:指定负载均衡调用的服务名
  * {@link FeignClient#configuration()}:指定Feign的自定义配置上下文,见{@link FeignConfig}
+ * {@link FeignClient#fallback()}:指定Hystrix断路器降级熔断时的调用方法,只能指定方法,不能处理异常,超时等信息
+ * {@link FeignClient#fallbackFactory()}:作用同fallback(),但是可以处理远程调用的异常以及一些自定义操作,
+ * 该属性指向的类必须实现{@link feign.hystrix.FallbackFactory<T>},而泛型则是当前接口
+ * {@link FeignClient#fallback()},{@link FeignClient#fallbackFactory()}同时存在时,fallback()优先级高,也可能出现其他错误
  * 
  * 继承FeignService接口,但是feign暂不支持获取接口上的requestmapping注解,必须重写实现接口
  * feign中不需要任何其他的实体类.直接可用object代替,客户端可正常使用get,post的restful方式接收参数
@@ -25,8 +29,7 @@ import com.wy.fallback.UserFallback;
  * 
  * 若getmapping或postmapping注解不可使用,可改成requestmapping,传多参数,对象到客户端时,必须是post方式
  * 
- * hystrix自定义断路器:必须指定configuration,同时fallbackFactory指向的类必须实现{@link feign.hystrix.FallbackFactory<T>}
- * fallback和fallbackFactory只能同时用一个,若同时写会出现不可预知的错误
+ * hystrix自定义断路器:必须指定configuration属性
  * 
  * @author 飞花梦影
  * @date 2021-09-21 16:24:00

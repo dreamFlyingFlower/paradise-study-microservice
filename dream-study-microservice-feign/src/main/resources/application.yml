@@ -3,7 +3,9 @@ server:
 
 spring:
   application:
-    name: cloud-feigin
+    name: dream-study-microservice-feign
+  profiles:
+    active: feign,trubine
     
 eureka: 
   instance:

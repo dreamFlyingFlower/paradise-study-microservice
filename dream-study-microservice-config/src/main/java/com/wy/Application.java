@@ -8,6 +8,7 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
 
 /**
  * 统一配置管理服务端:可以集中管理配置,不同环境使用不同配置,最重要的是运行期间可以动态调整配置和自动刷新
+ * 配置中心从远程仓库拉去配置,存在本地指定目录中,每次拉取都会打印日志. 而远程仓库如果修改了配置,需要配置一个hook来将远程配置同步到本地中
  * 
  * 单个配置文件中的通用配置,官方文档:
  * {@link https://docs.spring.io/spring-boot/docs/current/reference/html/application-properties.html#application-properties.core.logging.group}
@@ -45,6 +46,32 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
  * 		指定特殊属性:java -jar test.jar --server.port=8080
  * 7.optional:classpath:可选,存在则读取,不存在则跳过
  * 8.spring.config.location:该参数指定读取的目录或文件,若是目录,必须以/结尾
+ * </pre>
+ * 
+ * 其他微服务访问bootstrap.yml中远程仓库的配置文件映射规则:
+ * 
+ * <pre>
+ * 第一种格式:ip:port/{application}/{profile}[/{branch}]
+ * ip:port:是服务配置中心的ip和port
+ * application:就是配置文件名前缀application
+ * profile:application-xxx.yml中的xxx,指定配置的使用环境
+ * branch:远程git的分支名,默认为master
+ * 
+ * 第二种格式:ip:port/{application}-{profile}.properties或ip:port/{application}-{profile}.yml
+ * 第三种格式:ip:port/[{branch}/]{application}-{profile}.properties或ip:port/[{branch}/]{application}-{profile}.yml
+ * </pre>
+ * 
+ * 敏感信息加解密:
+ * 
+ * <pre>
+ * 需要使用JCE,从oracle下载压缩包,解压之后放到JDK/jre/lib/security目录下
+ * 下载地址: http://www.oracle.com/technetwork/java/javase/downloads/jce8-download-2133166.html
+ * 
+ * 先运行SpringCloud Config服务端项目,之后可以在Postman中使用post方式进行加解密,请求头为application/json
+ * 加密:ip:port/encrypt,xxxx,选择raw,text,直接输入xxxx进行加密,假设得到fsdfdfdsfdsfdswrewrew
+ * 解密:ip:port/decrypt,选择raw,text,直接输入fsdfdfdsfdsfdswrewrew
+ * 
+ * 如果要对配置文件中的敏感信息进行加密,则需要将加密后的字符串加上{cipher},如{cipher}fsdfdfdsfdsfdswrewrew,自动解密
  * </pre>
  * 
  * @author 飞花梦影

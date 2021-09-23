@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>dream.flying.flower</groupId>
 	<artifactId>dream-study-microservice</artifactId>
-	<version>${project.version}</version>
+	<version>0.0.1</version>
 	<packaging>pom</packaging>
 	<name>dream-study-microservice</name>
 	<description>study for spring cloud microservice</description>
@@ -18,7 +18,6 @@
 
 	<properties>
 		<java.version>1.8</java.version>
-		<project.version>0.0.1</project.version>
 		<spring.cloud-version>Hoxton.SR11</spring.cloud-version>
 	</properties>
 

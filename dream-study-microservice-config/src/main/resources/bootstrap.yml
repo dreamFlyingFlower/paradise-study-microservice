@@ -4,14 +4,19 @@ spring:
       server:
         git: 
           # 只需要些到仓库地址即可
-          uri: https://github.com/mygodness100/{application}
+          uri: https://github.com/dreamFlyingFlower/{application}
           # 若配置文件有多个,或者不同开发团队用的git仓库不一样,可以如下形式
           # application对应的是一个通配符,需要结合uri地址规则
           # 假设有config-test1,config-test2的远程仓库,则http访问时应该为ip:port/config-test1/dev,而不能使用任意字符
           # 若过是配置在项目中,则使用项目的spring.application.name的值来区分
-          # uri: https://github.com/mygodness100/{application}
+          # uri: https://github.com/dreamFlyingFlower/{application}
           # 还可以加上profile,同加上applicaiton
-          # uri: https://github.com/mygodness100/{application}-{profile}
+          # uri: https://github.com/dreamFlyingFlower/{application}-{profile}
+          # 仓库下的子目录,可以有多个
+          # search-paths:
+          # git仓库用户名密码
+          # username: 
+          # password: 
 #      discovery:
 #        # 是否发现配置,默认false
 #        enabled: true
@@ -23,5 +28,5 @@ spring:
 # 如加密后的字符串为fdsfwetregtrehtgfdsgfhgfh,则写入到配置文件中的值为'{cipher}fdsfwetregtrehtgfdsgfhgfh'
 # 值会在读取时自动解密
 # 非对称加密需要用到key-tools,JDK自带,详见SpringBoot官网,
-#encrypt:
+#encrypt: 
 #  key: jiamiyo

@@ -1,5 +1,7 @@
 #feign连接超时设置      
 feign: 
+  hystrix:
+    enabled: true
   client:
     config: 
       default: 
