@@ -1,6 +1,9 @@
 zuul: 
-  # 若不配置前缀,则默认访问其他服务URL为网关ip:port/被访问的服务名/接口URL
+  # 若不配置前缀,则默认访问其他服务URL为网关ip:port/被访问的服务名/接口URL,若配置了routes,则使用ip:port/key/接口URL
+  # 若配置了prefix,则需要在端口后都加上prefix,如ip:port/api/服务名/接口URL
   prefix: /api
+  # 默认true,表示从网关转发到指定微服务时,全局配置会去掉prefix.若为false,则不去掉prefix,即微服务的接口应该是api/接口URL
+  # strip-prefix: true
   host: 
     # 请求链接超时时间,默认2000ms
     connect-timeout-millis: 60000
@@ -13,6 +16,8 @@ zuul:
       service-id: dream-study-microservice-service
       # 网关代理路径./**表示所有层级的接口,/*表示只有一层
       path: /user/**
+      # 同全局是strip-prefix,可不配置
+      # strip-prefix: true
   ignore-local-service: true
   # 禁止以服务名访问,即禁止默认的访问方式.*表示所有,也可以写多个服务名
   ignored-services: "*"
