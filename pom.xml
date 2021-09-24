@@ -51,6 +51,8 @@
 		<module>dream-study-microservice-security-resource</module>
 		<module>dream-study-microservice-server</module>
 		<module>dream-study-microservice-service</module>
+		<module>dream-study-microservice-sleuth</module>
+		<module>dream-study-microservice-stream</module>
 		<module>dream-study-microservice-zuul</module>
 	</modules>
 </project>

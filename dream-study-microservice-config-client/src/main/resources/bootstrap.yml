@@ -1,6 +1,14 @@
 spring:
+  security:
+    user:
+      # 若配置中心开启了security认证,客户端需要配置用户名和密码
+      name: securityusername
+      password: securitypassword
   cloud: 
     config: 
+      # 若配置中心开启了security认证,客户端需要配置用户名和密码.可能和上一个配置重复,也可能只需要配置一个
+      username: securityusername
+      password: securitypassword
       uri: 
       # 只能写ip:port,不能写仓库名和profile
       - http://localhost:55556

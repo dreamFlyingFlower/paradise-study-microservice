@@ -9,54 +9,69 @@
 * ZipkinUI提供了一个依赖关系图,显示了每个应用程序通过的跟踪请求数
 * 如果要解决延迟问题或错误,可以根据应用程序,跟踪长度,注释或时间戳对所有跟踪进行筛选或排序
 * 选择跟踪后,可以看到每个跨度所需的总跟踪时间百分比,从而可以识别有问题的应用程序
+* 可以追踪10种类型的组件:async,Hystrix,messaging,websocket,rxjava,scheduling,web,Spring  MVC Controller,Servlet,webclient,Spring RestTemplate,Feign,Zuul
 
 
 
 # 核心
 
+![](image03.png)
+
+![](image04.webp)
+
+![](image05.png)
+
+上图表示一请求链路,一条链路通过TraceId唯一标识,`Span`标识发起的请求信息,各`Span`通过`parent id` 关联起来
+
+
+
 ## Span
 
-* 基本工作单元发送一个远程请求就会产生一个span
+* 跨度,基本工作单元,发送一个远程请求就会产生一个span
 * span通过一个64位ID唯一标识,trace以另一个64位ID表示
-* span还有其他数据信息,比如摘要,时间戳事件,关键值注释(tags),span的ID,进度ID(通常是IP)
-* span在不断的启动和停止,同时记录了时间信息,当你创建了一个span,必须在未来的某个时刻停止
+* 包含其他数据信息,比如描述,摘要,时间戳事件,关键值注释(tags),span的ID,span父ID,进度ID(通常是IP)
+* span在不断的启动和停止,同时记录了时间信息.当创建了一个span,必须在未来的某个时刻停止
+* 初始化span被称为rootspan,该 span的id和trace的ID相等
 
 
 
 ## Trace
 
 * 一系列spans组成的一个树状结构
+* trace也用一个64位的 ID唯一标识,trace中的所有 span都共享该 trace的 ID
 * 发送一个请求需要调用多个微服务,每调用一个微服务都会产生一个span,这些span组成一个trace
 
 
 
 ## Annotation
 
-* 用来及时记录一个事件的存在,一些核心annotations用来定义一个请求的开始和结束
+* 用来记录一个事件的存在,一些核心annotations用来定义请求的开始和结束
 
-- cs:Client Sent,客户端发起一个请求,这个annotion描述了这个span的开始
 
-- sr:Server Received,服务端获得请求并准备处理它,如果将其sr减去cs时间戳便可得到网络延迟
 
-- ss:Server Sent,表明请求处理的完成(当请求返回客户端),如果ss减去sr时间戳便可得到服务端需要的处理请求时间
 
-- cr:Client Received,表明span的结束,客户端成功接收到服务端的回复,如果cr减去cs时间戳便可得到客户端从服务端获取回复的所有所需时间
 
-  
+## CS
 
-## 示例
+- Client Sent,客户端发送.客户端发起一个请求,这个annotion描述了这个span的开始
 
-请求如下
 
-![dependency](image03.png)
 
-使用zipkin跟踪整个请求过程如下
+## SR
 
-![img](image04.webp)
+- Server Received,服务器端接收,服务端获得请求并准备处理它.sr减去cs时间戳便可得到网络延迟
 
-上图表示一请求链路,一条链路通过TraceId唯一标识,`Span`标识发起的请求信息,各`span`通过`parent id` 关联起来
-![](image05.png)
 
+
+## SS
+
+- Server Sent,服务器端发送,表明请求处理的完成.ss减去sr时间戳便可得到服务端处理请求的时间
+
+
+
+## CR
+
+- Client Received,客户端接收,表明span的结束,客户端成功接收到服务端的回复.cr减去cs时间戳便可得到客户端从服务端获取回复的所有所需时间
 
 
 

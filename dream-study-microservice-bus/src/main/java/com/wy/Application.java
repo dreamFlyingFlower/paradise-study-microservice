@@ -10,11 +10,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
- * 客户端配置自动刷新,需要使用cloud-bus和mq或kafka,仍然需要添加{@link RefreshScope},看到42分钟,trace页面无法打开
+ * 客户端配置自动刷新,需要使用cloud-bus和mq或kafka,仍然需要添加{@link RefreshScope}
  * 
- * @apiNote 添加依赖actuator,bus-amqp,安装rabbitmq,详见paradise-study-microservice/notes/MQ.md
+ * 添加依赖actuator,bus-amqp,安装rabbitmq,详见dream-study-microservice/notes/RabbitMQ.md
  * 
- * @apiNote 手动刷新,关闭actuator的拦截,发送post请求到客户端ip:port/actuator/bus-refresh.
+ * @apiNote 手动刷新,关闭actuator的拦截,发送post请求到bus客户端ip:port/actuator/bus-refresh.
  *          若只想刷新某个client客户端,而不是全部都刷新,可以在url后添加destination=applictionname:port,
  *          也可以使用通配符,如destination=applictionname:**.
  *          但是该方法在集群中有bug,因为集群中的applicationname:port是相同的,这样并不会刷新.
@@ -38,7 +38,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  *          服务端中也加入bus-amqp,actuator,这样一旦配置改动,config服务端将需要刷新配置的消息写入到amqp中,
  *          其他客户端只用接收消息,从config服务端拉取最新的配置即可
  * 
- * @author ParadiseWY
+ * @author 飞花梦影
  * @date 2020-12-04 09:29:28
  * @git {@link https://github.com/mygodness100}
  */

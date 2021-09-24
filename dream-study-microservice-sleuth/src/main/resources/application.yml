@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: dream-study-microservice-sleuth
+  profiles:
+    active: sleuth
+server: 
+  port: 55566
+  max-http-header-size: 10000000
+
+eureka:
+  instance:
+    hostname: localhost
+    # 每隔2s向注册中心发送心跳包,张明自己还没有宕机
+    lease-expiration-duration-in-seconds: 2
+    # 当多长时间没有收到心跳包的信息时,从注册中心中剔除本服务
+    lease-renewal-interval-in-seconds: 10
+    # 通知注册中心,本服务实例以IP作为链接,而不是取机器名
+    prefer-ip-address: true
+    # 本服务实例的唯一ID
+    instance-id: dream-study-microservice-sleuth
+  client: 
+    service-url:
+      defaultZone: http://${eureka.instance.hostname}:55550/eureka/

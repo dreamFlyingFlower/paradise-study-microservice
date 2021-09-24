@@ -8,30 +8,34 @@
 		<artifactId>dream-study-microservice</artifactId>
 		<version>0.0.1</version>
 	</parent>
-	<artifactId>dream-study-microservice-bus</artifactId>
-	<name>dream-study-microservice-bus</name>
-	<description>study for spring cloud config</description>
+	<artifactId>dream-study-microservice-sleuth</artifactId>
+	<name>dream-study-microservice-sleuth</name>
+	<description>study for spring cloud sleuth</description>
 
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-config</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
+			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-bus-amqp</artifactId>
+			<artifactId>spring-cloud-starter-zipkin</artifactId>
 		</dependency>
-		<!-- <dependency> -->
-		<!-- <groupId>org.springframework.cloud</groupId> -->
-		<!-- <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId> -->
-		<!-- </dependency> -->
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-actuator</artifactId>
+			<groupId>io.zipkin.java</groupId>
+			<artifactId>zipkin-server</artifactId>
+			<version>2.12.3</version>
+		</dependency>
+		<dependency>
+			<groupId>io.zipkin.java</groupId>
+			<artifactId>zipkin-autoconfigure-ui</artifactId>
+			<version>2.12.3</version>
+		</dependency>
+		<!-- 利用ElesticSearch做持久化,需要先部署ElasticSearch服务 -->
+		<dependency>
+			<groupId>io.zipkin.java</groupId>
+			<artifactId>zipkin-autoconfigure-storage-elasticsearch-http</artifactId>
+			<version>2.8.4</version>
 		</dependency>
 
 		<dependency>

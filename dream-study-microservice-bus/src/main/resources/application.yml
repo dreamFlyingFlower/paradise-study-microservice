@@ -4,6 +4,7 @@ server:
     encoding:
       charset: UTF-8
       
+# 必须打开所有的监控端点
 management:
   endpoints: 
     web:

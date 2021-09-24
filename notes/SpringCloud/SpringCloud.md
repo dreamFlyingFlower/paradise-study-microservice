@@ -1,4 +1,4 @@
-# Springcloud
+# SpringCloud
 -------
 # 项目结构
 
@@ -363,3 +363,10 @@ mvn install:install-file -DgroupId=com.wy -DartifactId=java-utils -Dversion=0.1 
 * 数据库的各种唯一约束:如主键约束,但是必须保证在分布式下全局唯一
 * redis set防重:计算数据的MD5放入redis的set集合中,每次处理数据查看MD5是否存在
 * 全局请求唯一id:接口被调用时,生成一个唯一id,redis将数据保存到set中,存在即处理过
+
+
+
+
+
+# SpringCloud Stream
+

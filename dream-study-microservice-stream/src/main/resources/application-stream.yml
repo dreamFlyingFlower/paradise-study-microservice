@@ -1,0 +1,29 @@
+spring:
+  cloud:
+    stream:
+      binders:
+        # 使用中间件的类型标识,可自定义
+        rabbitmq: 
+          # 中间件类型,暂时只能是rabbit或kafka
+          type: rabbit
+          environment:
+            spring: 
+              rabbitmq: 
+                host: 192.168.10.128
+                port: 5672
+                username: guest
+                password: guest
+                virtual-host: /
+      bindings:
+        # 消息生产者.output是一个key,是一个通道(channel)的名称,在代码中会用到
+        output: 
+          # destination表示要使用的Exchange名称定义
+          destination: spring.cloud.stream.exchange
+          # 设置要绑定的消息服务的binder
+          binder: rabbitmq
+        # 配置消费者,正常情况下应该是2个项目
+        intput: 
+          # destination表示要使用的Exchange名称定义,要和生产者中相同
+          destination: spring.cloud.stream.exchange
+          # 设置要绑定的消息服务的binder
+          binder: rabbitmq

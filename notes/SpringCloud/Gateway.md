@@ -10,7 +10,7 @@
 * API网关是介于客户端和服务器端之间的中间层,所有的外部请求都会先经过 API 网关这一层
 * API的实现方面更多的考虑业务逻辑,而安全,性能,监控可以交由API网关处理,这样既提高业务灵活性又不缺安全性
 
- ![](image01.png)
+ ![](Gateway01.png)
 
 
 
@@ -55,11 +55,11 @@ spring:
 * 多路由断言工厂通过and组合
 * 官方提供的路由工厂
 
- ![1567318676724](image02.png)
+ ![1567318676724](Gateway02.png)
 
 * 断言工厂的配置方式,参照[官方文档](https://cloud.spring.io/spring-cloud-static/spring-cloud-gateway/2.1.0.RELEASE/single/spring-cloud-gateway.html)的Route Predicate Factories
 
-![img](image03.png)
+![img](Gateway03.png)
 
 * 以下路由匹配以/foo或者/bar开头的路径,转发到example.org,例如/foo/1或/foo/bar或/bar/baz
 
@@ -81,7 +81,7 @@ spring:
 * 路由过滤器允许以某种方式修改传入的HTTP请求或HTTP响应,路径过滤器的范围限定为特定路由
 * Spring Cloud Gateway包含许多内置的GatewayFilter工厂
 
- ![1567323105648](image04.png)
+ ![1567323105648](Gateway04.png)
 
 * 过滤器工厂的配置方式,参照[官方文档](https://cloud.spring.io/spring-cloud-static/spring-cloud-gateway/2.1.0.RELEASE/single/spring-cloud-gateway.html)的GatewayFilter Factories
 * 过滤器有20多个实现类,根据过滤器工厂的用途来划分,可以分为以下几种:
@@ -96,7 +96,7 @@ spring:
   * RateLimiter
   * Hystrix
 
-![img](image05.png)
+![img](Gateway05.png)
 
 * 重点掌握PrefixPath GatewayFilter Factory
 

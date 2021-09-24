@@ -17,4 +17,4 @@ spring:
 #        enabled: true
 #        service-id: paradise-study-microservice-config
   application:
-    name: paradise-study-microservice-config-client
+    name: dream-study-microservice-config-client

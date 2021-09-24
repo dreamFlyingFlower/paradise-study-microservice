@@ -1,4 +1,9 @@
 spring:
+  security:
+    user:
+      # 开启security认证,如无必要,不要开启
+      name: securityusername
+      password: securitypassword
   cloud: 
     config: 
       server:
