@@ -4,7 +4,7 @@ import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Kafka配置
+ * Kafka配置,必须先配置zookeeper(https://www.cnblogs.com/shanyou/p/3221990.html)
  * 	
  * 配置文件,在application-kafka中:
  * 

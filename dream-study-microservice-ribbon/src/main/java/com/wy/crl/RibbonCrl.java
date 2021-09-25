@@ -4,6 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.SecurityProperties.User;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,9 +28,17 @@ public class RibbonCrl {
 	@Autowired
 	private LoadBalancerClient loadBalancerClient;
 
+	@Autowired
+	private HttpHeaders httpHeaders;
+
 	@GetMapping("/movie/{id}")
 	public User findById(@PathVariable Long id) {
-		return this.restTemplate.getForObject("http://dream-study-microservice-security/user/" + id, User.class);
+		// 若其他微服务中开启了SpringSecurity认证,需要在resttemplate中加入请求头
+		return restTemplate.exchange("http://dream-study-microservice-security/user/", HttpMethod.GET,
+				new HttpEntity<User>(httpHeaders), User.class).getBody();
+		// return
+		// this.restTemplate.getForObject("http://dream-study-microservice-security/user/"
+		// + id, User.class);
 	}
 
 	@GetMapping("/test")

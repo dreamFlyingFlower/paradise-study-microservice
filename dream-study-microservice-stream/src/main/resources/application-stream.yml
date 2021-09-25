@@ -1,6 +1,18 @@
 spring:
   cloud:
     stream:
+      rabbit:
+        bindings:
+          # 需要绑定其他参数的信道,需要同下面bindings里的key相同
+          output: 
+            # 此处因为提示的Object类型,所以报错,实际上其他类型.绑定路由键,默认是#.指定之后只会被符合路由键的消费者消费
+            producer:
+              binding-routing-key: dream-study-microservice-stream-routing-key
+          # 需要绑定其他参数的信道,需要同下面bindings里的key相同
+          input: 
+             consumer: 
+              # 此处因为提示的Object类型,所以报错,实际上其他类型.绑定路由键,默认是#
+               binding-routing-key: dream-study-microservice-stream-routing-key
       binders:
         # 使用中间件的类型标识,可自定义
         rabbitmq: 
@@ -17,12 +29,16 @@ spring:
       bindings:
         # 消息生产者.output是一个key,是一个通道(channel)的名称,在代码中会用到
         output: 
+          # 生产者配置无效,仍然会丢失消息
+          # group: dream-study-microservice-stream
           # destination表示要使用的Exchange名称定义
           destination: spring.cloud.stream.exchange
           # 设置要绑定的消息服务的binder
           binder: rabbitmq
         # 配置消费者,正常情况下应该是2个项目
-        intput: 
+        input: 
+          # 在生产中必须指定,将消息持久化,此时Web上的队列名为变为destincation.group.若不指定,消息在MQ停掉之后就会消失
+          group: dream-study-microservice-stream
           # destination表示要使用的Exchange名称定义,要和生产者中相同
           destination: spring.cloud.stream.exchange
           # 设置要绑定的消息服务的binder

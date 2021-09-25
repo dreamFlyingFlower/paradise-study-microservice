@@ -14,17 +14,50 @@ import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
  * 为了实现注册服务的高可用,可以复制注册服务,修改端口即可;在client注册多个服务,逗号隔开
  * 多个注册服务都启动的时候,client默认是连接第一个注册服务,第一个注册服务挂掉才会连接其他注册服务
  * 
- * @apiNote Feign:内部负载均衡,2个完全相同的项目,除了ip和端口不同,提供给前端调用的接口都相同,name要相同
- *          Hystrix:断路器,防止因为一个服务挂掉,其他服务全部挂掉的服务
- *          Actuator:spring服务监控,见CloudFeign.https://blog.csdn.net/hanghangaidoudou/article/details/81141473
- *          AdminUI:配合Actuator使用,可直接形成图形化界面<br>
- *          ZUUL:外部负载均衡,前端调用后台接口负载,网关<br>
- *          Gateway:作用等同于zuul,是spring官方支持的,需要spring5.0,boot2.0<br>
- *          Springloaded:热部署,和devtool不同,该jar包不会重新部署程序,而是以线程的方式在后台运行,对html的修改无法监控
- *          nginx+varnish:实现动静分离,提高前端web运行速度.实现反向代理,web加速 metrics:集群监控<br>
- *          sleuth:服务链路追踪<br>
+ * Eureka自我保护机制:
  * 
- * @apiNote eureka在2.0闭源,服务注册与发现可更换为其他组件,例如zookeeper,nacos,Consul,见CloudServer1
+ * <pre>
+ * 该机制是注册中心的重要特性,当Eureka注册中心进入自我保护模式时,在Eureka Server首页会输出如下警告信息:
+ * EMERGENCY! EUREKA MAY BE INCORRECTLY CLAIMING INSTANCES ARE UP WHEN THEY'RE NOT.
+ * RENEWALS ARE LESSER THAN THRESHOLD AND HENCE THE INSTANCES ARE NOT BEING EXPIRED JUST TO BE SAFE.
+ * 在没有Eureka自我保护的情况下,如果Eureka Server在一定时间内没有接收到某个微服务的心跳,Eureka Server将会注销该实例.
+ * 但是当发生网络分区故障时,微服务与Eureka Server之间将无法正常通信,以上行为可能变得非常危险.
+ * 因为微服务本身是正常的,此时不应该注销这个微服务.如果没有自我保护机制,Eureka Server就会将此服务注销掉.
+ * 当Eureka Server在短时间内丢失过多客户端时(可能发生了网络故障),就会把这个微服务节点进行保护,这就是自我保护机制.
+ * 一旦进入自我保护模式,Eureka Server就会保护服务注册表中的信息,不删除服务注册表中的数据(也就是不会注销任何微服务).
+ * 当网络故障恢复后,该Eureka Server会再自动退出自我保护模式.
+ * 所以,自我保护模式是一种应对网络异常的安全保护措施,它的架构哲学是宁可同时保留所有微服务(健康的微服务和不健康的微服务都会保留),
+ * 也不盲目注销任何健康的微服务,使用自我保护模式,可以让Eureka集群更加的健壮,稳定
+ * 
+ * 禁用自我保护模式:eureka.server.enable-self-preservation = false
+ * 关闭自我保护模式后会出现红色:
+ * THE SELF PRESERVATION MODE IS TURNED OFF. 
+ * THIS MAY NOT PROTECT INSTANCE EXPIRY IN CASE OF NETWORK/OTHER PROBLEMS.
+ * 
+ * Eureka自我保护模式也会带来一些困扰.
+ * 如果在保护期内某个服务提供者刚好非正常下线了,此时服务消费者就会拿到一个无效的服务实例,此时会调用失败.
+ * 对于这个问题需要服务消费者端具有一些容错机制,如重试,断路器等.
+ * Eureka的自我保护模式是有意义的.该模式被激活后,它不会从注册列表中剔除因长时间没收到心跳导致注册过期的服务,而是等待修复,
+ * 直到心跳恢复正常之后,它自动退出自我保护模式.这种模式旨在避免因网络分区故障导致服务不可用的问题
+ * </pre>
+ * 
+ * 
+ * SpringCloud的常用组件:
+ * 
+ * <pre>
+ * Feign:客户端负载均衡,2个完全相同的项目,除了ip和端口不同,提供给前端调用的接口都相同,spring.application.name要相同
+ * Ribbon:客户端负载均衡,已经被Feign继承
+ * Hystrix:断路器,防止因为一个服务挂掉,其他服务全部挂掉的服务
+ * Actuator:spring服务监控. https://blog.csdn.net/hanghangaidoudou/article/details/81141473
+ * AdminUI:配合Actuator使用,可直接形成图形化界面
+ * ZUUL:客户端网关调用,前端调用后台接口负载,网关
+ * Gateway:作用等同于Zuul,是spring官方支持的,需要spring5.0,boot2.0
+ * Springloaded:热部署,和devtool不同,该jar包不会重新部署程序,而是以线程的方式在后台运行,对html的修改无法监控
+ * nginx+varnish:实现动静分离,提高前端web运行速度.实现反向代理,web加速 metrics:集群监控
+ * Sleuth+Zipkin:服务链路追踪+图形界面监控
+ * </pre>
+ * 
+ * @apiNote eureka在2.0闭源,服务注册与发现可更换为其他组件,例如zookeeper,nacos,Consul
  *          若开启eureka集群,则只是server上配置文件的不同,可创建多个配置,启动不同的配置文件即可
  * 
  * @apiNote CAP:Consistency(一致性),Availability(可用性),PartitionTolerance(分区容错性),三者不可兼得

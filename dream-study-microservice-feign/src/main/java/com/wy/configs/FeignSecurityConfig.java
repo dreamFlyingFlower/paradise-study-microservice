@@ -1,6 +1,7 @@
 package com.wy.configs;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 import feign.auth.BasicAuthRequestInterceptor;
 
@@ -11,6 +12,7 @@ import feign.auth.BasicAuthRequestInterceptor;
  * @date 2021-09-21 17:07:57
  * @git {@link https://github.com/dreamFlyingFlower}
  */
+@Configuration
 public class FeignSecurityConfig {
 
 	/**

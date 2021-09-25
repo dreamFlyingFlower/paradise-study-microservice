@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.access.ExceptionTranslationFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
@@ -31,9 +32,9 @@ import com.wy.service.UserService;
  * 
  * {@link ExceptionTranslationFilter}:认证异常处理类
  * 
- * @author ParadiseWY
+ * @author 飞花梦影
  * @date 2020-12-08 10:23:47
- * @git {@link https://github.com/mygodness100}
+ * @git {@link https://github.com/dreamFlyingFlower}
  */
 @Configuration
 @EnableWebSecurity
@@ -103,6 +104,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 		auth.authenticationProvider(provider);
+
+		// 在内存中添加一些内置的用户,当其他微服务访问当前服务时,使用这些内置的用户即可
+		auth.inMemoryAuthentication().passwordEncoder(new BCryptPasswordEncoder()).withUser("test")
+				.password(new BCryptPasswordEncoder().encode("123456")).roles("USER").and().withUser("admin")
+				.password(new BCryptPasswordEncoder().encode("123456")).roles("USER", "ADMIN");
 	}
 
 	/**
@@ -193,6 +199,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	public void configure(WebSecurity web) throws Exception {
 		// 配置需要忽略检查的web url
-		web.ignoring().antMatchers("/js/**","/css/**","/images/**");
+		web.ignoring().antMatchers("/js/**", "/css/**", "/images/**");
 	}
 }
