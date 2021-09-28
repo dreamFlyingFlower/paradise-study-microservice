@@ -1,0 +1,38 @@
+management:
+  # 定义actuator的监控服务以及端口,可以和程序的不同
+  server: 
+    address: 127.0.0.1
+    port: 11111  endpoints:
+    web:
+      # 定义访问的路径,默认是actuator
+      base-path: /actuator
+      exposure:
+        # 暴露所有的端点服务
+        include: "*"
+  # 默认打开所有的health配置
+  health:    defaults:      enabled: true  endpoint:    # 可以在Web页面访问ip:port/actuator/beans,默认true.显示容器中的bean列表
+    beans:      enabled: true
+    # 可以在Web页面访问ip:port/actuator/caches,默认true.显示应用中的缓存
+    caches:      enabled: true    # 可以在Web页面访问ip:port/actuator/conditions,默认true.显示配置条件的计算情况
+    conditions:
+      enabled: true    # 可以在Web页面访问ip:port/actuator/configprops,默认true.显示@ConfigurationProperties的信息
+    configprops:
+      enabled: true    # 可以在Web页面访问ip:port/actuator/env,默认true.显示ConfigurableEnvironment中的信息
+    env:
+      enabled: true    # 可以在Web页面访问ip:port/actuator/health,默认true.显示健康检查
+    health:
+      enabled: true
+      # 默认是NEVER
+      show-details: always    # 可以在Web页面访问ip:port/actuator/httptrace,默认true.显示httptrace的信息
+    httptrace:
+      enabled: true    # 可以在Web页面访问ip:port/actuator/info,默认true.显示设置好的应用信息
+    info:
+      enabled: true    # 可以在Web页面访问ip:port/actuator/startup,默认true.显示启动信息
+    startup:      enabled: true
+
+# 若Admin服务端开启了Security,则客户端需要如下配置     
+spring:  boot:    admin:      client:        username: admin
+        password: 123456
+        instance:          metadata:            user: 
+              name: admin
+              password: 123456

@@ -245,6 +245,22 @@
 
 
 
+# SpringCloud
+
+
+
+## 组件
+
+![](SpringCloud01.png)
+
+
+
+## 注册中心
+
+![](SpringCloud02.png)
+
+
+
 
 
 # SpringCloudHystrix
@@ -279,7 +295,4 @@
 
 
 
-
-
-# SpringCloudStream
 
