@@ -1,9 +1,25 @@
 package com.wy;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
+import org.springframework.beans.factory.BeanNameAware;
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.ListableBeanFactory;
+import org.springframework.beans.factory.config.SingletonBeanRegistry;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.DefaultSingletonBeanRegistry;
+import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.util.ClassUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import de.codecentric.boot.admin.server.config.EnableAdminServer;
@@ -13,10 +29,6 @@ import zipkin2.server.internal.EnableZipkinServer;
  * 通用信息
  * 
  * sharding数据库分库分表技术:https://blog.csdn.net/shijiemozujiejie/article/details/80786231
- * 
- * sleuth:链路追踪,主要用来测试系统中各部分的性能以及改善系统
- * 
- * zipkin:是slenth的web端,可在网页查看sleuth的链路,需要配置sleuth的服务器,需开启@EnableZipkinServer注解
  * 
  * SpringBoot Actuator各种监控信息URL:
  * 
@@ -55,6 +67,23 @@ import zipkin2.server.internal.EnableZipkinServer;
  * org/springframework/boot/loader:Spring Boot Loader
  * BOOT-INF/classes:项目内容
  * BOOT-INF/lib:项目依赖
+ * </pre>
+ * 
+ * 定制Bean,除了自动配置之外,一些其他途径:
+ * 
+ * <pre>
+ * {@link InitializingBean}:初始化Bean时指定bean操作
+ * {@link PostConstruct}:初始化Bean时指定bean操作,只能对方法使用
+ * {@link DisposableBean}:bean实例被销毁时指定操作
+ * {@link  PreDestroy}:bean实例被销毁时指定操作,只能对方法使用
+ * {@link ApplicationContextAware}:可以获得{@link ApplicationContext},通过该类对bean进行操作
+ * {@link BeanFactoryAware}:获得{@link BeanFactory},作用类似于{@link ApplicationContext}
+ * {@link BeanNameAware}:只能设置bean的name
+ * {@link ClassUtils#isPresent(String, ClassLoader)}:判断某个类是否存在,不限定在Spring上下文中
+ * {@link ListableBeanFactory#containsBeanDefinition(String)}:判断指定名称的bean是否已定义
+ * {@link ListableBeanFactory#getBeanNamesForType(Class)}:判断指定class的bean是否已定义
+ * {@link BeanDefinitionRegistry#registerBeanDefinition()}:通过{@link GenericBeanDefinition}将某个类注入到Spring上下文
+ * {@link SingletonBeanRegistry#registerSingleton()}:通过{@link DefaultSingletonBeanRegistry}注册单例的bean到Spring上下文中
  * </pre>
  *
  * @author 飞花梦影
