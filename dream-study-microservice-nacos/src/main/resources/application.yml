@@ -1,0 +1,7 @@
+server:
+  port: 55556
+spring: 
+  application:
+    name: paradise-study-microservice-config
+  profiles:
+    active: dev

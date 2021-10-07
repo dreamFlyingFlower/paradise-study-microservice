@@ -4,7 +4,7 @@
 
 # Tomcat
 
-* 1.TomcatServletWebServerFactory#configureSession方法会指定session的超时时间,最少不能低于1min
+* TomcatServletWebServerFactory#configureSession方法会指定session的超时时间,最少不能低于1min
 
 
 
@@ -30,6 +30,8 @@
 
 ## 角色
 
+![](Security02.png)
+
 * 资源所有者:通常是用户
 * 第三方应用:需要使用资源所有者资源的应用
 * 服务提供商:拥有资源所有者相关资源的平台
@@ -49,6 +51,8 @@
 
 
 ## 授权码模式
+
+![](Security01.png)
 
 * 第三方登录固定流程,该方式为原始方式,使用Social更快捷
 * /oauth/authorize:获得授权码code,接口地址固定,不可配置,get或post请求都可
@@ -92,7 +96,9 @@
 
 ## 客户端模式
 
-* 不常用
+* 客户端直接使用在授权服务器注册时的clientid和secret去授权服务器进行验证
+* 验证通过后,授权服务器返回token给客户端
+* 客户端使用token访问资源
 
 
 

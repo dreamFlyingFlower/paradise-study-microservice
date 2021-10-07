@@ -2,7 +2,14 @@ package com.wy;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.cloud.client.serviceregistry.ServiceRegistry;
+import org.springframework.cloud.netflix.eureka.EurekaClientAutoConfiguration;
 import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
+import org.springframework.cloud.netflix.eureka.serviceregistry.EurekaAutoServiceRegistration;
+import org.springframework.cloud.netflix.eureka.serviceregistry.EurekaRegistration;
+import org.springframework.cloud.netflix.eureka.serviceregistry.EurekaServiceRegistry;
+import org.springframework.context.support.DefaultLifecycleProcessor;
 
 /**
  * SpringCloud服务注册中心,不同服务之间需要通过spring.application.name辨识和注册
@@ -55,6 +62,16 @@ import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
  * Springloaded:热部署,和devtool不同,该jar包不会重新部署程序,而是以线程的方式在后台运行,对html的修改无法监控
  * nginx+varnish:实现动静分离,提高前端web运行速度.实现反向代理,web加速 metrics:集群监控
  * Sleuth+Zipkin:服务链路追踪+图形界面监控
+ * </pre>
+ * 
+ * 自动注册原理:
+ * 
+ * <pre>
+ * {@link ServiceRegistry}:服务注册抽象,由服务端注册实现
+ * {@link DiscoveryClient}:客户端发现抽象,由服务端实现
+ * {@link EurekaServiceRegistry}{@link EurekaRegistration}:Eureka的服务发现实现以及注册,实现了ServiceRegistry
+ * {@link EurekaAutoServiceRegistration}:Eureka服务端配置,由{@link DefaultLifecycleProcessor}调用
+ * {@link EurekaClientAutoConfiguration}:发现服务注册的自动配置
  * </pre>
  * 
  * @apiNote eureka在2.0闭源,服务注册与发现可更换为其他组件,例如zookeeper,nacos,Consul

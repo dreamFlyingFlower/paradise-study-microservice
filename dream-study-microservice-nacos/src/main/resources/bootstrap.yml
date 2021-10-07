@@ -1,0 +1,7 @@
+spring:
+  cloud:
+    nacos:
+      config:
+        enabled: true
+        # nacos配置中心服务器地址
+        server-addr: 127.0.0.1:8848

@@ -2,9 +2,13 @@ package com.wy;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.bootstrap.config.PropertySourceLocator;
+import org.springframework.cloud.config.client.ConfigServicePropertySourceLocator;
 import org.springframework.cloud.config.environment.PropertySource;
 import org.springframework.cloud.config.server.EnableConfigServer;
+import org.springframework.cloud.config.server.environment.EnvironmentRepository;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.core.env.CompositePropertySource;
 
 /**
  * 统一配置管理服务端:可以集中管理配置,不同环境使用不同配置,最重要的是运行期间可以动态调整配置和自动刷新
@@ -72,6 +76,16 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
  * 解密:ip:port/decrypt,选择raw,text,直接输入fsdfdfdsfdsfdswrewrew
  * 
  * 如果要对配置文件中的敏感信息进行加密,则需要将加密后的字符串加上{cipher},如{cipher}fsdfdfdsfdsfdswrewrew,自动解密
+ * </pre>
+ * 
+ * SpringCloud Config的PropertySource:
+ * 
+ * <pre>
+ * {@link PropertySourceLocator}:提供PropertySource
+ * {@link CompositePropertySource}:SpringCloud Config Client使用,由{@link ConfigServicePropertySourceLocator#locate}设置
+ * {@link ZookeeperPropertySource}:Zookeeper使用,需要引入ZK相关依赖,由{@link ZookeeperPropertySourceLocator}设置
+ * {@link ConsulPropertySource}:Consul使用,需要引入Consul相关依赖
+ * {@link EnvironmentRepository}:可以做SSH,代理访问,配置加密等,根据不同的实现类,访问不同的远程服务器上的配置,比如git,svn
  * </pre>
  * 
  * @author 飞花梦影

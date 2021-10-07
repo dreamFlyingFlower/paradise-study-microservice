@@ -17,6 +17,15 @@ import com.wy.service.UserService;
 /**
  * Hystrix配置
  * 
+ * Hystrix触发流程:
+ * 
+ * <pre>
+ * 请求并发是否达到最小请求数
+ * ->如果达到,开始判断请求线程是否达到错误率阈值,默认是50%
+ * ->如果达到错误率阈值,断路器熔断
+ * ->熔断超过指定时间(默认5秒)之后放过请求,如果该请求调用成功率达到20%,则回到健康状态
+ * </pre>
+ * 
  * {@link HystrixCommand}:服务降级注解,超时和异常都会触发服务降级熔断,该注解只适用于单一接口
  * {@link HystrixCommand#fallbackMethod()}:服务降级时调用的方法,该方法必须和服务在同一个类中,方法参数相同
  * {@link HystrixCommand#commandProperties()}:自定义服务降级配置,比如超时时间等
@@ -36,6 +45,8 @@ import com.wy.service.UserService;
  * <pre>
  * Execution相关:
  * execution.isolation.strategy:隔离策略,默认是线程隔离.根据文档说明只有THREAD和SEMAPHORE2种模式
+ * 		信号量隔离:轻量,无额外开销.但是不支持任务排队,主动超时和异步调用.适用于受信客户(内部服务),高扇出(网关),高频高速调用(cache)
+ * 		线程池隔离:支持排队,超时,异步调用,但是会产生额外的开销.适用于不授信客户,有限扇出
  * execution.timeout.enabled:是否使用超时配置.默认true使用,false禁止
  * execution.isolation.thread.timeoutInMilliseconds:超时配置,默认1000ms.如果该配置没有生效,
  * 		可能是因为ribbon和hystrix都使用超时策略时,哪一个时间短就使用哪一个,

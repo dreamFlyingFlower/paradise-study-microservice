@@ -55,6 +55,9 @@ public class OAuth2AuthenticationServer extends AuthorizationServerConfigurerAda
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
+	/**
+	 * 实际生产应该从数据库查询加载到内存中,内存中没有再从数据库查询,数据据没有则说明没有注册
+	 */
 	// guest:加密->$2a$10$dXULkWNhddYNVH9yQkzwQeJinGE0e22iL4CSEdkm7sRPwa.A27iEi
 	// 123456:加密->$2a$10$lg5hcqs13V3c6FVjr1/mjO31clz7fkjlIKnppDhNDdxJVaWxh/xB6
 	// password:加密->$2a$10$owjsydvplVmh0wI6f.xOM.4TKBc/CoKYTvX.HmnS6Yeu7qlyukAPO

@@ -28,9 +28,7 @@ import zipkin2.server.internal.EnableZipkinServer;
 /**
  * 通用信息
  * 
- * sharding数据库分库分表技术:https://blog.csdn.net/shijiemozujiejie/article/details/80786231
- * 
- * SpringBoot Actuator各种监控信息URL:
+ * SpringBoot Actuator各种监控信息URL:ip:port/actuator/:
  * 
  * <pre>
  * beans:显示容器器中的Bean列表,默认开启,可http访问,jmx访问用jconsole
@@ -45,9 +43,9 @@ import zipkin2.server.internal.EnableZipkinServer;
  * metrics:显示应用的度量信息,默认开启,不可http访问,jmx访问用jconsole
  * mappings:显示所有的{@link RequestMapping}信息,,默认开启,不可http访问,jmx访问用jconsole
  * scheduledtasks:显示应用的调度任务信息,默认开启,不可http访问,jmx访问用jconsole
- * shutdown:优雅地关闭应⽤用程序,默认关闭,可http访问,jmx访问用jconsole
- * threaddump:执行Thread Dump,默认开启,可http访问,jmx访问用jconsole
- * heapdump:返回Heap Dump文件,格式为HPROF,默认开启,需要其他插件支持
+ * shutdown:优雅地关闭应⽤用程序,post请求,默认关闭,可http访问,jmx访问用jconsole
+ * threaddump:查看线程情况,默认开启,可http访问,jmx访问用jconsole
+ * heapdump:返回Jvm Heap Dump文件,格式为HPROF,默认开启,可以使用JDK自带的VisualVM打开文件查看内存快照
  * prometheus:返回可供Prometheus抓取的信息,默认开启,需要其他插件支持
  * </pre>
  * 
@@ -57,6 +55,9 @@ import zipkin2.server.internal.EnableZipkinServer;
  * 服务端:将{@link EnableAdminServer}添加在启动类获其他注解类上,需要使用spring-boot-admin-starter-server依赖
  * 客户端:配置Admin服务端的地址,management.endpoints.web.exposure.include=*,添加spring-boot-admin-starter-client依赖
  * </pre>
+ * 
+ * Prometheus:监控,块存储,了解即可,运维相关
+ * 
  * 
  * 可执行Jar包,其中包含以下信息:
  * 

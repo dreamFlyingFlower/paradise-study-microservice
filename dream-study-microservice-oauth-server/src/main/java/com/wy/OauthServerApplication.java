@@ -49,6 +49,16 @@ import org.springframework.web.bind.annotation.RestController;
  * {@link EnableResourceServer}:在类上只需要添加该注解即可注册为资源服务器
  * </pre>
  * 
+ * 搭建自己的认证服务器,表结构如下,参照:
+ * 
+ * <pre>
+ * oauth_client:id,client_id,client_secret,redirect_uri,createtime,updatetime
+ * oauth_scope:id,scope,default_scope,remark,createtime,createtime
+ * oauth_access_token:id,client_id,user_id,token,expiretime,scope,createtime,updatetime
+ * oauth_refresh_token:id,client_id,user_id,token,expiretime,scope,createtime,updatetime
+ * oauth_authorization_code:id,client_id,user_id,code,redirect_uri,expiretime,scope,createtime,updatetime
+ * </pre>
+ * 
  * @author 飞花梦影
  * @date 2021-04-09 11:04:34
  * @git {@link https://github.com/dreamFlyingFlower}

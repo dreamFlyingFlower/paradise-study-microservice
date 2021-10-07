@@ -2,6 +2,8 @@ package com.wy;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.loadbalancer.LoadBalancerAutoConfiguration;
+import org.springframework.cloud.client.loadbalancer.LoadBalancerInterceptor;
 import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
 import org.springframework.cloud.netflix.ribbon.RibbonAutoConfiguration;
 import org.springframework.cloud.netflix.ribbon.RibbonClient;
@@ -11,6 +13,12 @@ import com.wy.config.RibbonConfig;
 /**
  * SpringCloud Ribbon服务调度中心,客户端负载均衡
  * 
+ * <pre>
+ * {@link LoadBalancerAutoConfiguration}:自动配置负载均衡
+ * {@link LoadBalancerInterceptor}:实现{@link ClientHttpRequestInterceptor}对请求做拦截之后进行处理
+ * {@link RibbonAutoConfiguration}:配置请求工厂,设置LoadBalancerClient等
+ * </pre>
+ * 
  * 自定义Ribbon的负载均衡模式:
  * 
  * <pre>
@@ -18,7 +26,7 @@ import com.wy.config.RibbonConfig;
  * {@link RibbonClient#name()}:指定自定义负载均衡的服务名
  * {@link RibbonClient#configuration()}:指定自定义轮询的类,该类不能被扫描,否则所有的服务都将使用该负载均衡方式
  * 
- * 使用配置文件指定聚在均衡方式,该方式优先级比注解方式的优先级高
+ * 使用配置文件指定负载均衡方式,该方式优先级比注解方式的优先级高
  * </pre>
  * 
  * @author 飞花梦影
