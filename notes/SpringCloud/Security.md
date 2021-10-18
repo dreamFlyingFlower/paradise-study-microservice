@@ -55,6 +55,7 @@
 ![](Security01.png)
 
 * 第三方登录固定流程,该方式为原始方式,使用Social更快捷
+* 手机和后台服务也使用该方式,每次自动使用refresh_token获取新的access_token
 * /oauth/authorize:获得授权码code,接口地址固定,不可配置,get或post请求都可
 	* 源码:AuthorizationEndpoint
 	* response_type:4种认证模式中的一种,code是授权码认证模式,固定写死,可在OAuth2官网查看
@@ -63,7 +64,6 @@
 	* scope:取得什么权限,可自定义
 * 向认证服务器发送请求时,会检查第三方需要使用的用户是否登录,若自定义了登录方式,那么程序会报错.
 * 若没有自定义登录方式,则会跳出登录框,用户登录之后接口继续执行,若成功,会在当前页面让用户选择是否同意授权,不管用户是否同意,都会跳转到redirect_uri指向的url,若同意则授权码code将会直接拼在url后面.若不同意,不会带上code
-
 * /oauth/token:获得access_token,地址不可变,post
   * 源码:TokenEndpoint.该接口不用在本地系统中登录,可直接调用,但是需要用到上一步取得的code,code有时效
   * 发送请求时,请求头中需添加验证:Authentication->Basic Auth->oauth2服务器发放的client_id和client_secret
