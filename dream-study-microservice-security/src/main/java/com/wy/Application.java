@@ -233,9 +233,19 @@ import com.wy.crl.UserCrl;
  * 菜单表->菜单按钮(权限)表->按钮(数据)表
  * </pre>
  * 
+ * API安全:
+ * 
+ * <pre>
+ * 传输安全:将比较敏感的信息进行RSA加密,同时要将时间戳拼接到信息中同时加密.
+ * 		时间戳用来判断过期时间,但是会存在服务器和客户端时间不同步的问题,这样可能会导致请求一直不成功
+ * 加密串存储:为了更好的防止黑客利用上一次的请求在过期时间内再次请求,可以将加密串在服务器中利用Map进行存储,
+ * 		当请求再次被调用时,先从内存中Map中查找加密字符串是否使用过,使用过就不能再调用
+ * 请求防篡改:请求签名(MD5),对参数进行MD5加密,同时要指定盐(salt),salt不会随着请求进行传输,但客户端和服务器都要存
+ * </pre>
+ * 
  * @author 飞花梦影
  * @date 2019-01-31 00:09:33
- * @git {@link https://github.com/mygodness100}
+ * @git {@link https://github.com/dreamFlyingFlower}
  */
 @EnableRedisHttpSession
 @SpringBootApplication
