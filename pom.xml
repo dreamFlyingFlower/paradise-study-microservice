@@ -65,6 +65,7 @@
 		<module>dream-study-microservice-service</module>
 		<module>dream-study-microservice-sleuth</module>
 		<module>dream-study-microservice-stream</module>
+		<module>dream-study-microservice-transaction</module>
 		<module>dream-study-microservice-zuul</module>
 	</modules>
 </project>

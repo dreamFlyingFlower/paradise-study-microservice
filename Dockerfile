@@ -1,5 +1,5 @@
 # 维护者信息
-MAINTAINER ParadiseWY
+MAINTAINER DreamFlyingFlower
 # 指定构成镜像的基础镜像源,如需要jdk:镜像名,8-alpine:版本号
 # From java:8-alpine
 # 指定从网易的镜像网站中下载镜像

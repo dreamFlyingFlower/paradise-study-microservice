@@ -1,0 +1,26 @@
+management:
+  metrics:
+    web:
+      server:
+        # zipkin启动报错无法访问的解决方法
+        auto-time-requests: false
+# 其他微服务的zipkin配置
+spring:  zipkin:    enabled: true
+    # 关闭服务发现,否则springcloud会把zipkin的url当服务名称
+    discovery-client-enabled: false
+    # zipkin的地址,其他微服务使用本服务的地址
+    base-url: localhost:${server.port}
+    # 发送跟踪数据到zipkin的类型
+    sender:      type: web
+  sleuth: 
+    sampler: 
+      # 设置request抽样采集率为100%,默认0.1就是10%,即采样10%的请求数据
+      probability: 1
+# spring并不识别,没有starter启动器
+zipkin: 
+  storage: 
+    type: elasticsearch
+    elasticsearch: 
+      cluster: elasticsearch
+      hosts: http://localhost:9201
+      index: zipkin
