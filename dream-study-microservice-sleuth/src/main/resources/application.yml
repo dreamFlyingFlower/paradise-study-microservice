@@ -10,9 +10,9 @@ server:
 eureka:
   instance:
     hostname: localhost
-    # 每隔2s向注册中心发送心跳包,张明自己还没有宕机
-    lease-expiration-duration-in-seconds: 2
-    # 当多长时间没有收到心跳包的信息时,从注册中心中剔除本服务
+    # 当多长时间没有收到心跳包的信息时,从注册中心中剔除本服务,默认90S
+    lease-expiration-duration-in-seconds: 30
+    # 每隔10向注册中心发送心跳包,表明自己还没有宕机,默认30S
     lease-renewal-interval-in-seconds: 10
     # 通知注册中心,本服务实例以IP作为链接,而不是取机器名
     prefer-ip-address: true
