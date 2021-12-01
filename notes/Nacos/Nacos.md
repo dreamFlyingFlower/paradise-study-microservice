@@ -259,7 +259,7 @@ public class ProviderController {@Value("${myName}"){
 
 
 
-## 名称空间
+## 命名空间
 
 * 开发环境较多时(默认只有public),可以根据不同环境来创建不同的namespce,进行多环境的隔离
 
@@ -358,5 +358,4 @@ public class ProviderController {
 # 指定分组
 spring.cloud.nacos.config.ext-config[0].group=provider
 ```
-
 
