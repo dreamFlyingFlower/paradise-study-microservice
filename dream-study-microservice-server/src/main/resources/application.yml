@@ -1,6 +1,6 @@
 spring:
   application:
-    name: paradise-study-microservice-server
+    name: dream-study-microservice-server
   profiles:
     active: dev
 server: 
@@ -10,6 +10,10 @@ server:
 eureka:
   instance:
     hostname: localhost
+    # 当多长时间没有收到心跳包的信息时,从注册中心中剔除本服务,默认90S
+    #lease-expiration-duration-in-seconds: 30
+    # 每隔10向注册中心发送心跳包,表明自己还没有宕机,默认30S
+    #lease-renewal-interval-in-seconds: 10
     # 健康检查的页面
     #status-page-url-path: ${management.context-path}/info
     #health-check-url-path: ${management.context-path}/health
