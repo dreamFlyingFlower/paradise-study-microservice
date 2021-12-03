@@ -1,8 +1,11 @@
 turbine: 
   aggregator:
-    # 访问页面的应用名,默认default可直接访问ip:port/turbine.stream
+    # 访问页面的应用名,默认default可直接访问ip:port/turbine.stream或可能是ip:port/actuator/turbine.stream
     cluster-config: default
   # 需要进行监控的应用名
   app-config: dream-study-microservice-server,dream-study-microservice-auth-client
   # 在hystrix.dashboard中访问的时候的后缀名
   cluster-name-expression: "'default'"
+  # 指定服务使用特定访问前缀,需要依赖spring-cloud-starter-netflix-hystrix-dashboard
+  instance-url-suffix: 
+    dream-study-microservice-service: /ribbon/hystrix.stream

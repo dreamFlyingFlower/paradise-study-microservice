@@ -21,6 +21,9 @@ eureka:
     #status-page-url: https://${euraka.hostname}/info
     #health-check-url: https://${euraka.hostname}/health
     #home-page-url: https://${euraka.hostname}
+    # eureka可以理解的元数据,不会影响客户端行为
+    metadata-map:
+      id: 1
   server: 
     # 清理已经停止的服务的时间间隔,默认是60秒
     eviction-interval-timer-in-ms: 60000

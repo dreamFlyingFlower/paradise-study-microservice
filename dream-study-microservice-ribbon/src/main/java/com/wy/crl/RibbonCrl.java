@@ -41,6 +41,11 @@ public class RibbonCrl {
 		// + id, User.class);
 	}
 
+	/**
+	 * 直接使用SpringCloud自带的loadBalancerClient进行负载均衡,在2020.0.x的SpringCloud版本中,Ribbon组件被移除
+	 * 
+	 * @return
+	 */
 	@GetMapping("/test")
 	public String test() {
 		ServiceInstance serviceInstance = this.loadBalancerClient.choose("dream-study-microservice-security");

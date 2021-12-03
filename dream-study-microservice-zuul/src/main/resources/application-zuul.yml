@@ -14,6 +14,8 @@ zuul:
     user: 
       # 该路由服务指向哪一个服务名
       service-id: dream-study-microservice-service
+      # 以URL进行访问
+      url: localhost:12345
       # 网关代理路径./**表示所有层级的接口,/*表示只有一层
       path: /user/**
       # 同全局是strip-prefix,可不配置
@@ -27,3 +29,19 @@ zuul:
   SendErrorFilter:
     error: 
       disable: true
+      
+ribbon:
+  # 连接超时时间
+  ConnectTimeout: 3000
+  # 读数据超时时间
+  ReadTimeout: 60000
+  # 默认用eureka做注册中心,也可以禁用eureka做注册中心,此时需要配置下面的指定服务名称配置
+  eureka:
+    enabled: false
+# 指定服务名称
+dream-study-microservice-service: 
+  ribbon: 
+    # 指定服务使用的负载均衡方式,都是IRule的实现类
+    NFLoadBalancerRuleClassName: com.netflix.loadbalancer.WeightedResponseTimeRule
+    # 当没有使用eureka作为注册中心,或eureka被禁用了,需要配置被调用服务的ip地址.没有配置的服务,不会被调用
+    listOfServers: 127.0.0.1:55556,127.0.0.1:55557

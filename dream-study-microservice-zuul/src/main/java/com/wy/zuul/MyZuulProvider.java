@@ -7,7 +7,9 @@ import java.io.InputStream;
 import org.springframework.cloud.netflix.zuul.filters.route.FallbackProvider;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.stereotype.Component;
 
 /**
  * Zuul服务自身降级,必须实现{@link FallbackProvider}
@@ -16,10 +18,12 @@ import org.springframework.http.client.ClientHttpResponse;
  * @date 2021-09-23 15:42:20
  * @git {@link https://github.com/dreamFlyingFlower }
  */
+@Component
 public class MyZuulProvider implements FallbackProvider {
 
 	@Override
 	public String getRoute() {
+		// *表示所有服务都降低,若只降低指定服务,可写服务名,多个逗号隔开
 		return "*";
 	}
 
@@ -31,13 +35,14 @@ public class MyZuulProvider implements FallbackProvider {
 			@Override
 			public HttpHeaders getHeaders() {
 				HttpHeaders headers = new HttpHeaders();
-				headers.set("Content-Type", "text/html; charset=UTF-8");
+				headers.setContentType(MediaType.APPLICATION_JSON);
 				return headers;
 			}
 
 			@Override
 			public InputStream getBody() throws IOException {
 				// 响应体
+				System.out.println(MyZuulProvider.this.getRoute());
 				return new ByteArrayInputStream("服务正在维护,请稍后再试.".getBytes());
 			}
 

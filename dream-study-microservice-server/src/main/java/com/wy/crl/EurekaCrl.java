@@ -1,6 +1,7 @@
 package com.wy.crl;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
@@ -37,6 +38,9 @@ public class EurekaCrl {
 		}
 		// Eureka获得微服务组件的实例信息:微服务名,是否使用安全认证
 		InstanceInfo instanceInfo = eurekaClient.getNextServerFromEureka("dream-study-microservice-service", false);
+		// 获得元数据
+		Map<String, String> metadata = instanceInfo.getMetadata();
+		System.out.println(metadata.size());
 		return instanceInfo.getHostName();
 	}
 }
