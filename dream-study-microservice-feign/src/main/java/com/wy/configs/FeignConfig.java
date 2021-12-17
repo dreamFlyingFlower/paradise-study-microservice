@@ -1,11 +1,14 @@
 package com.wy.configs;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 import org.springframework.cloud.openfeign.FeignClientProperties.FeignClientConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import feign.Contract;
 import feign.Logger;
+import feign.Retryer;
 
 /**
  * 在FeignClient注解中有个configuration属性,该属性会自定义被注解修改的接口的上下文默认配置,不能在启动时被扫描
@@ -37,5 +40,14 @@ public class FeignConfig {
 	@Bean
 	Logger.Level feignLoggerLevel() {
 		return Logger.Level.FULL;
+	}
+
+	/**
+	 * 自定义Feign重试策略
+	 * 
+	 * @return
+	 */
+	public Retryer feignRetryer() {
+		return new Retryer.Default(100, SECONDS.toMillis(1), 5);
 	}
 }
