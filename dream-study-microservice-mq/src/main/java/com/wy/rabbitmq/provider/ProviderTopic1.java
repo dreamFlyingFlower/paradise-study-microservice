@@ -8,9 +8,9 @@ import org.springframework.stereotype.Component;
 /**
  * 主题模式(topic),交换器完全匹配,路由键可由通配符匹配
  * 
- * @author ParadiseWY
+ * @author 飞花梦影
  * @date 2019年4月15日 下午1:19:49
- * @git {@link https://github.com/mygodness100}
+ * @git {@link https://github.com/dreamFlyingFlower}
  */
 @Component
 public class ProviderTopic1 {

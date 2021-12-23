@@ -1,4 +1,4 @@
-package com.wy.config;
+package com.wy.rabbitmq;
 
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
@@ -7,9 +7,9 @@ import org.springframework.context.annotation.Configuration;
 /**
  * 修改rabbitmq默认的序列化类
  * 
- * @author ParadiseWY
+ * @author 飞花梦影
  * @date 2019-07-05 00:34:40
- * @git {@link https://github.com/mygodness100}
+ * @git {@link https://github.com/dreamFlyingFlower}
  */
 @Configuration
 public class RabbitMQConfig {

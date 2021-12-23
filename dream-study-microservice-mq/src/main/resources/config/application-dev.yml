@@ -53,3 +53,8 @@ spring:
       bindings: 
         msgClient: 
           group: test
+          
+config:
+  rabbit:
+    dead:
+      queue: dead-queue

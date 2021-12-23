@@ -1,4 +1,4 @@
-package com.wy.rabbitmq;
+package com.wy.rabbitmq.dead;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -6,16 +6,24 @@ import java.util.Map;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.TopicExchange;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import com.wy.properties.RabbitProperties;
 
 /**
  * 死信队列
  * 
  * @author 飞花梦影
  * @date 2021-01-04 23:27:10
- * @git {@link https://github.com/mygodness100}
+ * @git {@link https://github.com/dreamFlyingFlower}
  */
+@Configuration
 public class DeadQueueConfig {
+
+	@Autowired
+	private RabbitProperties rabbit;
 
 	/**
 	 * 声明业务交换机
@@ -36,9 +44,9 @@ public class DeadQueueConfig {
 	public Queue queue() {
 		Map<String, Object> arguments = new HashMap<>();
 		// x-dead-letter-exchange 这里声明当前队列绑定的死信交换机
-		arguments.put("x-dead-letter-exchange", "dead-exchange");
+		arguments.put("x-dead-letter-exchange", rabbit.getDead().getExchange());
 		// x-dead-letter-routing-key 这里声明当前队列的死信路由key
-		arguments.put("x-dead-letter-routing-key", "msg.dead");
+		arguments.put("x-dead-letter-routing-key", rabbit.getDead().getRoutingKey());
 		return new Queue("spring.test.queue", true, false, false, arguments);
 	}
 
@@ -59,7 +67,7 @@ public class DeadQueueConfig {
 	 */
 	@Bean
 	public TopicExchange deadExchange() {
-		return new TopicExchange("dead-exchange", true, false);
+		return new TopicExchange(rabbit.getDead().getExchange(), true, false);
 	}
 
 	/**
@@ -69,7 +77,7 @@ public class DeadQueueConfig {
 	 */
 	@Bean
 	public Queue deadQueue() {
-		return new Queue("dead-queue", true, false, false);
+		return new Queue(rabbit.getDead().getQueue(), true, false, false);
 	}
 
 	/**
@@ -79,6 +87,7 @@ public class DeadQueueConfig {
 	 */
 	@Bean
 	public Binding deadBinding() {
-		return new Binding("dead-queue", Binding.DestinationType.QUEUE, "dead-exchange", "msg.dead", null);
+		return new Binding(rabbit.getDead().getQueue(), Binding.DestinationType.QUEUE, rabbit.getDead().getExchange(),
+				rabbit.getDead().getRoutingKey(), null);
 	}
 }

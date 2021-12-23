@@ -1,6 +1,9 @@
 package com.wy.rabbitmq.receiver;
 
+import java.io.IOException;
+
 import org.springframework.amqp.core.ExchangeTypes;
+import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.Exchange;
 import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.QueueBinding;
@@ -8,24 +11,42 @@ import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
+import com.rabbitmq.client.Channel;
+
 /**
- * @apiNote 将listener写在类上,而放上中需要使用队列的方法上加上RabbitHandler注解
- * @apiNote bindings注解:value:绑定队列,队列名称,exchange:配置交互器,key:路由键
- * @apiNote queue注解:value队列的名称,autoDelete是否是一个可删除的临时队列
- * @apiNote exchange注解:value交换器的名称,type交换器的类型
- * @author ParadiseWY
+ * RabbitMQ消费者
+ * 
+ * <pre>
+ * {@link RabbitListener}:表明该类是一个消费者
+ * {@link RabbitListener#bindings}:指定队列绑定信息,包括队列信息,路由信息等
+ * {@link QueueBinding}:队列绑定信息,包括队列信息,路由信息等
+ * {@link QueueBinding#value()}:队列信息
+ * {@link QueueBinding#exchange()}:交换器信息
+ * {@link QueueBinding#key()}:路由键规则
+ * {@link Queue}:队列信息
+ * {@link Queue#value()}:队列的名称
+ * {@link Queue#autoDelete()}:是否是一个可删除的临时队列,true->是,false->默认不是
+ * {@link Exchange}:路由信息
+ * {@link Exchange#value()}:交换器信息
+ * {@link Exchange#type()}:交换器类型
+ * </pre>
+ * 
+ * @author 飞花梦影
  * @date 2019-04-16 13:40:22
- * @git {@link https://github.com/mygodness100}
+ * @git {@link https://github.com/dreamFlyingFlower}
  */
-@RabbitListener(bindings = @QueueBinding(
-		value = @Queue(value = "${mq.top.queue.info}", autoDelete = "true"),
-		exchange = @Exchange(value = "${mq.top.exchange}", type = ExchangeTypes.TOPIC),
-		key = "*.info.log"))
+@RabbitListener(bindings = @QueueBinding(value = @Queue(value = "${mq.top.queue.info}", autoDelete = "true"),
+		exchange = @Exchange(value = "${mq.top.exchange}", type = ExchangeTypes.TOPIC), key = "*.info.log"))
 @Component
 public class ReceiverTopic1 {
 
 	@RabbitHandler
-	public void receiveMsg(String msg) {
+	public void receiveMsg(String msg, Message message, Channel channel) {
 		System.out.println(msg);
+		try {
+			channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

@@ -10,7 +10,7 @@ import com.rabbitmq.client.Envelope;
 import com.wy.rabbitmq.util.ConnectionUtil;
 
 /**
- * 订阅模式消费者1
+ * 订阅模式消费者1.消费者绑定路由键时,#表示一个任意字符,*表示多个任务字符
  *
  * @author 飞花梦影
  * @date 2021-01-04 22:45:02
