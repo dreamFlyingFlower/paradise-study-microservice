@@ -55,7 +55,12 @@
 
 ## ACL(auth)
 
-> ACL(Access Control List):为保证zk的正常运行,zk提供的一套权限控制机制.有3种模式:权限模式,授权对象,权限
+
+
+* ACL(Access Control List):为保证zk的正常运行,zk提供的一套权限控制机制.有3种模式:
+  * 权限模式
+  * 授权对象
+  * 权限
 
 * 权限模式(Scheme),包括4中权限模式:
   * ip:通过对ip的细粒度控制
@@ -94,15 +99,27 @@
   * 选举状态
 * server1启动,第一轮投票都会投给自己,由于其他服务还没启动,得不到反馈,一直处于LOOKING状态
 * server2启动,给自己投票,与server1进行比较,由于server2的编号大于server1,server2胜出.若此时启动的服务数大于集群服务的一半,server2就是leader
-* server3启动,给自己投票,同时与server1,server2交换信息,尽管server3打,但leader已经选出,server3仍然是follower
-* 若leader挂了,此时不单单要比较myid的编号大小,还需要比较结点的zxid大小,2者比较的结果都胜出的才是新的leader
+* server3启动,给自己投票,同时与server1,server2交换信息,尽管server3大,但leader已经选出,server3仍然是follower
+* 若leader挂了,此时不单单要比较myid的编号大小,还需要比较节点的zxid大小,2者比较的结果都胜出的才是新的leader
 * 投票数大于半数即为leader
+
+
+
+## 数据同步
+
+
+
+* 所有follower节点写的请求统一交个leader实现,并且创建一个全局zxid(事务id)
+* Leader节点在第一阶段通知阶段,会带上zxid向每位follower节点发出确认同步通知
+* 只要有过半数的follower节点确认同步ack,这时候leader就会向所有的follower发出commit事务数据提交
 
 
 
 # ZNode
 
-## 1 特性
+
+
+## 特性
 
 * node节点的唯一标识就是他的路径,每个节点可以存储数据,可以有子节点,除了ephemeral不可有子节点
 * znode是有版本的,每个节点可以有多个数据版本,也就是会有多份数据
@@ -112,7 +129,7 @@
 
 
 
-## 2 节点类型
+## 节点类型
 
 * persistent:持久化目录节点,客户端与zookeeper断开后,节点仍存在
 * persistent_sequential:持久化顺序编号目录节点,在持久化基础上给该节点名称顺序编号
@@ -121,12 +138,30 @@
 
 
 
-## 3 事件类型
+## 事件类型
 
 * EventType.NodeCreated:节点创建事件
 * EventType.NodeDataChanged:节点数据变化事件
 * EventType.NodeChildrenChanged:节点的子节点变化事件
 * EventTYPE.NodeDeleted:节点删除事件
+
+
+
+## 状态信息Stat
+
+
+
+* cZxid:数据节点创建时的事务ID
+* ctime:数据节点创建时的时间
+* mZxid:数据节点最后一次更新时的事务ID
+* mtime:数据节点最后一次更新时的时间
+* pZxid:数据节点的子节点列表最后一次被修改(是子节点列表,而不是子节点内容)时的事务ID
+* cversion:子节点的版本号
+* dataVersion:数据节点的版本号
+* aclVersion:数据节点的ACL版本号 
+* ephemeralOwner:如果节点是临时节点,则表示创建该节点的会话的SessionID;如果节点是持久节点,则该属性值为0
+* dataLength:数据内容的长度
+* numChildren:数据节点当前的子节点个数
 
 
 

@@ -13,6 +13,9 @@
 	<description>basic dependency</description>
 
 	<properties>
+		<!-- 因为日志框架漏洞的关系,log4j-api和log4j-core要升级到2.17以上 -->
+		<log4j2.version>2.17.0</log4j2.version>
+		<logback.version>1.2.9</logback.version>
 		<springfox.swagger2.version>2.9.2</springfox.swagger2.version>
 		<swagger.models.version>1.5.21</swagger.models.version>
 	</properties>
@@ -61,6 +64,10 @@
 			<groupId>io.zipkin.java</groupId>
 			<artifactId>zipkin-autoconfigure-ui</artifactId>
 			<version>2.12.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-zookeeper-config</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>dream.flying.flower</groupId>
