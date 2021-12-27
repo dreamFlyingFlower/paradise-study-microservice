@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.cloud.netflix.zuul.filters.support.FilterConstants;
 import org.springframework.stereotype.Component;
 
+import com.google.common.util.concurrent.RateLimiter;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
@@ -27,6 +28,11 @@ import com.netflix.zuul.exception.ZuulException;
  */
 @Component
 public class MyZuulFilter extends ZuulFilter {
+
+	/**
+	 * gvaua令牌桶限流,将请求放入一个容器中,限制容器的容量的,当达到容量上限时,不再接受请求
+	 */
+	private static final RateLimiter RATE_LIMITER = RateLimiter.create(100);
 
 	/**
 	 * 返回过滤器的类型
@@ -57,9 +63,15 @@ public class MyZuulFilter extends ZuulFilter {
 	 */
 	@Override
 	public Object run() throws ZuulException {
+		// 从zuul自定义的上下文中拿到request
 		RequestContext currentContext = RequestContext.getCurrentContext();
 		HttpServletRequest request = currentContext.getRequest();
 		System.out.println("访问地址:" + request.getServerName() + ":" + request.getRequestURI());
+		// 每秒的请求不能超过100个
+		if (!RATE_LIMITER.tryAcquire()) {
+			// 没有拿到令牌
+			throw new RuntimeException("没有拿到令牌,被限流了");
+		}
 		// 目前返回值并没有任何意义
 		return null;
 	}

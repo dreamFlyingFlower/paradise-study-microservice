@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>dream.flying.flower</groupId>
 		<artifactId>dream-study-microservice</artifactId>
-		<version>${project.version}</version>
+		<version>0.0.1</version>
 	</parent>
 	<artifactId>dream-study-microservice-gateway</artifactId>
 	<name>dream-study-microservice-gateway</name>
@@ -25,11 +25,14 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
-		<!-- <dependency> -->
-		<!-- <groupId>org.springframework.cloud</groupId> -->
-		<!-- <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId> -->
-		<!-- </dependency> -->
-
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.alibaba.csp</groupId>
+			<artifactId>sentinel-spring-cloud-gateway-adapter</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-gateway</artifactId>
@@ -54,10 +57,6 @@
 			<groupId>org.isomorphism</groupId>
 			<artifactId>token-bucket</artifactId>
 			<version>1.7</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-netflix-zuul</artifactId>
 		</dependency>
 
 		<dependency>

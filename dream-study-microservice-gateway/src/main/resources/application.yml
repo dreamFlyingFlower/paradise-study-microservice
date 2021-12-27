@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: cloud-gateway
+    name: dream-study-microservice-gateway
     
 eureka: 
   instance:
@@ -14,26 +14,6 @@ eureka:
     service-url: 
       defaultZone: http://localhost:5500/eureka
       
-zuul:
-  # 若是为了防止接口暴露,可以增加统一的前缀
-  prefix: /zuul
-  # 禁止直接使用服务名访问服务,若只想禁用单个,则可以一个一个写,若是都禁用,直接写*
-  ignored-services: "*"
-  # 进制访问某些url,正则表达式,只对url后的api进行匹配
-  ignored-patterns:
-    - user/**
-  # 全部微服务忽略敏感头,都可以将cookie等带到其他微服务中,可以不写任何东西
-  sensitive-headers:
-    - 
-  routes: 
-    # 自定义url访问规则,key自定义,见名知意,route中serviceId:服务的name,path:匹配的url
-    service-user: 
-      serviceId: cloud-client1
-      path: /service/user/**
-    service-task: 
-      service-id: cloud-task
-      path: /service/task/**
-
 management: 
   endpoints:
     web:
