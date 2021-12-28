@@ -1,5 +1,7 @@
 package com.wy;
 
+import java.util.concurrent.Semaphore;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
@@ -48,7 +50,6 @@ import org.springframework.context.support.DefaultLifecycleProcessor;
  * 直到心跳恢复正常之后,它自动退出自我保护模式.这种模式旨在避免因网络分区故障导致服务不可用的问题
  * </pre>
  * 
- * 
  * SpringCloud的常用组件:
  * 
  * <pre>
@@ -74,25 +75,38 @@ import org.springframework.context.support.DefaultLifecycleProcessor;
  * {@link EurekaClientAutoConfiguration}:发现服务注册的自动配置
  * </pre>
  * 
- * @apiNote eureka在2.0闭源,服务注册与发现可更换为其他组件,例如zookeeper,nacos,Consul
- *          若开启eureka集群,则只是server上配置文件的不同,可创建多个配置,启动不同的配置文件即可
+ * 常用注册中心:
  * 
- * @apiNote CAP:Consistency(一致性),Availability(可用性),PartitionTolerance(分区容错性),三者不可兼得
- *          eureka和zookeeper的区别,eureka为AP,因为eureka的程序都是平级的关系,不存在数据的主从复制,
- *          数据可能会产生不一致.eureka有服务保护机制,即当某个服务挂掉的时候,注册中心会暂时保存client的信息,
- *          当client重新注册的时候,服务讲仍然可用.分区容错在是通过每个服务部署多个来实现
- *          zk为CP,zk的leader是唯一的,在leader挂掉的时候服务不可用,因为要重新选举leader.
- *          zk的数据一致性是通过主从复制来实现的,从服务的数据都会发送到主服务,主服务会重新将数据发送到各个从服务
- *          分区容错则是通过leader挂掉的时候,重新选举leader来实现的
+ * <pre>
+ * Eureka:AP模式,2.0闭源
+ * Consul:类似Eureka
+ * Nacos:AP+CP,RPC和RestFul都支持.集群底层用的是Raft协议,类似ZAB.初始选举用的是随机阻塞时间,最短的为Master;
+ * 		如果超过半数节点的随机时间相同,重新阻塞选举;其他投票方式类似ZAB
+ * 		Nacos默认会将服务进行注册,不需要添加{@link DiscoveryClient}
+ * </pre>
  * 
- * @apiNote 实现分布式锁,可使用zk的InterProcessMutex,用acquire获得锁,用release释放锁
- *          使用redis的incr方法同样可以实现自增长的线程安全数值.类似AtomicInteger
+ * CAP:Consistency(一致性),Availability(可用性),PartitionTolerance(分区容错性),三者不可兼得
  * 
- * @apiNote 实现分布式事务,可以使用zk的临时节点
+ * <pre>
+ * eureka和zookeeper的区别,eureka为AP,因为eureka的程序都是平级的关系,不存在数据的主从复制,
+ * 数据可能会产生不一致.eureka有服务保护机制,即当某个服务挂掉的时候,注册中心会暂时保存client的信息,
+ * 当client重新注册的时候,服务讲仍然可用.分区容错在是通过每个服务部署多个来实现
+ * ZK为CP,zk的leader是唯一的,在leader挂掉的时候服务不可用,因为要重新选举leader.
+ * ZK的数据一致性是通过主从复制来实现的,从服务的数据都会发送到主服务,主服务会重新将数据发送到各个从服务
+ * 分区容错则是通过leader挂掉的时候,重新选举leader来实现的
+ * </pre>
+ *
+ * 分布式锁:
  * 
- * @author ParadiseWY
+ * <pre>
+ * ZK的InterProcessMutex,用acquire获得锁,用release释放锁
+ * Redis的incr(),setnx()同样可以实现自增长的线程安全数值.类似AtomicInteger
+ * Redisson:专为高并发设计的分布式锁,信号量等,作用等同于java.util.concurrent包下的部分类,如{@link Semaphore}
+ * </pre>
+ * 
+ * @author 飞花梦影
  * @date 2020-12-03 17:19:13
- * @git {@link https://github.com/mygodness100}
+ * @git {@link https://github.com/dreamFlyingFlower}
  */
 @EnableEurekaServer
 @SpringBootApplication

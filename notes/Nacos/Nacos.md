@@ -17,6 +17,7 @@
 - 通过Nacos Server和spring-cloud-starter-alibaba-nacos-discovery 实现服务的注册与发现
 - Nacos是以服务为主要服务对象的中间件,Nacos支持所有主流的服务发现,配置和管理
 - Nacos用于服务发现和服务健康监测,动态配置服务,动态DNS服务,务及其元数据管理
+- Nacos在1.0之后即支持AP,也支持CP模式,默认使用AP模式
 
 
 
@@ -38,8 +39,27 @@
 
 ## 启动服务
 
-* linux:sh startup.sh -m standalone,standalone代表着单机模式运行,非集群模式
-* Windows:cmd startup.cmd或双击startup.cmd
+
+
+### 单机启动
+
+
+
+* 不需要修改任何配置,直接startup.sh -m standalone或cmd startup.cmd -m standalone
+* 访问:http://localhost:8848/nacos,用户名密码:nacos/nacos
+
+
+
+### 集群启动
+
+
+
+* 数据持久化:新建数据库,将conf/nacos-mysql.sql导入数据库中
+* 在conf/application.properties中填入mysql相关信息
+* 复制conf/cluster.conf.example并改名为cluster.conf,填入集群地址信息
+* cluster.conf中的ip不能写127.0.0.1以及localhost,要写真实的ip
+
+* 集群启动:startup.sh -m cluster
 * 访问:http://localhost:8848/nacos,用户名密码:nacos/nacos
 
 
