@@ -15,6 +15,7 @@ import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.builders.RequestParameterBuilder;
+import springfox.documentation.oas.annotations.EnableOpenApi;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.ApiKey;
 import springfox.documentation.service.AuthorizationScope;
@@ -24,7 +25,6 @@ import springfox.documentation.service.SecurityScheme;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /**
  * 使用swagger2自动生成文档,文档查看地址http://ip:port/swagger-ui.html#/,
@@ -33,13 +33,15 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
  * 若字段以大写开头,则需要加上jackjson以下2个注解,否则swagger2将无法显示字段注释:
  * {@link JsonNaming}:JsonNaming(PropertyNamingStrategy.UpperCamelCaseStrategy.class),表示字段以大写开头
  * {@link JsonAutoDetect}:JsonAutoDetect(fieldVisibility=Visibility.ANY),检测所有修饰符字段
+ * 
+ * {@link EnableOpenApi}:Swagger3.0需要使用该注解打开网页浏览,且浏览地址变为ip:port/swagger-ui/index.html
  *
  * @author 飞花梦影
  * @date 2020-12-05 23:48:02
  * @git {@link https://github.com/dreamFlyingFlower}
  */
 @Configuration
-@EnableSwagger2
+@EnableOpenApi
 @Profile({ "dev" })
 public class Swagger2Config {
 
