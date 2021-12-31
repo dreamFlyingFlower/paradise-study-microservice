@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>dream.flying.flower</groupId>
@@ -11,20 +12,21 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.4.2</version>
-		<relativePath/>	<!-- lookup parent from repository -->
+		<version>2.3.12.RELEASE</version>
+		<relativePath />	<!-- lookup parent from repository -->
 	</parent>
 
 	<properties>
-		<!-- 因为日志框架漏洞的关系,log4j-api和log4j-core要升级到2.17以上 -->
-		<log4j2.version>2.17.0</log4j2.version>
+		<!-- 因为日志框架漏洞的关系,log4j-api和log4j-core要升级到2.17.1以上 -->
+		<log4j2.version>2.17.1</log4j2.version>
 		<logback.version>1.2.9</logback.version>
 		<java.version>1.8</java.version>
-		<alibaba.cloud.version>2021.1</alibaba.cloud.version>
-		<spring.cloud-version>Hoxton.SR11</spring.cloud-version>
-		<!-- 若要升级到2020.0.x,Netflix的很多Jar被移除或替换 -->
+		<alibaba.cloud.version>2.2.7.RELEASE</alibaba.cloud.version>
+		<spring.cloud-version>Hoxton.SR12</spring.cloud-version>
+		<!-- 若要升级到2020.0.1,Netflix的很多Jar被移除或替换 -->
 		<!-- hystrix被移除,替换为resilience4j;zuul被移除,替换为gateway;ribbon被移除,替换为loadbalancer -->
-		<!-- turbine被移除,暂无替代 -->
+		<!-- turbine被移除,暂无替代,springboot要使用2.4.2版本 -->
+		<!-- <alibaba.cloud.version>2021.1</alibaba.cloud.version> -->
 		<!-- <spring.cloud-version>2020.0.1</spring.cloud-version> -->
 	</properties>
 

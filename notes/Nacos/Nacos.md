@@ -323,7 +323,7 @@ spring.cloud.nacos.config.namespace=7fd7e137-21c4-4723-a042-d527149e63e0
 
 ## 多配置文件
 
-* 加载多个配置文件,使用ext-config
+* 加载多个配置文件,使用extension-configs
 * 主配置文件优先级最高,即同属性以服务名开头的配置文件为准
 
 ![1567305611637](image09.png)
@@ -331,7 +331,7 @@ spring.cloud.nacos.config.namespace=7fd7e137-21c4-4723-a042-d527149e63e0
 nacos-provider.properties默认加载,在bootstrap.properties文件中添加如下配置:
 
 ```properties
-# 加载扩展配置,若配置中有属性相同,扩展配置config下标越大优先级越高
+# 加载扩展配置,若配置中有属性相同,扩展配置config下标越大优先级越高.文件后缀要注意加上
 spring.cloud.nacos.config.ext-config[0].data-id=redis.properties
 # 开启动态刷新配置,否则配置文件修改,工程无法感知
 spring.cloud.nacos.config.ext-config[0].refresh=true

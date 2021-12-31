@@ -11,7 +11,6 @@ import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,13 +18,14 @@ import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.wy.database.annotation.Sort;
-import com.wy.database.annotation.Unique;
-import com.wy.excel.ExcelModelUtils;
+import com.wy.collection.ListTool;
+import com.wy.database.Sort;
+import com.wy.database.Unique;
+import com.wy.excel.ExcelModelTools;
+import com.wy.lang.NumberTool;
+import com.wy.lang.StrTool;
 import com.wy.result.Result;
 import com.wy.result.ResultException;
-import com.wy.utils.ListUtils;
-import com.wy.utils.StrUtils;
 
 /**
  * 基础service层,通用service方法
@@ -68,9 +68,9 @@ public abstract class AbstractService<T> implements BaseService<T> {
 	public Page<Object> startPage(AbstractPager pager) {
 		String pageDirection = pager.getPageDirection();
 		if (pager.hasPager()) {
-			if (StrUtils.isNotBlank(pager.getPageOrder())) {
+			if (StrTool.isNotBlank(pager.getPageOrder())) {
 				return PageHelper.startPage(pager.getPageIndex(), pager.getPageSize(),
-						pager.getPageOrder() + " " + (StrUtils.isBlank(pageDirection) ? " desc " : pageDirection));
+						pager.getPageOrder() + " " + (StrTool.isBlank(pageDirection) ? " desc " : pageDirection));
 			} else {
 				return PageHelper.startPage(pager.getPageIndex(), pager.getPageSize());
 			}
@@ -135,8 +135,8 @@ public abstract class AbstractService<T> implements BaseService<T> {
 						// 当更新时,检查原始值和新值是否相同,若相同,不用再查数据库,且需要将实体类中的该字段值置空
 						Unique unique = field.getAnnotation(Unique.class);
 						String oriName = unique.oriName();
-						if (StrUtils.isBlank(oriName)) {
-							oriName = "ori" + StrUtils.upperFirst(field.getName());
+						if (StrTool.isBlank(oriName)) {
+							oriName = "ori" + StrTool.firstUpper(field.getName());
 						}
 						Field actualField = clazz.getDeclaredField(oriName);
 						actualField.setAccessible(true);
@@ -181,7 +181,7 @@ public abstract class AbstractService<T> implements BaseService<T> {
 		try {
 			Object value = field.get(model);
 			if (Objects.nonNull(value)) {
-				Long number = NumberUtils.toLong(field.get(model).toString());
+				Long number = NumberTool.toLong(field.get(model).toString());
 				if (number > 0) {
 					return number;
 				}
@@ -191,7 +191,7 @@ public abstract class AbstractService<T> implements BaseService<T> {
 			return -1l;
 		}
 		Sort sort = field.getAnnotation(Sort.class);
-		return baseMapper.getMaxValue(StrUtils.isBlank(sort.value()) ? field.getName() : sort.value());
+		return baseMapper.getMaxValue(StrTool.isBlank(sort.value()) ? field.getName() : sort.value());
 	}
 
 	@Override
@@ -252,9 +252,9 @@ public abstract class AbstractService<T> implements BaseService<T> {
 
 	/**
 	 * 该方法根据上级编号查询本级数据或下级数据.为统一前端树形结构,需要将标识符,
-	 * 如id全部转为treeId,显示的名称都改为treeName.同时每次查询都需要将下级的数量查询出来,放入childNum字段中 {@link select b.dic_id
-	 * treeId,b.dic_name treeName,b.dic_code dicCode, (select count(*) from td_dic a where a.pid =
-	 * b.dic_Id) childNum from td_dic b}
+	 * 如id全部转为treeId,显示的名称都改为treeName.同时每次查询都需要将下级的数量查询出来,放入childNum字段中
+	 * {@link select b.dic_id treeId,b.dic_name treeName,b.dic_code dicCode, (select
+	 * count(*) from td_dic a where a.pid = b.dic_Id) childNum from td_dic b}
 	 * 
 	 * @param id 条件编号
 	 * @param self 是否查询本级数据,true获取,false直接获取下级
@@ -267,7 +267,7 @@ public abstract class AbstractService<T> implements BaseService<T> {
 	}
 
 	public void getLeaf(List<T> trees, Map<String, Object> params) {
-		if (ListUtils.isBlank(trees)) {
+		if (ListTool.isEmpty(trees)) {
 			return;
 		}
 		for (T t : trees) {
@@ -297,9 +297,9 @@ public abstract class AbstractService<T> implements BaseService<T> {
 	@Override
 	public void getExport(T t, HttpServletRequest request, HttpServletResponse response) {
 		Result<List<T>> entitys = getEntitys(t);
-		String excelName = StrUtils.isBlank(request.getParameter("excelName")) ? "数据导出"
-				: request.getParameter("excelName");
-		ExcelModelUtils.getInstance().exportExcel(entitys.getData(), response, excelName);
+		String excelName =
+				StrTool.isBlank(request.getParameter("excelName")) ? "数据导出" : request.getParameter("excelName");
+		ExcelModelTools.getInstance().exportExcel(entitys.getData(), response, excelName);
 	}
 
 	@Override
@@ -307,16 +307,16 @@ public abstract class AbstractService<T> implements BaseService<T> {
 		if (params == null) {
 			return Result.ok(baseMapper.selectLists(new HashMap<>()));
 		}
-		if (params.get("pageIndex") == null || NumberUtils.toInt(params.get("pageIndex").toString()) < 0) {
+		if (params.get("pageIndex") == null || NumberTool.toInt(params.get("pageIndex").toString()) < 0) {
 			return Result.ok(baseMapper.selectLists(params));
 		}
 		int pageSize = 0;
-		if (params.get("pageSize") == null || NumberUtils.toInt(params.get("pageSize").toString()) <= 0) {
+		if (params.get("pageSize") == null || NumberTool.toInt(params.get("pageSize").toString()) <= 0) {
 			pageSize = 10;
 		} else {
-			pageSize = NumberUtils.toInt(params.get("pageSize").toString());
+			pageSize = NumberTool.toInt(params.get("pageSize").toString());
 		}
-		PageHelper.startPage(NumberUtils.toInt(params.get("pageIndex").toString()), pageSize);
+		PageHelper.startPage(NumberTool.toInt(params.get("pageIndex").toString()), pageSize);
 		List<Map<String, Object>> lists = baseMapper.selectLists(params);
 		PageInfo<Map<String, Object>> pageInfo = new PageInfo<>(lists);
 		return Result.page(lists, pageInfo.getPageNum(), pageInfo.getPageSize(), pageInfo.getTotal());

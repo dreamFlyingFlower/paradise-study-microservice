@@ -1,7 +1,6 @@
 package com.wy.example;
 
 import org.springframework.boot.actuate.amqp.RabbitHealthIndicator;
-import org.springframework.boot.actuate.cassandra.CassandraDriverHealthIndicator;
 import org.springframework.boot.actuate.couchbase.CouchbaseHealthIndicator;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthContributorRegistry;
