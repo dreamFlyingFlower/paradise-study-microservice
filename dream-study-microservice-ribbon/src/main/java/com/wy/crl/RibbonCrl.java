@@ -33,12 +33,18 @@ public class RibbonCrl {
 
 	@GetMapping("/movie/{id}")
 	public User findById(@PathVariable Long id) {
+		// 若请求为post,参数必须是MultiValueMap,且必须用exchange,参数放在HttpEntity中,否则对方接受不到参数
+		// MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+		// params.add("userName", "admin");
+		// params.add("password", "123456");
+		// return
+		// restTemplate.exchange("http://dream-study-microservice-security/user/",
+		// HttpMethod.POST,
+		// new HttpEntity<MultiValueMap<String, String>>(params,httpHeaders),
+		// User.class).getBody();
 		// 若其他微服务中开启了SpringSecurity认证,需要在resttemplate中加入请求头
 		return restTemplate.exchange("http://dream-study-microservice-security/user/", HttpMethod.GET,
 				new HttpEntity<User>(httpHeaders), User.class).getBody();
-		// return
-		// this.restTemplate.getForObject("http://dream-study-microservice-security/user/"
-		// + id, User.class);
 	}
 
 	/**
