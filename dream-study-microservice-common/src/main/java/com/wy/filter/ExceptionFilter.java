@@ -23,6 +23,7 @@ import org.yaml.snakeyaml.constructor.DuplicateKeyException;
 import com.alibaba.fastjson.JSONException;
 import com.wy.enums.TipFormatEnum;
 import com.wy.result.Result;
+import com.wy.result.ResultException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -101,6 +102,9 @@ public class ExceptionFilter {
 		}
 		// 数据库主键重复或unique字段重复值插入或更新
 		if (throwable instanceof DuplicateKeyException) {
+			return Result.error(throwable.getMessage());
+		}
+		if (throwable instanceof ResultException) {
 			return Result.error(throwable.getMessage());
 		}
 		return Result.error(throwable.getMessage());
