@@ -13,8 +13,6 @@
 
 	<properties>
 		<version.social>1.1.6.RELEASE</version.social>
-		<springfox.swagger2.version>2.9.2</springfox.swagger2.version>
-		<swagger.models.version>1.5.21</swagger.models.version>
 	</properties>
 
 	<dependencies>
