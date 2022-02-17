@@ -28,7 +28,9 @@ set "JAVA_OPT=%JAVA_OPT% -server -Drocketmq.broker.diskSpaceWarningLevelRatio=0.
 
 ## Web界面安装
 
-* [下载](https://github.com/apache/rocketmq-externals/tree/master/rocketmq-console),解压,是一个springboot的原码
+
+
+* [下载](https://github.com/apache/rocketmq-externals/tree/master/rocketmq-console),解压,是一个springboot的源码程序
 * 修改application.properties中的rocketmq.config.namesrvAddr为RocketMQ服务的端口
 * 打包成Jar:mvn clean package -Dmaven.test.skip=true
 * 运行Jar包,访问ip:port

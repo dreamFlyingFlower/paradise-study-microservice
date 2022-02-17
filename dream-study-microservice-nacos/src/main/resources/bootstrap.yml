@@ -7,6 +7,7 @@ spring:
         server-addr:  127.0.0.1:8848
         # 指定命名空间id,是名字后的一串UUID,若不指定,默认为public
         namespace: 1672775b-0f4a-4c2d-907f-d2cfe60053f6
+        # 分组,相当于属于某一个项目
         group: dream-study-microservice
         username: dev
         password: 123456
@@ -28,7 +29,7 @@ spring:
         # 获得配置的用户
         username: dev
         password: 123456
-        # 多配置,若和主配置重复,主配置优先级高.若多配置中有重复,则越下面的优先级越高
+        # 扩展配置,若和主配置重复,主配置优先级高.若多配置中有重复,则下标越大(越下面)的优先级越高
         extension-configs:
           # 扩展配置的后缀需要添加上,否则找不到.主配置的后缀可以不写,通过file-extension加上
         - data-id: dream-study-microservice-nacos2.yml

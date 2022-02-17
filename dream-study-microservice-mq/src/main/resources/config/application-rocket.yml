@@ -1,0 +1,6 @@
+rocketmq:
+  # rocketmq服务地址
+  name-server: 127.0.0.1:9876
+  producer:
+    # 生产组
+    group: test-rocket-producer
