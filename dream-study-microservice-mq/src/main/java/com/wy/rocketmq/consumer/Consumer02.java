@@ -25,8 +25,7 @@ public class Consumer02 implements RocketMQListener<MessageExt> {
 	public void onMessage(MessageExt message) {
 		byte[] body = message.getBody();
 		System.out.println(new String(body));
-		// 消费失败,消息重试
-		// 取出当前重试次数
+		// 消费失败,消息重试,取出当前重试次数
 		int times = message.getReconsumeTimes();
 		// 当大于一定次数时,将消息写入数据库,由其他程序或人工处理
 		if (times > 5) {

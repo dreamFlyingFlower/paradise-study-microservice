@@ -35,6 +35,13 @@ package com.wy.rocketmq;
  * 实际中则会指定重试次数,若最终消费失败,将消息写入数据库,由其他程序处理或人工处理
  * </pre>
  * 
+ * RocketMQ集群与广播模式:
+ * 
+ * <pre>
+ * 集群:同一个组里的消费者可以监听接收多个队列的消息,但是队列中的单条消息只能由同组中的单个消费者消费
+ * 广播:所有监听了队列的消费者都可以消费
+ * </pre>
+ * 
  * @author 飞花梦影
  * @date 2021-04-09 11:26:24
  * @git {@link https://github.com/dreamFlyingFlower}

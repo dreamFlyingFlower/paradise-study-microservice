@@ -93,13 +93,14 @@ public class Procuder01 {
 		// 发消息的超时时间,默认单位毫秒
 		rocketMQTemplate.syncSend(topic, message, 3);
 		// 发消息的超时时间,队列中消息延迟时间等级,从1s/5s/10s/30s/1m/2m/3m/4m...10m/20m/30m/1h/2h,总共18等级
-		// 5等级表示1m钟之后发送给消费者
+		// 5等级表示1m钟之后发送给消费者,同步发送延迟消息
 		rocketMQTemplate.syncSend(topic, message, 3, 5);
 		// 异步发送延迟消息,Message是rocket的Message对象
 		org.apache.rocketmq.common.message.Message message2 = new org.apache.rocketmq.common.message.Message();
 		// 设置延迟等级
 		message2.setDelayTimeLevel(5);
 		try {
+			// 异步发送延迟消息
 			rocketMQTemplate.getProducer().send(message2, new SendCallback() {
 
 				@Override
