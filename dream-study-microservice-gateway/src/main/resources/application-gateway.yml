@@ -15,13 +15,13 @@ spring:
         # 请求要转发到的地址,要注意后面的/,lb表示负载均衡
         uri: lb://dream-study-microservice-service/
         # 使用ip地址作为请求转发地址,要注意后面的/
-        # uri: http://localhost:8081/
+        # uri: http://localhost:12345/
         # 路由的优先级,数字越小级别越高
         order: 1
         # 断言,相当于匹配规则
         predicates: 
-          # 当请求路径满足Path指定的规则时,才进行路由转发
-          - Path=/product-serv/**
+          # 当请求路径满足Path指定的规则时,才进行路由转发.此处为所有以product开头的请求
+          - Path=/product/**
           # 在指定时间之后的请求
           # - After=2017-01-20T17:42:47.789-07:00[America/Denver]
           # 指定域名的请求
@@ -30,7 +30,7 @@ spring:
           # - Weight=group1,2
         # 过滤器,请求在传递过程中可以通过过滤器对其进行一定的修改
         filters:
-        # 转发之前去掉1层路径前缀
+        # 转发之前去掉1层路径前缀,因为通常第一层路径是微服务名
         - StripPrefix=1
         # 使用内置的过滤器,修改返回状态
         - SetStatus=2000
@@ -38,3 +38,7 @@ spring:
         - name: prefix
           args:
             StripPrefix: 1
+        - name: retry
+          args: 
+            retries: 3
+            status: 503

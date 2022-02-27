@@ -13,14 +13,19 @@
 
 # Dashborad
 
+
+
 * [下载地址](https://github.com/alibaba/Sentinel/releases)
-* 执行java -jar sentinel-dashboard-xxx.jar
-* 在浏览器中访问sentinel控制台,默认端口号是8080,默认用户名和密码:sentinel/sentinel
-* 刚进页面为空,这是因为还没有监控任何服务.另外,sentinel是懒加载的,如果服务没有被访问,也看不到该服务信息
+* 启动:`java -jar -Dserver.port=8080 -Dcsp.sentinel.dashborad.server=localhost:8080 sentinel-dashboard-xxx.jar`
+* 在浏览器中访问sentinel控制台,默认用户名和密码:sentinel/sentinel
+* 刚进页面为空,是因为还没有监控任何服务
+* sentinel是懒加载的,如果服务没有被访问,也看不到该服务信息
 
 
 
 # 整合SpringBoot
+
+
 
 * 去官网下载对应版本的SentinelDashboard控制台的jar包到本地,通过控制台启动jar包
 * 项目中导入依赖spring-cloud-starter-alibaba-sentinel
@@ -101,11 +106,12 @@ feign.sentinel.enabled=true
 
 ## QPS流量控制
 
-当 QPS 超过某个阈值的时候,则采取措施进行流量控制,流量控制的效果包括以下几种:
 
-* 直接拒绝
-* Warm Up,预热
-* 匀速排队
+
+* 当 QPS 超过某个阈值的时候,则采取措施进行流量控制,流量控制的效果包括以下几种:
+  * 直接拒绝
+  * Warm Up,预热
+  * 匀速排队
 
 
 
@@ -130,9 +136,11 @@ feign.sentinel.enabled=true
 
 ### Warm Up
 
-* Warm Up(`RuleConstant.CONTROL_BEHAVIOR_WARM_UP`)方式,即预热/冷启动方式
-* 当系统长期处于低水位的情况下,当流量突然增加时,直接把系统拉升到高水位可能瞬间把系统压垮
-* 通过"冷启动",让通过的流量缓慢增加,在一定时间内逐渐增加到阈值上限,给冷系统一个预热的时间,避免冷系统被压垮
+
+
+* Warm Up(`RuleConstant.CONTROL_BEHAVIOR_WARM_UP`):预热/冷启动方式
+* 当系统长期处于低水位的情况下,流量突然增加时,直接把系统拉升到高水位可能瞬间把系统压垮.通过冷启动,让通过的流量缓慢增加,在一定时间内逐渐增加到阈值上限,给冷系统一个预热的时间,避免冷系统被压垮
+* 它从开始阈值到最大QPS阈值会有一个缓冲阶段,一开始的阈值是最大QPS阈值的1/3,然后慢慢增长,直到最大阈值,适用于将突然增大的流量转换为缓步增长的场景
 
  ![](image05.png)
 
@@ -142,7 +150,10 @@ feign.sentinel.enabled=true
 
 ### 匀速排队
 
-* 匀速排队(`RuleConstant.CONTROL_BEHAVIOR_RATE_LIMITER`)方式会严格控制请求通过的间隔时间,也即是让请求以均匀的速度通过,对应的是漏桶算法
+
+
+* `RuleConstant.CONTROL_BEHAVIOR_RATE_LIMITER`:会严格控制请求通过的间隔时间,也即是让请求以均匀的速度通过,对应的是漏桶算法
+* 还可以设置一个超时时间,当请求超过超时间时间还未处理,则会被丢弃  
 * 测试配置如下:1s处理一个请求,排队等待,等待时间20s
 
  ![](image06.png)
@@ -221,18 +232,56 @@ public class ConsumerCrl{
 
 
 
+## 流控规则
+
+
+
+* 流量控制,其原理是监控应用流量的QPS(每秒查询率) 或并发线程数等指标,当达到指定的阈值时对流量进行控制,以避免被瞬时的流量高峰冲垮,从而保障应用的高可用性
+* 点击簇点链路,可以看到访问过的接口地址,然后点击对应的流控按钮,进入流控规则配置页面
+  * 资源名:唯一名称,默认是请求路径,可自定义
+  * 针对来源:指定对哪个微服务进行限流,默认指default,意思是不区分来源,全部限制
+  * 阈值类型/单机阈值:
+    * QPS:每秒请求数量,当调用该接口的QPS达到阈值的时候,进行限流
+    * 线程数:当调用该接口的线程数达到阈值的时候,进行限流
+  * 是否集群:暂不需要集群
+* 配置流控模式
+  * 点击上面设置流控规则的编辑按钮,然后在编辑页面点击高级选项,会看到有流控模式一栏
+  * Sentinel共有三种流控模式:
+    * 直接:默认,接口达到限流条件时,开启限流
+    * 关联:当关联的资源达到限流条件时,开启限流 [适合做应用让步]
+    * 链路:当从某个接口过来的资源达到限流条件时,开启限流
+  * 直接流控模式:最简单的模式,当指定的接口达到限流条件时开启限流
+  * 关联流控模式:当指定关联的接口达到限流条件时,开启对指定接口开启限流
+    * 流控模式选择关联,关联资源填上需要限制的接口地址
+  * 链路流控模式:当从某个接口过来的资源达到限流条件时,开启限流.它的功能有点类似于针对来源配置项,区别在于针对来源是针对上级微服务,而链路流控是针对上级接口,也就是说它的粒度更细
+
+
+
 # 熔断降级
 
 
 
 * Sentinel熔断降级会在调用链路中某个资源出现不稳定状态时(例如调用超时或异常比例升高),对这个资源的调用进行限制,让请求快速失败,避免影响到其它的资源而导致级联错误
-* 当资源被降级后,在接下来的降级时间窗口之内,对该资源的调用都自动熔断(默认行为是抛出 `DegradeException`)
+* 当资源被降级后,在接下来的降级时间窗口内,对该资源的调用都自动熔断(默认抛出`DegradeException`)
 * Sentinel和Hystrix的原则是一致的:当调用链路中某个资源出现不稳定,例如,表现为 timeout,异常比例升高的时候,则对这个资源的调用进行限制,并让请求快速失败,避免影响到其它的资源,最终产生雪崩的效果
+* 通过并发线程数进行限制
+  * Sentinel 通过限制资源并发线程的数量来减少不稳定资源对其它资源的影响.当某个资源出现不稳定的情况下,例如响应时间变长,对资源的直接影响就是会造成线程数的逐步堆积.当线程数在特定资源上堆积到一定的数量之后,对该资源的新请求就会被拒绝.堆积的线程完成任务后才开始继续接收请求
+
+* 通过响应时间对资源进行降级
+  * Sentinel 通过响应时间来快速降级不稳定的资源.当依赖的资源出现响应时间过长后,所有对该资源的访问都会被直接拒绝,直到过了指定的时间窗口之后才重新恢复
+
+* 系统负载保护
+  * Sentinel 同时提供系统维度的自适应保护能力.当系统负载较高的时候,如果还持续让请求进入可能会导致系统崩溃,无法响应.在集群环境下,会把本应这台机器承载的流量转发到其它的机器上去.如果这个时候其它的机器也处在一个边缘状态的时候, Sentinel 提供了对应的保护机制,让系统的入口流量和系统的负载达到一个平衡,保证系统在能力范围之内处理最多的请求  
+
 * 限流降级指标有三个:平均响应时间(RT);异常比例;异常数
 
 
 
+
+
 ## 平均响应时间(RT)
+
+
 
 * 平均响应时间 (`DEGRADE_GRADE_RT`):当资源的平均响应时间超过阈值(`DegradeRule`中的 `count`,单位为ms,默认上限是4900ms)之后,资源进入准降级状态
 * 如果1s之内持续进入 5 个请求,它们的RT都持续超过这个阈值,那么在接下来的时间窗口(`DegradeRule`中的timeWindow,单位为s)之内,对这个方法的调用都会自动地返回(抛出 `DegradeException`)
@@ -255,31 +304,170 @@ public class ConsumerCrl{
 
 
 
+## 降级规则
+
+
+
+* 平均响应时间:RT,当资源的平均响应时间超过阈值(以ms为单位)之后,资源进入准降级状态
+  * 新增降级规则->降级策略->RT
+  * 填写RT和时间窗口的值,RT单位为ms,时间窗口单位为s
+  * 如RT为10,时间窗口为10,表示如果平均响应时间大于10ms时,接下来的10s内服务降级,10s后恢复正常,进行下一轮判断
+* 异常比例:当资源的每秒异常总数占通过量的比值超过阈值之后,资源进入降级状态,即在接下的时间窗口(以 s为单位)之内,对这个方法的调用都会自动地返回.异常比率的阈值范围是[0,1]
+  * 新增降级规则->降级策略->异常比例
+  * 填写异常比例和时间窗口的值,异常比例范围从0到1,时间窗口单位为s
+* 异常数:当资源近1分钟的异常数目超过阈值之后会进行服务降级.由于统计时间窗口是分钟级别的,若时间窗口小于 60s,则结束熔断状态后仍可能再进入熔断状态
+  * 新增降级规则->降级策略->异常数
+  * 填写异常数和时间窗口的值,时间窗口单位为s
+
+
+
+## 热点规则
+
+
+
+* 热点参数流控规则是一种更细粒度的流控规则,它允许将规则具体到参数上
+
+  ```java
+  @RequestMapping("/order/message3")
+  @SentinelResource("message3")// 这里必须使用这个注解标识,否则热点规则不生效
+  public String message3(String name, Integer age) {
+      return name + age;
+  }
+  ```
+
+* 配置热点规则
+
+  * 资源名:同代码中`@SentinelResource`的值
+  * 参数索引:限制方法的指定索引位置的参数,从0开始.此处填0表示限制name的访问次数
+  * 单机阈值:访问次数限制
+  * 统计窗口时长:统计时长
+
+* 增强使用:编辑时参数例外项允许对一个参数的具体值进行流控
+
+  * 编辑热点规则,点击参数例外项
+  * 参数类型:填写完成的参数类型,如java.lang.String
+  * 参数值:被限制的参数的值
+
+
+
+## 授权规则
+
+
+
+* 根据调用来源来判断该次请求是否允许放行,可以使用Sentinel的来源访问控制的功能
+
+* 来源访问控制根据资源的请求来源限制资源是否通过:
+
+  * 若配置白名单,则只有请求来源位于白名单内时才可通过
+  * 若配置黑名单,则请求来源位于黑名单时不通过,其余的请求通过
+
+* 需要实现`RequestOriginParser`接口来实现授权规则控制
+
+  ```java
+  @Component
+  public class RequestOriginParserDefinition implements RequestOriginParser{
+      @Override
+      public String parseOrigin(HttpServletRequest request) {
+          // 参数是指定当该参数为某个或某些值时不能访问
+          return request.getParameter("serviceName");
+      }
+  }
+  ```
+
+* 配置授权规则
+
+  * 资源名:需要限制的资源名
+  * 流控应用:添加serviceName的值为某个特定值时,不能/能访问
+  * 授权应用:选择黑名单(不能访问),白名单(可以访问)
+
+
+
+## 系统规则
+
+
+
+* 系统保护规则是从应用级别的入口流量进行控制,从单台机器的总体 Load,RT,入口QPS,CPU使用率和线程数五个维度监控应用数据,让系统尽可能跑在最大吞吐量的同时保证系统整体的稳定性
+
+* 系统保护规则是应用整体维度的,而不是资源维度的,并且仅对入口流量(进入应用的流量)生效
+
+* Load:仅对 Linux/Unix-like生效.当系统 load1 超过阈值,且系统当前的并发线程数超过系统容量时才会触发系统保护.系统容量由系统的`maxQps * minRt`计算得出,参考值一般是 `CPU cores * 2.5`
+
+* RT:当单台机器上所有入口流量的平均 RT 达到阈值即触发系统保护,单位是毫秒
+
+* 线程数:当单台机器上所有入口流量的并发线程数达到阈值即触发系统保护
+
+* 入口 QPS:当单台机器上所有入口流量的 QPS 达到阈值即触发系统保护
+
+* CPU使用率:当单台机器上所有入口流量的 CPU使用率达到阈值即触发系统保护
+
+* 自定义异常返回
+
+  ```java
+  @Component
+  public class ExceptionHandlerPage implements UrlBlockHandler {
+      // BlockException异常接口包含Sentinel的五个异常
+      // FlowException 限流异常
+      // DegradeException 降级异常
+      // ParamFlowException 参数限流异常
+      // AuthorityException 授权异常
+      // SystemBlockException 系统负载异常
+      @Override
+      public void blocked(HttpServletRequest request, HttpServletResponse
+                          response, BlockException e) throws IOException {
+          response.setContentType("application/json;charset=utf-8");
+          ResponseData data = null;
+          if (e instanceof FlowException) {
+              data = new ResponseData(-1, "接口被限流了...");
+          } else if (e instanceof DegradeException) {
+              data = new ResponseData(-2, "接口被降级了...");
+          } 
+          response.getWriter().write(JSON.toJSONString(data));
+      }
+  } 
+  
+  @Data
+  @AllArgsConstructor
+  @NoArgsConstructor
+  class ResponseData {
+      private int code;
+      private String message;
+  }
+  ```
+
+  
+
+
+
 # 规则持久化
 
-* 无论是通过硬编码的方式来更新规则,还是通过接入SentinelDashboard后,在页面上操作更新规则,都无法避免一个问题,那就是服务重启后,规则就丢失了,因为默认情况下规则是保存在内存中的
-* 在Dashboard上为客户端配置好了规则,并推送给了客户端,这时由于一些因素客户端出现异常,服务不可用了,当客户端恢复正常再次连接上Dashboard后,这时所有的规则都丢失了,我们还需要重新配置一遍规则
-* 持久化配置分以下3步:
-* 引入依赖
 
-```xml
-<dependency>
-    <groupId>com.alibaba.csp</groupId>
-    <artifactId>sentinel-datasource-nacos</artifactId>
-</dependency>
-```
+
+## 流控规则持久化
+
+
+
+* 默认情况下规则是保存在内存中的,为避免宕机等原因,需要将规则持久化
+
+* 利用nacos进行持久化,引入依赖
+
+  ```xml
+  <dependency>
+      <groupId>com.alibaba.csp</groupId>
+      <artifactId>sentinel-datasource-nacos</artifactId>
+  </dependency>
+  ```
 
 * 添加配置:
 
-```properties
-# 这里datasource后的consumer是数据源名称,可以随便写,推荐使用服务名
-spring.cloud.sentinel.datasource.consumer.nacos.server-addr=localhost:8848
-spring.cloud.sentinel.datasource.consumer.nacos.dataId=${spring.application.name}-sentinel-rules
-spring.cloud.sentinel.datasource.consumer.nacos.groupId=SENTINEL_GROUP
-spring.cloud.sentinel.datasource.consumer.nacos.data-type=json
-# 规则类型,取值见:org.springframework.cloud.alibaba.sentinel.datasource.RuleType
-spring.cloud.sentinel.datasource.consumer.nacos.rule_type=flow
-```
+  ```properties
+  # 这里datasource后的consumer是数据源名称,可以随便写,推荐使用服务名
+  spring.cloud.sentinel.datasource.consumer.nacos.server-addr=localhost:8848
+  spring.cloud.sentinel.datasource.consumer.nacos.dataId=${spring.application.name}-sentinel-rules
+  spring.cloud.sentinel.datasource.consumer.nacos.groupId=SENTINEL_GROUP
+  spring.cloud.sentinel.datasource.consumer.nacos.data-type=json
+  # 规则类型,取值见:org.springframework.cloud.alibaba.sentinel.datasource.RuleType
+  spring.cloud.sentinel.datasource.consumer.nacos.rule_type=flow
+  ```
 
 * nacos中创建流控规则
 
@@ -287,27 +475,65 @@ spring.cloud.sentinel.datasource.consumer.nacos.rule_type=flow
 
 * 配置内容如下:
 
-```json
-[
-    {
-        "resource": "/hello",
-        "limitApp": "default",
-        "grade": 1,
-        "count": 2,
-        "strategy": 0,
-        "controlBehavior": 0,
-        "clusterMode": false
-    }
-]
-```
+  ```json
+  [
+      {
+          "resource": "/hello",
+          "limitApp": "default",
+          "grade": 1,
+          "count": 2,
+          "strategy": 0,
+          "controlBehavior": 0,
+          "clusterMode": false
+      }
+  ]
+  ```
 
-* resource:资源名称
-* limitApp:限流应用,就是用默认就可以
-* grade:阈值类型,0表示线程数,1表示qps
-* count:单机阈值
-* strategy:流控模式,0-直接,1-关联, 2-链路
-* controlBehavior:流控效果.0-快速失败,1-warm up 2-排队等待
-* clusterMode:是否集群
+  * resource:资源名称,说明对那个URI进行流控
+
+  * limitApp:限流应用,默认default,用默认就可以
+
+  * grade:阈值类型.0表示线程数,1表示QPS
+
+  * count:单机阈值.2表示超过2个QPS就被限流
+
+  * strategy:流控模式.0-直接,1-关联, 2-链路
+
+  * controlBehavior:流控效果.0-快速失败,1-warm up,2-排队等待
+
+  * clusterMode:是否集群
+
+* Sentinel流控设置界面,高级设置
+
+  ![](image12.png)
+
+* 如果使用了actuator,可以访问:ip:port/actuator/sentinel查看限流规则
+
+
+
+## 熔断持久化
+
+
+
+* 需要使用`@SentinelResource`注解对方法进行修饰
+
+* 配置同流控规则,只是配置内容不同
+
+  ```json
+  [
+      {
+          "resource": "/hello",
+          "limitApp": "default",
+          "grade": 0,
+          "count": 100,
+          "timeWindow": 5,
+          "minRequestAmount": 1,
+          "slowRatioThreshold": false
+      }
+  ]
+  ```
+
+  
 
 
 
@@ -324,6 +550,3 @@ spring.cloud.sentinel.datasource.consumer.nacos.rule_type=flow
 * 系统自适应保护:Sentinel->支持;Hystrix->不支持
 * 控制台:Sentinel->可配置队则,查看秒级监控,机器发现等;Hystrix->简单的监控查看
 
-
-
-# Hystrix

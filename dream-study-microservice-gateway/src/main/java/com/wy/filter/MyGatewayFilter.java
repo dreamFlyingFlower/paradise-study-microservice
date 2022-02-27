@@ -1,6 +1,7 @@
 package com.wy.filter;
 
 import org.springframework.cloud.gateway.filter.ForwardRoutingFilter;
+import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.cloud.gateway.filter.NettyRoutingFilter;
@@ -21,6 +22,7 @@ import reactor.core.publisher.Mono;
 
 /**
  * {@link GlobalFilter}:全局拦截器,应用到所有的路由上,可以实现权限统一校验,安全验证等
+ * {@link GatewayFilter}:应用到单个或一个分组的路由上
  * 
  * <pre>
  * {@link ReactiveLoadBalancerClientFilter}:通过负载均衡客户端根据路由URL解析转换成真实URL

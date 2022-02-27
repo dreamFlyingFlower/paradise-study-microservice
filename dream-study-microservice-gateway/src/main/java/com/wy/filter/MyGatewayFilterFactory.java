@@ -29,6 +29,7 @@ import org.springframework.cloud.gateway.filter.factory.SetResponseHeaderGateway
 import org.springframework.cloud.gateway.filter.factory.SetStatusGatewayFilterFactory;
 import org.springframework.cloud.gateway.filter.factory.StripPrefixGatewayFilterFactory;
 import org.springframework.cloud.gateway.filter.factory.rewrite.ModifyRequestBodyGatewayFilterFactory;
+import org.springframework.cloud.gateway.filter.factory.rewrite.ModifyResponseBodyGatewayFilterFactory;
 import org.springframework.cloud.gateway.filter.headers.RemoveHopByHopHeadersFilter;
 import org.springframework.web.server.ServerWebExchange;
 
@@ -39,9 +40,9 @@ import reactor.core.publisher.Mono;
 /**
  * {@link GatewayFilter}:局部过滤器,应用到单个路由或者一个分组的路由上
  * 
- * 自定义局部过滤器,类名结尾必须是GatewayFilterFactory
+ * 自定义局部过滤器,类名结尾必须是GatewayFilterFactory,
  * 
- * Gateway内置局部过滤器:
+ * Gateway内置局部过滤器,在配置中的key只需要写剔除GatewayFilterFactory的值即可,如-AddRequestHeader=xxx:
  * 
  * <pre>
  * {@link AddRequestHeaderGatewayFilterFactory}:为原始请求添加Header,参数为Header的名称及值
@@ -70,7 +71,7 @@ import reactor.core.publisher.Mono;
  * {@link RetryGatewayFilterFactory}:针对不同的响应进行重试.参数为retries、statuses、methods、series
  * {@link RequestSizeGatewayFilterFactory}:设置允许接收最大请求包的大小,如果请求包大小超过设置的值,则返回413.参数为请求包大小,单位字节,默认值5M
  * {@link ModifyRequestBodyGatewayFilterFactory}:在转发请求之前修改原始请求体内容,参数为修改后的请求体内容
- * ModifyResponseBody:修改原始响应体的内容.参数为修改后的响应体内容
+ * {@link ModifyResponseBodyGatewayFilterFactory}:修改原始响应体的内容.参数为修改后的响应体内容
  * </pre>
  *
  * @author 飞花梦影

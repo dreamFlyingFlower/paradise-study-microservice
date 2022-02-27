@@ -117,4 +117,25 @@ public class Procuder01 {
 			e.printStackTrace();
 		}
 	}
+
+	/**
+	 * 同步顺序消息
+	 */
+	public void testSyncSendOrderly() {
+		// 第三个参数用于队列的选择
+		rocketMQTemplate.syncSendOrderly("test-topic-1", "这是一条同步顺序消息", "queue");
+		// 异步顺序消息
+		rocketMQTemplate.asyncSendOrderly("test-topic-1", "这是一条异步顺序消息", "queue", new SendCallback() {
+
+			@Override
+			public void onSuccess(SendResult arg0) {
+
+			}
+
+			@Override
+			public void onException(Throwable arg0) {
+
+			}
+		});
+	}
 }

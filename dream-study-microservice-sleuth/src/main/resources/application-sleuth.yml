@@ -18,7 +18,9 @@ spring:  zipkin:    enabled: true
       probability: 1
 # spring并不识别,没有starter启动器
 zipkin: 
+  # 持久化策略
   storage: 
+    # 类型:es或mysql
     type: elasticsearch
     elasticsearch: 
       cluster: elasticsearch

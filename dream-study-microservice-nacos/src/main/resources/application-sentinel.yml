@@ -1,0 +1,39 @@
+spring:
+  cloud:
+    nacos:
+      server-addr: localhost:8848
+    sentinel: 
+      transport:
+        # sentinel dashborad通信地址
+        dashboard: 192.168.0.150:9100
+      # 取消控制台懒加载
+      eager: true
+      datasource: 
+        # 利用nacos保存sentinel规则,consumer是数据源名称,可以随便写,推荐使用服务名
+        consumer:
+          nacos: 
+            server-addr: localhost:8848
+            # 定义流控规则data-id,在配置中心设置时data-id必须对应
+            dataId: ${spring.application.name}-sentinel-rules
+            # 对应配置文件分组,对应配置中心groups项
+            group-id: SENTINEL_GROUP
+            # nacos通信的用户名和密码
+            username: nacos
+            password: nacos
+            # 规则类型,取值见:com.alibaba.cloud.sentinel.datasource.RuleType
+            # flow表示流控,degrade表示熔断
+            rule-type: flow
+            # 数据类型,默认是json
+            data-type: json
+
+# feign整合sentinel,直接开启该配置即可
+feign:
+  sentinel:
+    enabled: true
+    
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+        - '*'

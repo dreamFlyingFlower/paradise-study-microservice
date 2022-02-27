@@ -58,9 +58,10 @@
 * 在conf/application.properties中填入mysql相关信息
 * 复制conf/cluster.conf.example并改名为cluster.conf,填入集群地址信息
 * cluster.conf中的ip不能写127.0.0.1以及localhost,要写真实的ip
-
 * 集群启动:startup.sh -m cluster
 * 访问:http://localhost:8848/nacos,用户名密码:nacos/nacos
+
+
 
 
 
@@ -79,6 +80,55 @@ db.password=root
 ```
 
 * 配置完成后重启Nacos
+
+
+
+# 集群
+
+
+
+## 节点
+
+
+
+* Nacos集群采用Raft算法实现,用于选举出Nacos集群中重要的leader节点
+* 在 Nacos 集群中,每个节点都拥有以下三种角色中的一种
+  * Leader:领导者,集群中最重要的角色,用于向其他节点下达指令
+  * Candidate:参选者,参与竞选Leader的节点
+  * Follower:跟随者,用于接收来自Leader或者Candidate的请求并进行处理
+* 在集群中选举出 Leader 是最重要的工作,产生选举的时机有三个:
+  * 在 Nacos 节点启动后,还没有产生Leader时选举
+  * 集群成员总量变更时重新选举
+  * 当 Leader 停止服务后重新选举
+* Raft 算法将时间划分成为任意不同长度的任期(Term),任期用连续的数字进行表示.每一个任期的开始都是一次选举(Election),一个或多个候选人会试图成为 Leader
+  * 当最开始的时候,所有 Nacos 节点都没有启动.角色默认为 Follower(跟随者),任期都是 0
+  * 当第一个节点启动后,节点角色会变为 Candidate,第一个节点在每一个任期开始时便会尝试向其他节点发出投票请求,征求自己能否成为 Leader节点
+  * 只有算上自己获得超过半数的选票,这个 Candidate 才能转正为 Leader
+  * 因为第一个节点发起选举投票,但第二和第三两个节点不在线,尽管第一个节点会投自己一票,但在总3票中未过半数,因此无法成为 Leader
+  * 因为第一次选举没有产生 Leader,过段时间在下一个任期开始时,第一个节点任期自增加 1,同时会再次向其他节点发起投票请求争取其他节点同意,直到同意票过半
+  * 在Raft中,成为 Leader 的必要条件是某个Candidate获得过半选票,如果第二个节点上线,遇到 第一个节点再次发起投票,第二个节点投票给第一个节点,第一个节点获得两票超过半数就会成为Leader,第二个节点自动成为 Follower.之后第三个节点上线,因为集群中已有 Leader,因此自动成为 Follower
+  * 当Leader宕机或停止服务,会在剩余 2 个 Nacos 节点中产生新的 Leader.如第一个节点故障,第三个节点获得两票成为 Leader,第二个节点成为 Follower,第一个节点已经下线但角色暂时仍为Leader
+  * 之后第一个节点恢复上线,但此时Nacos集群已有 Leader,第一个节点自动变为Follower,且任期归0
+  * 对于 Nacos 集群来说,只要 UP 状态节点不少于`1+N/2`,集群就能正常运行.但少于`1+N/2`,集群仍然可以提供基本服务,但已无法保证 Nacos 各节点数据一致性
+
+
+
+## 数据同步
+
+
+
+![](image02-02.png)
+
+
+
+* 在 Raft 算法中,只有 Leader 才拥有数据处理与信息分发的权利.因此当微服务启动时.假如注册中心指定为 Follower 节点.则步骤如下:
+  * 第一步:Follower 会自动将注册心跳包转给 Leader 节点
+  * 第二步:Leader 节点完成实质的注册登记工作
+  * 第三步:完成注册后向其他 Follower 节点发起同步注册日志的指令
+  * 第四步:所有可用的 Follower 在收到指令后进行Ack应答,通知 Leader 消息已收到
+  * 第五步:当 Leader 接收过半数 Follower 节点的Ack应答后,返回给微服务注册成功的响应信息
+  * 对于其他无效的 Follower 节点,Leader 仍会不断重新发送,直到所有 Follower 的状态与 Leader 保持同步
+* 对于脑裂问题,可以在Raft算法中增加Leader lease机制
 
 
 
@@ -221,6 +271,18 @@ public class ConsumerController {
 ```
 
 测试访问成功
+
+
+
+## 心跳机制
+
+
+
+![](image02-01.png)
+
+
+
+* 微服务每5秒向注册中心发送一次心跳,包含ip,权重,名称等信息
 
 
 

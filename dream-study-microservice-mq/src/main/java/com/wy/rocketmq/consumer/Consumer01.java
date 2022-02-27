@@ -1,5 +1,7 @@
 package com.wy.rocketmq.consumer;
 
+import org.apache.rocketmq.spring.annotation.ConsumeMode;
+import org.apache.rocketmq.spring.annotation.MessageModel;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
 import org.apache.rocketmq.spring.core.RocketMQListener;
 import org.springframework.stereotype.Component;
@@ -12,7 +14,11 @@ import org.springframework.stereotype.Component;
  * @git {@link https://github.com/dreamFlyingFlower}
  */
 @Component
-@RocketMQMessageListener(topic = "test-rocket-topic", consumerGroup = "test-rocket-group")
+@RocketMQMessageListener(topic = "test-rocket-topic", consumerGroup = "test-rocket-group",
+		// 消费模式:无序和有序
+		consumeMode = ConsumeMode.CONCURRENTLY,
+		// 消息模式:广播和集群,默认集群
+		messageModel = MessageModel.CLUSTERING)
 public class Consumer01 implements RocketMQListener<String> {
 
 	/**
