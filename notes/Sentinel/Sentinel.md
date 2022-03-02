@@ -16,10 +16,57 @@
 
 
 * [下载地址](https://github.com/alibaba/Sentinel/releases)
+
 * 启动:`java -jar -Dserver.port=8080 -Dcsp.sentinel.dashborad.server=localhost:8080 sentinel-dashboard-xxx.jar`
-* 在浏览器中访问sentinel控制台,默认用户名和密码:sentinel/sentinel
-* 刚进页面为空,是因为还没有监控任何服务
-* sentinel是懒加载的,如果服务没有被访问,也看不到该服务信息
+
+* 在浏览器中访问Sentinel控制台,默认用户名和密码:sentinel/sentinel
+
+* 刚进页面为空,是因为还没有监控任何服务.Sentinel是懒加载的,如果服务没有被访问,也看不到该服务信息
+
+* Sentinel Dashboard是Sentinel的控制端,是新的限流与熔断规则的创建者
+
+* 当内置在微服务内的 Sentinel Core(客户端)接收到新的限流,熔断规则后,微服务便会自动启用的相应的保护措施
+
+* 按执行流程,Sentinel 的执行流程分为三个阶段:
+
+  * Sentinel Core 与 Sentinel Dashboard 建立连接
+  * Sentinel Dashboard 向 Sentinel Core 下发新的保护规则
+  * Sentinel Core 应用新的保护规则,实施限流,熔断等动作
+
+* 第一步,建立连接
+
+  * Sentine Core 在初始化的时候,通过 application.yml 参数中指定的 Dashboard 的 IP地址,会主动向 dashboard 发起连接的请求
+
+  ```yaml
+  # Sentinel Dashboard通信地址
+  spring: 
+    cloud:
+      sentinel: 
+        transport:
+          dashboard: 192.168.0.150:9100
+  ```
+
+  * 该请求是以心跳包的方式定时向 Dashboard 发送,包含 Sentinel Core 的 AppName,IP,端口信息
+  * Sentinel Core为了能够持续接收到来自 Dashboard的数据,会在微服务实例设备上监听 8719 端口,在心跳包上报时也是上报这个 8719 端口,而非微服务本身的 80 端口
+  * 在 Sentinel Dashboard 接收到心跳包后,来自 Sentinel Core的AppName,IP,端口信息会被封装为 MachineInfo 对象放入 ConcurrentHashMap 保存在 JVM的内存中,以备后续使用
+
+* 第二步,推送新规则
+
+  * 如果在 Dashboard 页面中设置了新的保护规则,会先从当前的 MachineInfo 中提取符合要求的微服务实例信息,之后通过 Dashboard内置的 transport 模块将新规则打包推送到微服务实例的 Sentinel Core,Sentinel Core收到新规则在微服务应用中对本地规则进行更新,这些新规则会保存在微服务实例的 JVM 内存中
+
+* 第三步,处理请求
+
+  ![](image09-01.png)
+
+  * Sentinel Core 为服务限流,熔断提供了核心拦截器 SentinelWebInterceptor,这个拦截器默认对所有请求进行拦截,然后开始请求的链式处理流程,在对于每一个处理请求的节点被称为 Slot(槽),通过多个槽的连接形成处理链,在请求的流转过程中,如果有任何一个 Slot 验证未通过,都会产生异常,请求处理链便会中断,并返回Blocked by sentinel异常信息
+  * 默认 Slot 有7 个,前 3 个 Slot为前置处理,用于收集,统计,分析必要的数据;后 4 个为规则校验 Slot,从Dashboard 推送的新规则保存在规则池中,然后对应 Slot 进行读取并校验当前请求是否允许放行,允许放行则送入下一个 Slot 直到最终被 RestController 进行业务处理,不允许放行则直接抛出异常,返回响应
+    * NodeSelectorSlot:负责收集资源的路径,并将这些资源的调用路径,以树状结构存储起来,用于根据调用路径来限流降级
+    * ClusterBuilderSlot:则用于存储资源的统计信息以及调用者信息,例如该资源的 RT(运行时间), QPS, thread count(线程总数)等,这些信息将用作为多维度限流,降级的依据
+    * StatistcSlot:则用于记录,统计不同维度的runtime 信息
+    * SystemSlot:则通过系统的状态,例如CPU,内存的情况,来控制总的入口流量
+    * AuthoritySlot:则根据黑白名单,来做黑白名单控制
+    * FlowSlot:则用于根据预设的限流规则,以及前面 slot 统计的状态,来进行限流
+    * DegradeSlot:则通过统计信息,以及预设的规则,来做熔断降级
 
 
 
@@ -90,108 +137,58 @@ feign.sentinel.enabled=true
 
 ## 概述
 
+
+
 * 流量控制用于调整网络包的发送数据,从系统稳定性角度考虑,在处理请求的速度上,也有非常多的讲究.任意时间到来的请求往往是随机不可控的,而系统的处理能力是有限的,此时需要根据系统的处理能力对流量进行控制
+* 核心算法使用的是滑动窗口算法
 * 流量控制有以下几个角度:
   * 资源的调用关系,例如资源的调用链路,资源和资源之间的关系
   * 运行指标,例如 QPS,线程数等
   * 控制的效果,例如直接限流(快速失败),冷启动(Warm Up),匀速排队(排队等待)等
+* 流量控制,其原理是监控应用流量的QPS(每秒查询率) 或并发线程数等指标,当达到指定的阈值时对流量进行控制,以避免被瞬时的流量高峰冲垮,从而保障应用的高可用性
 
 
 
 ## 配置
 
+
+
  ![](image01.png)
 
 
 
-## QPS流量控制
+* 在 Sentinel Dashboard 中簇点链路,找到需要限流的 URI,点击+流控进入流控设置
+* Sentinel Dashboard 基于懒加载模式,如果在簇点链路没有找到对应的 URI,需要先访问下这个功能的功能后对应的 URI 便会出现
+* 资源名:要流控的 URI,在 Sentinel 中 URI 被称为资源,一般是请求路径
+* 针对来源:默认 default 代表所有来源,可以针对某个微服务或者调用者单独设置
+* 阈值类型:是按每秒访问数量(QPS)还是并发数(线程数)进行流控
+* 单机阈值:具体限流的数值是多少
+* 点击高级选项,就会出现更为详细的设置项
+* 流控模式:是指采用什么方式进行流量控制
+  * 直接:默认,接口达到限流条件时,开启限流
+  * 关联:当关联的资源达到限流条件时,开启限流,适合做应用让步
+  * 链路:当从某个接口过来的资源达到限流条件时,开启限流.功能和关联类似,区别是关联模式是任意两个资源只要设置关联就可以进行限流;链路模式是2个接口归墟在同一个调用链路中才会限流
 
 
 
-* 当 QPS 超过某个阈值的时候,则采取措施进行流量控制,流量控制的效果包括以下几种:
-  * 直接拒绝
-  * Warm Up,预热
-  * 匀速排队
+## 流控模式
 
 
 
-### 直接拒绝
-
-* 直接拒绝(`RuleConstant.CONTROL_BEHAVIOR_DEFAULT`)方式是默认的流量控制方式,当QPS超过任意规则的阈值后,新的请求就会被立即拒绝,拒绝方式为抛出FlowException
-* 这种方式适用于对系统处理能力确切已知的情况下,比如通过压测确定了系统的准确水位时
-
-![](image02.png)
-
- ![](image03.png)
-
-* 这里做一个最简单的配置:阈值类型选择->QPS,单机阈值->2
-* 综合起来的配置效果就是,该接口的限流策略是每秒最多允许2个请求进入
-* 点击新增按钮之后,可以看到如下界面:
-
-![](image04.png)
-
-* 在浏览器疯狂刷新http://localhost:18080/hi,出现如下信息:Blocked By Sentinel(flow limit)
+### 关联限流
 
 
-
-### Warm Up
-
-
-
-* Warm Up(`RuleConstant.CONTROL_BEHAVIOR_WARM_UP`):预热/冷启动方式
-* 当系统长期处于低水位的情况下,流量突然增加时,直接把系统拉升到高水位可能瞬间把系统压垮.通过冷启动,让通过的流量缓慢增加,在一定时间内逐渐增加到阈值上限,给冷系统一个预热的时间,避免冷系统被压垮
-* 它从开始阈值到最大QPS阈值会有一个缓冲阶段,一开始的阈值是最大QPS阈值的1/3,然后慢慢增长,直到最大阈值,适用于将突然增大的流量转换为缓步增长的场景
-
- ![](image05.png)
-
-* 疯狂访问:http://localhost:18080/hi,可以发现前几秒会发生熔断,几秒钟之后就完全没有问题了
-
-
-
-### 匀速排队
-
-
-
-* `RuleConstant.CONTROL_BEHAVIOR_RATE_LIMITER`:会严格控制请求通过的间隔时间,也即是让请求以均匀的速度通过,对应的是漏桶算法
-* 还可以设置一个超时时间,当请求超过超时间时间还未处理,则会被丢弃  
-* 测试配置如下:1s处理一个请求,排队等待,等待时间20s
-
- ![](image06.png)
-
-* 在postman中使用run模式,每100ms请求该uri,http://localhost:18080/hi,发20次
-* 查看控制台,可以看到基本每隔1s打印一次
-
-
-
-## 关联限流
 
 * 关联限流:当关联的资源请求达到阈值时,就限流自己
 * 配置如下:/hi2的关联资源/hi,并发数超过2时,/hi2就限流自己
 
  ![](image07.png)
 
-* 给消费者添加一个controller方法:
-
-![1584946721313](E:/repository/paradise-grain/notes/nacos_gateway_sentinel_sleuth/assets/1584946721313.png)
-
-```java
-public class ConsumerCrl{
-	@Autowired
-    private ProviderClient providerClient;
-    
-    @GetMapping("hi2")
-    public String hi2(){
-        return prividerClient.hello() + "hi2";
-    }
-}
-```
-
-* 用postman配置如下:每个400ms发送一次请求,一共发送50个,每秒钟超过了2次
-* 在浏览器中访问/hi2已经被限流:Blocked by Sentinel(flow limiting)
 
 
+### 链路限流
 
-## 链路限流
+
 
 一棵典型的调用树如下图所示:
 
@@ -213,7 +210,9 @@ public class ConsumerCrl{
 
 
 
-## 线程数限流
+### 线程数限流
+
+
 
 * 并发线程数限流用于保护业务线程数不被耗尽
 * 例如,当应用所依赖的下游应用由于某种原因导致服务不稳定,响应延迟增加,对于调用者来说,意味着吞吐量下降和更多的线程数占用,极端情况下甚至导致线程池耗尽
@@ -226,34 +225,51 @@ public class ConsumerCrl{
 
 
 
-改造controller中的hi方法:
-
-![1584952668510](E:/repository/paradise-grain/notes/nacos_gateway_sentinel_sleuth/assets/1584952668510.png)
+## 流控效果
 
 
 
-## 流控规则
+### 快速失败
 
 
 
-* 流量控制,其原理是监控应用流量的QPS(每秒查询率) 或并发线程数等指标,当达到指定的阈值时对流量进行控制,以避免被瞬时的流量高峰冲垮,从而保障应用的高可用性
-* 点击簇点链路,可以看到访问过的接口地址,然后点击对应的流控按钮,进入流控规则配置页面
-  * 资源名:唯一名称,默认是请求路径,可自定义
-  * 针对来源:指定对哪个微服务进行限流,默认指default,意思是不区分来源,全部限制
-  * 阈值类型/单机阈值:
-    * QPS:每秒请求数量,当调用该接口的QPS达到阈值的时候,进行限流
-    * 线程数:当调用该接口的线程数达到阈值的时候,进行限流
-  * 是否集群:暂不需要集群
-* 配置流控模式
-  * 点击上面设置流控规则的编辑按钮,然后在编辑页面点击高级选项,会看到有流控模式一栏
-  * Sentinel共有三种流控模式:
-    * 直接:默认,接口达到限流条件时,开启限流
-    * 关联:当关联的资源达到限流条件时,开启限流 [适合做应用让步]
-    * 链路:当从某个接口过来的资源达到限流条件时,开启限流
-  * 直接流控模式:最简单的模式,当指定的接口达到限流条件时开启限流
-  * 关联流控模式:当指定关联的接口达到限流条件时,开启对指定接口开启限流
-    * 流控模式选择关联,关联资源填上需要限制的接口地址
-  * 链路流控模式:当从某个接口过来的资源达到限流条件时,开启限流.它的功能有点类似于针对来源配置项,区别在于针对来源是针对上级微服务,而链路流控是针对上级接口,也就是说它的粒度更细
+* 快速失败是默认的流量控制方式,当QPS超过任意规则的阈值后,新的请求就会被立即拒绝,并抛出异常
+* 这种方式适用于对系统处理能力确切已知的情况下,比如通过压测确定了系统的准确水位时
+* 做一个最简单的配置:阈值类型选择->QPS,单机阈值->2
+* 综合起来的配置效果就是,该接口的限流策略是每秒最多允许2个请求进入
+
+
+
+### Warm Up
+
+
+
+![](image05.png)
+
+* Warm Up:预热/冷启动方式
+* 当系统长期处于低水位的情况下,流量突然增加时,直接把系统拉升到高水位可能瞬间把系统压垮
+* 通过冷启动,让流量缓慢增加,在一定时间内逐渐增加到阈值上限,给系统一个预热的时间,避免系统被压垮
+* 一开始的阈值是最大QPS阈值的1/3,然后慢慢增长,直到最大阈值,适用于将突然增大的流量转换为缓步增长的场景
+
+* 疯狂访问:http://localhost:18080/hi,可以发现前几秒会发生熔断,几秒钟之后就完全没有问题了
+
+
+
+### 排队等待
+
+
+
+* 控制请求通过的间隔时间,也即是让请求以均匀的速度通过,对应的是漏桶算法
+* 超时时间:当请求超过超时间时间还未处理,则会被丢弃  
+* 如下所示,假设现在有100个请求瞬间进入,那么会出现以下几种情况:
+  * 单机 QPS 阈值=1,代表每 1 秒只能放行 1 个请求,其他请求队列等待,共需 100 秒处理完毕
+  * 单机 QPS 阈值=4,代表 250 毫秒匀速放行 1 个请求,其他请求队列等待,共需 25 秒处理完毕
+  * 单机 QPS 阈值=200,代表 5 毫秒匀速放行一个请求,其他请求队列等待,共需 0.5 秒处理完毕
+  * 如果某一个请求在队列中处于等待状态超过 20000 毫秒,则直接抛出 BlockException
+  * 匀速队列只支持 QPS 模式,且单机阈值不得大于 1000
+
+
+ ![](image06.png)
 
 
 
@@ -279,42 +295,37 @@ public class ConsumerCrl{
 
 
 
-## 平均响应时间(RT)
+## RT
 
 
 
-* 平均响应时间 (`DEGRADE_GRADE_RT`):当资源的平均响应时间超过阈值(`DegradeRule`中的 `count`,单位为ms,默认上限是4900ms)之后,资源进入准降级状态
-* 如果1s之内持续进入 5 个请求,它们的RT都持续超过这个阈值,那么在接下来的时间窗口(`DegradeRule`中的timeWindow,单位为s)之内,对这个方法的调用都会自动地返回(抛出 `DegradeException`)
-* 在下一个时间窗口到来时, 会接着再放入5个请求, 再重复上面的判断
+* 平均响应时间:当资源的平均响应时间超过阈值(以ms为单位,默认上限4900ms)之后,资源进入准降
+  * 新增降级规则->降级策略->RT
+  * 填写RT和时间窗口的值,RT单位为ms,时间窗口单位为s
+  * 如RT为10,时间窗口为10,表示如果平均响应时间大于10ms时,接下来的10s内服务降级,10s后恢复正常,进行下一轮判断
+
 * 配置如下:超时时间100ms,熔断时间10s
 
  ![](image10.png)
 
 
 
+
+
 ## 异常比例
 
-异常比例(`DEGRADE_GRADE_EXCEPTION_RATIO`):当资源的每秒请求量 >= 5,且每秒异常总数占通过量的比值超过阈值(`DegradeRule`中的`count`)之后,资源进入降级状态,即在接下的时间窗口(`DegradeRule`中的 `timeWindow`,单位为s)之内,对这个方法的调用都会自动地返回.异常比率的阈值范围是 `[0.0, 1.0]`,代表 0% - 100%
+
+
+* 当资源的每秒异常总数占通过量的比值超过阈值之后,资源进入降级状态,即在接下的时间窗口(以 s为单位)之内,对这个方法的调用都会自动地返回.异常比率的阈值范围是[0,1]
+  * 异常比例:新增降级规则->降级策略->异常比例
+  * 填写异常比例和时间窗口的值,异常比例范围从0到1,时间窗口单位为s
 
 
 
 ## 异常数
 
-异常数(`DEGRADE_GRADE_EXCEPTION_COUNT`):当资源近1分钟的异常数目超过阈值之后会进行熔断
 
 
-
-## 降级规则
-
-
-
-* 平均响应时间:RT,当资源的平均响应时间超过阈值(以ms为单位)之后,资源进入准降级状态
-  * 新增降级规则->降级策略->RT
-  * 填写RT和时间窗口的值,RT单位为ms,时间窗口单位为s
-  * 如RT为10,时间窗口为10,表示如果平均响应时间大于10ms时,接下来的10s内服务降级,10s后恢复正常,进行下一轮判断
-* 异常比例:当资源的每秒异常总数占通过量的比值超过阈值之后,资源进入降级状态,即在接下的时间窗口(以 s为单位)之内,对这个方法的调用都会自动地返回.异常比率的阈值范围是[0,1]
-  * 新增降级规则->降级策略->异常比例
-  * 填写异常比例和时间窗口的值,异常比例范围从0到1,时间窗口单位为s
 * 异常数:当资源近1分钟的异常数目超过阈值之后会进行服务降级.由于统计时间窗口是分钟级别的,若时间窗口小于 60s,则结束熔断状态后仍可能再进入熔断状态
   * 新增降级规则->降级策略->异常数
   * 填写异常数和时间窗口的值,时间窗口单位为s
@@ -438,11 +449,7 @@ public class ConsumerCrl{
 
 
 
-# 规则持久化
-
-
-
-## 流控规则持久化
+# 流控规则持久化
 
 
 
@@ -459,21 +466,44 @@ public class ConsumerCrl{
 
 * 添加配置:
 
-  ```properties
-  # 这里datasource后的consumer是数据源名称,可以随便写,推荐使用服务名
-  spring.cloud.sentinel.datasource.consumer.nacos.server-addr=localhost:8848
-  spring.cloud.sentinel.datasource.consumer.nacos.dataId=${spring.application.name}-sentinel-rules
-  spring.cloud.sentinel.datasource.consumer.nacos.groupId=SENTINEL_GROUP
-  spring.cloud.sentinel.datasource.consumer.nacos.data-type=json
-  # 规则类型,取值见:org.springframework.cloud.alibaba.sentinel.datasource.RuleType
-  spring.cloud.sentinel.datasource.consumer.nacos.rule_type=flow
+  ```yaml
+  spring:
+  	application:
+  		name: nacos-consumer
+  	cloud:
+  		sentinel:
+  			# Sentinel Dashboard通信地址
+  			transport:
+  				dashboard: 192.168.1.150:9100
+              # 取消控制台懒加载
+              eager: true 
+              datasource:
+              	# 数据源名称,可自定义
+                  consumer: 
+                  	# nacos配置中心
+                      nacos: 
+                          server-addr: ${spring.cloud.nacos.server-addr}
+                          # 定义流控规则data-id,在配置中心设置时data-id必须对应
+                          dataId: ${spring.application.name}-sentinel-rules
+                          # gourpId对应配置文件分组,对应配置中心groups项
+                          groupId: SENTINEL_GROUP
+                          # flow固定写死,说明这个配置是流控规则
+                          rule-type: flow
+                          data-type: json
+                          # nacos通信的用户名与密码
+                          username: nacos
+                          password: nacos
+          nacos:
+              server-addr: 192.168.1.150:8848
+              username: nacos
+              password: nacos
   ```
 
 * nacos中创建流控规则
 
 ![](image11.png)
 
-* 配置内容如下:
+* 配置内容如下,和Sentinel Dashboard中的流控规则对应:
 
   ```json
   [
@@ -511,13 +541,73 @@ public class ConsumerCrl{
 
 
 
-## 熔断持久化
+
+
+# SentinelResource
 
 
 
-* 需要使用`@SentinelResource`注解对方法进行修饰
+* 一个注解,针对某一个Service业务逻辑方法进行限流熔断等规则设置
+
+* 在应用入口声明 SentinelResourceAspect,SentinelResourceAspect就是 Sentinel 提供的切面类,用于进行熔断的前置检查
+
+  ```java
+  @SpringBootApplication
+  public class SentinelSampleApplication {
+  
+      @Bean
+      public SentinelResourceAspect sentinelResourceAspect() {
+          return new SentinelResourceAspect();
+      }
+  
+      public static void main(String[] args) {
+          SpringApplication.run(SentinelSampleApplication.class, args);
+      }
+  }
+  ```
+
+* 在需要限流熔断的方法上增加 @SentinelResource 注解用于声明 Sentinel 资源点,只有声明了资源点，Sentinel 才能实施限流熔断等保护措施
+
+
+
+# 熔断持久化
+
+
 
 * 配置同流控规则,只是配置内容不同
+
+  ```yaml
+  spring:
+  	application:
+  		name: nacos-consumer
+  	cloud:
+  		sentinel:
+  			# Sentinel Dashboard通信地址
+  			transport:
+  				dashboard: 192.168.1.150:9100
+              # 取消控制台懒加载
+              eager: true 
+              datasource:
+              	# 数据源名称,可自定义
+                  degrade: 
+                  	# nacos配置中心
+                      nacos: 
+                          server-addr: ${spring.cloud.nacos.server-addr}
+                          # 定义流控规则data-id,在配置中心设置时data-id必须对应
+                          dataId: ${spring.application.name}-sentinel-rules
+                          # gourpId对应配置文件分组,对应配置中心groups项
+                          groupId: SENTINEL_GROUP
+                          # 熔断规则
+                          rule-type: degrade
+                          data-type: json
+                          # nacos通信的用户名与密码
+                          username: nacos
+                          password: nacos
+          nacos:
+              server-addr: 192.168.1.150:8848
+              username: nacos
+              password: nacos
+  ```
 
   ```json
   [
@@ -533,7 +623,92 @@ public class ConsumerCrl{
   ]
   ```
 
-  
+* resource:自定义资源名
+
+* limitApp:default,命名空间
+
+* grade:0-慢调用比例 1-异常比例 2-异常数
+
+* count:最大RT 100毫秒执行时间
+
+* timeWindow:时间窗口5秒
+
+* minRequestAmount:最小请求数
+
+* slowRatioThreshold:比例阈值
+
+
+
+# 自定义异常
+
+
+
+* 针对 RESTful 接口的统一异常处理需要实现 BlockExceptionHandler
+
+```java
+@Component
+public class UrlBlockHandler implements BlockExceptionHandler {
+
+    @Override
+    public void handle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, BlockException e) throws Exception {
+        String msg = null;
+        if(e instanceof FlowException){//限流异常
+            msg = "接口已被限流";
+        }else if(e instanceof DegradeException){//熔断异常
+            msg = "接口已被熔断,请稍后再试";
+        }else if(e instanceof ParamFlowException){ //热点参数限流
+            msg = "热点参数限流"; 
+        }else if(e instanceof SystemBlockException){ //系统规则异常
+            msg = "系统规则(负载/....不满足要求)";
+        }else if(e instanceof AuthorityException){ //授权规则异常
+            msg = "授权规则不通过"; 
+        }
+        httpServletResponse.setStatus(500);
+        httpServletResponse.setCharacterEncoding("UTF-8");
+        httpServletResponse.setContentType("application/json;charset=utf-8");
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        mapper.writeValue(httpServletResponse.getWriter(),
+                          new ResponseObject(e.getClass().getSimpleName(), msg)
+                         );
+    }
+}
+```
+
+* 自定义资源点的异常处理,需要在 @SentinelResource 注解上额外附加 blockHandler属性进行异常处理
+
+```java
+@Service
+public class SampleService {
+
+    @SentinelResource(value = "createOrder",blockHandler = "createOrderBlockHandler")
+    public void createOrder() throws IllegalStateException{
+        try {
+            //模拟处理业务逻辑需要 101 毫秒
+            Thread.sleep(101);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("订单已创建");
+    }
+
+    public void createOrderBlockHandler(BlockException e) throws IllegalStateException{
+        String msg = null;
+        if(e instanceof FlowException){//限流异常
+            msg = "资源已被限流";
+        }else if(e instanceof DegradeException){//熔断异常
+            msg = "资源已被熔断,请稍后再试";
+        }else if(e instanceof ParamFlowException){ //热点参数限流
+            msg = "热点参数限流";
+        }else if(e instanceof SystemBlockException){ //系统规则异常
+            msg = "系统规则(负载/....不满足要求)";
+        }else if(e instanceof AuthorityException){ //授权规则异常
+            msg = "授权规则不通过";
+        }
+        throw new IllegalStateException(msg);
+    }
+}
+```
 
 
 
