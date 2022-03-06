@@ -5,6 +5,7 @@ package com.wy.rocketmq;
  *
  * RocketMQ4大构成:生产者(Producer),管理中心(NameServer),消息块(Broker),消费者(Consumer)
  *
+ *	NameServer是一个很简单的Topic路由注册中心,支持Broker的动态注册和发现,保存Topic和Broker之间的关系
  * Broker会定时发送自身状态到NameServer,Producer请求NameServer获取Broker地址,
  * Producer将消息发送到Broker中的消息队列,Consumer订阅Broker中的消息队列,通过主动拉取,或由Broker推送获取消息
  * 
