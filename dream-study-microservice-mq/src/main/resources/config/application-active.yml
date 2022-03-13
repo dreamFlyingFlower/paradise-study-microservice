@@ -1,7 +1,9 @@
-server:
-  port: 55560
 spring:
-  application:
-    name: paradise-study-microservice-amqp
-  profiles:
-    active: dev,amqp
+  activemq:
+    broker-url: tcp://192.168.1.146:61616
+    # 连接的用户名和密码
+    user: admin
+    password: admin
+    # 最大连接池数
+    pool:
+      max-connections: 10

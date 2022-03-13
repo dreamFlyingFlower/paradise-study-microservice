@@ -2,6 +2,6 @@ server:
   port: 55560
 spring:
   application:
-    name: paradise-study-microservice-amqp
+    name: paradise-study-microservice-mq
   profiles:
     active: dev,amqp

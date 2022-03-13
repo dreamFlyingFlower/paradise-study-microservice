@@ -3,14 +3,10 @@ package com.wy.rocketmq.procuder;
 import java.util.Date;
 import java.util.UUID;
 
-import org.apache.rocketmq.spring.annotation.RocketMQTransactionListener;
-import org.apache.rocketmq.spring.core.RocketMQLocalTransactionListener;
-import org.apache.rocketmq.spring.core.RocketMQLocalTransactionState;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
-import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
-import org.springframework.messaging.Message;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,7 +28,7 @@ public class Procuder02 {
 	public void createOrderBefore(Order order) {
 		String txId = UUID.randomUUID().toString();
 		// 发送半事务消息
-		rocketMQTemplate.sendMessageInTransaction("tx_producer_group", "tx_topic",
+		rocketMQTemplate.sendMessageInTransaction("tx_producer_group",
 				MessageBuilder.withPayload(order).setHeader("txId", txId).build(), order);
 	}
 
