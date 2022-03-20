@@ -63,10 +63,19 @@ public class OAuth2AuthenticationServer extends AuthorizationServerConfigurerAda
 	// password:加密->$2a$10$owjsydvplVmh0wI6f.xOM.4TKBc/CoKYTvX.HmnS6Yeu7qlyukAPO
 	@Override
 	public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-		clients.inMemory().withClient(config.getOauth2().getClientIdGuest())
+		clients.inMemory()
+				// client的id和密码
+				.withClient(config.getOauth2().getClientIdGuest())
 				.secret(passwordEncoder.encode(config.getOauth2().getClientSecretGuest()))
-				.accessTokenValiditySeconds(100).authorizedGrantTypes(config.getOauth2().getGrantTypes())
+				// token有效期
+				.accessTokenValiditySeconds(100)
+				// 该client可访问的资源服务器ID,每个资源服务器都有一个ID
+				.resourceIds("resourceId")
+				// 认证模式
+				.authorizedGrantTypes(config.getOauth2().getGrantTypes())
+				// 授权的范围,每个resource会设置自己的范围
 				.scopes(config.getOauth2().getScopes())
+				// authorization_code认证模式传递code给client的uri,该uri由client指定
 				.redirectUris("http://localhost:55300/oauthClient/oauth/authorized").and().withClient("user1")
 				.secret("password").authorizedGrantTypes(config.getOauth2().getGrantTypes())
 				.redirectUris("http://localhost:55300/oauthClient/oauth/authorized");

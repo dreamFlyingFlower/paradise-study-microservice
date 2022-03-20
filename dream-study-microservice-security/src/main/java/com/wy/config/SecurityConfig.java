@@ -145,6 +145,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http
+				// 设置在页面可以通过iframe访问受保护的页面,默认为不允许访问
+				// .headers().frameOptions().sameOrigin().and()
 				// 进行短信验证
 				// .apply(new SmsAuthenticationSecurityConfig()).and()
 				// 进行social验证
