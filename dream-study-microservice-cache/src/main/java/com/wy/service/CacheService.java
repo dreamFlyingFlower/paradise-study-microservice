@@ -31,6 +31,7 @@ public class CacheService {
 	// @Cacheable(value = "cacheTest", keyGenerator = "customizeKeyGenerator")
 	// 当userId大于0的时候才缓存,可以用and或者or连接过个判断
 	// @Cacheable(value = "cacheTest", key = "#userId", condition = "#userId > 0")
+	// 可添加常量.如key="'"+ee+"'+#userId"
 	// #result可以拿到方法的结果,同时可以对结果进行操作判断
 	@Cacheable(value = "cacheTest", key = "#userId", unless = "#result == null")
 	public User getCache(Integer userId) {
