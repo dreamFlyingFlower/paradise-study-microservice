@@ -43,9 +43,9 @@ public class DeadQueueConfig {
 	@Bean
 	public Queue queue() {
 		Map<String, Object> arguments = new HashMap<>();
-		// x-dead-letter-exchange 这里声明当前队列绑定的死信交换机
+		// x-dead-letter-exchange 声明当前队列绑定的死信交换机
 		arguments.put("x-dead-letter-exchange", rabbit.getDead().getExchange());
-		// x-dead-letter-routing-key 这里声明当前队列的死信路由key
+		// x-dead-letter-routing-key 声明当前队列的死信路由key
 		arguments.put("x-dead-letter-routing-key", rabbit.getDead().getRoutingKey());
 		return new Queue("spring.test.queue", true, false, false, arguments);
 	}
