@@ -7,7 +7,7 @@ mybatis:
 spring:
   datasource:
     # 若数据库没有指定时区,连接还需要加上时区
-    url: jdbc:mysql://localhost:3306/simpleoa?autoReconnect=true&useUnicode=true&serverTimezone=GMT
+    url: jdbc:mysql://localhost:3306/simpleoa?autoReconnect=true&useUnicode=true&serverTimezone=GMT&tinyInt1isBit=false&allowMultiQueries=true
     username: root
     password: 52LDforever
     driver-class-name: com.mysql.cj.jdbc.Driver
