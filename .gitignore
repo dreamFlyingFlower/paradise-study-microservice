@@ -1,3 +1,4 @@
+HELP.md
 target
 !.mvn/wrapper/maven-wrapper.jar
 *.class
@@ -40,4 +41,5 @@ logs
 /.nb-gradle/
 /node_modules/
 
-rebel.xml
+### VS Code ###
+.vscode/
