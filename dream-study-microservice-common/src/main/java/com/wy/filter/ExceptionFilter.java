@@ -20,7 +20,7 @@ import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.yaml.snakeyaml.constructor.DuplicateKeyException;
 
-import com.alibaba.fastjson.JSONException;
+import com.alibaba.fastjson2.JSONException;
 import com.wy.enums.TipFormatEnum;
 import com.wy.result.Result;
 import com.wy.result.ResultException;
