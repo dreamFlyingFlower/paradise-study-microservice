@@ -40,7 +40,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http.authorizeRequests().antMatchers(config.getSecurity().getPermitAllSources()).permitAll().anyRequest()
-				.authenticated().and().formLogin().successHandler(loginSuccessHandler).and().csrf().disable();
+		        .authenticated().and().formLogin().successHandler(loginSuccessHandler).and().csrf().disable();
 	}
 
 	/**
@@ -56,6 +56,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		return new BCryptPasswordEncoder();
 	}
 
+	/**
+	 * 不同的版本可能不一样,高版本一般不要
+	 */
 	@Bean
 	@Override
 	public AuthenticationManager authenticationManagerBean() throws Exception {

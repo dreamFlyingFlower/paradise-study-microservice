@@ -5,7 +5,7 @@ import java.util.HashMap;
 import org.springframework.social.oauth2.AbstractOAuth2ApiBinding;
 import org.springframework.social.oauth2.TokenStrategy;
 
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson2.JSON;
 import com.wy.entity.UserWeiXin;
 import com.wy.social.IToken;
 

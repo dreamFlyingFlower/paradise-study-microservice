@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
 
 import org.apache.catalina.connector.ClientAbortException;
+import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
@@ -21,7 +22,6 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
-import com.alibaba.fastjson.JSONException;
 import com.wy.enums.TipFormatEnum;
 import com.wy.result.Result;
 import com.wy.result.ResultException;
@@ -36,7 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestControllerAdvice
 @Slf4j
 public class SecurityExceptionFilter {
-	
+
 	@ExceptionHandler(Throwable.class)
 	public Result<?> handleException(HttpServletRequest request, Throwable throwable) {
 		throwable.printStackTrace();
@@ -73,14 +73,13 @@ public class SecurityExceptionFilter {
 		}
 		// 必传参数为空异常
 		if (throwable instanceof MissingServletRequestParameterException) {
-			return Result.error(TipFormatEnum.TIP_PARAM_EMPTY.getMsg(
-					((MissingServletRequestParameterException) throwable).getParameterName()));
+			return Result.error(TipFormatEnum.TIP_PARAM_EMPTY
+			        .getMsg(((MissingServletRequestParameterException) throwable).getParameterName()));
 		}
 		// 方法参数验证失败
 		if (throwable instanceof MethodArgumentNotValidException) {
 			StringBuilder sb = new StringBuilder();
-			BindingResult bindingResult = ((MethodArgumentNotValidException) throwable)
-					.getBindingResult();
+			BindingResult bindingResult = ((MethodArgumentNotValidException) throwable).getBindingResult();
 			// 解析原错误信息,封装后返回,此处返回非法的字段名称，原始值，错误信息
 			for (FieldError error : bindingResult.getFieldErrors()) {
 				sb.append("字段：" + error.getField() + "-" + error.getRejectedValue() + ";");
