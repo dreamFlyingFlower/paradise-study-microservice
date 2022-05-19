@@ -7,6 +7,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -38,9 +39,30 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	private UserAuthenticationProvider provider;
 
 	@Override
+	public void configure(WebSecurity web) throws Exception {
+		web.ignoring().antMatchers(
+		        // 过滤静态资源
+		        "/public/**", "/static/**", "/resources/**",
+		        // swagger api json
+		        "/swagger**", "/swagger-ui.html", "/v2/api-docs",
+		        // 用来获取支持的动作
+		        "/swagger-resources/configuration/ui",
+		        // 用来获取api-docs的URI
+		        "/swagger-resources",
+		        // 安全选项
+		        "/swagger-resources/configuration/security", "/swagger-resources/**",
+		        // 在搭建swagger接口文档时,通过浏览器控制台发现该/webjars路径下的文件被拦截,故加上此过滤条件
+		        "/webjars/**");
+	}
+
+	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.authorizeRequests().antMatchers(config.getSecurity().getPermitAllSources()).permitAll().anyRequest()
-		        .authenticated().and().formLogin().successHandler(loginSuccessHandler).and().csrf().disable();
+		http.authorizeRequests()
+		        // 过滤swagger相关资源
+		        .antMatchers("/authenticate", "/swagger-resources/**", "/swagger-ui/**", "/v3/api-docs", "/webjars/**")
+		        .permitAll()
+		        .antMatchers(config.getSecurity().getPermitAllSources()).permitAll().anyRequest().authenticated().and()
+		        .formLogin().successHandler(loginSuccessHandler).and().csrf().disable();
 	}
 
 	/**

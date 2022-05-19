@@ -13,7 +13,7 @@ import lombok.Setter;
 public class SecurityProperties {
 
 	/**
-	 * 不需要验证的资源,url
+	 * 不需要验证的资源URL,需要从根路径开始填写
 	 */
 	private String[] permitSources;
 

@@ -15,10 +15,10 @@ import lombok.Setter;
 public class SecurityProperties {
 
 	/**
-	 * 不需要验证的资源,url
+	 * 不需要验证的资源URL,需要从根路径开始填写
 	 */
 	private String[] permitAllSources = { "/images/**", "/user/getCode/**", "/user/login/**", "/html/**", "/plugins/**",
-			"/actuator/**", "/oauth/authorize**", "/oauth/**", "/oauth/token_key", "/messages/**", "/oauth/error",
-			"/swagger-ui.html", "/swagger-ui/*", "/swagger-resources/**", "/v2/api-docs", "/v3/api-docs", "/webjars/**",
-			"/login" };
+	        "/actuator/**", "/oauth/authorize**", "/oauth/**", "/oauth/token_key", "/messages/**", "/oauth/error",
+	        "/swagger-ui.html", "/swagger-ui/*", "/swagger-resources/**", "/v2/api-docs", "/v3/api-docs", "/webjars/**",
+	        "/login" };
 }
