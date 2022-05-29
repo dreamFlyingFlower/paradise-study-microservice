@@ -1,4 +1,4 @@
-package com.wy.rocketmq.procuder;
+package com.wy.rocketmq.listener;
 
 import java.util.Date;
 import java.util.UUID;
@@ -34,22 +34,30 @@ public class Procuder02Listener implements RocketMQLocalTransactionListener {
 	@Override
 	public RocketMQLocalTransactionState executeLocalTransaction(Message msg, Object arg) {
 		try {
-			// 本地事物
+			// 本地事物成功
 			// dosomething save or update or delete
 			return RocketMQLocalTransactionState.COMMIT;
 		} catch (Exception e) {
+			// 本地事务失败
 			return RocketMQLocalTransactionState.ROLLBACK;
 		}
 	}
 
-	// 消息回查
+	/**
+	 * 消息回查
+	 * 
+	 * @param msg 消息
+	 * @return 回查状态
+	 */
 	@Override
 	public RocketMQLocalTransactionState checkLocalTransaction(Message msg) {
 		// 查询日志记录,从数据库查询
 		TxLog txLog = new TxLog();
 		if (txLog == null) {
+			// 成功
 			return RocketMQLocalTransactionState.COMMIT;
 		} else {
+			// 失败
 			return RocketMQLocalTransactionState.ROLLBACK;
 		}
 	}
