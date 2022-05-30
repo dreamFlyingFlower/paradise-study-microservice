@@ -26,6 +26,11 @@
 * Push:服务端(Broker)向消费者主动推送消息.实际上底层仍然是pull模式.Consumer把轮询过程封装并注册MessageListener监听器,取到消息后,唤醒MessageListener的consumeMessage()来消费,对用户来说,感觉像是消息被推送的
 * Pull:消费者向服务器(Broker)定时拉取消息.取消息的过程需要用户实现.先通过打算消费的Topic拿到MessageQueue的集合,遍历该集合,然后针对每个MessageQueue批量取消息,一次取完后,记录该队列下一次要取的开始offset,直到取完,再换另一个MessageQueue
 * 长轮询:为保持消息的实时性,Consumer和Broker之间建立了长轮询.如果Broker没有消息更新,则将连接挂起,直到Broker推送新的数据.客户端象传统轮询一样从Broker请求数据,Broker会阻塞请求不会立刻返回,直到有数据或超市才返回给Consumer,然后关闭连接,Consumer处理完响应信息后再想Broker发送新的请求
+* RocketMQ消息存储是由ConsumeQueue和CommitLog共同完成,CommitLog是真正存储数据的文件,ConsumeQueue是索引文件
+* 消息写入磁盘时有2种方式
+  * 同步刷盘:在Producer写入Broker返回写成功时,消息已经被写入磁盘.消息写入内存的pageCache后,立即通知刷盘线程刷盘,刷盘完后,刷盘线程唤醒等待线程,返回消息写入成功的状态
+  * 异步刷盘:当返回写入成功状态时,消息可能只是被写入了内存的pageCache,写操作的返回快,吞吐量大.当内存里的消息量累计到一定程度时,统一触发写磁盘动作,快速写入
+
 
 
 

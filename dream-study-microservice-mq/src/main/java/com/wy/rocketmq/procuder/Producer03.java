@@ -30,6 +30,9 @@ public class Producer03 {
 		DefaultMQProducer producer = new DefaultMQProducer("group");
 		// 设置nameserver地址
 		producer.setNamesrvAddr("192.168.1.150:9876");
+		// 设置消息发送失败重试次数
+		producer.setRetryTimesWhenSendFailed(3);
+		producer.setRetryTimesWhenSendAsyncFailed(3);
 		// 建立连接
 		producer.start();
 		Message message = new Message("topic", "tag", msg.getBytes());
@@ -39,6 +42,8 @@ public class Producer03 {
 		message.putUserProperty("age", "22");
 		// 发送同步消息
 		SendResult sendResult = producer.send(message);
+		// 指定发送超时时间
+		producer.send(message, 3000);
 		// 消息id
 		System.out.println(sendResult.getMsgId());
 		// 消息队列

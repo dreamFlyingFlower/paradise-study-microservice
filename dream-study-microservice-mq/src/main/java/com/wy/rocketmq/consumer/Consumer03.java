@@ -36,6 +36,13 @@ public class Consumer03 {
 				for (MessageExt msg : msgs) {
 					System.out.println(new String(msg.getBody(), StandardCharsets.UTF_8));
 				}
+				// 获得消息的重试次数,如果重试3次仍然失败,直接返回成功
+				if (msgs.get(0).getReconsumeTimes() > 3) {
+					// return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
+				}
+				// 消息消费失败,进行重试
+				// return ConsumeConcurrentlyStatus.RECONSUME_LATER;
+				// 消息消费成功
 				return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
 			}
 		});
