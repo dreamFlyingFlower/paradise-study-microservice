@@ -1,5 +1,6 @@
 package com.wy.configs;
 
+import java.util.Enumeration;
 import java.util.concurrent.CompletableFuture;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,10 +35,19 @@ public class FeignInterceptorConfig {
 			public void apply(RequestTemplate requestTemplate) {
 				// 拿到刚进来的这个请求
 				ServletRequestAttributes requestAttributes =
-						(ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+				        (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
 				HttpServletRequest request = requestAttributes.getRequest();
 				// 同步请求头数据
 				requestTemplate.header("Cookie", request.getHeader("Cookie"));
+				// 将请求头中所有数据进行同步
+				Enumeration<String> headerNames = request.getHeaderNames();
+				if (headerNames != null) {
+					while (headerNames.hasMoreElements()) {
+						String name = headerNames.nextElement();
+						String values = request.getHeader(name);
+						requestTemplate.header(name, values);
+					}
+				}
 			}
 		};
 	}
