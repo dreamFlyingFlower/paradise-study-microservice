@@ -9,25 +9,32 @@ import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface RoleMapper extends BaseMapper<Role> {
-    long countByExample(RoleExample example);
 
-    int deleteByExample(RoleExample example);
+	long countByExample(RoleExample example);
 
-    int deleteByPrimaryKey(Integer roleId);
+	int deleteByExample(RoleExample example);
 
-    int insert(Role record);
+	@Override
+	int deleteByPrimaryKey(Integer roleId);
 
-    int insertSelective(Role record);
+	@Override
+	int insert(Role record);
 
-    List<Role> selectByExample(RoleExample example);
+	@Override
+	int insertSelective(Role record);
 
-    Role selectByPrimaryKey(Integer roleId);
+	List<Role> selectByExample(RoleExample example);
 
-    int updateByExampleSelective(@Param("record") Role record, @Param("example") RoleExample example);
+	@Override
+	Role selectByPrimaryKey(Integer roleId);
 
-    int updateByExample(@Param("record") Role record, @Param("example") RoleExample example);
+	int updateByExampleSelective(@Param("record") Role record, @Param("example") RoleExample example);
 
-    int updateByPrimaryKeySelective(Role record);
+	int updateByExample(@Param("record") Role record, @Param("example") RoleExample example);
 
-    int updateByPrimaryKey(Role record);
+	@Override
+	int updateByPrimaryKeySelective(Role record);
+
+	@Override
+	int updateByPrimaryKey(Role record);
 }

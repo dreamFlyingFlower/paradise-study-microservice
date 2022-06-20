@@ -104,6 +104,7 @@ public class ZkGeneratorId {
 		} else if (removeMethod.equals(RemoveMethod.DELAY)) {
 			cleanExector.execute(new Runnable() {
 
+				@Override
 				public void run() {
 					try {
 						client.delete().forPath(ourPath);

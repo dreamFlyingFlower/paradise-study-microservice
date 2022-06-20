@@ -9,25 +9,32 @@ import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface DepartMapper extends BaseMapper<Depart> {
-    long countByExample(DepartExample example);
 
-    int deleteByExample(DepartExample example);
+	long countByExample(DepartExample example);
 
-    int deleteByPrimaryKey(Integer departId);
+	int deleteByExample(DepartExample example);
 
-    int insert(Depart record);
+	@Override
+	int deleteByPrimaryKey(Integer departId);
 
-    int insertSelective(Depart record);
+	@Override
+	int insert(Depart record);
 
-    List<Depart> selectByExample(DepartExample example);
+	@Override
+	int insertSelective(Depart record);
 
-    Depart selectByPrimaryKey(Integer departId);
+	List<Depart> selectByExample(DepartExample example);
 
-    int updateByExampleSelective(@Param("record") Depart record, @Param("example") DepartExample example);
+	@Override
+	Depart selectByPrimaryKey(Integer departId);
 
-    int updateByExample(@Param("record") Depart record, @Param("example") DepartExample example);
+	int updateByExampleSelective(@Param("record") Depart record, @Param("example") DepartExample example);
 
-    int updateByPrimaryKeySelective(Depart record);
+	int updateByExample(@Param("record") Depart record, @Param("example") DepartExample example);
 
-    int updateByPrimaryKey(Depart record);
+	@Override
+	int updateByPrimaryKeySelective(Depart record);
+
+	@Override
+	int updateByPrimaryKey(Depart record);
 }

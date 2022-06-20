@@ -9,25 +9,32 @@ import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface UserMapper extends BaseMapper<User> {
-    long countByExample(UserExample example);
 
-    int deleteByExample(UserExample example);
+	long countByExample(UserExample example);
 
-    int deleteByPrimaryKey(Integer userId);
+	int deleteByExample(UserExample example);
 
-    int insert(User record);
+	@Override
+	int deleteByPrimaryKey(Integer userId);
 
-    int insertSelective(User record);
+	@Override
+	int insert(User record);
 
-    List<User> selectByExample(UserExample example);
+	@Override
+	int insertSelective(User record);
 
-    User selectByPrimaryKey(Integer userId);
+	List<User> selectByExample(UserExample example);
 
-    int updateByExampleSelective(@Param("record") User record, @Param("example") UserExample example);
+	@Override
+	User selectByPrimaryKey(Integer userId);
 
-    int updateByExample(@Param("record") User record, @Param("example") UserExample example);
+	int updateByExampleSelective(@Param("record") User record, @Param("example") UserExample example);
 
-    int updateByPrimaryKeySelective(User record);
+	int updateByExample(@Param("record") User record, @Param("example") UserExample example);
 
-    int updateByPrimaryKey(User record);
+	@Override
+	int updateByPrimaryKeySelective(User record);
+
+	@Override
+	int updateByPrimaryKey(User record);
 }

@@ -9,19 +9,22 @@ import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface RoleButtonMapper extends BaseMapper<RoleButton> {
-    long countByExample(RoleButtonExample example);
 
-    int deleteByExample(RoleButtonExample example);
+	long countByExample(RoleButtonExample example);
 
-    int deleteByPrimaryKey(@Param("roleId") Integer roleId, @Param("buttonId") Integer buttonId);
+	int deleteByExample(RoleButtonExample example);
 
-    int insert(RoleButton record);
+	int deleteByPrimaryKey(@Param("roleId") Integer roleId, @Param("buttonId") Integer buttonId);
 
-    int insertSelective(RoleButton record);
+	@Override
+	int insert(RoleButton record);
 
-    List<RoleButton> selectByExample(RoleButtonExample example);
+	@Override
+	int insertSelective(RoleButton record);
 
-    int updateByExampleSelective(@Param("record") RoleButton record, @Param("example") RoleButtonExample example);
+	List<RoleButton> selectByExample(RoleButtonExample example);
 
-    int updateByExample(@Param("record") RoleButton record, @Param("example") RoleButtonExample example);
+	int updateByExampleSelective(@Param("record") RoleButton record, @Param("example") RoleButtonExample example);
+
+	int updateByExample(@Param("record") RoleButton record, @Param("example") RoleButtonExample example);
 }

@@ -26,6 +26,7 @@ public class SmsAuthenticationFilter extends AbstractAuthenticationProcessingFil
 		super(new AntPathRequestMatcher("loginMobile", "POST"));
 	}
 
+	@Override
 	public Authentication attemptAuthentication(HttpServletRequest request,
 			HttpServletResponse response) throws AuthenticationException {
 		if (postOnly && !request.getMethod().equals("POST")) {

@@ -23,18 +23,22 @@ public class ExtraSecurityExpressionRoot extends SecurityExpressionRoot implemen
 		super(a);
 	}
 
+	@Override
 	public void setFilterObject(Object filterObject) {
 		this.filterObject = filterObject;
 	}
 
+	@Override
 	public Object getFilterObject() {
 		return filterObject;
 	}
 
+	@Override
 	public void setReturnObject(Object returnObject) {
 		this.returnObject = returnObject;
 	}
 
+	@Override
 	public Object getReturnObject() {
 		return returnObject;
 	}
@@ -49,6 +53,7 @@ public class ExtraSecurityExpressionRoot extends SecurityExpressionRoot implemen
 		this.target = target;
 	}
 
+	@Override
 	public Object getThis() {
 		return target;
 	}

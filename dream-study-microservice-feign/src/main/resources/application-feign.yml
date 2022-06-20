@@ -4,14 +4,27 @@ feign:
     enabled: true
   client:
     config: 
+      # 定义FeginClient的名称,default对所有有效
       default: 
+        # Feign请求参数,相当于feign.Request.Options,建立链接的超时时长
         connect-timeout: 5000
+        # 读取超时时长
         read-timeout: 5000
+        # Feign的日志级别,相当于代码配置的feign.Logger
         logger-level: full
+        # Feign的错误解析器,相当于代码配置的feign.codec.ErrorDecoder
+        error-decoder:
+        # Feign的重试侧脸,相当于代码配置的feign.Retryer 
+        retryer:
+        # Feign拦截器,相当于代码配置的feign.RequestInterceptor 
+        request-interceptors:
+        # 配置熔断是否处理404异常:false->不处理
+        decode404: false
   # 压缩feign请求
   compression:
     request:
       enabled: true
+      # 压缩的请求类型
       mime-types:
       - application/json
       - text/xml

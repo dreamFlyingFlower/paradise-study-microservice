@@ -199,6 +199,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.exceptionHandling().authenticationEntryPoint(new LoginAuthEntryPoint(null)).and().csrf().disable();
 	}
 
+	@Override
 	public void configure(WebSecurity web) throws Exception {
 		// 配置需要忽略检查的web url
 		web.ignoring().antMatchers("/js/**", "/css/**", "/images/**");

@@ -9,25 +9,32 @@ import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface MenuMapper extends BaseMapper<Menu> {
-    long countByExample(MenuExample example);
 
-    int deleteByExample(MenuExample example);
+	long countByExample(MenuExample example);
 
-    int deleteByPrimaryKey(Integer menuId);
+	int deleteByExample(MenuExample example);
 
-    int insert(Menu record);
+	@Override
+	int deleteByPrimaryKey(Integer menuId);
 
-    int insertSelective(Menu record);
+	@Override
+	int insert(Menu record);
 
-    List<Menu> selectByExample(MenuExample example);
+	@Override
+	int insertSelective(Menu record);
 
-    Menu selectByPrimaryKey(Integer menuId);
+	List<Menu> selectByExample(MenuExample example);
 
-    int updateByExampleSelective(@Param("record") Menu record, @Param("example") MenuExample example);
+	@Override
+	Menu selectByPrimaryKey(Integer menuId);
 
-    int updateByExample(@Param("record") Menu record, @Param("example") MenuExample example);
+	int updateByExampleSelective(@Param("record") Menu record, @Param("example") MenuExample example);
 
-    int updateByPrimaryKeySelective(Menu record);
+	int updateByExample(@Param("record") Menu record, @Param("example") MenuExample example);
 
-    int updateByPrimaryKey(Menu record);
+	@Override
+	int updateByPrimaryKeySelective(Menu record);
+
+	@Override
+	int updateByPrimaryKey(Menu record);
 }

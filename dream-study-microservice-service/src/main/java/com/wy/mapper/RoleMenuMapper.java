@@ -9,17 +9,20 @@ import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface RoleMenuMapper extends BaseMapper<RoleMenu> {
-    long countByExample(RoleMenuExample example);
 
-    int deleteByExample(RoleMenuExample example);
+	long countByExample(RoleMenuExample example);
 
-    int insert(RoleMenu record);
+	int deleteByExample(RoleMenuExample example);
 
-    int insertSelective(RoleMenu record);
+	@Override
+	int insert(RoleMenu record);
 
-    List<RoleMenu> selectByExample(RoleMenuExample example);
+	@Override
+	int insertSelective(RoleMenu record);
 
-    int updateByExampleSelective(@Param("record") RoleMenu record, @Param("example") RoleMenuExample example);
+	List<RoleMenu> selectByExample(RoleMenuExample example);
 
-    int updateByExample(@Param("record") RoleMenu record, @Param("example") RoleMenuExample example);
+	int updateByExampleSelective(@Param("record") RoleMenu record, @Param("example") RoleMenuExample example);
+
+	int updateByExample(@Param("record") RoleMenu record, @Param("example") RoleMenuExample example);
 }

@@ -35,10 +35,12 @@ import org.mybatis.generator.codegen.mybatis3.xmlmapper.elements.UpdateByPrimary
  * @author paradiseWy 2018年9月4日
  */
 public class XmlDaoGenerator extends XMLMapperGenerator {
+
 	public XmlDaoGenerator() {
 		super();
 	}
 
+	@Override
 	protected XmlElement getSqlMapElement() {
 		FullyQualifiedTable table = introspectedTable.getFullyQualifiedTable();
 		progressCallback.startTask(getString("Progress.12", table.toString()));
@@ -74,6 +76,7 @@ public class XmlDaoGenerator extends XMLMapperGenerator {
 		return answer;
 	}
 
+	@Override
 	protected void addResultMapWithoutBLOBsElement(XmlElement parentElement) {
 		if (introspectedTable.getRules().generateBaseResultMap()) {
 			AbstractXmlElementGenerator elementGenerator = new ResultMapWithoutBLOBsElementGenerator(false);
@@ -81,6 +84,7 @@ public class XmlDaoGenerator extends XMLMapperGenerator {
 		}
 	}
 
+	@Override
 	protected void addResultMapWithBLOBsElement(XmlElement parentElement) {
 		if (introspectedTable.getRules().generateResultMapWithBLOBs()) {
 			AbstractXmlElementGenerator elementGenerator = new ResultMapWithBLOBsElementGenerator();
@@ -88,6 +92,7 @@ public class XmlDaoGenerator extends XMLMapperGenerator {
 		}
 	}
 
+	@Override
 	protected void addExampleWhereClauseElement(XmlElement parentElement) {
 		if (introspectedTable.getRules().generateSQLExampleWhereClause()) {
 			AbstractXmlElementGenerator elementGenerator = new ExampleWhereClauseElementGenerator(false);
@@ -95,6 +100,7 @@ public class XmlDaoGenerator extends XMLMapperGenerator {
 		}
 	}
 
+	@Override
 	protected void addMyBatis3UpdateByExampleWhereClauseElement(XmlElement parentElement) {
 		if (introspectedTable.getRules().generateMyBatis3UpdateByExampleWhereClause()) {
 			AbstractXmlElementGenerator elementGenerator = new ExampleWhereClauseElementGenerator(true);
@@ -102,6 +108,7 @@ public class XmlDaoGenerator extends XMLMapperGenerator {
 		}
 	}
 
+	@Override
 	protected void addBaseColumnListElement(XmlElement parentElement) {
 		if (introspectedTable.getRules().generateBaseColumnList()) {
 			AbstractXmlElementGenerator elementGenerator = new BaseColumnListElementGenerator();
@@ -109,6 +116,7 @@ public class XmlDaoGenerator extends XMLMapperGenerator {
 		}
 	}
 
+	@Override
 	protected void addBlobColumnListElement(XmlElement parentElement) {
 		if (introspectedTable.getRules().generateBlobColumnList()) {
 			AbstractXmlElementGenerator elementGenerator = new BlobColumnListElementGenerator();
@@ -116,6 +124,7 @@ public class XmlDaoGenerator extends XMLMapperGenerator {
 		}
 	}
 
+	@Override
 	protected void addSelectByExampleWithoutBLOBsElement(XmlElement parentElement) {
 		if (introspectedTable.getRules().generateSelectByExampleWithoutBLOBs()) {
 			AbstractXmlElementGenerator elementGenerator = new SelectByExampleWithoutBLOBsElementGenerator();
@@ -123,6 +132,7 @@ public class XmlDaoGenerator extends XMLMapperGenerator {
 		}
 	}
 
+	@Override
 	protected void addSelectByExampleWithBLOBsElement(XmlElement parentElement) {
 		if (introspectedTable.getRules().generateSelectByExampleWithBLOBs()) {
 			AbstractXmlElementGenerator elementGenerator = new SelectByExampleWithBLOBsElementGenerator();
@@ -130,6 +140,7 @@ public class XmlDaoGenerator extends XMLMapperGenerator {
 		}
 	}
 
+	@Override
 	protected void addSelectByPrimaryKeyElement(XmlElement parentElement) {
 		if (introspectedTable.getRules().generateSelectByPrimaryKey()) {
 			AbstractXmlElementGenerator elementGenerator = new SelectByPrimaryKeyElementGenerator();
@@ -137,6 +148,7 @@ public class XmlDaoGenerator extends XMLMapperGenerator {
 		}
 	}
 
+	@Override
 	protected void addDeleteByExampleElement(XmlElement parentElement) {
 		if (introspectedTable.getRules().generateDeleteByExample()) {
 			AbstractXmlElementGenerator elementGenerator = new DeleteByExampleElementGenerator();
@@ -144,6 +156,7 @@ public class XmlDaoGenerator extends XMLMapperGenerator {
 		}
 	}
 
+	@Override
 	protected void addDeleteByPrimaryKeyElement(XmlElement parentElement) {
 		if (introspectedTable.getRules().generateDeleteByPrimaryKey()) {
 			AbstractXmlElementGenerator elementGenerator = new DeleteByPrimaryKeyElementGenerator(false);
@@ -151,6 +164,7 @@ public class XmlDaoGenerator extends XMLMapperGenerator {
 		}
 	}
 
+	@Override
 	protected void addInsertElement(XmlElement parentElement) {
 		if (introspectedTable.getRules().generateInsert()) {
 			AbstractXmlElementGenerator elementGenerator = new InsertElementGenerator(false);
@@ -158,6 +172,7 @@ public class XmlDaoGenerator extends XMLMapperGenerator {
 		}
 	}
 
+	@Override
 	protected void addInsertSelectiveElement(XmlElement parentElement) {
 		if (introspectedTable.getRules().generateInsertSelective()) {
 			AbstractXmlElementGenerator elementGenerator = new InsertSelectiveElementGenerator();
@@ -165,6 +180,7 @@ public class XmlDaoGenerator extends XMLMapperGenerator {
 		}
 	}
 
+	@Override
 	protected void addCountByExampleElement(XmlElement parentElement) {
 		if (introspectedTable.getRules().generateCountByExample()) {
 			AbstractXmlElementGenerator elementGenerator = new CountByExampleElementGenerator();
@@ -172,6 +188,7 @@ public class XmlDaoGenerator extends XMLMapperGenerator {
 		}
 	}
 
+	@Override
 	protected void addUpdateByExampleSelectiveElement(XmlElement parentElement) {
 		if (introspectedTable.getRules().generateUpdateByExampleSelective()) {
 			AbstractXmlElementGenerator elementGenerator = new UpdateByExampleSelectiveElementGenerator();
@@ -179,6 +196,7 @@ public class XmlDaoGenerator extends XMLMapperGenerator {
 		}
 	}
 
+	@Override
 	protected void addUpdateByExampleWithBLOBsElement(XmlElement parentElement) {
 		if (introspectedTable.getRules().generateUpdateByExampleWithBLOBs()) {
 			AbstractXmlElementGenerator elementGenerator = new UpdateByExampleWithBLOBsElementGenerator();
@@ -186,6 +204,7 @@ public class XmlDaoGenerator extends XMLMapperGenerator {
 		}
 	}
 
+	@Override
 	protected void addUpdateByExampleWithoutBLOBsElement(XmlElement parentElement) {
 		if (introspectedTable.getRules().generateUpdateByExampleWithoutBLOBs()) {
 			AbstractXmlElementGenerator elementGenerator = new UpdateByExampleWithoutBLOBsElementGenerator();
@@ -193,6 +212,7 @@ public class XmlDaoGenerator extends XMLMapperGenerator {
 		}
 	}
 
+	@Override
 	protected void addUpdateByPrimaryKeySelectiveElement(XmlElement parentElement) {
 		if (introspectedTable.getRules().generateUpdateByPrimaryKeySelective()) {
 			AbstractXmlElementGenerator elementGenerator = new UpdateByPrimaryKeySelectiveElementGenerator();
@@ -200,6 +220,7 @@ public class XmlDaoGenerator extends XMLMapperGenerator {
 		}
 	}
 
+	@Override
 	protected void addUpdateByPrimaryKeyWithBLOBsElement(XmlElement parentElement) {
 		if (introspectedTable.getRules().generateUpdateByPrimaryKeyWithBLOBs()) {
 			AbstractXmlElementGenerator elementGenerator = new UpdateByPrimaryKeyWithBLOBsElementGenerator();
@@ -207,6 +228,7 @@ public class XmlDaoGenerator extends XMLMapperGenerator {
 		}
 	}
 
+	@Override
 	protected void addUpdateByPrimaryKeyWithoutBLOBsElement(XmlElement parentElement) {
 		if (introspectedTable.getRules().generateUpdateByPrimaryKeyWithoutBLOBs()) {
 			AbstractXmlElementGenerator elementGenerator = new UpdateByPrimaryKeyWithoutBLOBsElementGenerator(false);
@@ -214,6 +236,7 @@ public class XmlDaoGenerator extends XMLMapperGenerator {
 		}
 	}
 
+	@Override
 	protected void initializeAndExecuteGenerator(AbstractXmlElementGenerator elementGenerator,
 			XmlElement parentElement) {
 		elementGenerator.setContext(context);

@@ -9,25 +9,32 @@ import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface FileinfoMapper extends BaseMapper<Fileinfo> {
-    long countByExample(FileinfoExample example);
 
-    int deleteByExample(FileinfoExample example);
+	long countByExample(FileinfoExample example);
 
-    int deleteByPrimaryKey(Integer fileinfoId);
+	int deleteByExample(FileinfoExample example);
 
-    int insert(Fileinfo record);
+	@Override
+	int deleteByPrimaryKey(Integer fileinfoId);
 
-    int insertSelective(Fileinfo record);
+	@Override
+	int insert(Fileinfo record);
 
-    List<Fileinfo> selectByExample(FileinfoExample example);
+	@Override
+	int insertSelective(Fileinfo record);
 
-    Fileinfo selectByPrimaryKey(Integer fileinfoId);
+	List<Fileinfo> selectByExample(FileinfoExample example);
 
-    int updateByExampleSelective(@Param("record") Fileinfo record, @Param("example") FileinfoExample example);
+	@Override
+	Fileinfo selectByPrimaryKey(Integer fileinfoId);
 
-    int updateByExample(@Param("record") Fileinfo record, @Param("example") FileinfoExample example);
+	int updateByExampleSelective(@Param("record") Fileinfo record, @Param("example") FileinfoExample example);
 
-    int updateByPrimaryKeySelective(Fileinfo record);
+	int updateByExample(@Param("record") Fileinfo record, @Param("example") FileinfoExample example);
 
-    int updateByPrimaryKey(Fileinfo record);
+	@Override
+	int updateByPrimaryKeySelective(Fileinfo record);
+
+	@Override
+	int updateByPrimaryKey(Fileinfo record);
 }

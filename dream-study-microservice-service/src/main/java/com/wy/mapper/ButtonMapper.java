@@ -9,25 +9,32 @@ import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface ButtonMapper extends BaseMapper<Button> {
-    long countByExample(ButtonExample example);
 
-    int deleteByExample(ButtonExample example);
+	long countByExample(ButtonExample example);
 
-    int deleteByPrimaryKey(Integer buttonId);
+	int deleteByExample(ButtonExample example);
 
-    int insert(Button record);
+	@Override
+	int deleteByPrimaryKey(Integer buttonId);
 
-    int insertSelective(Button record);
+	@Override
+	int insert(Button record);
 
-    List<Button> selectByExample(ButtonExample example);
+	@Override
+	int insertSelective(Button record);
 
-    Button selectByPrimaryKey(Integer buttonId);
+	List<Button> selectByExample(ButtonExample example);
 
-    int updateByExampleSelective(@Param("record") Button record, @Param("example") ButtonExample example);
+	@Override
+	Button selectByPrimaryKey(Integer buttonId);
 
-    int updateByExample(@Param("record") Button record, @Param("example") ButtonExample example);
+	int updateByExampleSelective(@Param("record") Button record, @Param("example") ButtonExample example);
 
-    int updateByPrimaryKeySelective(Button record);
+	int updateByExample(@Param("record") Button record, @Param("example") ButtonExample example);
 
-    int updateByPrimaryKey(Button record);
+	@Override
+	int updateByPrimaryKeySelective(Button record);
+
+	@Override
+	int updateByPrimaryKey(Button record);
 }

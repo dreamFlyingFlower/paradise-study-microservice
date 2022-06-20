@@ -9,25 +9,32 @@ import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface DictMapper extends BaseMapper<Dict> {
-    long countByExample(DictExample example);
 
-    int deleteByExample(DictExample example);
+	long countByExample(DictExample example);
 
-    int deleteByPrimaryKey(Integer dictId);
+	int deleteByExample(DictExample example);
 
-    int insert(Dict record);
+	@Override
+	int deleteByPrimaryKey(Integer dictId);
 
-    int insertSelective(Dict record);
+	@Override
+	int insert(Dict record);
 
-    List<Dict> selectByExample(DictExample example);
+	@Override
+	int insertSelective(Dict record);
 
-    Dict selectByPrimaryKey(Integer dictId);
+	List<Dict> selectByExample(DictExample example);
 
-    int updateByExampleSelective(@Param("record") Dict record, @Param("example") DictExample example);
+	@Override
+	Dict selectByPrimaryKey(Integer dictId);
 
-    int updateByExample(@Param("record") Dict record, @Param("example") DictExample example);
+	int updateByExampleSelective(@Param("record") Dict record, @Param("example") DictExample example);
 
-    int updateByPrimaryKeySelective(Dict record);
+	int updateByExample(@Param("record") Dict record, @Param("example") DictExample example);
 
-    int updateByPrimaryKey(Dict record);
+	@Override
+	int updateByPrimaryKeySelective(Dict record);
+
+	@Override
+	int updateByPrimaryKey(Dict record);
 }
