@@ -85,16 +85,20 @@ public class MySentinelGateway {
 	@PostConstruct
 	private void initCustomizedApis() {
 		Set<ApiDefinition> definitions = new HashSet<>();
-		ApiDefinition api1 = new ApiDefinition("order_api").setPredicateItems(new HashSet<ApiPredicateItem>() {
+		ApiDefinition api1 =
+				// 定义分组,唯一
+				new ApiDefinition("order_api").setPredicateItems(new HashSet<ApiPredicateItem>() {
 
-			private static final long serialVersionUID = -6640367415566843441L;
+					private static final long serialVersionUID = -6640367415566843441L;
 
-			{
-				add(new ApiPathPredicateItem().setPattern("/order-serv/api/**")
-						.setMatchStrategy(SentinelGatewayConstants.URL_MATCH_STRATEGY_PREFIX));
-			}
-		});
+					{
+						// 添加所有匹配order-service/api/的url
+						add(new ApiPathPredicateItem().setPattern("/order-service/api/**")
+								.setMatchStrategy(SentinelGatewayConstants.URL_MATCH_STRATEGY_PREFIX));
+					}
+				});
 		definitions.add(api1);
+		// 可继续添加其他分组
 		GatewayApiDefinitionManager.loadApiDefinitions(definitions);
 	}
 
@@ -104,9 +108,12 @@ public class MySentinelGateway {
 	@PostConstruct
 	private void initGatewayRules() {
 		Set<GatewayFlowRule> rules = new HashSet<>();
-		rules.add(new GatewayFlowRule("product_route")
+		// 以下方式只会对单个路由进行限流
+		// 参数为配置文件中的spring.cloud.gateway.routes.id
+		rules.add(new GatewayFlowRule("product")
 				// 表示一秒钟1超过了3次就会限流
 				.setCount(3).setIntervalSec(1));
+		// 该方式会对initCustomizedApis()中定义的order_api所属的所有路由进行限流
 		rules.add(new GatewayFlowRule("order_api").setCount(1).setIntervalSec(1));
 		GatewayRuleManager.loadRules(rules);
 	}
@@ -118,6 +125,7 @@ public class MySentinelGateway {
 	public void initBlockHandlers() {
 		BlockRequestHandler blockRequestHandler = new BlockRequestHandler() {
 
+			@Override
 			public Mono<ServerResponse> handleRequest(ServerWebExchange serverWebExchange, Throwable throwable) {
 				return ServerResponse.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON)
 						.body(BodyInserters.fromValue(Result.error("接口被限流了")));

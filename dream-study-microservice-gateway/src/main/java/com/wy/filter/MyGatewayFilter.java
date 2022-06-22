@@ -13,6 +13,7 @@ import org.springframework.cloud.gateway.filter.WebClientWriteResponseFilter;
 import org.springframework.cloud.gateway.filter.WebsocketRoutingFilter;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ServerWebExchange;
 
@@ -39,10 +40,13 @@ import reactor.core.publisher.Mono;
  * @date 2021-12-27 16:15:11
  * @git {@link https://github.com/dreamFlyingFlower }
  */
+@Component
 public class MyGatewayFilter implements GlobalFilter {
 
 	/**
 	 * 简单的鉴权
+	 * 
+	 * @param exchange 请求和响应的上下文
 	 */
 	@Override
 	public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {

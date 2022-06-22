@@ -6,8 +6,10 @@ spring:
           order: 1          
       discovery:
         locator:
-          # true:可以从注册中心获得其他微服务
+          # true:可以从注册中心获得其他微服务,根据服务名自动转发.若没有特殊转发,可不写下面的routes
           enabled: true
+          # 微服务名以小写形式呈现
+          lower-case-service-id: true
       # 路由数组
       routes: 
         # 当前路由的标识, 要求唯一
@@ -28,17 +30,29 @@ spring:
           # - Host=dream.com
           # 权重,负载均衡时有效
           # - Weight=group1,2
-        # 过滤器,请求在传递过程中可以通过过滤器对其进行一定的修改
+        # 过滤器,请求在传递过程中可以通过过滤器对其进行一定的修改,参照MyGatewayFilterFactory中的局部过滤器
         filters:
         # 转发之前去掉1层路径前缀,因为通常第一层路径是微服务名
         - StripPrefix=1
         # 使用内置的过滤器,修改返回状态
         - SetStatus=2000
+        # 路径重写,利用正则去掉前面的product,$\为$转义
+        - RewritePath=/product/(?<segment>.*),/$\{segment}
         - My=true
+        # 使用PrefixPathGatewayFilterFactory过滤器,去掉GatewayFilterFactory就是name或使用PREFIX_KEY的值
         - name: prefix
           args:
             StripPrefix: 1
+        # 使用RetryGatewayFilterFactory过滤器,去掉GatewayFilterFactory就是name
         - name: retry
           args: 
             retries: 3
             status: 503
+        - name: RequestRateLimiter
+          args:
+            # 使用SpEL表达式从容器中获取对象.以下表达式为从spring中获取beanName为pathKeyResolver的对象,参照SelfKeyResolver
+            key-resolver: '#{@pathKeyResolver}'
+            # 令牌桶每秒填充平局速率
+            redis-rate-limiter.replenishRate: 1
+            # 令牌桶的上限
+            redis-rate-limiter.burstCapacity: 3
