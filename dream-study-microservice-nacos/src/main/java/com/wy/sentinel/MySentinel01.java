@@ -1,7 +1,6 @@
 package com.wy.sentinel;
 
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
-import com.alibaba.csp.sentinel.slots.block.BlockException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -18,7 +17,7 @@ public class MySentinel01 {
 	int i = 0;
 
 	/**
-	 * blockHandler:指定发生BlockException时进入的方法;fallback:指定发生Throwable时进入的方法
+	 * value:自定义的资源名称;blockHandler:指定发生降级时进入的方法;fallback:指定发生异常时进入的方法
 	 * 
 	 * @return
 	 */
@@ -31,8 +30,12 @@ public class MySentinel01 {
 		return "message";
 	}
 
-	public String blockHandler(BlockException ex) {
-		log.error("{}", ex);
+	/**
+	 * 降级方法的参数可以和原方法相同
+	 * 
+	 * @return
+	 */
+	public String blockHandler() {
 		return "接口被限流或者降级了...";
 	}
 

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.netflix.hystrix.HystrixCommandProperties;
 import com.netflix.hystrix.HystrixThreadPoolProperties;
+import com.netflix.hystrix.contrib.javanica.annotation.DefaultProperties;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
 import com.netflix.hystrix.strategy.concurrency.HystrixConcurrencyStrategy;
@@ -131,12 +132,15 @@ import com.wy.service.UserService;
  * 发生熔断不代表服务停止,再次调用该方法的时候仍然会调用到异常的方法
  * </pre>
  * 
+ * {@link DefaultProperties}:默认的方法熔断注解,defaultFallback指定默认熔断方法名,该方法无参
+ * 
  * @author 飞花梦影
  * @date 2021-09-21 17:40:09
  * @git {@link https://github.com/dreamFlyingFlower}
  */
 @RestController
 @RequestMapping
+@DefaultProperties(defaultFallback = "defaultFallbackMethod")
 public class HystrixCrl {
 
 	@Autowired
@@ -161,5 +165,14 @@ public class HystrixCrl {
 	 */
 	public Result<?> fallbackMethod(@PathVariable("id") String id, Throwable cause) {
 		return Result.error("hystrix is happend");
+	}
+
+	/**
+	 * 统一的默认降级方法,使用该方法后不需要再在其他方法上添加fallbackMethod属性.该默认方法无参数,同时需要配置{@link DefaultProperties}
+	 * 
+	 * @return 结果
+	 */
+	public Result<?> defaultFallbackMethod() {
+		return Result.error();
 	}
 }

@@ -33,7 +33,7 @@ import com.alibaba.fastjson.TypeReference;
  * 1.利用本地文件持久化规则,实现接口
  * 
  * 2.在resources下创建配置目录META-INF/services,然后添加文件com.alibaba.csp.sentinel.init.InitFunc,
- * 在文件中添加配置类的全路径com.wy>sentinel.MySentinel03
+ * 在文件中添加配置类的全路径com.wy.sentinel.MySentinel03
  * 
  * @author 飞花梦影
  * @date 2022-02-26 17:10:57

@@ -60,7 +60,7 @@ import com.wy.crl.HystrixCrl;
  * <pre>
  * 当cluster-config的值为default时,Web页面可直接访问ip:port/turbine.stream,有请求时会显示请求详情,有延迟
  * 当cluster-config的值不是default时,Web页面访问ip:port/turbine.stream?cluster=cluster-config的值
- * 将ip:port/turbine.stream输入到Hystrix Dashboar的监控地址栏中,就可以在Web端监控整个服务集群
+ * 将ip:port/turbine.stream输入到Hystrix Dashboard的监控地址栏中,就可以在Web端监控整个服务集群
  * </pre>
  * 
  * Ribbon:负载均衡,由Feign集成,有以下几种算法:
