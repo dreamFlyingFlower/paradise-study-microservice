@@ -48,8 +48,27 @@ spring:
         retry:
           enabled: true
           max-attempts: 5
-          
-config:
-  rabbit:
-    dead:
-      queue: dead-queue
+  cloud:
+    stream:
+      # 若生产者开起了分区,消费者也可开启分区
+      # 消费者总数
+      instance-count: 2
+      # 若有多个消费者,根据个数指定消费者的索引,从0开始
+      instance-index: 0
+      binders:
+        defaultRabbit:
+          type: rabbit
+      bindings: 
+        msgClient: 
+          # 消息分组,若同名组中有多个消费者,只有组名相同的消费者会接收到生产者的消息
+          group: test
+          # 消息发送的目的地
+          destination: testMsgClient
+          producer:
+            # 生产者分区,分区关键字
+            partition-key-expression: payload
+            # 分区大小
+            partition-count: 2
+          # 消费者开启分区
+          consumer:
+            partitioned: true

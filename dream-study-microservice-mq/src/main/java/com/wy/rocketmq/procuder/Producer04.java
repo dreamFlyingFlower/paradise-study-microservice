@@ -23,6 +23,7 @@ public class Producer04 {
 		producer.start();
 		// 发送消息
 		Message message = new Message("pay_topic", "用户A给用户B转账5000元".getBytes("UTF-8"));
+		// 发送事务消息
 		producer.sendMessageInTransaction(message, null);
 		Thread.sleep(999999);
 		producer.shutdown();

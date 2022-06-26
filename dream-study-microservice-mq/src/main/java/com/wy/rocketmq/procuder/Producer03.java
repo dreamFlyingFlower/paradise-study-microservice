@@ -1,8 +1,11 @@
 package com.wy.rocketmq.procuder;
 
+import java.util.Arrays;
+
 import org.apache.rocketmq.client.exception.MQBrokerException;
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
+import org.apache.rocketmq.client.producer.SendCallback;
 import org.apache.rocketmq.client.producer.SendResult;
 import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.remoting.exception.RemotingException;
@@ -42,6 +45,23 @@ public class Producer03 {
 		message.putUserProperty("age", "22");
 		// 发送同步消息
 		SendResult sendResult = producer.send(message);
+		// 批量发送消息,单次数量不能超过4M,超过4M要将消息分割分多次发.Topic要相同,不能是延迟消息
+		producer.send(Arrays.asList(message));
+		// 发送异步消息
+		producer.send(message, new SendCallback() {
+
+			@Override
+			public void onSuccess(SendResult sendResult) {
+
+			}
+
+			@Override
+			public void onException(Throwable e) {
+
+			}
+		});
+		// 发送单向消息
+		producer.sendOneway(message);
 		// 指定发送超时时间
 		producer.send(message, 3000);
 		// 消息id

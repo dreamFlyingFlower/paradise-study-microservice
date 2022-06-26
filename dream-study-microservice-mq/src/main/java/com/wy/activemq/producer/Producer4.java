@@ -32,6 +32,7 @@ public class Producer4 {
 	public void sendMessage(final MailParam mail) {
 		activeJmsTemplate.send(new MessageCreator() {
 
+			@Override
 			public Message createMessage(Session session) throws JMSException {
 				return session.createTextMessage(JSONObject.toJSONString(mail));
 			}

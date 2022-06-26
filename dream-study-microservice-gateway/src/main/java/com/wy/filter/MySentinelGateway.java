@@ -88,6 +88,7 @@ public class MySentinelGateway {
 	public void initBlockHandlers() {
 		BlockRequestHandler blockRequestHandler = new BlockRequestHandler() {
 
+			@Override
 			public Mono<ServerResponse> handleRequest(ServerWebExchange serverWebExchange, Throwable throwable) {
 				Map<String, Object> map = new HashMap<>();
 				map.put("code", 0);

@@ -29,6 +29,7 @@ public class MailServiceImpl {
 	public void mailSend(final MailParam mailParam) {
 		threadPool.execute(new Runnable() {
 
+			@Override
 			public void run() {
 				try {
 					simpleMailMessage.setFrom(simpleMailMessage.getFrom());

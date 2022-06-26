@@ -12,6 +12,8 @@
 * Consumer Group:同Producer Group
 * Broker:类似于服务器,队列存储在Broker中,负责消息的存储,查询消费.一个Master可对应多个Slave ,Master支持读写,Slave只负责读.Broker会向集群中的每一台NameServer注册自己的路由信息
 * NameServer:一个很简单的Topic路由注册中心,支持Broker的动态注册和发现,保存Topic和Broker之间的关系.集群中的NameServer不会进行相互通讯,各NameServer都有完整的路由信息
+* Topic:区分消息的种类,一个发送者可以发送消息给一个或多个Topic,一个消费者可以接收一个或多个Topic
+* Message Queue:相当于Topic的分区,用于并行发送和接收消息
 
 
 
@@ -50,11 +52,33 @@ set "JAVA_OPT=%JAVA_OPT% -server -Xms512m -Xmx512m -Xmn512m -XX:MetaspaceSize=12
 * 修改bin/runbroker.sh,调整磁盘利用率大小,默认磁盘空间超过85%不再接收消息
 
 ```shell
-set "JAVA_OPT=%JAVA_OPT% -server -Drocketmq.broker.diskSpaceWarningLevelRatio=0.98 -Xms512m -Xmx512m -Xmn512m"
+set "JAVA_OPT=%JAVA_OPT% -server -Drocketmq.broker.diskSpaceWarningLevelRatio=0.85 -Xms512m -Xmx512m -Xmn512m -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=320m"
 ```
 
-* 启动NameServer:sh mqnamesrv
+* 启动NameServer:nohup sh mqnamesrv &
 * 启动Broker:sh mqbroker -n 127.0.0.1:9876,-n指定nameserver的地址
+* 查看NameServer日志:tail -f ~/logs/rocketmqlogs/namesrv.log
+* 查看Broker日志:tail -f ~/logs/rocketmqlogs/broker.log
+* 发送消息
+
+  ```sh
+  # 设置环境变量
+  export NAMESRV_ADDR=localhost:9876
+  # 使用安装包的Demo发送消息
+  sh bin/tools.sh org.apache.rocketmq.example.quickstart.Producer
+  ```
+
+
+* 接收消息
+
+  ```shell
+  # 设置环境变量
+  export NAMESRV_ADDR=localhost:9876
+  # 接收消息
+  sh bin/tools.sh org.apache.rocketmq.example.quickstart.Consumer
+  ```
+
+* 管闭RocketMQ:sh bin/mqshutdown namesrv,sh bin/mqshutdown broker
 
 
 
@@ -141,38 +165,115 @@ set "JAVA_OPT=%JAVA_OPT% -server -Drocketmq.broker.diskSpaceWarningLevelRatio=0.
   sh tools.sh org.apache.rocketmq.example.quickstart.Consumer
   ```
 
-  
+
+
+
+# 顺序消息
+
+
+
+* 消息有序指的是可以按照消息的发送顺序来消费(FIFO)
+* RocketMQ可以严格的保证消息有序,可以分为分区有序或者全局有序
+* 在默认的情况下消息发送会采取Round Robin轮询方式把消息发送到不同的queue(分区队列);而消费消息的时候从多个queue上拉取消息,这种情况发送和消费是不能保证顺序.但是如果控制发送的顺序消息只依次发送到同一个queue中,消费的时候只从这个queue上依次拉取,则就保证了顺序
+* 当发送和消费参与的queue只有一个,则是全局有序;如果多个queue参与,则为分区有序,即相对每个queue,消息都是有序的
+
+
+
+
+
+# 过滤消息
+
+
+
+## ||过滤
+
+
+
+* 生产者发送消息时除了传递Topic之外还是TAG
+* 消费者消费消息时TAG参数可以传*,表示消费TOPIC下所有类型的消息
+* ||:表示或,如TAG1 || TAG2表示消费TAG1和TAG2类型的消息
+
+
+
+## SQL过滤
+
+
+
+* RocketMQ只定义了一些基本语法来支持这个特性
+* 数值比较:`>,>=,<,<=,BETWEEN,=`
+* 字符比较:`=,<>,IN`
+* IS NULL 或 IS NOT NULL
+* 逻辑符号:`AND,OR,NOT`
+* 常量支持类型为:
+  * 数值:比如:123,3.1415
+  * 字符符:比如:'abc',必须用单引号包裹起来
+  * NULL:特殊的常量
+  * 布尔值:TRUE / FALSE
+* 只有使用push模式的消费者才能用使用SQL92标准的sql语句,接口如下
+
+```java
+public void subscribe(finalString topic, final MessageSelector messageSelector)
+```
+
+
 
 # 事务消息
 
 
 
+![](Rocket01.png)
+
+
+
 * RocketMQ提供了事务消息,通过事务消息就能达到分布式事务的最终一致
-
-* 事务消息交互流程
-
-  ![](Rocket01.png)
-
 * 半事务消息:暂不能投递的消息,发送方已经成功地将消息发送到了RocketMQ服务端,但是服务端未收到生产者对该消息的二次确认,此时该消息被标记成`暂不能投递`状态,处于该种状态下的消息即半事务消息
-
 * 消息回查:由于网络闪断,生产者应用重启等原因,导致某条事务消息的二次确认丢失,RocketMQ服务端通过扫描发现某条消息长期处于`半事务消息`时,需主动向生产者询问该消息的最终状态(Commit是Rollback),该询问过程即消息回查
-
 * 事务消息发送:
 
   * 发送方将半事务消息发送至RocketMQ服务端
   * RocketMQ服务端将消息持久化之后,向发送方返回Ack确认消息发送成功,此时消息为半事务消息
   * 发送方开始执行本地事务逻辑
   * 发送方根据本地事务执行结果向服务端提交二次确认(Commit或Rollback),服务端收到Commit 状态则将半事务消息标记为可投递,订阅方最终将收到该消息;服务端收到 Rollback 状态则删除半事务消息,订阅方将不会接受该消息
-
 * 事务消息回查:
 
   * 在断网或者是应用重启的特殊情况下,上述步骤4提交的二次确认最终未到达服务端,经过固定时间后服务端将对该消息发起消息回查
   * 发送方收到消息回查后,需要检查对应消息的本地事务执行的最终结果
   * 发送方根据检查得到的本地事务的最终状态再次提交二次确认,服务端仍按照步骤4对半事务消息进行操作
+* 事务消息共有三种状态:提交,回滚,中间状态:
+  * TransactionStatus.CommitTransaction:提交事务,它允许消费者消费此消息
+  * TransactionStatus.RollbackTransaction:回滚事务,它代表该消息将被删除,不允许被消费
+  * TransactionStatus.Unknown:中间状态,它代表需要检查消息队列来确定状态
+
+
+
+## 使用限制
+
+
+
+* 事务消息不支持延时消息和批量消息
+* 事务性消息可能不止一次被检查或消费
+  * 为了避免单个消息被检查太多次而导致半队列消息累积,默认将单个消息的检查次数限制为 15 次
+  * 通过 Broker 配置文件的 `transactionCheckMax` 修改此限制
+  * 如果已经检查某条消息超过 N 次(N = `transactionCheckMax` ),则 Broker 将丢弃此消息,并在默认情况下同时打印错误日志,可以通过重写 `AbstractTransactionCheckListener` 修改这个行为
+* 事务消息将在 Broker 配置文件中的参数 transactionMsgTimeout 这样的特定时间长度之后被检查.当发送事务消息时,用户还可以通过设置 CHECK_IMMUNITY_TIME_IN_SECONDS 来改变这个限制,该参数优先于 `transactionMsgTimeout`
+* 提交给用户的目标主题消息可能会失败,目前这依日志的记录而定.它的高可用性通过 RocketMQ 本身的高可用性机制来保证,如果希望确保事务消息不丢失,并且事务完整性得到保证,建议使用同步的双重写入机制
+* 事务消息的生产者 ID 不能与其他类型消息的生产者 ID 共享.与其他类型的消息不同,事务消息允许反向查询、MQ服务器能通过它们的生产者 ID 查询到消费者
 
 
 
 # 集群
+
+
+
+## 集群特点
+
+
+
+- NameServer是一个几乎无状态节点,可集群部署,节点之间无任何信息同步
+
+- Broker分为Master与Slave,一个Master可以对应多个Slave,但是一个Slave只能对应一个Master,Master与Slave的对应关系通过指定相同的BrokerName,不同的BrokerId来定义,BrokerId为0表示Master,非0表示Slave。Master也可以部署多个。每个Broker与NameServer集群中的所有节点建立长连接,定时注册Topic信息到所有NameServer
+- Producer与NameServer集群中的其中一个节点（随机选择）建立长连接,定期从NameServer取Topic路由信息,并向提供Topic服务的Master建立长连接,且定时向Master发送心跳。Producer完全无状态,可集群部署
+- Consumer与NameServer集群中的其中一个节点（随机选择）建立长连接,定期从NameServer取Topic路由信息,并向提供Topic服务的Master、Slave建立长连接,且定时向Master、Slave发送心跳。Consumer既可以从Master订阅消息,也可以从Slave订阅消息,订阅规则由Broker配置决定
 
 
 

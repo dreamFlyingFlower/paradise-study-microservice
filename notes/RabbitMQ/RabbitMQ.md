@@ -1,6 +1,10 @@
 # RabbitMQ
 
+
+
 # AMQP和JMS
+
+
 
 * MQ是消息通信的模型,并不是具体实现.实现MQ的有两种主流方式:AMQP,JMS
 
@@ -16,6 +20,8 @@
 
 
 # 概述
+
+
 
 * [官网](http://www.rabbitmq.com/)
 * Message:消息,不具名,由消息头,消息体组成,不透明,而消息头则由一系列可选属性组成,包括RoutingKey(路由键),priority(相对于其他消息的优先权),DeliveryMode(是否持久性)等
@@ -51,11 +57,14 @@
 
 ## 基本消息模型
 
+
+
 * P:一个生产者,一个发送消息的用户应用程序
 * C:一个消费者,接收消息的用户应用程序
 * 队列:红色区域,只有一个,实质上是一个大的消息缓冲区,消息都存储在队列中
+* 不需要交换机或使用默认交换机
 * 生产者将消息发送到队列中,消费者直接从队列中取消息,每条消息只能被消费一次
-* 样例详见**paradise-study-microsevice-amqp/com/wy/rabbitmq/simple**
+* 样例详见**dream-study-microsevice-amqp/com/wy/rabbitmq/simple**
 * Web管理界面,此时消息还没被消费
 
 ![](image07.png)
@@ -66,13 +75,15 @@
 
 ## Work
 
-* 工作模式或竞争模式,一个生产者,多个消费者,每条消息只能被消费一次
+
+
+* 工作模式或竞争模式,一个生产者,多个消费者,每条消息只能被消费一次,不需要交换机或默认交换机
 
 * 多个消费者会轮询获取消息,若是不进行轮询,而是某个队列处理完之后立刻处理下一个,则需要手动返回ACK状态,默认ACK状态是自动确认
 
 * 该模式可以稍微缓解消息堆积
 
-* 样例见**paradise-study-microsevice-amqp/com/wy/rabbitmq/work**
+* 样例见**dream-study-microsevice-amqp/com/wy/rabbitmq/work**
 
 * 控制台输出,两个消费者各自消费了25条消息,而且各不相同,这就实现了任务的分发
 
@@ -88,6 +99,8 @@
 
 ## Publish/Subscribe
 
+
+
 * 发布/订阅,有多种模式,默认消息模式为ExchangeTypes.FANOUT(广播)
 * 一个生产者,多个消费者,每个队列的消费者实例可以消费一次消息,多个队列会消费多次消息
 * 每一个消费者都有自己的一个队列,而一个队列可以对应多个消费者实例
@@ -100,34 +113,40 @@
 
 ## Fanout
 
+
+
 * 广播模式,可以有多个消费者,每个消费者有自己的Queue
 * 每个队列都要绑定到Exchange(交换机),生产者和消费者的Exchange要完全匹配,不需要路由键
 * 生产者发送的消息,只能发送到交换机,交换机来决定要发给哪个队列,生产者无法决定
 * 交换机把消息发送给绑定过的所有队列
 * 队列的消费者都能拿到消息,实现一条消息被多个消费者消费
 * 生产者声明Exchange,不再声明Queue.同时消息发送到Exchange,不再发送到Queue
-* 样例见**paradise-study-microsevice-amqp/com/wy/rabbitmq/fanout**
+* 样例见**dream-study-microsevice-amqp/com/wy/rabbitmq/fanout**
 
 
 
 ## Direct
 
-* 路由模式,对应的消息模式为ExchangeTypes.DIRECT
+
+
+* 定向模式,对应的消息模式为ExchangeTypes.DIRECT
 * 在交换机的基础上又增加了一个路由键(routingkey),即从广播中取出符合路由键的消息进行消费
 * 生产者和消费者的exchange和routeingkey需要完全匹配
 * 生产者是将消息发送到交换器(exchange),而每个队列(queue)需要将自己绑定到交换器上
-* 样例见**paradise-study-microsevice-amqp/com/wy/rabbitmq/direct**
+* 样例见**dream-study-microsevice-amqp/com/wy/rabbitmq/direct**
 
 
 
 ## Topic
+
+
 
 * 订阅模式,将路由键和特定的规则进行匹配
 * Topic类型的Exchange与Direct相比,只不过是routingkey可以使用通配符
 * 队列需要绑定到特定的规则上
   * #:匹配一个或多个词
   * *:匹配一个词
-* 样例见**paradise-study-microsevice-amqp/com/wy/rabbitmq/topic**
+* 样例见**dream-study-microsevice-amqp/com/wy/rabbitmq/topic**
 
 
 
@@ -293,25 +312,9 @@
 
 
 
-# 集群
-
-## 普通集群
-
-* 多台服务器中,只有一台服务器上有queue的元数据和真实数据,元数据相当于配置文件.其他服务器只有元数据
-* 当消费数据时,若是请求到只有元数据的服务器,该服务器将和主服务器通讯请求数据,再将数据返回
-* 若主服务器挂了,那么该集群就不可用了,只能用做高并发的访问
-* 该模式适用于消息无需持久化的场景,如日志队列
-
-
-
-## 镜像集群
-
-* 每台服务器上都有queue的元数据以及真实数据
-* 该集群模式实现了高可用,但是并不是分布式的,因为每个服务器的数据都是一样的
-
-
-
 # Linux安装
+
+
 
 * [官网](https://www.rabbitmq.com/install-rpm.html)下载RabbitMQ安装包,在同页面可找到对应版本的Erlang下载地址
 * 安装Erlang:rpm -Uvh erlang.noarch.rpm,安装完成后可修改sha加密值,也可不修改
@@ -364,6 +367,63 @@ net.ipv4.ip_forward=1
 # 重启network服务
 systemctl restart network
 ```
+
+
+
+## 日志与监控
+
+
+
+* RabbitMQ默认日志存放路径:/var/log/rabbitmq/rabbit@xxx.log
+* 日志包含了RabbitMQ的版本号,Erlang的版本号,RabbitMQ服务节点名称,cookie的hash值,RabbitMQ配置文件地址,内存限制,磁盘限制,默认账户guest的创建以及权限配置等等
+* rabbitmqctl管理和监控
+  * rabbitmqctl list_queues:查看队列
+  * rabbitmqctl list_exchanges:查看exchanges
+  * rabbitmqctl list_users:查看用户
+  * rabbitmqctl list_connections:查看连接
+  * rabbitmqctl list_consumers:查看消费者信息
+  * rabbitmqctl environment:查看环境变量
+  * rabbitmqctl list_queues name messages_unacknowledged:查看未被确认的队列
+  * rabbitmqctl list_queues name memory:查看单个队列的内存使用
+  * rabbitmqctl list_queues name messages_ready:查看准备就绪的队列
+* 可以通过RabbitMQ的Web控制台直接查看相关信息
+
+
+
+## 消息追踪
+
+
+
+* 在使用任何消息中间件的过程中,难免会出现某条消息异常丢失的情况
+* 对于RabbitMQ而言,产生消息丢失的情况可能是:
+  * 生产者或消费者与RabbitMQ断开了连接,而它们与RabbitMQ又采用了不同的确认机制
+  * 交换器与队列之间不同的转发策略
+  * 交换器并没有与任何队列进行绑定,生产者又不感知或者没有采取相应的措施
+  * RabbitMQ本身的集群策略也可能导致消息的丢失
+* 在RabbitMQ中可以使用Firehose和rabbitmq_tracing插件功能来实现消息追踪
+
+
+
+### Firehose
+
+
+
+* firehose的机制是将生产者投递给rabbitmq的消息, rabbitmq投递给消费者的消息按照指定的格式发送到默认的exchange上,这个默认的exchange的名为amq.rabbitmq.trace,一个topic类型的exchange.该交换机由RabbitMQ自动生成
+* 发送到这个exchange上的routing key为 publish.exchangename 和deliver.queuename;exchangename和queuename为实际exchange和queue的名称,分别对应生产者投递到exchange的消息和消费者从queue上获取的消息
+* 打开 trace 会影响消息写入功能,适当打开后请关闭
+* rabbitmqctl trace_on:开启Firehose命令
+* rabbitmqctl trace_off:关闭Firehose命令
+
+
+
+### Rabbitmq_tracing
+
+
+
+* Rabbitmq_tracing和Firehose类似,只不过Rabbitmq_tracing可以在Web管理界面查看,更容易使用和管理
+* 要使用该功能,需要启用插件:rabbitmq-plugins enable rabbitmq_tracing
+* 启用插件后可以在Web管理界面的右边看到Tracing选项.点击进入设置name,其他默认即可
+* 当RabbitMQ有消息发送或接收时,会从Trace log files中查看到信息
 
 
 
@@ -442,66 +502,186 @@ systemctl restart network
 
 
 
+# 集群
 
 
-# Springboot集成
 
-```yaml
-spring: 
-  rabbitmq: 
-    host: 192.168.1.146
-    port: 5672
-    # 登录rabbit的用户名和密码,默认guest
-    username: guest
-    password: guest
-    # 连接超时时间,0不超时
-    connection-timeout: 0
-    listener:
-      simple:
-        # 全局Ack是否手动确认,manual手动,none不确认,auto自动,默认自动
-        # 若在开启手动确认消息,则必须在消费者中手动确认消息,否则生产者会不停的发消息
-        # acknowledge-mode: manual
-        retry:
-          # 是否开启重试机制,默认不开启
-          enabled: true
-          # 最大重试次数,默认3次
-          max-attempts: 5
-      direct:
-      	# NONE:不确认消息;AUTO:自动确认消息;MANUAL:手动确认消息
-        acknowledge-mode: manual
-        retry:
-          enabled: true
-          max-attempts: 5
+## 普通集群
+
+
+
+* 多台服务器中,只有一台服务器上有queue的元数据和真实数据,元数据相当于配置文件.其他服务器只有元数据
+
+* 当消费数据时,若是请求到只有元数据的服务器,该服务器将和主服务器通讯请求数据,再将数据返回
+
+* 若主服务器挂了,那么该集群就不可用了,只能用做高并发的访问
+
+* 该模式适用于消息无需持久化的场景,如日志队列
+
+  ```shell
+  # rabbit1操作作为主节点
+  # 先停止rabbitmq,再重置,再启动
+  rabbitmqctl -n rabbit1 stop_app  
+  rabbitmqctl -n rabbit1 reset	 
+  rabbitmqctl -n rabbit1 start_app
+  
+  # rabbit2操作为从节点
+  rabbitmqctl -n rabbit2 stop_app
+  rabbitmqctl -n rabbit2 reset
+  # hostname为从节点的域名或ip:port
+  rabbitmqctl -n rabbit2 join_cluster rabbit1@'hostname' 
+  rabbitmqctl -n rabbit2 start_app
+  ```
+
+
+
+## 镜像集群
+
+
+
+* 基于普通集群添加一些其他策略
+
+* 每台服务器上都有queue的元数据以及真实数据
+
+* 该集群模式实现了高可用,但是并不是分布式的,因为每个服务器的数据都是一样的
+
+* 设置的镜像队列可以通过开启的网页的管理端Admin->Policies,也可以通过命令:`rabbitmqctl set_policy my_ha "^" '{"ha-mode":"all"}'`
+
+* 通过网页开启
+
+  * Name:策略名称
+  * Pattern:匹配的规则,如果是匹配所有的队列,是^
+  * Definition:使用ha-mode模式中的all,即同步所有匹配的队列,问号链接帮助文档
+
+  ![](image12.png)
+
+
+
+## 负载均衡-HAProxy
+
+
+
+* HAProxy提供高可用性,负载均衡以及基于TCP和HTTP应用的代理
+* HAProxy实现了一种事件驱动、单一进程模型,此模型支持非常大的并发连接数
+
+
+
+### 安装
+
+
+
+```shell
+# 下载依赖包
+yum install gcc vim wget
+# 上传haproxy源码包,解压
+tar -zxvf haproxy-1.6.5.tar.gz -C /usr/local
+# 进入目录、进行编译、安装
+cd /usr/local/haproxy-1.6.5
+make TARGET=linux31 PREFIX=/usr/local/haproxy
+make install PREFIX=/usr/local/haproxy
+mkdir /etc/haproxy
+# 赋权
+groupadd -r -g 149 haproxy
+useradd -g haproxy -r -s /sbin/nologin -u 149 haproxy
+# 创建haproxy配置文件
+mkdir /etc/haproxy
+vim /etc/haproxy/haproxy.cfg
 ```
 
-在代码中手动确认消息
 
-```java
-@Configuration
-@RabbitListener(bindings = @QueueBinding(value = @Queue(value = "${config.rabbitmq.queue-email}"),
-		exchange = @Exchange(value = "${config.rabbitmq.exchange-email}", type = ExchangeTypes.FANOUT)))
-@Slf4j
-public class EmailReceiver {
-    // import com.rabbitmq.client.Channel;
-    // import org.springframework.amqp.core.Message;
-    // params为生产者传递的参数,可自定义
-	@RabbitHandler
-	public void sendMail(Channel channel, Message msg, Map<String, String> params) {
-		try {
-			// Ack手动确认消息已经被消费,false表示只确认当前的消息,true表示队列中所有的消息都被确认
-			channel.basicAck(msg.getMessageProperties().getDeliveryTag(), false);
-			// Ack返回false,拒绝消费消息
-            // 第一个boolean表示是否确认当前消息,true表示该队列中所有消息,false表示当前消息
-			// 第二个boolean表示丢弃消息或重新回到队列中,true表示重新回到队列,false表示丢弃
-			// channel.basicNack(msg.getMessageProperties().getDeliveryTag(), false, true);
-			// Ack拒绝消息
-			// channel.basicReject(msg.getMessageProperties().getDeliveryTag(), true);
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-	}
-}
+
+### 配置
+
+
+
+* 配置文件路径:/etc/haproxy/haproxy.cfg
+
+```shell
+#logging options
+global
+	log 127.0.0.1 local0 info
+	maxconn 5120
+	chroot /usr/local/haproxy
+	uid 99
+	gid 99
+	daemon
+	quiet
+	nbproc 20
+	pidfile /var/run/haproxy.pid
+
+defaults
+	log global
+	
+	mode tcp
+
+	option tcplog
+	option dontlognull
+	retries 3
+	option redispatch
+	maxconn 2000
+	contimeout 5s
+   
+     clitimeout 60s
+
+     srvtimeout 15s	
+#front-end IP for consumers and producters
+
+listen rabbitmq_cluster
+	bind 0.0.0.0:5672
+	
+	mode tcp
+	#balance url_param userid
+	#balance url_param session_id check_post 64
+	#balance hdr(User-Agent)
+	#balance hdr(host)
+	#balance hdr(Host) use_domain_only
+	#balance rdp-cookie
+	#balance leastconn
+	#balance source //ip
+	
+	balance roundrobin
+	
+        server node1 192.168.1.150:5673 check inter 5000 rise 2 fall 2
+        server node2 192.168.1.151:5673 check inter 5000 rise 2 fall 2
+
+listen stats
+	bind 172.16.98.133:8100
+	mode http
+	option httplog
+	stats enable
+	stats uri /rabbitmq-stats
+	stats refresh 5s
 ```
+
+
+
+```shell
+# 启动HAproxy负载
+/usr/local/haproxy/sbin/haproxy -f /etc/haproxy/haproxy.cfg
+# 查看haproxy进程状态
+ps -ef | grep haproxy
+
+# 访问如下地址对mq节点进行监控
+http://172.16.98.133:8100/rabbitmq-stats
+```
+
+
+
+* 代码中访问mq集群地址,变为访问haproxy地址:5672
+
+
+
+## 命令
+
+
+
+* rabbitmqctl join_cluster {cluster_node} [–ram]:将节点加入指定集群中,执行前需要停止RabbitMQ并重置节点
+* rabbitmqctl cluster_status:显示集群的状态
+* rabbitmqctl change_cluster_node_type {disc|ram}:修改集群节点的类型,执行前需要停止RabbitMQ
+* rabbitmqctl forget_cluster_node [–offline]:将节点从集群中删除,允许离线执行
+* rabbitmqctl update_cluster_nodes {clusternode}:在集群中的节点应用启动前咨询clusternode节点的最新信息,并更新相应的集群信息.和join_cluster不同的是,它不加入集群.可能出现的情况中,节点A和B都在集群中,当节点A离线了,节点C又和节点B组成了一个集群,然后节点B又离开了集群,当A醒来的时候,它会尝试联系节点B,但是这样会失败,因为节点B已经不在集群中了
+* rabbitmqctl cancel_sync_queue [-p vhost] {queue}:取消队列queue同步镜像的操作
+* rabbitmqctl set_cluster_name {name}:设置集群名称.集群名称在客户端连接时会通报给客户端.Federation和Shovel插件也会用到集群名称.集群名称默认是集群中第一个节点的名称,通过这个命令可以重新设置
 
 
 

@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * 延迟队列
+ * 延迟队列,利用TTL+死信队列可组成延迟队列,消费者则监听死信队列即可达到延迟效果
  * 
  * @author 飞花梦影
  * @date 2021-01-04 23:39:44
@@ -38,12 +38,14 @@ public class TTLQueueConfig {
 	@Bean
 	public Queue ttlQueue() {
 		Map<String, Object> arguments = new HashMap<>();
+		// 以下参数都可以在RabbitMQ的管理界面看到
 		// x-dead-letter-exchange 声明当前队列绑定的死信交换机
 		arguments.put("x-dead-letter-exchange", "DEAD-EXCHANGE");
 		// x-dead-letter-routing-key 声明当前队列的死信路由key
 		arguments.put("x-dead-letter-routing-key", "order.close");
 		// 声明延迟队列的过期时间,仅仅用于测试,实际根据需求,通常30分钟或者15分钟
 		arguments.put("x-message-ttl", 120000);
+		// 将死信队列参数绑定到正常队列中
 		return new Queue("BIZ-TTL-QUEUE", true, false, false, arguments);
 	}
 
@@ -65,6 +67,16 @@ public class TTLQueueConfig {
 	@Bean
 	public Exchange deadExchange() {
 		return new TopicExchange("DEAD-EXCHANGE", true, false, null);
+	}
+
+	/**
+	 * 死信队列
+	 * 
+	 * @return
+	 */
+	@Bean
+	public Queue deadQueue() {
+		return new Queue("DEAD-CLOSE-QUEUE", true, false, false);
 	}
 
 	/**

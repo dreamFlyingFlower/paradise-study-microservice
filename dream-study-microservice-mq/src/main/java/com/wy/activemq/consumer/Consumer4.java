@@ -27,6 +27,7 @@ public class Consumer4 implements SessionAwareMessageListener<Message> {
 	@Autowired
 	private MailServiceImpl mailServiceImpl;
 
+	@Override
 	public synchronized void onMessage(Message message, Session session) {
 		try {
 			ActiveMQTextMessage msg = (ActiveMQTextMessage) message;

@@ -6,9 +6,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * @apiNote springstream发送消息,注意messagebuilder的包
- * @author ParadiseWY
- * @date 2019年9月15日 上午7:42:12
+ * springstream发送消息,注意messagebuilder的包
+ * 
+ * @author 飞花梦影
+ * @date 2019-09-15 07:42:12
+ * @git {@link https://gitee.com/dreamFlyingFlower}
  */
 @RestController
 public class StreamCrl {

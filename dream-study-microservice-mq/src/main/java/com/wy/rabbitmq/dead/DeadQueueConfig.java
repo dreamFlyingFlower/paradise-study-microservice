@@ -43,10 +43,16 @@ public class DeadQueueConfig {
 	@Bean
 	public Queue queue() {
 		Map<String, Object> arguments = new HashMap<>();
-		// x-dead-letter-exchange 声明当前队列绑定的死信交换机
+		// 以下参数都可以在RabbitMQ的管理界面看到
+		// x-dead-letter-exchange:固定写法.声明当前队列绑定的死信交换机
 		arguments.put("x-dead-letter-exchange", rabbit.getDead().getExchange());
-		// x-dead-letter-routing-key 声明当前队列的死信路由key
+		// x-dead-letter-routing-key:固定写法.声明当前队列的死信路由key
 		arguments.put("x-dead-letter-routing-key", rabbit.getDead().getRoutingKey());
+		// x-message-ttl:固定写法.声明当前队列的过期时间,仅仅用于测试,实际根据需求,通常30分钟或者15分钟
+		arguments.put("x-message-ttl", 120000);
+		// x-max-length:固定写法.声明当前队列的最大长度,超过长度的消息也将转到死信队列中
+		arguments.put("x-max-length", 1000);
+		// 将死信队列参数以及其他参数绑定到正常队列中
 		return new Queue("spring.test.queue", true, false, false, arguments);
 	}
 
