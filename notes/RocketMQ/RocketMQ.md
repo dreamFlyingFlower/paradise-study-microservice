@@ -179,8 +179,6 @@ set "JAVA_OPT=%JAVA_OPT% -server -Drocketmq.broker.diskSpaceWarningLevelRatio=0.
 
 
 
-
-
 # 过滤消息
 
 
@@ -221,7 +219,7 @@ public void subscribe(finalString topic, final MessageSelector messageSelector)
 
 
 
-![](Rocket01.png)
+![](img/Rocket01.png)
 
 
 
