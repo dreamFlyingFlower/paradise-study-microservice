@@ -12,6 +12,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingPathVariableException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -83,6 +84,10 @@ public class ExceptionFilter {
 		if (throwable instanceof MissingServletRequestParameterException) {
 			return Result.error(TipFormatEnum.TIP_PARAM_EMPTY
 					.getMsg(((MissingServletRequestParameterException) throwable).getParameterName()));
+		}
+		if (throwable instanceof MissingPathVariableException) {
+			return Result.error(
+					TipFormatEnum.TIP_PARAM_EMPTY.getMsg(((MissingPathVariableException) throwable).getVariableName()));
 		}
 		// 方法参数验证失败
 		if (throwable instanceof MethodArgumentNotValidException) {
