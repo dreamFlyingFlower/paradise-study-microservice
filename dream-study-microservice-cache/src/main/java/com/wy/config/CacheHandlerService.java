@@ -6,16 +6,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.TypeReference;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.TypeReference;
 import com.wy.lang.StrTool;
 
 /**
  * 使用redis缓存,防止缓存击穿
  * 
- * @author ParadiseWY
+ * @author 飞花梦影
  * @date 2019-06-23 10:42:48
- * @git {@link https://github.com/mygodness100}
+ * @git {@link https://github.com/dreamFlyingFlower}
  */
 @Component
 public class CacheHandlerService {
