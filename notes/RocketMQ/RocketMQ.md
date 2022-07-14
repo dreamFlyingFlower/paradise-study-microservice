@@ -42,6 +42,8 @@
 
 ## 服务安装
 
+
+
 * 要求JDK1.8,Maven3.2,[下载地址](http://archive.apache.org/dist/rocketmq),按需下载版本,解压到/app/rocketmq中
 * 修改bin/runserver.sh,根据服务器情况调整内存大小
 
@@ -78,7 +80,14 @@ set "JAVA_OPT=%JAVA_OPT% -server -Drocketmq.broker.diskSpaceWarningLevelRatio=0.
   sh bin/tools.sh org.apache.rocketmq.example.quickstart.Consumer
   ```
 
-* 管闭RocketMQ:sh bin/mqshutdown namesrv,sh bin/mqshutdown broker
+* 关闭RocketMQ:sh bin/mqshutdown namesrv,sh bin/mqshutdown broker
+
+* 防火墙设置:RocketMQ默认使用3个端口:9876,10911,11011
+
+  * `nameserver` 默认使用 9876 端口
+  * `master` 默认使用 10911 端口
+  * `slave` 默认使用11011 端口
+
 
 
 
@@ -269,9 +278,9 @@ public void subscribe(finalString topic, final MessageSelector messageSelector)
 
 - NameServer是一个几乎无状态节点,可集群部署,节点之间无任何信息同步
 
-- Broker分为Master与Slave,一个Master可以对应多个Slave,但是一个Slave只能对应一个Master,Master与Slave的对应关系通过指定相同的BrokerName,不同的BrokerId来定义,BrokerId为0表示Master,非0表示Slave。Master也可以部署多个。每个Broker与NameServer集群中的所有节点建立长连接,定时注册Topic信息到所有NameServer
-- Producer与NameServer集群中的其中一个节点（随机选择）建立长连接,定期从NameServer取Topic路由信息,并向提供Topic服务的Master建立长连接,且定时向Master发送心跳。Producer完全无状态,可集群部署
-- Consumer与NameServer集群中的其中一个节点（随机选择）建立长连接,定期从NameServer取Topic路由信息,并向提供Topic服务的Master、Slave建立长连接,且定时向Master、Slave发送心跳。Consumer既可以从Master订阅消息,也可以从Slave订阅消息,订阅规则由Broker配置决定
+- Broker分为Master与Slave,一个Master可以对应多个Slave,但是一个Slave只能对应一个Master,Master与Slave的对应关系通过指定相同的BrokerName,不同的BrokerId来定义,BrokerId为0表示Master,非0表示Slave.Master也可以部署多个。每个Broker与NameServer集群中的所有节点建立长连接,定时注册Topic信息到所有NameServer
+- Producer与NameServer集群中的其中一个节点(随机选择)建立长连接,定期从NameServer取Topic路由信息,并向提供Topic服务的Master建立长连接,且定时向Master发送心跳.Producer完全无状态,可集群部署
+- Consumer与NameServer集群中的其中一个节点（随机选择）建立长连接,定期从NameServer取Topic路由信息,并向提供Topic服务的Master、Slave建立长连接,且定时向Master、Slave发送心跳.Consumer既可以从Master订阅消息,也可以从Slave订阅消息,订阅规则由Broker配置决定
 
 
 
@@ -302,3 +311,15 @@ public void subscribe(finalString topic, final MessageSelector messageSelector)
 * HA 采用同步双写方式,即只有主备都写成功,才向应用返回成功,该模式数据与服务都无单点故障
 * Master 宕机情况下,消息无延迟,服务可用性与数据可用性都非常高
 * 缺点是性能比异步复制模式低 10% 左右,发送单个消息的执行时间会略高,且目前版本在主节点宕机后,备机不能自动切换为主机
+
+
+
+## 集群工作流程
+
+
+
+* 启动NameServer,NameServer起来后监听端口,等待Broker、Producer、Consumer连上来,相当于一个路由控制中心
+* Broker启动,跟所有的NameServer保持长连接,定时发送心跳包.心跳包中包含当前Broker信息(IP+端口等)以及存储所有Topic信息.注册成功后,NameServer集群中就有Topic跟Broker的映射关系
+* 收发消息前,先创建Topic,创建Topic时需要指定该Topic要存储在哪些Broker上,也可以在发送消息时自动创建Topic
+* Producer发送消息,启动时先跟NameServer集群中的其中一台建立长连接,并从NameServer中获取当前发送的Topic存在哪些Broker上,轮询从队列列表中选择一个队列,然后与队列所在的Broker建立长连接从而向Broker发消息
+* Consumer跟Producer类似,跟其中一台NameServer建立长连接,获取当前订阅Topic存在哪些Broker上,然后直接跟Broker建立连接通道,开始消费消息
