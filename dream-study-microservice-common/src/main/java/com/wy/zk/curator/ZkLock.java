@@ -1,12 +1,14 @@
 package com.wy.zk.curator;
 
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.recipes.cache.TreeCache;
 import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
 import org.apache.curator.framework.recipes.cache.TreeCacheListener;
+import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.apache.curator.framework.recipes.cache.TreeCacheEvent.Type;
 import org.apache.curator.retry.RetryForever;
 import org.apache.zookeeper.CreateMode;
@@ -38,6 +40,22 @@ public class ZkLock {
 			// 重新获取锁
 			getLock();
 		}
+	}
+
+	/**
+	 * 获取锁
+	 * 
+	 * @param lockPath
+	 * @throws Exception
+	 */
+	public void getLock(String lockPath) throws Exception {
+		InterProcessMutex interProcessMutex = new InterProcessMutex(client, lockPath);
+		// 获取锁
+		interProcessMutex.acquire();
+		boolean acquire = interProcessMutex.acquire(0, TimeUnit.SECONDS);
+		System.out.println(acquire);
+		// 释放锁
+		interProcessMutex.release();
 	}
 
 	// 尝试获取锁
