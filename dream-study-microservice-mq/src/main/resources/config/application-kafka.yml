@@ -1,3 +1,9 @@
+server:
+  port: 443
+  ssl:
+    key-store: 3702162_wechat.coding-dream.com.pfx
+    key-store-password: 49Jk65Pi
+
 spring:
   kafka:
     # 集群地址
@@ -34,20 +40,37 @@ spring:
       # none:只要有一个分区不存在已提交的offset,就抛出异常
       auto-offset-reset: latest
       # 提交offset延时(接收到消息后多久提交offset)
-      auto-commit-interval:
-        seconds: 1
+      auto-commit-interval: PT1S
       # Kafka提供的序列化和反序列化类
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       properties: 
         # 默认的消费组ID
-        group.id: defaultConsumerGroup
+        group:
+          id: defaultConsumerGroup
         # 消费会话超时时间(超过这个时间consumer没有发送心跳,就会触发rebalance操作)
-        session.timeout.ms: 120000
+        session: 
+          timeout: 
+            ms: 120000
         # 消费请求超时时间
-        request.timeout.ms: 180000
+        request: 
+          timeout: 
+            ms: 180000
     listener: 
       # 消费端监听的topic不存在时,项目启动会报错(关掉)
       missing-topics-fatal: false
       # 设置批量消费
       type: batch
+      
+template:
+  templates:
+    - {"templateId":"1","templateFilePath":"template/template.json","active": true}
+    - {"templateId":"2","templateFilePath":"template/template.json","active": false}
+  template-result-type: 0  # 0-文件获取 1-数据库获取 2-ES
+  template-result-file-path: "template/templateResult.json"
+
+wechat:
+  kafka:
+    bootstrap_servers: "192.168.1.150:9092"
+    acks_config: "all"
+    partitioner_class: "com.wy.kafka.producer.SamplePartition"
