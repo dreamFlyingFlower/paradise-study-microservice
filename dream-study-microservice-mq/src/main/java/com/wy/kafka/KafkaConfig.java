@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * Kafka配置,必须先配置zookeeper(https://www.cnblogs.com/shanyou/p/3221990.html)
- * 	
+ * 
  * 配置文件,在application-kafka中:
  * 
  * <pre>
@@ -23,13 +23,14 @@ import org.springframework.context.annotation.Configuration;
  * 		根据计算结果路由到指定分区,这种情况下可以保证同一个Key的所有消息都进入到相同的分区
  * 3.patition 和 key 都未指定,则使用kafka默认的分区策略,轮询选出一个 patition
  * </pre>
- *
- *	@author ParadiseWY
- *	@date 2020-12-08 12:59:49
+ * 
+ * @author 飞花梦影
+ * @date 2020-12-08 12:59:49
  * @git {@link https://github.com/mygodness100}
  */
 @Configuration
 public class KafkaConfig {
+
 	/**
 	 * 创建一个名为topicName的Topic,设置分区数为8,分区副本为2
 	 * 

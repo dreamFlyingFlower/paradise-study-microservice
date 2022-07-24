@@ -15,21 +15,27 @@ public class CustomizePartitiner implements Partitioner {
 
 	@Override
 	public void configure(Map<String, ?> arg0) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void close() {
-		// TODO Auto-generated method stub
 
 	}
 
 	/**
 	 * 该方法的返回值就表示将消息发送到几号分区
+	 * 
+	 * @param topic 主题
+	 * @param key 生产者发送时使用的key,可以通过该规则key进行自定义分区
+	 * @param keyBytes
+	 * @param value
+	 * @param valueBytes
+	 * @param cluster
+	 * @return
 	 */
 	@Override
-	public int partition(String arg0, Object arg1, byte[] arg2, Object arg3, byte[] arg4, Cluster arg5) {
+	public int partition(String topic, Object key, byte[] keyBytes, Object value, byte[] valueBytes, Cluster cluster) {
 		// 自定义分区规则(这里假设全部发到0号分区)
 		return 0;
 	}

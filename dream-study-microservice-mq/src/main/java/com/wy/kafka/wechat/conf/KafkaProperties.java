@@ -9,7 +9,9 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "wechat.kafka")
 public class KafkaProperties {
 
-    private String bootstrapServers;
-    private String acksConfig;
-    private String partitionerClass;
+	private String bootstrapServers;
+
+	private String acksConfig;
+
+	private String partitionerClass;
 }

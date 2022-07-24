@@ -11,10 +11,19 @@ import java.util.List;
 @ConfigurationProperties(prefix = "template")
 public class WechatTemplateProperties {
 
+	/**
+	 * 模板文件
+	 */
 	private List<WechatTemplate> templates;
 
-	private int templateResultType; // 0-文件获取 1-数据库获取 2-ES
+	/**
+	 * 结果处理:0-文件获取 1-数据库获取 2-ES
+	 */
+	private int templateResultType;
 
+	/**
+	 * 模板结果地址
+	 */
 	private String templateResultFilePath;
 
 	@Data

@@ -13,7 +13,7 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.common.TopicPartition;
 
-public class ConsumerSample {
+public class ConsumerKafka {
 
 	private final static String TOPIC_NAME = "dream-topic";
 
@@ -32,11 +32,11 @@ public class ConsumerSample {
 	}
 
 	/**
-	 * 工作里这种用法,有,但是不推荐
+	 * 自动提交
 	 */
 	public static void helloworld() {
 		Properties props = new Properties();
-		props.setProperty("bootstrap.servers", "192.168.220.128:9092");
+		props.setProperty("bootstrap.servers", "192.168.1.150:9092");
 		props.setProperty("group.id", "test");
 		props.setProperty("enable.auto.commit", "true");
 		props.setProperty("auto.commit.interval.ms", "1000");
@@ -50,7 +50,7 @@ public class ConsumerSample {
 				ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(10000));
 				for (ConsumerRecord<String, String> record : records)
 					System.out.printf("patition = %d , offset = %d, key = %s, value = %s%n", record.partition(),
-					        record.offset(), record.key(), record.value());
+							record.offset(), record.key(), record.value());
 			}
 		}
 	}
@@ -60,8 +60,10 @@ public class ConsumerSample {
 	 */
 	public static void commitedOffset() {
 		Properties props = new Properties();
-		props.setProperty("bootstrap.servers", "192.168.220.128:9092");
+		props.setProperty("bootstrap.servers", "192.168.1.150:9092");
+		// 消费分组
 		props.setProperty("group.id", "test");
+		// 手动提交
 		props.setProperty("enable.auto.commit", "false");
 		props.setProperty("auto.commit.interval.ms", "1000");
 		props.setProperty("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
@@ -73,10 +75,9 @@ public class ConsumerSample {
 			while (true) {
 				ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(10000));
 				for (ConsumerRecord<String, String> record : records) {
-					// 想把数据保存到数据库,成功就成功,不成功...
-					// TODO record 2 db
+					// 想把数据保存到数据库,成功就成功,不成功写redis或其他
 					System.out.printf("patition = %d , offset = %d, key = %s, value = %s%n", record.partition(),
-					        record.offset(), record.key(), record.value());
+							record.offset(), record.key(), record.value());
 					// 如果失败,则回滚, 不要提交offset
 				}
 
@@ -91,7 +92,7 @@ public class ConsumerSample {
 	 */
 	public static void commitedOffsetWithPartition() {
 		Properties props = new Properties();
-		props.setProperty("bootstrap.servers", "192.168.220.128:9092");
+		props.setProperty("bootstrap.servers", "192.168.1.150:9092");
 		props.setProperty("group.id", "test");
 		props.setProperty("enable.auto.commit", "false");
 		props.setProperty("auto.commit.interval.ms", "1000");
@@ -108,7 +109,7 @@ public class ConsumerSample {
 					List<ConsumerRecord<String, String>> pRecord = records.records(partition);
 					for (ConsumerRecord<String, String> record : pRecord) {
 						System.out.printf("patition = %d , offset = %d, key = %s, value = %s%n", record.partition(),
-						        record.offset(), record.key(), record.value());
+								record.offset(), record.key(), record.value());
 
 					}
 					long lastOffset = pRecord.get(pRecord.size() - 1).offset();
@@ -128,7 +129,7 @@ public class ConsumerSample {
 	 */
 	public static void commitedOffsetWithPartition2() {
 		Properties props = new Properties();
-		props.setProperty("bootstrap.servers", "192.168.220.128:9092");
+		props.setProperty("bootstrap.servers", "192.168.1.150:9092");
 		props.setProperty("group.id", "test");
 		props.setProperty("enable.auto.commit", "false");
 		props.setProperty("auto.commit.interval.ms", "1000");
@@ -154,7 +155,7 @@ public class ConsumerSample {
 					List<ConsumerRecord<String, String>> pRecord = records.records(partition);
 					for (ConsumerRecord<String, String> record : pRecord) {
 						System.out.printf("patition = %d , offset = %d, key = %s, value = %s%n", record.partition(),
-						        record.offset(), record.key(), record.value());
+								record.offset(), record.key(), record.value());
 
 					}
 					long lastOffset = pRecord.get(pRecord.size() - 1).offset();
@@ -174,7 +175,7 @@ public class ConsumerSample {
 	 */
 	public static void controlOffset() {
 		Properties props = new Properties();
-		props.setProperty("bootstrap.servers", "192.168.220.128:9092");
+		props.setProperty("bootstrap.servers", "192.168.1.150:9092");
 		props.setProperty("group.id", "test");
 		props.setProperty("enable.auto.commit", "false");
 		props.setProperty("auto.commit.interval.ms", "1000");
@@ -205,7 +206,7 @@ public class ConsumerSample {
 					List<ConsumerRecord<String, String>> pRecord = records.records(partition);
 					for (ConsumerRecord<String, String> record : pRecord) {
 						System.err.printf("patition = %d , offset = %d, key = %s, value = %s%n", record.partition(),
-						        record.offset(), record.key(), record.value());
+								record.offset(), record.key(), record.value());
 
 					}
 					long lastOffset = pRecord.get(pRecord.size() - 1).offset();
@@ -225,7 +226,7 @@ public class ConsumerSample {
 	 */
 	private static void controlPause() {
 		Properties props = new Properties();
-		props.setProperty("bootstrap.servers", "192.168.220.128:9092");
+		props.setProperty("bootstrap.servers", "192.168.1.150:9092");
 		props.setProperty("group.id", "test");
 		props.setProperty("enable.auto.commit", "false");
 		props.setProperty("auto.commit.interval.ms", "1000");
@@ -248,7 +249,7 @@ public class ConsumerSample {
 					long num = 0;
 					for (ConsumerRecord<String, String> record : pRecord) {
 						System.out.printf("patition = %d , offset = %d, key = %s, value = %s%n", record.partition(),
-						        record.offset(), record.key(), record.value());
+								record.offset(), record.key(), record.value());
 						/*
 						 * 1、接收到record信息以后,去令牌桶中拿取令牌 2、如果获取到令牌,则继续业务处理 3、如果获取不到令牌, 则pause等待令牌
 						 * 4、当令牌桶中的令牌足够, 则将consumer置为resume状态
