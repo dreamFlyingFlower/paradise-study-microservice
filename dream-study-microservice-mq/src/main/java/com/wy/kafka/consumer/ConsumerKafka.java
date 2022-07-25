@@ -18,15 +18,15 @@ public class ConsumerKafka {
 	private final static String TOPIC_NAME = "dream-topic";
 
 	public static void main(String[] args) {
-		// helloworld();
+		test01();
 		// 手动提交offset
-		// commitedOffset();
+		commitedOffset();
 		// 手动对每个Partition进行提交
-		// commitedOffsetWithPartition();
+		commitedOffsetWithTopic();
 		// 手动订阅某个或某些分区,并提交offset
-		// commitedOffsetWithPartition2();
+		commitedOffsetWithPartition();
 		// 手动指定offset的起始位置,及手动提交offset
-		// controlOffset();
+		controlOffset();
 		// 流量控制
 		controlPause();
 	}
@@ -34,7 +34,7 @@ public class ConsumerKafka {
 	/**
 	 * 自动提交
 	 */
-	public static void helloworld() {
+	public static void test01() {
 		Properties props = new Properties();
 		props.setProperty("bootstrap.servers", "192.168.1.150:9092");
 		props.setProperty("group.id", "test");
@@ -88,9 +88,9 @@ public class ConsumerKafka {
 	}
 
 	/**
-	 * 手动提交offset,并且手动控制partition
+	 * 手动提交offset,并且手动控制Topic中的partition
 	 */
-	public static void commitedOffsetWithPartition() {
+	public static void commitedOffsetWithTopic() {
 		Properties props = new Properties();
 		props.setProperty("bootstrap.servers", "192.168.1.150:9092");
 		props.setProperty("group.id", "test");
@@ -102,6 +102,7 @@ public class ConsumerKafka {
 		try (KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props)) {
 			// 消费订阅哪一个Topic或者几个Topic
 			consumer.subscribe(Arrays.asList(TOPIC_NAME));
+
 			while (true) {
 				ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(10000));
 				// 每个partition单独处理
@@ -112,9 +113,11 @@ public class ConsumerKafka {
 								record.offset(), record.key(), record.value());
 
 					}
+					// 最后一个record的offset
 					long lastOffset = pRecord.get(pRecord.size() - 1).offset();
 					// 单个partition中的offset,并且进行提交
 					Map<TopicPartition, OffsetAndMetadata> offset = new HashMap<>();
+					// +1是为了防止重复提交,下一次提交的起点是本次提交的终点
 					offset.put(partition, new OffsetAndMetadata(lastOffset + 1));
 					// 提交offset
 					consumer.commitSync(offset);
@@ -125,9 +128,9 @@ public class ConsumerKafka {
 	}
 
 	/**
-	 * 手动提交offset,并且手动控制partition,更高级
+	 * 手动提交offset,并且手动控制指定partition
 	 */
-	public static void commitedOffsetWithPartition2() {
+	public static void commitedOffsetWithPartition() {
 		Properties props = new Properties();
 		props.setProperty("bootstrap.servers", "192.168.1.150:9092");
 		props.setProperty("group.id", "test");

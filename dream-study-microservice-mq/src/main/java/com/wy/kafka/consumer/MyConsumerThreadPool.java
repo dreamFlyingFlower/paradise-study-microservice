@@ -12,7 +12,14 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 
-public class ConsumerRecordThreadSample {
+/**
+ * 利用线程池解决多线程问题,只能处理不太严谨的数据,更快,消耗更小
+ *
+ * @author 飞花梦影
+ * @date 2022-07-25 23:42:28
+ * @git {@link https://gitee.com/dreamFlyingFlower}
+ */
+public class MyConsumerThreadPool {
 
 	private final static String TOPIC_NAME = "dream-topic";
 
@@ -27,7 +34,6 @@ public class ConsumerRecordThreadSample {
 		Thread.sleep(1000000);
 
 		consumers.shutdown();
-
 	}
 
 	// Consumer处理
@@ -52,7 +58,7 @@ public class ConsumerRecordThreadSample {
 
 		public void execute(int workerNum) {
 			executors = new ThreadPoolExecutor(workerNum, workerNum, 0L, TimeUnit.MILLISECONDS,
-			        new ArrayBlockingQueue<>(1000), new ThreadPoolExecutor.CallerRunsPolicy());
+					new ArrayBlockingQueue<>(1000), new ThreadPoolExecutor.CallerRunsPolicy());
 
 			while (true) {
 				ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(200));
@@ -95,7 +101,7 @@ public class ConsumerRecordThreadSample {
 			// 假如说数据入库操作
 			System.out.println("Thread - " + Thread.currentThread().getName());
 			System.err.printf("patition = %d , offset = %d, key = %s, value = %s%n", record.partition(),
-			        record.offset(), record.key(), record.value());
+					record.offset(), record.key(), record.value());
 		}
 	}
 }

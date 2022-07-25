@@ -14,12 +14,19 @@ import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.WakeupException;
 
-public class ConsumerThreadSample {
+/**
+ * 多线程下的KafkaConsumer,非线程安全,需要自定解决线程安全问题
+ *
+ * @author 飞花梦影
+ * @date 2022-07-25 23:37:07
+ * @git {@link https://gitee.com/dreamFlyingFlower}
+ */
+public class MyConsumerThread {
 
 	private final static String TOPIC_NAME = "dream-topic";
 
-	/*
-	 * 这种类型是经典模式，每一个线程单独创建一个KafkaConsumer，用于保证线程安全
+	/**
+	 * 每一个线程单独创建一个KafkaConsumer,用于保证线程安全,对数据更安全,消耗更大
 	 */
 	public static void main(String[] args) throws InterruptedException {
 		KafkaConsumerRunner r1 = new KafkaConsumerRunner();
@@ -56,6 +63,7 @@ public class ConsumerThreadSample {
 			consumer.assign(Arrays.asList(p0, p1));
 		}
 
+		@Override
 		public void run() {
 			try {
 				while (!closed.get()) {
@@ -67,7 +75,7 @@ public class ConsumerThreadSample {
 						// 处理每个分区的消息
 						for (ConsumerRecord<String, String> record : pRecord) {
 							System.out.printf("patition = %d , offset = %d, key = %s, value = %s%n", record.partition(),
-							        record.offset(), record.key(), record.value());
+									record.offset(), record.key(), record.value());
 						}
 
 						// 返回去告诉kafka新的offset
@@ -75,7 +83,6 @@ public class ConsumerThreadSample {
 						// 注意加1
 						consumer.commitSync(Collections.singletonMap(partition, new OffsetAndMetadata(lastOffset + 1)));
 					}
-
 				}
 			} catch (WakeupException e) {
 				if (!closed.get()) {

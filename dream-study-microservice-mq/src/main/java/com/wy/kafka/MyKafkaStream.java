@@ -1,4 +1,4 @@
-package com.wy.kafka.stream;
+package com.wy.kafka;
 
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.Properties;
 
-public class StreamSample {
+public class MyKafkaStream {
 
 	private static final String INPUT_TOPIC = "dream-stream-in";
 
@@ -20,7 +20,7 @@ public class StreamSample {
 
 	public static void main(String[] args) {
 		Properties props = new Properties();
-		props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "192.168.220.128:9092");
+		props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "192.168.1.150:9092");
 		props.put(StreamsConfig.APPLICATION_ID_CONFIG, "wordcount-app");
 		props.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
 		props.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass());
@@ -41,7 +41,7 @@ public class StreamSample {
 	static void foreachStream(final StreamsBuilder builder) {
 		KStream<String, String> source = builder.stream(INPUT_TOPIC);
 		source.flatMapValues(value -> Arrays.asList(value.toLowerCase(Locale.getDefault()).split(" ")))
-		        .foreach((key, value) -> System.out.println(key + " : " + value));
+				.foreach((key, value) -> System.out.println(key + " : " + value));
 	}
 
 	// 如果定义流计算过程
@@ -52,20 +52,19 @@ public class StreamSample {
 		// KTable是数据集合的抽象对象
 		// 算子
 		final KTable<String, Long> count = source
-		        // flatMapValues -> 将一行数据拆分为多行数据 key 1 , value Hello World
-		        // flatMapValues -> 将一行数据拆分为多行数据 key 1 , value Hello key xx , value World
-		        /*
-		         * key 1 , value Hello -> Hello 1 World 2 key 2 , value World key 3 , value
-		         * World
-		         */
-		        .flatMapValues(value -> Arrays.asList(value.toLowerCase(Locale.getDefault()).split(" ")))
-		        // 合并 -> 按value值合并
-		        .groupBy((key, value) -> value)
-		        // 统计出现的总数
-		        .count();
+				// flatMapValues -> 将一行数据拆分为多行数据 key 1 , value Hello World
+				// flatMapValues -> 将一行数据拆分为多行数据 key 1 , value Hello key xx , value World
+				/*
+				 * key 1 , value Hello -> Hello 1 World 2 key 2 , value World key 3 , value
+				 * World
+				 */
+				.flatMapValues(value -> Arrays.asList(value.toLowerCase(Locale.getDefault()).split(" ")))
+				// 合并 -> 按value值合并
+				.groupBy((key, value) -> value)
+				// 统计出现的总数
+				.count();
 
 		// 将结果输入到OUT_TOPIC中
 		count.toStream().to(OUT_TOPIC, Produced.with(Serdes.String(), Serdes.Long()));
 	}
-
 }
