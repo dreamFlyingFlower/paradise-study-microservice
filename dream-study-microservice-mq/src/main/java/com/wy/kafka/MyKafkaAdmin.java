@@ -82,7 +82,7 @@ public class MyKafkaAdmin {
 	 */
 	public static void createTopic() {
 		AdminClient adminClient = adminClient();
-		// 副本因子,副本数量
+		// 副本因子,partition副本总数量.假设有3个partition,副本因子设置为3,则每个partition都有一个副本
 		Short rs = 1;
 		NewTopic newTopic = new NewTopic(TOPIC_NAME, 1, rs);
 		CreateTopicsResult topics = adminClient.createTopics(Arrays.asList(newTopic));
