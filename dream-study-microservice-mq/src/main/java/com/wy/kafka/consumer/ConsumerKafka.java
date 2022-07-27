@@ -282,4 +282,38 @@ public class ConsumerKafka {
 			}
 		}
 	}
+
+	/**
+	 * 访问Kafka需要证书,需要将SSL证书(client.truststore.jks)放到指定目录中
+	 */
+	public static void testSSL() {
+		Properties props = new Properties();
+		// 端口需要根据Kafka中配置的SSL地址修改
+		props.setProperty("bootstrap.servers", "192.168.1.150:8989");
+		props.setProperty("group.id", "test");
+		props.setProperty("enable.auto.commit", "true");
+		props.setProperty("auto.commit.interval.ms", "1000");
+		props.setProperty("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+		props.setProperty("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+
+		// 协议
+		props.setProperty("security.protocol", "SSL");
+		// 算法, 使用默认即可
+		props.setProperty("ssl.endpoint.identification.algorithm", "");
+		// 证书地址,可以是绝对路径,也可以是项目中的相对路径.注意,此处的证书是客户端使用的证书,Kafka使用服务器的证书
+		props.setProperty("ssl.truststore.location", "client.truststore.jks");
+		// 证书密码
+		props.setProperty("ssl.truststore.password", "dream");
+		
+		try (KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props)) {
+			// 消费订阅哪一个Topic或者几个Topic
+			consumer.subscribe(Arrays.asList(TOPIC_NAME));
+			while (true) {
+				ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(10000));
+				for (ConsumerRecord<String, String> record : records)
+					System.out.printf("patition = %d , offset = %d, key = %s, value = %s%n", record.partition(),
+							record.offset(), record.key(), record.value());
+			}
+		}
+	}
 }
