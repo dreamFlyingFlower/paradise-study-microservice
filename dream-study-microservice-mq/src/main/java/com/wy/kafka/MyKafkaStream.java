@@ -12,6 +12,13 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.Properties;
 
+/**
+ * Kafka流式处理,非实时,有延迟
+ *
+ * @author 飞花梦影
+ * @date 2022-07-29 00:11:18
+ * @git {@link https://gitee.com/dreamFlyingFlower}
+ */
 public class MyKafkaStream {
 
 	private static final String INPUT_TOPIC = "dream-stream-in";
@@ -37,18 +44,26 @@ public class MyKafkaStream {
 		streams.start();
 	}
 
-	// 如果定义流计算过程
+	/**
+	 * 定义流计算过程
+	 * 
+	 * @param builder
+	 */
 	static void foreachStream(final StreamsBuilder builder) {
 		KStream<String, String> source = builder.stream(INPUT_TOPIC);
 		source.flatMapValues(value -> Arrays.asList(value.toLowerCase(Locale.getDefault()).split(" ")))
 				.foreach((key, value) -> System.out.println(key + " : " + value));
 	}
 
-	// 如果定义流计算过程
+	/**
+	 * 定义流计算过程,经典的大数据wordcount
+	 * 
+	 * @param builder
+	 */
 	static void wordcountStream(final StreamsBuilder builder) {
-		// 不断从INPUT_TOPIC上获取新数据，并且追加到流上的一个抽象对象
+		// 不断从INPUT_TOPIC上获取新数据,并且追加到流上的一个抽象对象
 		KStream<String, String> source = builder.stream(INPUT_TOPIC);
-		// Hello World imooc
+		// Hello World dream
 		// KTable是数据集合的抽象对象
 		// 算子
 		final KTable<String, Long> count = source
