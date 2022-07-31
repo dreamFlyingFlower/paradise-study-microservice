@@ -34,8 +34,8 @@ public class MyKafkaStream {
 
 		// 如果构建流结构拓扑
 		final StreamsBuilder builder = new StreamsBuilder();
-		// 构建Wordcount
-		// wordcountStream(builder);
+		// 构建Wordcount单词出现次数计算
+		wordcountStream(builder);
 		// 构建foreachStream
 		foreachStream(builder);
 
@@ -51,6 +51,7 @@ public class MyKafkaStream {
 	 */
 	static void foreachStream(final StreamsBuilder builder) {
 		KStream<String, String> source = builder.stream(INPUT_TOPIC);
+		// 将value值根据空格拆分后返回
 		source.flatMapValues(value -> Arrays.asList(value.toLowerCase(Locale.getDefault()).split(" ")))
 				.foreach((key, value) -> System.out.println(key + " : " + value));
 	}
@@ -61,17 +62,18 @@ public class MyKafkaStream {
 	 * @param builder
 	 */
 	static void wordcountStream(final StreamsBuilder builder) {
-		// 不断从INPUT_TOPIC上获取新数据,并且追加到流上的一个抽象对象
+		// 不断从INPUT_TOPIC上获取新数据,并且追加到流上的一个抽象对象,类似于队列
 		KStream<String, String> source = builder.stream(INPUT_TOPIC);
 		// Hello World dream
 		// KTable是数据集合的抽象对象
 		// 算子
 		final KTable<String, Long> count = source
-				// flatMapValues -> 将一行数据拆分为多行数据 key 1 , value Hello World
-				// flatMapValues -> 将一行数据拆分为多行数据 key 1 , value Hello key xx , value World
+				// flatMapValues -> 数据拆分,将一行数据拆分为多行数据 key -> 1 , value -> Hello World
+				// 拆分为key->1,value->Hello;key->1,value->World
 				/*
-				 * key 1 , value Hello -> Hello 1 World 2 key 2 , value World key 3 , value
-				 * World
+				 * key 1 , value Hello ;key 2 , value World ;key 3 , value World
+				 * 
+				 * 最终计算单词出现的次数结果为: Hello 1 World 2
 				 */
 				.flatMapValues(value -> Arrays.asList(value.toLowerCase(Locale.getDefault()).split(" ")))
 				// 合并 -> 按value值合并
