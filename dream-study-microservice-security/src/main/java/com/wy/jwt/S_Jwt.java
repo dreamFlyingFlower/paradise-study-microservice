@@ -23,9 +23,9 @@ import com.wy.util.DateTool;
  *         注册信息中常用的有iss(发行者),exp(到期时间),sub(主题),aud(受众)等,公开和私有数据不能和注册信息重复
  *	signature:签名,非对称加密,防篡改.这个部分需要公私钥进行加解密.发送方用私钥加密,接收方用公钥解密
  *  
- *  加的方式:用指定的编码或加密方式对header,payload分别进行加密,将加密后的数据用.连接得到temp,
- *			再用header中指定的加密算法,利用私钥对temp进行2次加密,将得到的结果用.连接到temp上,得到最终的结果
- *     		如:header编码或加密.payload编码或加密.加密算法(header加密.payload加密,signature)加密
+ *	签名算法:用base64分别对header,payload进行编码,将编码后的数据用.连接得到temp,
+ *			再用header中指定的加密算法,利用secret(私钥)对temp进行加密,将得到的结果用.连接到temp上,得到最终的结果
+ *     		如:header编码.payload编码.加密算法(header编码.payload编码,私钥)
  * </pre>
  *
  * @author 飞花梦影
