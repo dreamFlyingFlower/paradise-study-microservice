@@ -3,7 +3,7 @@ package com.wy.fallback;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
-import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson.JSON;
 import com.wy.service.impl.FeignServiceImpl;
 
 import feign.hystrix.FallbackFactory;
@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * 该类需要实现所有方法,并加入到spring的环境中,可直接写匿名内部内,也可以实现该类,最好是实现该类,可复用父类
+ * 
  * @author paradiseWy
  */
 @Slf4j

@@ -5,12 +5,13 @@ import java.util.HashMap;
 import org.springframework.social.oauth2.AbstractOAuth2ApiBinding;
 import org.springframework.social.oauth2.TokenStrategy;
 
-import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson.JSON;
 import com.wy.entity.UserWeiXin;
 import com.wy.social.IToken;
 
 /**
- * @apiNote
+ * 微信Token
+ * 
  * @author ParadiseWY
  * @date 2019年9月26日
  */
@@ -20,8 +21,8 @@ public class WxTokenService extends AbstractOAuth2ApiBinding implements IToken<U
 	private static final String URL_GET_OPENID = "https://graph.qq.com/oauth2.0/me?access_token=%s";
 
 	// 获取鹅厂用户信息的url地址,accesstoken会由下面的构造方法中传入
-	private static final String URL_GET_USERINFO = "https://graph.qq.com/user/get_user_info?"
-			+ "oauth_consumer_key=%s&openid=%s";
+	private static final String URL_GET_USERINFO =
+	        "https://graph.qq.com/user/get_user_info?" + "oauth_consumer_key=%s&openid=%s";
 
 	// 申请鹅厂的第三方app登录成功后,分配给app的appid,即在注册自己的应用时鹅厂给的appId
 	private String appId;
@@ -49,8 +50,9 @@ public class WxTokenService extends AbstractOAuth2ApiBinding implements IToken<U
 	 */
 	@Override
 	public UserWeiXin getUserInfo() {
-		UserWeiXin penguin = getRestTemplate().getForEntity(String.format(URL_GET_USERINFO, appId, openId),
-				UserWeiXin.class, new Object[] {}).getBody();
+		UserWeiXin penguin = getRestTemplate()
+		        .getForEntity(String.format(URL_GET_USERINFO, appId, openId), UserWeiXin.class, new Object[] {})
+		        .getBody();
 		return penguin;
 	}
 }

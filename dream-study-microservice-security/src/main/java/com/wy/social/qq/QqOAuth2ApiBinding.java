@@ -5,7 +5,7 @@ import java.util.HashMap;
 import org.springframework.social.oauth2.AbstractOAuth2ApiBinding;
 import org.springframework.social.oauth2.TokenStrategy;
 
-import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson.JSON;
 import com.wy.entity.UserQq;
 import com.wy.social.IToken;
 
@@ -38,7 +38,7 @@ public class QqOAuth2ApiBinding extends AbstractOAuth2ApiBinding implements ITok
 
 	/** 获取鹅厂用户信息的url地址,accesstoken会由下面的构造方法中传入 */
 	private static final String URL_GET_USERINFO =
-			"https://graph.qq.com/user/get_user_info?oauth_consumer_key=%s&openid=%s";
+	        "https://graph.qq.com/user/get_user_info?oauth_consumer_key=%s&openid=%s";
 
 	/** 申请鹅厂的第三方app登录成功后,分配给app的appid,即在注册自己的应用时鹅厂给的appId */
 	private String appId;
@@ -66,7 +66,7 @@ public class QqOAuth2ApiBinding extends AbstractOAuth2ApiBinding implements ITok
 	@Override
 	public UserQq getUserInfo() {
 		UserQq penguin = getRestTemplate()
-				.getForEntity(String.format(URL_GET_USERINFO, appId, openId), UserQq.class, new Object[] {}).getBody();
+		        .getForEntity(String.format(URL_GET_USERINFO, appId, openId), UserQq.class, new Object[] {}).getBody();
 		penguin.setOpenId(openId);
 		return penguin;
 	}

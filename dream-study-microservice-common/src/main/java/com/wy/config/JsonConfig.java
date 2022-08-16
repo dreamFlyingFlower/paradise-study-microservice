@@ -8,9 +8,9 @@ import org.springframework.boot.autoconfigure.jackson.JacksonProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
 
-import com.alibaba.fastjson2.JSONWriter;
-import com.alibaba.fastjson2.support.config.FastJsonConfig;
-import com.alibaba.fastjson2.support.spring.http.converter.FastJsonHttpMessageConverter;
+import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.alibaba.fastjson.support.config.FastJsonConfig;
+import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
 
 /**
  * 可使用fastjon替换jackjson,但一般会出现各种奇葩情况,不建议使用
@@ -28,7 +28,7 @@ public class JsonConfig {
 	public HttpMessageConverters fastJsonConfig(JacksonProperties properties) {
 		FastJsonHttpMessageConverter fastConverter = new FastJsonHttpMessageConverter();
 		FastJsonConfig fastJsonConfig = new FastJsonConfig();
-		fastJsonConfig.setWriterFeatures(JSONWriter.Feature.PrettyFormat, JSONWriter.Feature.WriteMapNullValue);
+		fastJsonConfig.setSerializerFeatures(SerializerFeature.PrettyFormat, SerializerFeature.WriteMapNullValue);
 		/** --- 若数据库字段全为大写,且使用了fastjson代替jackjson,可使用如下配置 --- **/
 		// SerializeConfig parser = new SerializeConfig();
 		// // 解决swagger2在将字段都变成大写之后无法访问的问题

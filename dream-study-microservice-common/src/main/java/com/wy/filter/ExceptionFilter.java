@@ -21,7 +21,7 @@ import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.yaml.snakeyaml.constructor.DuplicateKeyException;
 
-import com.alibaba.fastjson2.JSONException;
+import com.alibaba.fastjson.JSONException;
 import com.wy.enums.TipFormatEnum;
 import com.wy.result.Result;
 import com.wy.result.ResultException;
@@ -43,7 +43,7 @@ public class ExceptionFilter {
 	public Result<?> handleException(HttpServletRequest request, Throwable throwable) {
 		throwable.printStackTrace();
 		log.error("主机Host:{},请求URL:{},异常原因:{}", request.getRemoteHost(), request.getRequestURL(),
-				throwable.getMessage());
+		        throwable.getMessage());
 		// http请求中断
 		if (throwable instanceof ClientAbortException) {
 			return Result.error("客户端中断了请求");
@@ -83,11 +83,11 @@ public class ExceptionFilter {
 		// 必传参数为空
 		if (throwable instanceof MissingServletRequestParameterException) {
 			return Result.error(TipFormatEnum.TIP_PARAM_EMPTY
-					.getMsg(((MissingServletRequestParameterException) throwable).getParameterName()));
+			        .getMsg(((MissingServletRequestParameterException) throwable).getParameterName()));
 		}
 		if (throwable instanceof MissingPathVariableException) {
 			return Result.error(
-					TipFormatEnum.TIP_PARAM_EMPTY.getMsg(((MissingPathVariableException) throwable).getVariableName()));
+			        TipFormatEnum.TIP_PARAM_EMPTY.getMsg(((MissingPathVariableException) throwable).getVariableName()));
 		}
 		// 方法参数验证失败
 		if (throwable instanceof MethodArgumentNotValidException) {

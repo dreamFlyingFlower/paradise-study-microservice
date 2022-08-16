@@ -6,8 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.TypeReference;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.wy.lang.StrTool;
 
 /**
@@ -24,7 +24,7 @@ public class CacheHandlerService {
 	private RedisTemplate<Object, Object> redisTemplate;
 
 	public <T> T getCahce(String key, long expire, TimeUnit unit, TypeReference<T> clazz,
-			CacheHandler<T> cacheHandler) {
+	        CacheHandler<T> cacheHandler) {
 		String result = String.valueOf(redisTemplate.opsForValue().get(key));
 		if (StrTool.isNotBlank(result)) {
 			return JSON.parseObject(result, clazz);
