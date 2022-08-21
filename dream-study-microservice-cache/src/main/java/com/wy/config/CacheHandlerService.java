@@ -24,7 +24,7 @@ public class CacheHandlerService {
 	private RedisTemplate<Object, Object> redisTemplate;
 
 	public <T> T getCahce(String key, long expire, TimeUnit unit, TypeReference<T> clazz,
-	        CacheHandler<T> cacheHandler) {
+			CacheHandler<T> cacheHandler) {
 		String result = String.valueOf(redisTemplate.opsForValue().get(key));
 		if (StrTool.isNotBlank(result)) {
 			return JSON.parseObject(result, clazz);
