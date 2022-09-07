@@ -1,4 +1,4 @@
-package com.wy.filter;
+package com.wy.config;
 
 import org.springframework.cloud.gateway.filter.factory.RequestRateLimiterGatewayFilterFactory;
 import org.springframework.cloud.gateway.filter.ratelimit.KeyResolver;

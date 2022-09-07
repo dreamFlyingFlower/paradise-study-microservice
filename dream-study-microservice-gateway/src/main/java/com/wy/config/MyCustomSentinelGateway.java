@@ -1,4 +1,4 @@
-package com.wy.filter;
+package com.wy.config;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -26,7 +26,7 @@ import com.alibaba.csp.sentinel.adapter.gateway.common.rule.GatewayRuleManager;
  * @git {@link https://github.com/dreamFlyingFlower}
  */
 @Component
-public class MySentinelGateway01 {
+public class MyCustomSentinelGateway {
 
 	/**
 	 * 配置初始化的限流参数

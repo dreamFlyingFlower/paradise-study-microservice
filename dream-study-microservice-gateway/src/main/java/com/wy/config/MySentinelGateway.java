@@ -8,6 +8,7 @@ import java.util.Set;
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -38,6 +39,9 @@ import reactor.core.publisher.Mono;
 
 /**
  * Gateway整合Sentinel限流
+ * 
+ * 基于Sentinel 的Gateway限流是通过其提供的Filter来完成的,使用时只需注入对应的SentinelGatewayFilter实例以及
+ * SentinelGatewayBlockExceptionHandler实例即可
  *
  * @author 飞花梦影
  * @date 2021-12-27 17:14:55
@@ -57,6 +61,18 @@ public class MySentinelGateway {
 	}
 
 	/**
+	 * 初始化一个限流的过滤器
+	 * 
+	 * @return
+	 */
+	@Bean
+	@Order(Ordered.HIGHEST_PRECEDENCE)
+	@ConditionalOnMissingBean
+	public GlobalFilter sentinelGatewayFilter() {
+		return new SentinelGatewayFilter();
+	}
+
+	/**
 	 * 配置限流的异常处理器
 	 * 
 	 * @return
@@ -66,17 +82,6 @@ public class MySentinelGateway {
 	public SentinelGatewayBlockExceptionHandler sentinelGatewayBlockExceptionHandler() {
 		// Register the block exception handler for Spring Cloud Gateway.
 		return new SentinelGatewayBlockExceptionHandler(viewResolvers, serverCodecConfigurer);
-	}
-
-	/**
-	 * 初始化一个限流的过滤器
-	 * 
-	 * @return
-	 */
-	@Bean
-	@Order(Ordered.HIGHEST_PRECEDENCE)
-	public GlobalFilter sentinelGatewayFilter() {
-		return new SentinelGatewayFilter();
 	}
 
 	/**

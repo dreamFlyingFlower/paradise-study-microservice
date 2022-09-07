@@ -1,4 +1,4 @@
-package com.wy.config;
+package com.wy.entity;
 
 /**
  * 测试用户类

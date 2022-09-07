@@ -7,10 +7,11 @@ import org.springframework.cloud.gateway.filter.ratelimit.RedisRateLimiter;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+
+import com.wy.entity.User;
 
 import reactor.core.publisher.Mono;
 
@@ -21,7 +22,7 @@ import reactor.core.publisher.Mono;
  * @date 2021-12-28 15:29:47
  * @git {@link https://github.com/dreamFlyingFlower }
  */
-@Configuration
+// @Configuration
 public class Route {
 
 	@Bean

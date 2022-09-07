@@ -12,9 +12,13 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 public class ThrottleGatewayFilter implements GatewayFilter {
+
 	int capacity;
+
 	int refillTokens;
+
 	int refillPeriod;
+
 	TimeUnit refillUnit;
 
 	public int getCapacity() {
