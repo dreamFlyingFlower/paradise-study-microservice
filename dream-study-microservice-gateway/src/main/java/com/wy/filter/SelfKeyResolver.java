@@ -3,6 +3,7 @@ package com.wy.filter;
 import org.springframework.cloud.gateway.filter.factory.RequestRateLimiterGatewayFilterFactory;
 import org.springframework.cloud.gateway.filter.ratelimit.KeyResolver;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 
@@ -22,6 +23,7 @@ public class SelfKeyResolver {
 	 * 基于请求路径的限流规则
 	 */
 	@Bean
+	@Primary
 	public KeyResolver pathKeyResolver() {
 		return new KeyResolver() {
 
