@@ -5,8 +5,8 @@ import java.io.Serializable;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
-import com.wy.database.Pri;
-import com.wy.database.Unique;
+import com.wy.db.annotation.Pri;
+import com.wy.db.annotation.Unique;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

@@ -8,7 +8,7 @@ spring:
         locator:
           # true:可以从注册中心获得其他微服务,根据服务名自动转发.若没有特殊转发,可不写下面的routes
           enabled: true
-          # 微服务名以小写形式呈现
+          # 微服务名以小写形式呈现,默认false,微服务名为转成大写
           lower-case-service-id: true
       # 路由数组
       routes: 
@@ -32,7 +32,7 @@ spring:
           # - Weight=group1,2
         # 过滤器,请求在传递过程中可以通过过滤器对其进行一定的修改,参照MyGatewayFilterFactory中的局部过滤器
         filters:
-        # 转发之前去掉1层路径前缀,因为通常第一层路径是微服务名,注意等号前后不能有空格
+        # 转发之前去掉1层路径前缀,如/api/product/**->/prodcut/**,注意等号前后不能有空格
         - StripPrefix=1
         # 使用内置的过滤器,修改返回状态
         - SetStatus=2000
@@ -52,7 +52,8 @@ spring:
           args:
             # 使用SpEL表达式从容器中获取对象.以下表达式为从spring中获取beanName为pathKeyResolver的对象,参照SelfKeyResolver
             key-resolver: '#{@pathKeyResolver}'
-            # 令牌桶每秒填充平局速率
-            redis-rate-limiter.replenishRate: 1
-            # 令牌桶的上限
-            redis-rate-limiter.burstCapacity: 3
+            redis-rate-limiter:
+              # 令牌桶每秒填充平局速率
+              replenishRate: 1
+              # 令牌桶的上限
+              burstCapacity: 3
