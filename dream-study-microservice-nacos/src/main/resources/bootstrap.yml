@@ -1,19 +1,29 @@
 spring:
   cloud:
     nacos:
+      # nacos配置中心服务器地址,默认localhost:8848
+      server-addr:  127.0.0.1:8848
+      # 登录nacos的用户名密码
+      username: dev
+      password: 123456
       # 设置注册服务功能属性
       discovery:
-        # nacos配置中心服务器地址
+        # 是否可以被其他服务发现,默认true
+        enabled: true
+        # 是否注册到nacos服务中,默认true
+        register-enabled: true
+        # nacos配置中心服务器地址,默认为${spring.cloud.nacos.server-addr}
         server-addr:  127.0.0.1:8848
         # 指定命名空间id,是名字后的一串UUID,若不指定,默认为public
         namespace: 1672775b-0f4a-4c2d-907f-d2cfe60053f6
-        # 分组,相当于属于某一个项目
+        # 分组,相当于属于某一个项目,默认为DEFAULT_GROUP
         group: dream-study-microservice
+        # 登录nacos的用户名密码,默认为${spring.cloud.nacos.username}和${spring.cloud.nacos.password}
         username: dev
         password: 123456
       config:
         enabled: true
-        # nacos配置中心服务器地址
+        # nacos配置中心服务器地址,默认为${spring.cloud.nacos.server-addr}
         server-addr: 127.0.0.1:8848
         # 指定命名空间id,是名字后的一串UUID,若不指定,默认为public
         namespace: 1672775b-0f4a-4c2d-907f-d2cfe60053f6
@@ -24,9 +34,9 @@ spring:
         # 配置前缀,默认${spring.application.name},完整的dataId就是prefix-${spring.profiles.active}.${file-extension}
         # 若prefix和name都有,prefix优先级更高
         #prefix: dream-study-microservice-nacos1
-        # 配置后缀
+        # 配置后缀,默认properties
         file-extension: yml
-        # 获得配置的用户
+        # 登录nacos的用户名密码,默认为${spring.cloud.nacos.username}和${spring.cloud.nacos.password}
         username: dev
         password: 123456
         # 扩展配置,若和主配置重复,主配置优先级高.若多配置中有重复,则下标越大(越下面)的优先级越高

@@ -43,7 +43,7 @@ public class TokenStoreConfig {
 	 */
 	@Bean
 	@ConditionalOnProperty(prefix = "config.security.oauth2.token", name = "storeType", havingValue = "jwt",
-			matchIfMissing = true)
+	        matchIfMissing = true)
 	public TokenStore jwtTokenStore() {
 		return new JwtTokenStore(jwtAccessTokenConverter());
 	}
@@ -55,13 +55,18 @@ public class TokenStoreConfig {
 	 */
 	@Bean
 	@ConditionalOnProperty(prefix = "config.security.oauth2.token", name = "storeType", havingValue = "jwt",
-			matchIfMissing = true)
+	        matchIfMissing = true)
 	public JwtAccessTokenConverter jwtAccessTokenConverter() {
 		JwtAccessTokenConverter jwtAccessTokenConverter = new JwtAccessTokenConverter();
 		jwtAccessTokenConverter.setSigningKey("密钥,可配置");
 		return jwtAccessTokenConverter;
 	}
 
+	/**
+	 * 自定义Token生成器,若无扩展信息可不自定义
+	 * 
+	 * @return TokenEnhancer
+	 */
 	@Bean
 	@ConditionalOnMissingBean(name = "jwtTokenEnhancer")
 	public TokenEnhancer jwtTokenEnhancer() {

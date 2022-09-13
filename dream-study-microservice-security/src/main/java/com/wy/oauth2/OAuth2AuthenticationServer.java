@@ -4,21 +4,24 @@ import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.provider.ClientDetails;
 import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.security.oauth2.provider.CompositeTokenGranter;
 import org.springframework.security.oauth2.provider.TokenGranter;
 import org.springframework.security.oauth2.provider.TokenRequest;
+import org.springframework.security.oauth2.provider.approval.UserApprovalHandler;
 import org.springframework.security.oauth2.provider.client.InMemoryClientDetailsService;
 import org.springframework.security.oauth2.provider.client.JdbcClientDetailsService;
+import org.springframework.security.oauth2.provider.code.AuthorizationCodeServices;
 import org.springframework.security.oauth2.provider.code.AuthorizationCodeTokenGranter;
 import org.springframework.security.oauth2.provider.endpoint.AuthorizationEndpoint;
 import org.springframework.security.oauth2.provider.endpoint.TokenEndpoint;
@@ -31,7 +34,7 @@ import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenCo
 import org.springframework.security.oauth2.provider.token.store.redis.RedisTokenStore;
 
 /**
- * OAuth2认证服务器
+ * OAuth2认证服务器,需要配合 {@link OAuth2Config}
  * 
  * {@link EnableAuthorizationServer}:添加该注解即可启动认证服务器,实现4种认证模式:授权码模式;密码模式;简化模式;客户端模式
  * 
@@ -80,45 +83,58 @@ public class OAuth2AuthenticationServer extends AuthorizationServerConfigurerAda
 	@Autowired
 	private AuthenticationManager authenticationManager;
 
+	/** {@link OAuth2Config#authorizationCodeServices()} */
+	@Autowired
+	private AuthorizationCodeServices authorizationCodeServices;
+
+	/** {@link OAuth2Config#authorizationServerTokenServices()} */
+	@Autowired
+	private AuthorizationServerTokenServices authorizationServerTokenServices;
+
+	@Autowired
+	private ClientDetailsService clientDetailsService;
+
 	@Autowired
 	private UserDetailsService userDetailsService;
 
+	/** {@link TokenStoreConfig#redisTokenStore()} */
 	@Autowired
 	private RedisTokenStore redisTokenStore;
 
+	/** {@link TokenStoreConfig#jwtAccessTokenConverter()} */
 	@Autowired
 	private JwtAccessTokenConverter jwtAccessTokenConverter;
 
+	/** {@link TokenStoreConfig#jwtTokenEnhancer()} */
 	@Autowired
 	private TokenEnhancer jwtTokenEnhancer;
 
-	@Override
-	public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
-		// 获得签名的signkey,需要身份验证才行,默认是denyAll(),这是SpringSecurity的权限表达式
-		security.tokenKeyAccess("isAuthenticated()");
-	}
+	@Autowired
+	private UserApprovalHandler userApprovalHandler;
 
 	/**
 	 * 客户端相关配置,如有那些客户端会访问服务器,认证服务器会给那些客户端发令牌等信息.
 	 * 重写该方法后,写在配置文件中的security.oauth2.client.client-id和client-secret都将无效
-	 * 
-	 * 最好的方法是从数据库取数据
 	 */
 	@Override
 	public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-		clients.inMemory()
-				// 配置clientid
-				.withClient("test_config")
-				// 配置密钥
-				.secret("test_secret")
-				// 设置过期时间
-				.accessTokenValiditySeconds(7200)
-				// 支持的授权模式
-				.authorizedGrantTypes("refresh_token", "authorization_code")
-				// 客户端请求权限.如果客户端不传scope,则直接给服务配置的权限;如果传了,则必须在配置的权限集合内
-				.scopes("all")
-				// 使用and()可以添加多个客户端授权
-				.and().withClient("test_config1");
+		// 从内存中读取信息
+		// clients.inMemory()
+		// // 配置clientid
+		// .withClient("test_config")
+		// // 配置密钥
+		// .secret("test_secret")
+		// // 设置过期时间
+		// .accessTokenValiditySeconds(7200)
+		// // 支持的授权模式
+		// .authorizedGrantTypes("refresh_token", "authorization_code")
+		// // 客户端请求权限.如果客户端不传scope,则直接给服务配置的权限;如果传了,则必须在配置的权限集合内
+		// .scopes("all")
+		// // 使用and()可以添加多个客户端授权
+		// .and().withClient("test_config1");
+
+		// 从数据库中读取信息
+		clients.withClientDetails(clientDetailsService);
 	}
 
 	/**
@@ -126,17 +142,43 @@ public class OAuth2AuthenticationServer extends AuthorizationServerConfigurerAda
 	 */
 	@Override
 	public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-		endpoints
-				// 使用redis存储第三方客户端相关信息
-				.tokenStore(redisTokenStore).authenticationManager(authenticationManager)
-				.userDetailsService(userDetailsService);
+		// endpoints.tokenServices(tokenService)
+
+		endpoints.authenticationManager(authenticationManager)
+		        // 若无refresh_token会有UserDetailsService is required错误
+		        .authorizationCodeServices(authorizationCodeServices)
+		        .pathMapping("/oauth/confirm_access", "/confirm_access").pathMapping("/oauth/error", "/oauth_error")
+		        // 只允许POST方式访问
+		        .allowedTokenEndpointRequestMethods(HttpMethod.POST)
+		        // 使用默认的tokenService,默认实现 DefaultTokenServices
+		        // .tokenServices(defaulAuthorizationServerTokenServices)
+		        // 使用自定义的tokenService,改造后的 DefaultTokenServices
+		        .tokenServices(authorizationServerTokenServices)
+		        // 使用redis存储第三方客户端相关信息
+		        .tokenStore(redisTokenStore).userDetailsService(userDetailsService)
+		        .userApprovalHandler(userApprovalHandler)
+		        // 自定义异常
+		        .exceptionTranslator(new OAuth2WebResponseExceptionTranslator());
+		// 不使用authorizationServerTokenServices,直接使用JWT处理token
 		if (null != jwtAccessTokenConverter && null != jwtTokenEnhancer) {
-			TokenEnhancerChain chain = new TokenEnhancerChain();
+			TokenEnhancerChain tokenEnhancerChain = new TokenEnhancerChain();
 			ArrayList<TokenEnhancer> enhancers = new ArrayList<>();
 			enhancers.add(jwtTokenEnhancer);
 			enhancers.add(jwtAccessTokenConverter);
-			chain.setTokenEnhancers(enhancers);
-			endpoints.tokenEnhancer(chain).accessTokenConverter(jwtAccessTokenConverter);
+			tokenEnhancerChain.setTokenEnhancers(enhancers);
+			endpoints.tokenEnhancer(tokenEnhancerChain).accessTokenConverter(jwtAccessTokenConverter);
 		}
+	}
+
+	/**
+	 * 令牌访问端点安全策略
+	 */
+	@Override
+	public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
+		security.tokenKeyAccess("permitAll()").checkTokenAccess("permitAll()")
+		        // 获得签名的signkey,需要身份验证才行,默认是denyAll(),这是SpringSecurity的权限表达式
+		        .tokenKeyAccess("isAuthenticated()")
+		        // 允许表单认证
+		        .allowFormAuthenticationForClients();
 	}
 }
