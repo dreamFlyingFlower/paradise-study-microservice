@@ -29,10 +29,6 @@ public class SpringContextUtils implements InitializingBean, ApplicationContextA
 		PARAMETER_NAME_DISCOVERER = new LocalVariableTableParameterNameDiscoverer();
 	}
 
-	public static ParameterNameDiscoverer getDisCoverer() {
-		return PARAMETER_NAME_DISCOVERER;
-	}
-
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		SpringContextUtils.applicationContext = applicationContext;
@@ -122,6 +118,10 @@ public class SpringContextUtils implements InitializingBean, ApplicationContextA
 	 */
 	public static <T> Map<String, T> getBeansOfType(Class<T> clazz) {
 		return applicationContext.getBeansOfType(clazz);
+	}
+
+	public static ParameterNameDiscoverer getDisCoverer() {
+		return PARAMETER_NAME_DISCOVERER;
 	}
 
 	/**
