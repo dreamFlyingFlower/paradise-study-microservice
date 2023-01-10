@@ -11,7 +11,6 @@ import org.springframework.cloud.gateway.filter.factory.AddRequestParameterGatew
 import org.springframework.cloud.gateway.filter.factory.AddResponseHeaderGatewayFilterFactory;
 import org.springframework.cloud.gateway.filter.factory.DedupeResponseHeaderGatewayFilterFactory;
 import org.springframework.cloud.gateway.filter.factory.FallbackHeadersGatewayFilterFactory;
-import org.springframework.cloud.gateway.filter.factory.HystrixGatewayFilterFactory;
 import org.springframework.cloud.gateway.filter.factory.PrefixPathGatewayFilterFactory;
 import org.springframework.cloud.gateway.filter.factory.PreserveHostHeaderGatewayFilterFactory;
 import org.springframework.cloud.gateway.filter.factory.RedirectToGatewayFilterFactory;
@@ -49,7 +48,7 @@ import reactor.core.publisher.Mono;
  * {@link AddRequestParameterGatewayFilterFactory}:为原始请求添加请求参数,参数为参数名称及值
  * {@link AddResponseHeaderGatewayFilterFactory}:为原始响应添加Header,参数为Header的名称及值
  * {@link DedupeResponseHeaderGatewayFilterFactory}:剔除响应头中重复的值,需要去重的Header名称及去重策略
- * {@link HystrixGatewayFilterFactory}:为路由引入Hystrix的断路器保护,参数为 HystrixCommand 的名称
+ * {@link HystrixGatewayFilterFactory}:为路由引入Hystrix的断路器保护,参数为 HystrixCommand 的名称,2.4以下版本有效
  * {@link FallbackHeadersGatewayFilterFactory}:为fallbackUri的请求头中添加具体的异常信息,参数为Header的名称
  * {@link PrefixPathGatewayFilterFactory}:为原始请求路径添加前缀,参数为前缀路径
  * {@link PreserveHostHeaderGatewayFilterFactory}:为请求添加一个preserveHostHeader=true的属性,

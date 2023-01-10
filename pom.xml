@@ -2,50 +2,26 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>dream.flying.flower</groupId>
+	<parent>
+		<groupId>dream.flying.flower</groupId>
+		<artifactId>dream-parent</artifactId>
+		<version>0.0.1</version>
+	</parent>
+
 	<artifactId>dream-study-microservice</artifactId>
-	<version>0.0.1</version>
 	<packaging>pom</packaging>
 	<name>dream-study-microservice</name>
 	<description>study for spring cloud microservice</description>
 
-	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.7.5</version>
-		<relativePath />	<!-- lookup parent from repository -->
-	</parent>
-
 	<properties>
-		<!-- 因为日志框架漏洞的关系,log4j-api和log4j-core要升级到2.17.1以上 -->
+		<!-- 因为日志框架漏洞的关系,log4j-api和log4j-core要升级到2.17.1以上,springboot2.7以上已升级,以下不需要重写版本号 -->
 		<java.version>1.8</java.version>
-		<alibaba.cloud.version>2.2.7.RELEASE</alibaba.cloud.version>
-		<spring.cloud-version>Hoxton.SR12</spring.cloud-version>
 		<!-- 若要升级到2020.0.1,Netflix的很多Jar被移除或替换 -->
 		<!-- hystrix被移除,替换为resilience4j;zuul被移除,替换为gateway;ribbon被移除,替换为loadbalancer -->
 		<!-- turbine被移除,暂无替代,springboot要使用2.4.2版本 -->
 		<!-- <alibaba.cloud.version>2021.1</alibaba.cloud.version> -->
 		<!-- <spring.cloud-version>2020.0.1</spring.cloud-version> -->
 	</properties>
-
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>com.alibaba.cloud</groupId>
-				<artifactId>spring-cloud-alibaba-dependencies</artifactId>
-				<version>${alibaba.cloud.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework.cloud</groupId>
-				<artifactId>spring-cloud-dependencies</artifactId>
-				<version>${spring.cloud-version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
 
 	<modules>
 		<module>dream-study-microservice-bus</module>

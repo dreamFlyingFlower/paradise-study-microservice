@@ -11,7 +11,7 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 /**
- * Gateway跨域
+ * Gateway跨域,配置文件的配置和Bean配置作用相同
  *
  * @author 飞花梦影
  * @date 2021-12-28 15:57:18

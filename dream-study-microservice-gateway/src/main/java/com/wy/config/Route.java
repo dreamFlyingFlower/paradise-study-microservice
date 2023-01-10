@@ -66,13 +66,16 @@ public class Route {
 							Object data = map.get("data");
 							return Mono.just(data.toString());
 						}).setResponseHeader("Content-Type", MediaType.TEXT_PLAIN_VALUE)).uri("http://httpbin.org"))
-				.route("hystrix_route",
-						r -> r.host("*.hystrix.org").filters(f -> f.hystrix(c -> c.setName("slowcmd")))
-								.uri("http://httpbin.org"))
-				.route("hystrix_fallback_route",
-						r -> r.host("*.hystrixfallback.org").filters(
-								f -> f.hystrix(c -> c.setName("slowcmd").setFallbackUri("forward:/hystrixfallback")))
-								.uri("http://httpbin.org"))
+				// 2.4以下版本springboot有效
+				// .route("hystrix_route",
+				// r -> r.host("*.hystrix.org").filters(f -> f.hystrix(c ->
+				// c.setName("slowcmd")))
+				// .uri("http://httpbin.org"))
+				// .route("hystrix_fallback_route",
+				// r -> r.host("*.hystrixfallback.org").filters(
+				// f -> f.hystrix(c ->
+				// c.setName("slowcmd").setFallbackUri("forward:/hystrixfallback")))
+				// .uri("http://httpbin.org"))
 				.route("limit_route",
 						r -> r.host("*.limited.org").and().path("/anything/**")
 								.filters(f -> f.requestRateLimiter(c -> c.setRateLimiter(redisRateLimiter())))

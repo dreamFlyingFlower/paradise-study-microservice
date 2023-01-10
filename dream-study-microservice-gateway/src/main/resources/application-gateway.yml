@@ -1,6 +1,22 @@
 spring:
   cloud:
     gateway:
+      # 全局redis限流
+      redis-rate-limiter:
+        # 请求头中标识限流上限的属性
+        burst-capacity-header:
+        # 请求头中标识令牌桶填充速率的属性
+        replenish-rate-header:  
+      globalcors:
+        # 全局允许跨域请求
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedHeaders: "*"
+            allowedMethods: "*"
+      default-filters:
+        # 会调用DedupeResponseHeaderGatewayFilterFactory中的dedupe方法
+      - DedupeResponseHeader=Vary Access-Control-Allow-Origin Access-Control-Allow-Credentials
       filter:
         remove-hop-by-hop:
           order: 1          
@@ -48,12 +64,15 @@ spring:
           args: 
             retries: 3
             status: 503
+        # 使用RequestRateLimiterGatewayFilterFactory限流过滤器
         - name: RequestRateLimiter
           args:
             # 使用SpEL表达式从容器中获取对象.以下表达式为从spring中获取beanName为pathKeyResolver的对象,参照SelfKeyResolver
             key-resolver: '#{@pathKeyResolver}'
             redis-rate-limiter:
-              # 令牌桶每秒填充平局速率
-              replenishRate: 1
+              # 令牌桶每秒填充平局速率,不能设置小数
+              replenish-rate: 1
               # 令牌桶的上限
-              burstCapacity: 3
+              burst-capacity: 3
+              # 拒绝空key
+              deny-empty-key: true

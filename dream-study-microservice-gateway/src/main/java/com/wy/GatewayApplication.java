@@ -4,7 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.gateway.config.GatewayAutoConfiguration;
 import org.springframework.cloud.gateway.config.GatewayClassPathWarningAutoConfiguration;
-import org.springframework.cloud.gateway.config.GatewayLoadBalancerClientAutoConfiguration;
+import org.springframework.cloud.gateway.config.GatewayReactiveLoadBalancerClientAutoConfiguration;
 import org.springframework.cloud.gateway.handler.RoutePredicateHandlerMapping;
 import org.springframework.cloud.netflix.hystrix.EnableHystrix;
 import org.springframework.web.reactive.DispatcherHandler;
@@ -15,7 +15,7 @@ import org.springframework.web.reactive.handler.AbstractHandlerMapping;
  * 
  * {@link GatewayAutoConfiguration}:Gateway自动配置入口,加载了Gateway需要注入的类
  * 	{@link GatewayClassPathWarningAutoConfiguration}:检查是否配置webfux依赖
- * {@link GatewayLoadBalancerClientAutoConfiguration}:网关需要使用的负载均衡
+ * {@link GatewayReactiveLoadBalancerClientAutoConfiguration}:网关需要使用的负载均衡
  * {@link DispatcherHandler#handle}:前端请求处理转发
  * {@link AbstractHandlerMapping#getHandler}:根据Web请求获得转发处理
  * {@link RoutePredicateHandlerMapping#getHandlerInternal}:处理转发请求
