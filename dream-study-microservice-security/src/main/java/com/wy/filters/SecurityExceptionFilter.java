@@ -73,8 +73,8 @@ public class SecurityExceptionFilter {
 		}
 		// 必传参数为空异常
 		if (throwable instanceof MissingServletRequestParameterException) {
-			return Result.error(TipFormatEnum.TIP_PARAM_EMPTY
-			        .getMsg(((MissingServletRequestParameterException) throwable).getParameterName()));
+			return Result.error(TipFormatEnum.TIP_PARAM_REQUIRED_IS_NULL
+					.getMsg(((MissingServletRequestParameterException) throwable).getParameterName()));
 		}
 		// 方法参数验证失败
 		if (throwable instanceof MethodArgumentNotValidException) {

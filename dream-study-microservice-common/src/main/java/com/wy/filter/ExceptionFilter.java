@@ -43,7 +43,7 @@ public class ExceptionFilter {
 	public Result<?> handleException(HttpServletRequest request, Throwable throwable) {
 		throwable.printStackTrace();
 		log.error("主机Host:{},请求URL:{},异常原因:{}", request.getRemoteHost(), request.getRequestURL(),
-		        throwable.getMessage());
+				throwable.getMessage());
 		// http请求中断
 		if (throwable instanceof ClientAbortException) {
 			return Result.error("客户端中断了请求");
@@ -82,12 +82,12 @@ public class ExceptionFilter {
 		}
 		// 必传参数为空
 		if (throwable instanceof MissingServletRequestParameterException) {
-			return Result.error(TipFormatEnum.TIP_PARAM_EMPTY
-			        .getMsg(((MissingServletRequestParameterException) throwable).getParameterName()));
+			return Result.error(TipFormatEnum.TIP_PARAM_REQUIRED_IS_NULL
+					.getMsg(((MissingServletRequestParameterException) throwable).getParameterName()));
 		}
 		if (throwable instanceof MissingPathVariableException) {
-			return Result.error(
-			        TipFormatEnum.TIP_PARAM_EMPTY.getMsg(((MissingPathVariableException) throwable).getVariableName()));
+			return Result.error(TipFormatEnum.TIP_PARAM_REQUIRED_IS_NULL
+					.getMsg(((MissingPathVariableException) throwable).getVariableName()));
 		}
 		// 方法参数验证失败
 		if (throwable instanceof MethodArgumentNotValidException) {

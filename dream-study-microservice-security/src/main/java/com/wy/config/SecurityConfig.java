@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.access.ExceptionTranslationFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -166,6 +167,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		        // .maxSessionsPreventsLogin(true)
 		        // 用户多session登录导致前面session失效时触发的事件
 		        // .expiredSessionStrategy(sessionExpiredStrategy)
+		        // 不需要session
+		        // .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 		        // .and().and()
 		        // 验证开始
 		        .authorizeRequests().antMatchers(userProperties.getSecurity().getPermitSources())
