@@ -216,6 +216,22 @@ import com.wy.crl.UserCrl;
  * 详见{@link ExtraSecurityExpressionRoot}和{@link ExtraMethodSecurityExpressionHandler}
  * </pre>
  * 
+ * 权限表达式:
+ * 
+ * <pre>
+ * permitAll:只要匹配表达式,任意请求都可以访问,无需登录校验
+ * denyAll:所有的请求都拦截
+ * anonymous:匿名用户才通过
+ * rememberMe:只有当前用户是记住用户时通过
+ * authenticated:当前用户不是anonymous时通过
+ * fullAuthenticated:当前用户既不是anonymous也不是rememberme,且校验通过
+ * hasRole:用户拥有指定的角色
+ * hasAnyRole:拥有指定的任意一种角色
+ * hasAuthority:用户拥有指定权限
+ * hasAnyAuthority:用户有任意一个指定的权限
+ * hasIpAddress:请求发送的ip匹配时才通过 
+ * </pre>
+ * 
  * {@link PostAuthorize}:该注解在方法执行完之后判断是否有权限,可以用returnObject表示返回值对象
  * 
  * {@link PreFilter}:对Collection类型的方法参数进行拦截,只能用在实现了Collection的类型上,数组也不行
@@ -253,16 +269,17 @@ import com.wy.crl.UserCrl;
  * 加密串存储:为了更好的防止黑客利用上一次的请求在过期时间内再次请求,可以将加密串在服务器中利用Map进行存储,
  * 		当请求再次被调用时,先从内存中Map中查找加密字符串是否使用过,使用过就不能再调用
  * 请求防篡改:请求签名(MD5),对参数进行MD5加密,同时要指定盐(salt),salt不会随着请求进行传输,但客户端和服务器都要存
+ * CSRF攻击:跨站请求伪造,SpringSecurity会对所有post请求验证是否携带系统生成的csrf token信息,没有就报错
  * </pre>
  * 
  * @author 飞花梦影
  * @date 2019-01-31 00:09:33
  * @git {@link https://github.com/dreamFlyingFlower}
  */
+@SuppressWarnings("deprecation")
 @EnableRedisHttpSession
 @SpringBootApplication
 @EnableOAuth2Sso
-@Deprecated
 public class Application {
 
 	public static void main(String[] args) {

@@ -130,6 +130,7 @@ import com.wy.social.qq.QqSocialConfigurer;
  * @date 2019-09-23 00:18:00
  * @git {@link https://github.com/dreamFlyingFlower}
  */
+@SuppressWarnings("deprecation")
 @Configuration
 @ConditionalOnProperty(prefix = "user.social.qq", name = "app-id")
 @EnableSocial

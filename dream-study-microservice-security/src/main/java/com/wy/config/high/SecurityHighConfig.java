@@ -12,8 +12,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.config.ldap.EmbeddedLdapServerContextSourceFactoryBean;
-import org.springframework.security.config.ldap.LdapBindAuthenticationManagerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -23,6 +21,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.wy.jwt.JwtTokenFilter;
 import com.wy.security.LoginAuthEntryPoint;
 import com.wy.service.UserService;
 
@@ -33,6 +32,7 @@ import com.wy.service.UserService;
  * @date 2023-02-01 16:51:06
  * @git {@link https://github.com/dreamFlyingFlower }
  */
+@SuppressWarnings("deprecation")
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -41,10 +41,12 @@ public class SecurityHighConfig {
 	@Autowired
 	private UserService userService;
 
-	// jwt 校验过滤器,从 http 头部 Authorization 字段读取 token 并校验
+	/**
+	 * jwt 校验过滤器,从 http 头部 Authorization 字段读取 token 并校验
+	 */
 	@Bean
-	public JwtAuthFilter authFilter() throws Exception {
-		return new JwtAuthFilter();
+	public JwtTokenFilter jwtTokenFilter() {
+		return new JwtTokenFilter();
 	}
 
 	@Bean
@@ -53,7 +55,7 @@ public class SecurityHighConfig {
 	}
 
 	/**
-	 * 获取AuthenticationManager（认证管理器）,登录时认证使用
+	 * 获取AuthenticationManager(认证管理器),登录时认证使用
 	 * 
 	 * @param authenticationConfiguration
 	 * @return
@@ -84,12 +86,13 @@ public class SecurityHighConfig {
 	 * {@link WebSecurityConfigurerAdapter#configure(org.springframework.security.config.annotation.web.builders.HttpSecurity)}
 	 * 
 	 * @param http HttpSecurity
+	 * @throws Exception
 	 */
 	@Bean
-	SecurityFilterChain filterChain(HttpSecurity http) {
+	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http.authorizeHttpRequests((authz) -> authz.anyRequest().authenticated())
 				// 自定义认证处理器,默认为 ProviderManager
-				.authenticationManager(new CustomAuthenticationManager());
+				.authenticationManager(new SelfAuthenticationManager());
 		return http.csrf().disable()
 				// 基于 token,不需要 session
 				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
@@ -101,7 +104,7 @@ public class SecurityHighConfig {
 				.authorizeRequests(authorize -> authorize.antMatchers("/**").permitAll().antMatchers("/**").permitAll()
 						.anyRequest().authenticated())
 				// 添加 JWT 过滤器,JWT 过滤器在用户名密码认证过滤器之前
-				.addFilterBefore(authFilter(), UsernamePasswordAuthenticationFilter.class)
+				.addFilterBefore(jwtTokenFilter(), UsernamePasswordAuthenticationFilter.class)
 				// 认证用户时用户信息加载配置
 				.userDetailsService(userService).build();
 	}
@@ -114,29 +117,22 @@ public class SecurityHighConfig {
 		return (web) -> web.ignoring().antMatchers("/ignore1", "/ignore2");
 	}
 
-	@Bean
-	public EmbeddedLdapServerContextSourceFactoryBean contextSourceFactoryBean() {
-		EmbeddedLdapServerContextSourceFactoryBean contextSourceFactoryBean =
-				EmbeddedLdapServerContextSourceFactoryBean.fromEmbeddedLdapServer();
-		contextSourceFactoryBean.setPort(0);
-		return contextSourceFactoryBean;
-	}
-
-	@Bean
-	AuthenticationManager ldapAuthenticationManager(BaseLdapPathContextSource contextSource) {
-		LdapBindAuthenticationManagerFactory factory = new LdapBindAuthenticationManagerFactory(contextSource);
-		factory.setUserDnPatterns("uid={0},ou=people");
-		factory.setUserDetailsContextMapper(new PersonContextMapper());
-		return factory.createAuthenticationManager();
-	}
-
 	/**
 	 * 配置跨源访问(CORS)
 	 */
 	@Bean
 	CorsConfigurationSource corsConfigurationSource() {
+		CorsConfiguration corsConfiguration = new CorsConfiguration();
+		// 允许跨域的站点
+		corsConfiguration.addAllowedOrigin("*");
+		// 允许跨域的请求头
+		corsConfiguration.addAllowedHeader("*");
+		// 允许跨域的请求类型
+		corsConfiguration.addAllowedMethod("*");
+		// 允许携带凭证
+		corsConfiguration.setAllowCredentials(true);
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-		source.registerCorsConfiguration("/**", new CorsConfiguration().applyPermitDefaultValues());
+		source.registerCorsConfiguration("/**", corsConfiguration);
 		return source;
 	}
 }

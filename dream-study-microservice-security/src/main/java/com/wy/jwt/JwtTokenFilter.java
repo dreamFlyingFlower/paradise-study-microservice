@@ -18,8 +18,9 @@ import com.wy.collection.ListTool;
 /**
  * token过滤器,验证token有效性
  *
- * @author ParadiseWY
- * @date 2020年4月8日 上午12:28:32
+ * @author 飞花梦影
+ * @date 2023-02-02 10:03:46
+ * @git {@link https://github.com/dreamFlyingFlower }
  */
 @Component
 public class JwtTokenFilter extends OncePerRequestFilter {

@@ -11,13 +11,13 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.access.ExceptionTranslationFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 
+import com.wy.config.high.SecurityHighConfig;
 import com.wy.filters.VerifyFilter;
 import com.wy.properties.UserProperties;
 import com.wy.security.LoginAuthEntryPoint;
@@ -33,10 +33,13 @@ import com.wy.service.UserService;
  * 
  * {@link ExceptionTranslationFilter}:认证异常处理类
  * 
+ * {@link Deprecated}:{@link WebSecurityConfigurerAdapter}在5.7以上废弃,使用见{@link SecurityHighConfig}
+ * 
  * @author 飞花梦影
  * @date 2020-12-08 10:23:47
  * @git {@link https://github.com/dreamFlyingFlower}
  */
+@SuppressWarnings("deprecation")
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
@@ -108,8 +111,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 		// 在内存中添加一些内置的用户,当其他微服务访问当前服务时,使用这些内置的用户即可
 		auth.inMemoryAuthentication().passwordEncoder(new BCryptPasswordEncoder()).withUser("test")
-		        .password(new BCryptPasswordEncoder().encode("123456")).roles("USER").and().withUser("admin")
-		        .password(new BCryptPasswordEncoder().encode("123456")).roles("USER", "ADMIN");
+				.password(new BCryptPasswordEncoder().encode("123456")).roles("USER").and().withUser("admin")
+				.password(new BCryptPasswordEncoder().encode("123456")).roles("USER", "ADMIN");
 	}
 
 	/**
@@ -119,16 +122,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	 * apply:进行另外的验证;
 	 * authorizeRequests:开始请求权限配置
 	 * antmatchers:匹配表达式的所有请求,若是资源文件目录,不可写/resources/**或/static/**,仍然会拦截
-	 * permitall:只要匹配表达式,任意请求都可以访问,无需登录校验
+	 * permitAll:只要匹配表达式,任意请求都可以访问,无需登录校验
 	 * denyAll:所有的请求都拦截 
 	 * anonymous:匿名用户才通过
-	 * rememberme:只有当前用户是记住用户时通过 
+	 * rememberMe:只有当前用户是记住用户时通过 
 	 * authenticated:当前用户不是anonymous时通过
-	 * fullAuthenticated:当前用户既不是anonymous也不是rememberme时通过 
-	 * hasRole:用户拥有指定的权限时才通过
-	 * hasAnyRole:拥有指定的任意一种权限时就可以通过 
-	 * hasAnyAuthority:用户有任意一个指定的权限时才通过
-	 * hasIpAddress:请求发送的ip匹配时才通过 
+	 * fullAuthenticated:当前用户既不是anonymous也不是rememberme,且校验通过 
+	 * hasRole:用户拥有指定的角色
+	 * hasAnyRole:拥有指定的任意一种角色
+	 * hasAuthority:用户拥有指定权限
+	 * hasAnyAuthority:用户有任意一个指定的权限
+	 * hasIpAddress:请求发送的ip匹配时才通过
 	 * anyrequest.authenticated:所有的请求登录后才可访问
 	 * formlogin:表示允许表单登录
 	 * httpbasic:表示允许http请求登录
@@ -146,60 +150,62 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http
-		        // 设置在页面可以通过iframe访问受保护的页面,默认为不允许访问
-		        // .headers().frameOptions().sameOrigin().and()
-		        // 进行短信验证
-		        // .apply(new SmsAuthenticationSecurityConfig()).and()
-		        // 进行social验证
-		        // .apply(qqSocialConfigurer).and()
-		        // 在用户名和密码校验之后进行拦截
-		        .addFilterBefore(verifyFilter, UsernamePasswordAuthenticationFilter.class)
-		        // 添加jwt校验
-		        // .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
-		        // 对session的操作
-		        // .sessionManagement()
-		        // session失效之后跳转的地址,若是jsp则是页面,不是则为api接口地址,不需要安全验证
-		        // .invalidSessionUrl("/session/invalid")
-		        // .invalidSessionStrategy("session/")
-		        // 同一个用户的最大session数量,若再登录时则会将前面登录的session失效
-		        // .maximumSessions(1)
-		        // 当session达到最大数时,不然后面的用户session再次登录;false则不限制
-		        // .maxSessionsPreventsLogin(true)
-		        // 用户多session登录导致前面session失效时触发的事件
-		        // .expiredSessionStrategy(sessionExpiredStrategy)
-		        // 不需要session
-		        // .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-		        // .and().and()
-		        // 验证开始
-		        .authorizeRequests().antMatchers(userProperties.getSecurity().getPermitSources())
-		        // 所有匹配的url请求不需要验证
-		        .permitAll()
-		        // 访问某些页面需要的权限,此处给的admin权限,是在用户登录时返回的,同时admin需要完全匹配
-		        // 而给权限的时候需要加上ROLE_,每一种权限都需要加,否则不识别
-		        // .antMatchers("/user").hasRole("admin")
-		        // 可以指定请求的类型,可以用通配符指定一类的请求
-		        // .antMatchers(HttpMethod.GET,"user/*").hasRole("admin")
-		        .anyRequest().authenticated().and().formLogin().loginProcessingUrl("/user/login")
-		        .usernameParameter("username").passwordParameter("password").successHandler(loginSuccessHandler)
-		        // 失败的自定义处理
-		        .failureHandler(loginFailHandler)
-		        // 使用记住密码功能需要使用数据库,只是服务端记住,而非浏览器,浏览器关掉之后仍然需要重新登录
-		        .and().rememberMe().tokenRepository(persistentTokenRepository()).tokenValiditySeconds(1209600)
-		        .userDetailsService(userService).and()
-		        // 退出的自定义配置
-		        .logout()
-		        // 清除所有的认证
-		        // .clearAuthentication(true)
-		        // 删除指定的cookie,参数为cookie的名字
-		        // .deleteCookies("JSESSIONID")
-		        // 自定义退出的接口或页面,默认为logout
-		        // .logoutUrl("/signout")
-		        // 自定义退出成功的页面,默认退出到登录页
-		        // .logoutSuccessUrl("/logoutsuccess.html")
-		        // 自定义登出登录返回json字符串,若不定义则跳到默认地址,url和handler只能有一个生效
-		        .logoutSuccessHandler(logoutSuccessHandler).and()
-		        // 自定义拦截未登录请求,若不定义则跳转到loginForm自定义地址或默认的/login
-		        .exceptionHandling().authenticationEntryPoint(new LoginAuthEntryPoint(null)).and().csrf().disable();
+				// 设置在页面可以通过iframe访问受保护的页面,默认为不允许访问
+				// .headers().frameOptions().sameOrigin().and()
+				// 进行短信验证
+				// .apply(new SmsAuthenticationSecurityConfig()).and()
+				// 进行social验证
+				// .apply(qqSocialConfigurer).and()
+				// 在用户名和密码校验之后进行拦截
+				.addFilterBefore(verifyFilter, UsernamePasswordAuthenticationFilter.class)
+				// 添加jwt校验
+				// .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
+				// 对session的操作
+				// .sessionManagement()
+				// session失效之后跳转的地址,若是jsp则是页面,不是则为api接口地址,不需要安全验证
+				// .invalidSessionUrl("/session/invalid")
+				// .invalidSessionStrategy("session/")
+				// 同一个用户的最大session数量,若再登录时则会将前面登录的session失效
+				// .maximumSessions(1)
+				// 当session达到最大数时,不然后面的用户session再次登录;false则不限制
+				// .maxSessionsPreventsLogin(true)
+				// 用户多session登录导致前面session失效时触发的事件
+				// .expiredSessionStrategy(sessionExpiredStrategy)
+				// 不需要session
+				// .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+				// .and()
+				// 验证开始
+				.authorizeRequests().antMatchers(userProperties.getSecurity().getPermitSources())
+				// 所有匹配的url请求不需要验证
+				.permitAll()
+				// 访问某些页面需要的权限,此处给的admin权限,是在用户登录时返回的,同时admin需要完全匹配
+				// 而给权限的时候需要加上ROLE_,每一种权限都需要加,否则不识别
+				// .antMatchers("/user").hasRole("admin")
+				// 效果等同于hasRole和hasIpAddress
+				// .access("hasRole('admin') and hasIpAddress('127.0.0.1')")
+				// 可以指定请求的类型,可以用通配符指定一类的请求
+				// .antMatchers(HttpMethod.GET,"user/*").hasRole("admin")
+				.anyRequest().authenticated().and().formLogin().loginProcessingUrl("/user/login")
+				.usernameParameter("username").passwordParameter("password").successHandler(loginSuccessHandler)
+				// 失败的自定义处理
+				.failureHandler(loginFailHandler)
+				// 使用记住密码功能需要使用数据库,只是服务端记住,而非浏览器,浏览器关掉之后仍然需要重新登录
+				.and().rememberMe().tokenRepository(persistentTokenRepository()).tokenValiditySeconds(1209600)
+				.userDetailsService(userService).and()
+				// 退出的自定义配置
+				.logout()
+				// 清除所有的认证
+				// .clearAuthentication(true)
+				// 删除指定的cookie,参数为cookie的名字
+				// .deleteCookies("JSESSIONID")
+				// 自定义退出的接口或页面,默认为logout
+				// .logoutUrl("/signout")
+				// 自定义退出成功的页面,默认退出到登录页
+				// .logoutSuccessUrl("/logoutsuccess.html")
+				// 自定义登出登录返回json字符串,若不定义则跳到默认地址,url和handler只能有一个生效
+				.logoutSuccessHandler(logoutSuccessHandler).and()
+				// 自定义拦截未登录请求,若不定义则跳转到loginForm自定义地址或默认的/login
+				.exceptionHandling().authenticationEntryPoint(new LoginAuthEntryPoint(null)).and().csrf().disable();
 	}
 
 	@Override
