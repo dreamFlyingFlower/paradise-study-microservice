@@ -20,6 +20,7 @@ import org.apache.zookeeper.CreateMode;
  * @date 2021-12-24 17:32:35
  * @git {@link https://github.com/dreamFlyingFlower }
  */
+@SuppressWarnings("deprecation")
 public class ZkLock {
 
 	// 计数器

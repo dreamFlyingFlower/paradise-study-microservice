@@ -32,6 +32,7 @@ import org.apache.zookeeper.data.Stat;
  * @date 2019-03-09 23:31:27
  * @git {@link https://github.com/dreamFlyingFlower}
  */
+@SuppressWarnings("deprecation")
 public class ZkCurator {
 
 	private static String path = "/testRoot";
