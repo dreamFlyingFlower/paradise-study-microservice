@@ -15,6 +15,7 @@ import java.util.Date;
  * @date 2021-09-25 11:23:27
  * @git {@link https://github.com/dreamFlyingFlower}
  */
+@SuppressWarnings("deprecation")
 @EnableBinding(MessageProducerSource.class)
 public class MessageProcuder {
 

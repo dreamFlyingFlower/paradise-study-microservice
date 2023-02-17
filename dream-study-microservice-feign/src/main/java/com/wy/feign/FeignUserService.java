@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.wy.configs.FeignConfig;
 import com.wy.configs.FeignSecurityConfig;
-import com.wy.fallback.UserFallback;
 
 /**
  * FeignClient:使用注解的方式进行类似轮询的负载均衡调用
@@ -38,8 +37,10 @@ import com.wy.fallback.UserFallback;
 // @FeignClient(value = "dream-study-microservice-service", configuration =
 // FeignClientConfiguration.class,
 // fallbackFactory = UserFallback.class)
-@FeignClient(value = "dream-study-microservice-service", configuration = FeignSecurityConfig.class,
-		fallbackFactory = UserFallback.class)
+// UserFallback需要spring-cloud-starter-openfeign版本为2.2.10.RELEASE
+//@FeignClient(value = "dream-study-microservice-service", configuration = FeignSecurityConfig.class,
+//		fallbackFactory = UserFallback.class)
+@FeignClient(value = "dream-study-microservice-service", configuration = FeignSecurityConfig.class)
 public interface FeignUserService extends FeignService {
 
 	@Override

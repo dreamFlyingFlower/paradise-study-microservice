@@ -3,6 +3,7 @@ package com.wy.producer;
 import org.springframework.cloud.stream.annotation.Output;
 import org.springframework.messaging.MessageChannel;
 
+@SuppressWarnings("deprecation")
 public interface MessageProducerSource {
 
 	/**

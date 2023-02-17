@@ -27,6 +27,7 @@ import org.springframework.messaging.Message;
  * @git {@link https://github.com/dreamFlyingFlower}
  */
 @EnableBinding(MessageConsumerSource.class)
+@SuppressWarnings("deprecation")
 public class MessageConsumer {
 
 	@StreamListener(MessageConsumerSource.INPUT)
