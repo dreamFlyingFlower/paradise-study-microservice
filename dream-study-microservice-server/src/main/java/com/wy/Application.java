@@ -8,6 +8,11 @@ import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.client.serviceregistry.ServiceRegistry;
 import org.springframework.cloud.netflix.eureka.EurekaClientAutoConfiguration;
 import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
+import org.springframework.cloud.netflix.eureka.server.EurekaServerAutoConfiguration;
+import org.springframework.cloud.netflix.eureka.server.EurekaServerInitializerConfiguration;
+import org.springframework.cloud.netflix.eureka.server.EurekaServerMarkerConfiguration;
+import org.springframework.cloud.netflix.eureka.server.event.EurekaRegistryAvailableEvent;
+import org.springframework.cloud.netflix.eureka.server.event.EurekaServerStartedEvent;
 import org.springframework.cloud.netflix.eureka.serviceregistry.EurekaAutoServiceRegistration;
 import org.springframework.cloud.netflix.eureka.serviceregistry.EurekaRegistration;
 import org.springframework.cloud.netflix.eureka.serviceregistry.EurekaServiceRegistry;
@@ -102,6 +107,13 @@ import org.springframework.context.support.DefaultLifecycleProcessor;
  * ZK的InterProcessMutex,用acquire获得锁,用release释放锁
  * Redis的incr(),setnx()同样可以实现自增长的线程安全数值.类似AtomicInteger
  * Redisson:专为高并发设计的分布式锁,信号量等,作用等同于java.util.concurrent包下的部分类,如{@link Semaphore}
+ * </pre>
+ * 
+ * Eureka启动流程,由{@link EurekaServerAutoConfiguration}开始
+ * 
+ * <pre>
+ * {@link EurekaServerMarkerConfiguration.Marker}:该bean由{@link EnableEurekaServer}导入
+ * {@link EurekaServerInitializerConfiguration}:发布{@link EurekaRegistryAvailableEvent},{@link EurekaServerStartedEvent}监听,初始化 EurekaServerContext
  * </pre>
  * 
  * @author 飞花梦影
