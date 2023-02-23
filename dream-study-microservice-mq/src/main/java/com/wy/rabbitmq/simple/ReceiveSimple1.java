@@ -25,6 +25,9 @@ public class ReceiveSimple1 {
 		Connection connection = ConnectionUtil.getConnection();
 		// 创建通道
 		Channel channel = connection.createChannel();
+		// 预取值,默认0,轮训,处理慢的队列可能造成数据积压
+		// 1表示消费者只能同时处理一条消息,能者多劳,处理的越快,就可以处理更多消息,避免队列的长时间任务
+		channel.basicQos(1);
 		// 声明队列
 		channel.queueDeclare(QUEUE_NAME, false, false, false, null);
 		// 定义队列的消费者

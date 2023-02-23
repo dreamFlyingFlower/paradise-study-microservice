@@ -2,6 +2,7 @@ package com.wy.rabbitmq.work;
 
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.MessageProperties;
 import com.wy.rabbitmq.util.ConnectionUtil;
 
 /**
@@ -22,13 +23,12 @@ public class ProviderWork {
 		Channel channel = connection.createChannel();
 		// 声明队列
 		channel.queueDeclare(QUEUE_NAME, false, false, false, null);
-		// 设置每个消费者同时只能处理一条消息,若不设置该参数,则可能因为某个任务耗时较长而等待
-		channel.basicQos(1);
 		// 循环发布任务
 		for (int i = 0; i < 50; i++) {
 			// 消息内容
 			String message = "task .. " + i;
-			channel.basicPublish("", QUEUE_NAME, null, message.getBytes());
+			// MessageProperties.PERSISTENT_TEXT_PLAIN:生产者消息持久化
+			channel.basicPublish("", QUEUE_NAME, MessageProperties.PERSISTENT_TEXT_PLAIN, message.getBytes());
 			System.out.println("Sent '" + message + "'");
 			Thread.sleep(i * 2);
 		}

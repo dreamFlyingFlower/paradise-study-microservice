@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
  * @git {@link https://gitee.com/dreamFlyingFlower}
  */
 @Component
+@SuppressWarnings("deprecation")
 @EnableBinding(StreamClient.class)
 public class StreamReceiver {
 

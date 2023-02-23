@@ -185,6 +185,7 @@ public class MyKafkaAdmin {
 	 * replicas=192.168.220.128:9092 (id: 0 rack: null), isr=192.168.220.128:9092
 	 * (id: 0 rack: null)), authorizedOperations=[])
 	 */
+	@SuppressWarnings("deprecation")
 	public static void describeTopics() throws Exception {
 		AdminClient adminClient = adminClient();
 		DescribeTopicsResult describeTopicsResult = adminClient.describeTopics(Arrays.asList(TOPIC_NAME));

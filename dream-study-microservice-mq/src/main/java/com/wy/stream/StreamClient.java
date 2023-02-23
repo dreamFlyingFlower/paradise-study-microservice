@@ -14,6 +14,7 @@ import org.springframework.messaging.SubscribableChannel;
  * @date 2019-09-15 07:31:53
  * @git {@link https://gitee.com/dreamFlyingFlower}
  */
+@SuppressWarnings("deprecation")
 public interface StreamClient {
 
 	@Input("msgClient")

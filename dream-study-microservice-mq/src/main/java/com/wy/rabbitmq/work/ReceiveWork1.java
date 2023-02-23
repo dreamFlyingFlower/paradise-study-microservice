@@ -27,7 +27,7 @@ public class ReceiveWork1 {
 		final Channel channel = connection.createChannel();
 		// 声明队列
 		channel.queueDeclare(QUEUE_NAME, false, false, false, null);
-		// 设置每个消费者同时只能处理一条消息
+		// 不公平分发,默认0,轮训.1表示每个消费者同时只能处理一条消息,能者多劳,处理的越快,就可以处理更多消息,避免队列的长时间任务
 		channel.basicQos(1);
 		// 定义队列的消费者
 		DefaultConsumer consumer = new DefaultConsumer(channel) {
