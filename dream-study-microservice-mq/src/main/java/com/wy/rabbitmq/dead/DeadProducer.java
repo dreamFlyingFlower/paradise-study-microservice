@@ -21,6 +21,7 @@ public class DeadProducer {
 		// 向消息队列发送消息;交换器名称,路由键,消息
 		rabbitAmqpTemplate.convertAndSend("spring.test.exchange", "a.b", msg, message -> {
 			// 设置消息过期时间,单位毫秒
+			// 消息过期时间和队列过期时间不一样,如果消息过期了,但是还未到队列设置的过期时间,则消息仍然在队列中
 			message.getMessageProperties().setExpiration("1000");
 			return message;
 		});

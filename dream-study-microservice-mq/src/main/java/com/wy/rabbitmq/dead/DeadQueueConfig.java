@@ -36,7 +36,7 @@ public class DeadQueueConfig {
 	}
 
 	/**
-	 * 声明业务队列并把死信交换机绑定到业务队列
+	 * 声明业务队列并把业务队列绑定到死信交换机
 	 * 
 	 * @return
 	 */
@@ -49,6 +49,7 @@ public class DeadQueueConfig {
 		// x-dead-letter-routing-key:固定写法.声明当前队列的死信路由key
 		arguments.put("x-dead-letter-routing-key", rabbit.getDead().getRoutingKey());
 		// x-message-ttl:固定写法.声明当前队列的过期时间,仅仅用于测试,实际根据需求,通常30分钟或者15分钟
+		// 可以不设置,由生产者设置过期时间,更灵活
 		arguments.put("x-message-ttl", 120000);
 		// x-max-length:固定写法.声明当前队列的最大长度,超过长度的消息也将转到死信队列中
 		arguments.put("x-max-length", 1000);

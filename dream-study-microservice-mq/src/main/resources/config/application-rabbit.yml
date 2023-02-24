@@ -7,7 +7,7 @@ spring:
     username: guest
     password: guest
     connection-timeout: 0
-    # 开启生产者ACK机制
+    # 开启生产者与交换机的ACK机制
     # publisher-confirm-type: correlated
     # publisher-returns: true
     template:

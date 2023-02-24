@@ -1,5 +1,7 @@
 package com.wy.rabbitmq.simple;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentNavigableMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
@@ -47,7 +49,11 @@ public class ProviderSimple {
 			concurrentSkipListMap.get(deliveryTag);
 		});
 		// 声明队列,这是一个幂等的操作,只有当它不存在时才会被自动创建
-		channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+		// 最后一个参数大部分情况需要根据实际情况设置,如死信队列,懒惰队列等
+		Map<String, Object> map = new HashMap<>();
+		// 设置懒惰队列
+		map.put("x-queue-mode", "lazy");
+		channel.queueDeclare(QUEUE_NAME, false, false, false, map);
 		// 消息内容
 		String message = "Hello World!";
 		// 每个消息都有一个唯一编号,当批量发送消息,而进行异步确认时,为了找到可能确认失败的消息,将所有的编号存入队列

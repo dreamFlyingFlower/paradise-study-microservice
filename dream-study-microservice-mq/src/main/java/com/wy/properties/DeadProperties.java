@@ -14,9 +14,18 @@ import lombok.Setter;
 @Setter
 public class DeadProperties {
 
+	/**
+	 * 死信交换机
+	 */
 	private String exchange = "dead-exchange";
 
+	/**
+	 * 死信路由
+	 */
 	private String routingKey = "dead-key";
 
+	/**
+	 * 死信队列
+	 */
 	private String queue = "dead-queue";
 }

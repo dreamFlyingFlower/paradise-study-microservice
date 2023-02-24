@@ -18,7 +18,7 @@ import org.springframework.context.annotation.Configuration;
  * @git {@link https://github.com/dreamFlyingFlower}
  */
 @Configuration
-public class TTLQueueConfig {
+public class TtlQueueConfig {
 
 	/**
 	 * 业务交换机
@@ -44,13 +44,14 @@ public class TTLQueueConfig {
 		// x-dead-letter-routing-key 声明当前队列的死信路由key
 		arguments.put("x-dead-letter-routing-key", "order.close");
 		// 声明延迟队列的过期时间,仅仅用于测试,实际根据需求,通常30分钟或者15分钟
+		// 设置了业务队列的过期时间才会将消息发送到死信队列,会造成不同的延迟时间需要多个队列,可以不设置该参数,由生产者设置
 		arguments.put("x-message-ttl", 120000);
 		// 将死信队列参数绑定到正常队列中
 		return new Queue("BIZ-TTL-QUEUE", true, false, false, arguments);
 	}
 
 	/**
-	 * 延时队列绑定到交换机 rountingKey:order.create
+	 * 业务延时队列绑定到业务延时交换机 rountingKey:order.create
 	 * 
 	 * @return
 	 */
