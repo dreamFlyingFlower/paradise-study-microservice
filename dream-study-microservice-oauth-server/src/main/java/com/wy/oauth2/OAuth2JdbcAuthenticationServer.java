@@ -1,12 +1,10 @@
 package com.wy.oauth2;
 
-import javax.sql.DataSource;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
@@ -85,7 +83,7 @@ import com.wy.config.SecurityConfig;
 public class OAuth2JdbcAuthenticationServer extends AuthorizationServerConfigurerAdapter {
 
 	/**
-	 * 不同的版本可能不一样,高版本一般不要.在 {@link SecurityConfig#authenticationManagerBean}中设置
+	 * 授权管理器.不同的版本可能不一样,高版本一般不要.在{@link SecurityConfig#authenticationManagerBean}中设置
 	 */
 	@Autowired
 	private AuthenticationManager authenticationManager;
@@ -102,9 +100,7 @@ public class OAuth2JdbcAuthenticationServer extends AuthorizationServerConfigure
 	@Autowired
 	private UserApprovalHandler userApprovalHandler;
 
-	@Autowired
-	private DataSource dataSource;
-
+	/** 用户认证业务 */
 	@Autowired
 	private UserDetailsService userDetailsService;
 
@@ -114,13 +110,8 @@ public class OAuth2JdbcAuthenticationServer extends AuthorizationServerConfigure
 	@Autowired
 	private AuthorizationServerTokenServices jdbcAuthorizationServerTokenServices;
 
-	/**
-	 * 注入数据库资源
-	 */
-	@Bean
-	public ClientDetailsService jdbcClientDetailsService() {
-		return new JdbcClientDetailsService(dataSource);
-	}
+	@Autowired
+	private JdbcClientDetailsService jdbcClientDetailsService;
 
 	/**
 	 * 管理令牌:令牌生成和存储
@@ -139,7 +130,7 @@ public class OAuth2JdbcAuthenticationServer extends AuthorizationServerConfigure
 	 */
 	@Override
 	public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-		clients.withClientDetails(jdbcClientDetailsService());
+		clients.withClientDetails(jdbcClientDetailsService);
 	}
 
 	/**
@@ -164,17 +155,17 @@ public class OAuth2JdbcAuthenticationServer extends AuthorizationServerConfigure
 	@Override
 	public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
 		endpoints
-		        // 用于支持密码模式
-		        .authenticationManager(authenticationManager).accessTokenConverter(jwtAccessTokenConverter)
-		        .userDetailsService(userDetailsService).userApprovalHandler(userApprovalHandler)
-		        // 授权码存储
-		        .authorizationCodeServices(jdbcAuthorizationCodeServices)
-		        // token服务
-		        .tokenServices(jdbcAuthorizationServerTokenServices)
-		        // 从数据库查看来源数据
-		        .tokenStore(jdbcTokenStore)
-		        // 支持的请求类型
-		        .allowedTokenEndpointRequestMethods(HttpMethod.POST);
+				// 用于支持密码模式
+				.authenticationManager(authenticationManager).accessTokenConverter(jwtAccessTokenConverter)
+				.userDetailsService(userDetailsService).userApprovalHandler(userApprovalHandler)
+				// 授权码存储
+				.authorizationCodeServices(jdbcAuthorizationCodeServices)
+				// token服务
+				.tokenServices(jdbcAuthorizationServerTokenServices)
+				// 从数据库查看来源数据
+				.tokenStore(jdbcTokenStore)
+				// 支持的请求类型
+				.allowedTokenEndpointRequestMethods(HttpMethod.POST);
 		// if (null == jwtTokenStore) {
 		// endpoints.tokenStore(redisTokenStore);
 		// } else {
@@ -199,10 +190,12 @@ public class OAuth2JdbcAuthenticationServer extends AuthorizationServerConfigure
 	public void configure(AuthorizationServerSecurityConfigurer oauthServer) throws Exception {
 		// 获得签名的signkey,需要身份验证才行,默认是denyAll(),这是SpringSecurity的权限表达式
 		oauthServer
-		        // token_key公开
-		        .tokenKeyAccess("permitAll()")
-		        // token_key公开
-		        .checkTokenAccess("isAuthenticated()").allowFormAuthenticationForClients();
+				// token_key公开
+				.tokenKeyAccess("permitAll()")
+				// 必须是认证的
+				.checkTokenAccess("isAuthenticated()")
+				// 允许以表单的方式将token传递到服务
+				.allowFormAuthenticationForClients();
 		// oauthServer.tokenKeyAccess("isAnonymous() ||
 		// hasAuthority('ROLE_TRUSTED_CLIENT')");
 		// oauthServer.checkTokenAccess("hasAuthority('ROLE_TRUSTED_CLIENT')");

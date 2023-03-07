@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.security.oauth2.client.token.grant.code.AuthorizationCodeResourceDetails;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
+import org.springframework.security.oauth2.provider.client.JdbcClientDetailsService;
 import org.springframework.security.oauth2.provider.endpoint.AuthorizationEndpoint;
 import org.springframework.security.oauth2.provider.endpoint.TokenEndpoint;
 import org.springframework.web.bind.annotation.RestController;
@@ -49,7 +50,7 @@ import org.springframework.web.bind.annotation.RestController;
  * {@link EnableResourceServer}:在类上只需要添加该注解即可注册为资源服务器
  * </pre>
  * 
- * 搭建自己的认证服务器,表结构如下,参照:
+ * 搭建自己的认证服务器,表结构如下,具体表字段可见 {@link JdbcClientDetailsService}:
  * 
  * <pre>
  * oauth_client:id,client_id,client_secret,redirect_uri,createtime,updatetime

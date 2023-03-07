@@ -19,6 +19,7 @@ import org.springframework.security.oauth2.provider.approval.ApprovalStore;
 import org.springframework.security.oauth2.provider.approval.ApprovalStoreUserApprovalHandler;
 import org.springframework.security.oauth2.provider.approval.JdbcApprovalStore;
 import org.springframework.security.oauth2.provider.approval.UserApprovalHandler;
+import org.springframework.security.oauth2.provider.client.JdbcClientDetailsService;
 import org.springframework.security.oauth2.provider.code.AuthorizationCodeServices;
 import org.springframework.security.oauth2.provider.code.JdbcAuthorizationCodeServices;
 import org.springframework.security.oauth2.provider.request.DefaultOAuth2RequestFactory;
@@ -45,9 +46,6 @@ import com.wy.util.JwtUtil;
 public class OAuth2JdbcConfig {
 
 	@Autowired
-	private ClientDetailsService clientDetailsService;
-
-	@Autowired
 	private DataSource dataSource;
 
 	/**
@@ -72,6 +70,14 @@ public class OAuth2JdbcConfig {
 	public TokenStore jdbcTokenStore() {
 		JdbcTokenStore tokenStore = new JdbcTokenStore(dataSource);
 		return tokenStore;
+	}
+
+	/**
+	 * 注入数据库资源
+	 */
+	@Bean
+	public ClientDetailsService jdbcClientDetailsService() {
+		return new JdbcClientDetailsService(dataSource);
 	}
 
 	/**
@@ -117,7 +123,7 @@ public class OAuth2JdbcConfig {
 				String content;
 				try {
 					content = this.objectMapper
-					        .formatMap(getAccessTokenConverter().convertAccessToken(accessToken, authentication));
+							.formatMap(getAccessTokenConverter().convertAccessToken(accessToken, authentication));
 				} catch (Exception ex) {
 					throw new IllegalStateException("Cannot convert access token to JSON", ex);
 				}
@@ -136,13 +142,20 @@ public class OAuth2JdbcConfig {
 		return jwtAccessTokenConverter;
 	}
 
+	/**
+	 * 授权信息保存策略
+	 * 
+	 * @return ApprovalStore
+	 */
 	@Bean
 	public ApprovalStore jdbcApprovalStore() {
 		return new JdbcApprovalStore(dataSource);
 	}
 
 	/**
-	 * 将授权码存储在数据库
+	 * 授权码模式数据来源,将授权码存储在数据库
+	 * 
+	 * @return AuthorizationCodeServices
 	 */
 	@Bean
 	public AuthorizationCodeServices authorizationCodeServices() {
@@ -158,7 +171,7 @@ public class OAuth2JdbcConfig {
 	@Bean
 	public JWKSet jwkSet() {
 		RSAKey.Builder builder = new RSAKey.Builder(JwtUtil.getVerifierKey()).keyUse(KeyUse.SIGNATURE)
-		        .algorithm(JWSAlgorithm.RS256).keyID(JwtUtil.VERIFIER_KEY_ID);
+				.algorithm(JWSAlgorithm.RS256).keyID(JwtUtil.VERIFIER_KEY_ID);
 		return new JWKSet(builder.build());
 	}
 
@@ -166,8 +179,8 @@ public class OAuth2JdbcConfig {
 	public UserApprovalHandler userApprovalHandler() {
 		ApprovalStoreUserApprovalHandler userApprovalHandler = new ApprovalStoreUserApprovalHandler();
 		userApprovalHandler.setApprovalStore(jdbcApprovalStore());
-		userApprovalHandler.setClientDetailsService(clientDetailsService);
-		userApprovalHandler.setRequestFactory(new DefaultOAuth2RequestFactory(clientDetailsService));
+		userApprovalHandler.setClientDetailsService(jdbcClientDetailsService());
+		userApprovalHandler.setRequestFactory(new DefaultOAuth2RequestFactory(jdbcClientDetailsService()));
 		return userApprovalHandler;
 	}
 
@@ -178,7 +191,7 @@ public class OAuth2JdbcConfig {
 	public AuthorizationServerTokenServices authorizationServerTokenServices() {
 		DefaultTokenServices service = new DefaultTokenServices();
 		// 客户端信息服务
-		service.setClientDetailsService(clientDetailsService);
+		service.setClientDetailsService(jdbcClientDetailsService());
 		// 是否刷新令牌
 		service.setSupportRefreshToken(true);
 		// 令牌存储策略
