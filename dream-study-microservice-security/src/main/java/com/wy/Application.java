@@ -137,6 +137,17 @@ import com.wy.crl.UserCrl;
  * ->{@link AbstractAuthenticationProcessingFilter#unsuccessfulAuthentication}:认证失败的处理方法,会调用自定义的认证失败处理类
  * ->{@link BasicAuthenticationFilter}...
  * ->{@link ExceptionTranslationFilter}->{@link FilterSecurityInterceptor}->REST API
+ * 
+ * 1.用户提交用户名密码被SecurityFilterChain中的 UsernamePasswordAuthenticationFilter 拦截,封装为请求Authentication(接口),
+ * 		默认实现为 UsernamePasswordAuthenticationToken
+ * 2.过滤器将Authentication提交至认证管理器 AuthenticationManager 进行认证
+ * 3.认证成功后, AuthenticationManager 返回携带了权限信息,身份信息,细节信息的 Authentication 实例
+ * 4.SecurityContextHolder 安全上下文容器将第3步携带信息的 Authentication 设置到其中
+ * 5.AuthenticationManager 是认证相关的核心接口,也是发起认证的出发点,默认实现为 ProviderManager.
+ * 		ProviderManager维护着一个List<AuthenticationProvider>,存放多种认证方式,最终实际的认证工作由AuthenticationProvider完成
+ * 		Web表单对应的AuthenticationProvider类为DaoAuthenticationProvider,它维护着一个UserDetailsService负责UserDetails的获取,
+ * 		最终AuthenticationProvider将UserDetails填充至Authentication
+ * 6.流程图见dream-study-notes/Spring/img/SpringSecurity001.png
  * </pre>
  * 
  * SpringSecurity记住我主要流程:
@@ -153,7 +164,7 @@ import com.wy.crl.UserCrl;
  * ---->之后的流程大部分同登录流程
  * </pre>
  * 
- * SpringSecurity控制授权:
+ * SpringSecurity认证授权:
  * 
  * <pre>
  * ->{@link FilterSecurityInterceptor#invoke()}:权限过滤器,在登录验证成功之后才会调用,实际上是一个拦截器
@@ -170,6 +181,8 @@ import com.wy.crl.UserCrl;
  * --->{@link ConsensusBased}:比较通过和不通过的票数多少,谁多就根据谁决定是否通过
  * --->{@link UnanimousBased}:一组投票中只要有一个不通过,则请求不通过
  * ->{@link ExceptionTranslationFilter}:若抛出异常,会被该类拦截,根据异常不同进行不同的操作,同时会对匿名操作进行验证
+ * 
+ * 流程图见dream-study-notes/Spring/img/SpringSecurity002.png
  * </pre>
  * 
  * SpringSecurity的主要接口类以及注解:
@@ -229,7 +242,7 @@ import com.wy.crl.UserCrl;
  * hasAnyRole:拥有指定的任意一种角色
  * hasAuthority:用户拥有指定权限
  * hasAnyAuthority:用户有任意一个指定的权限
- * hasIpAddress:请求发送的ip匹配时才通过 
+ * hasIpAddress:请求发送的ip匹配时才通过
  * </pre>
  * 
  * {@link PostAuthorize}:该注解在方法执行完之后判断是否有权限,可以用returnObject表示返回值对象
