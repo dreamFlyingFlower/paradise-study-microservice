@@ -8,6 +8,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth2Sso;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration;
+import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
 import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.access.AccessDecisionVoter;
 import org.springframework.security.access.ConfigAttribute;
@@ -31,8 +33,14 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.AbstractConfiguredSecurityBuilder;
+import org.springframework.security.config.annotation.AbstractSecurityBuilder;
+import org.springframework.security.config.annotation.SecurityConfigurer;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -104,6 +112,25 @@ import com.wy.crl.UserCrl;
  * ->2.1.3.如果2.1.1中有符合条件的SecurityFilterChain,创建一个VirtualFilterChain,执行所有的SecurityFilterChain的doFilter()
  * 
  * {@link SecurityAutoConfiguration}:自动配置,引入#SpringBootWebSecurityConfiguration->SecurityFilterChain->FilterChainProxy
+ * ->1.1.{@link SpringBootWebSecurityConfiguration}:注册SecurityFilterChain,引入EnableWebSecurity
+ * ->1.2.{@link EnableWebSecurity}:引入4个关键注解,包括Web,Http,OAuth2等自动配置
+ * ->1.3.{@link WebSecurityConfiguration}:注入webSecurityConfigurers,该参数为所有的继承或实现SecurityConfigurer的类集合,
+ * 		自定义的Web配置继承的 WebSecurityConfigurerAdapter 实现了SecurityConfigurer
+ * ->1.3.1.{@link WebSecurityConfiguration#springSecurityFilterChain}:构建springSecurityFilterChain的过滤器bean
+ * ->1.3.1.1.{@link AbstractSecurityBuilder#build()}:调用AbstractConfiguredSecurityBuilder
+ * ->1.3.1.2. {@link AbstractConfiguredSecurityBuilder#doBuild()}:构建过滤器链,执行配置
+ * ->1.3.1.3.{@link AbstractConfiguredSecurityBuilder#init()}:构建springSecurityFilterChain过滤器链,
+ * 		该类的configurers属性包含用户自定义的配置类
+ * ->1.3.1.3.1.{@link SecurityConfigurer#init}:调用WebSecurityConfigurerAdapter
+ * ->1.3.1.3.2.{@link WebSecurityConfigurerAdapter#init}:构建HttpSecurity,配置webSecurity以及过滤器 FilterSecurityInterceptor
+ * 		HttpSecurity 包含各种默认的Filter以及配置,	在用户自定义的类(继承当前类)可利用configure()对该对象进行修改.
+ * ->1.3.1.4.{@link AbstractConfiguredSecurityBuilder#configure()}:调用系统或自定义的configure配置方法,如URL匹配等.
+ * 		该方法在会调用WebSecurityConfigurerAdapter的configure(WebSecurity)
+ * ->1.3.1.5.{@link AbstractConfiguredSecurityBuilder#performBuild}:调用WebSecurity
+ * ->1.3.1.5.1.{@link WebSecurity#performBuild}:最终构建SecurityFilterChain,FilterChainProxy,排序等,返回FilterChainProxy
+ * ->1.3.2.{@link WebSecurityConfiguration#setFilterChainProxySecurityConfigurer}:获得所有的SecurityConfigurer实例bean
+ * {@link SecurityFilterAutoConfiguration}:将所有的springSecurityFilterChain添加到ServletRegistrationBean集合中
+ * {@link UserDetailsServiceAutoConfiguration}:添加默认用户到内存的认证管理器中
  * {@link SecurityFilterChain}:SpringSecurity的过滤器链,最终生成的过滤器都是Filter,最后被FilterChainProxy处理
  * ->1.{@link DefaultSecurityFilterChain}:默认实现
  * {@link SecurityContextPersistenceFilter}:使用SecurityContextRepository在session中保存SecurityContext,以便给之后的过滤器使用.

@@ -167,9 +167,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				// .invalidSessionStrategy("session/")
 				// 同一个用户的最大session数量,若再登录时则会将前面登录的session失效
 				// .maximumSessions(1)
-				// 当session达到最大数时,不然后面的用户session再次登录;false则不限制
+				// 当session达到最大数时,不让后面的用户再次登录;false则不限制
 				// .maxSessionsPreventsLogin(true)
-				// 用户多session登录导致前面session失效时触发的事件
+				// 用户多session登录导致前面session失效时触发的事件,默认会踢掉前面登录的用户
 				// .expiredSessionStrategy(sessionExpiredStrategy)
 				// 不需要session
 				// .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
