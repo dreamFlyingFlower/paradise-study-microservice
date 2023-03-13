@@ -64,6 +64,8 @@ import org.springframework.security.web.authentication.AnonymousAuthenticationFi
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.RememberMeServices;
+import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.authentication.rememberme.AbstractRememberMeServices;
@@ -89,6 +91,7 @@ import org.springframework.web.filter.DelegatingFilterProxy;
 
 import com.wy.config.ExtraMethodSecurityExpressionHandler;
 import com.wy.config.ExtraSecurityExpressionRoot;
+import com.wy.config.SecurityConfig;
 import com.wy.crl.UserCrl;
 
 /**
@@ -163,7 +166,7 @@ import com.wy.crl.UserCrl;
  * SpringSecurity用户登录主要流程:
  * 
  * <pre>
- * 1.{@link SecurityContextPersistenceFilter}:使用SecurityContextRepository在session中保存SecurityContext,以便给之后的过滤器使用
+ * 1.{@link SecurityContextPersistenceFilter}:过滤器链最前面,使用SecurityContextRepository在session中保存SecurityContext
  * 2.{@link AbstractAuthenticationProcessingFilter#doFilter()}:调用拦截器
  * 2.1.{@link AbstractAuthenticationProcessingFilter#attemptAuthentication()}:调用实现UsernamePasswordAuthenticationFilter
  * 3.{@link UsernamePasswordAuthenticationFilter#attemptAuthentication()}:调用认证方法,将认证信息存入 Authentication.
@@ -189,7 +192,12 @@ import com.wy.crl.UserCrl;
  * 5.1.{@link NullAuthenticatedSessionStrategy#onAuthentication}:Session处理,默认无session策略
  * 6.{@link AbstractAuthenticationProcessingFilter#successfulAuthentication}:认证成功,将认证信息存入SecurityContextHolder
  * 		{@link SecurityContextHolder}:默认实现类{@link SecurityContextImpl},该类会将认证信息存入{@link SecurityContext}中
- * 7.{@link AbstractAuthenticationProcessingFilter#unsuccessfulAuthentication}:认证失败的处理方法,会调用自定义的认证失败处理类
+ * 6.1.{@link AuthenticationSuccessHandler#onAuthenticationSuccess}:调用 SavedRequestAwareAuthenticationSuccessHandler
+ * 6.2.{@link SavedRequestAwareAuthenticationSuccessHandler#onAuthenticationSuccess}:登录成功之后的处理,可自定义,
+ * 		在{@link WebSecurityConfigurerAdapter#configure}中进行设置,详情参见{@link SecurityConfig#configure}
+ * 7.{@link AbstractAuthenticationProcessingFilter#unsuccessfulAuthentication}:认证失败,清除SpringSecurity上下文
+ * 7.1.{@link AuthenticationFailureHandler#onAuthenticationFailure}:调用SimpleUrlAuthenticationFailureHandler
+ * 7.2.{@link SimpleUrlAuthenticationFailureHandler#onAuthenticationFailure}:认证失败的处理方法,同认证成功的处理方法,可自定义
  * 8.{@link BasicAuthenticationFilter}...
  * 9.{@link ExceptionTranslationFilter}->{@link FilterSecurityInterceptor}->REST API
  * 
