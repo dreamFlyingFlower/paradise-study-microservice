@@ -8,9 +8,11 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * @apiNote 各种拦截,验证配置
- * @author ParadiseWY
- * @date 2019年9月25日
+ * 各种拦截,验证配置
+ * 
+ * @author 飞花梦影
+ * @date 2023-03-15 09:22:21
+ * @git {@link https://gitee.com/dreamFlyingFlower}
  */
 @Getter
 @Setter
