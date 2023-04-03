@@ -1,4 +1,4 @@
-package com.wy.config;
+package com.wy.oauth.memory.config;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,6 +24,7 @@ import org.springframework.security.oauth2.provider.request.DefaultOAuth2Request
 import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
+import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
@@ -41,7 +42,7 @@ import com.wy.util.JwtUtil;
  * @git {@link https://github.com/dreamFlyingFlower }
  */
 @Configuration
-public class OAuth2MemoryConfig {
+public class MemoryOAuth2Config {
 
 	@Autowired
 	private ClientDetailsService clientDetailsService;
@@ -114,7 +115,7 @@ public class OAuth2MemoryConfig {
 				String content;
 				try {
 					content = this.objectMapper
-					        .formatMap(getAccessTokenConverter().convertAccessToken(accessToken, authentication));
+							.formatMap(getAccessTokenConverter().convertAccessToken(accessToken, authentication));
 				} catch (Exception ex) {
 					throw new IllegalStateException("Cannot convert access token to JSON", ex);
 				}
@@ -155,7 +156,7 @@ public class OAuth2MemoryConfig {
 	@Bean
 	public JWKSet jwkSet() {
 		RSAKey.Builder builder = new RSAKey.Builder(JwtUtil.getVerifierKey()).keyUse(KeyUse.SIGNATURE)
-		        .algorithm(JWSAlgorithm.RS256).keyID(JwtUtil.VERIFIER_KEY_ID);
+				.algorithm(JWSAlgorithm.RS256).keyID(JwtUtil.VERIFIER_KEY_ID);
 		return new JWKSet(builder.build());
 	}
 
@@ -164,11 +165,13 @@ public class OAuth2MemoryConfig {
 	 */
 	@Bean
 	public AuthorizationServerTokenServices memoryAthorizationServerTokenServices() {
+		// 使用默认的token服务
 		DefaultTokenServices service = new DefaultTokenServices();
 		// 是否刷新令牌
 		service.setSupportRefreshToken(true);
-		// 令牌存储策略
-		service.setTokenStore(jwtTokenStore());
+		// 令牌存储策略,需要和AuthorizationServerEndpointsConfigurer配置的tokenStore方式相同
+		// 使用内存方式
+		service.setTokenStore(new InMemoryTokenStore());
 		// 令牌默认有效期2小时
 		service.setAccessTokenValiditySeconds(7200);
 		// 刷新令牌默认有效期3天

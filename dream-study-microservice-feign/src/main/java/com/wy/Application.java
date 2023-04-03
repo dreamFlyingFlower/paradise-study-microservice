@@ -3,15 +3,28 @@ package com.wy;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.SpringCloudApplication;
+import org.springframework.cloud.client.actuator.HasFeatures;
 import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
+import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreakerImportSelector;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.netflix.hystrix.EnableHystrix;
+import org.springframework.cloud.netflix.hystrix.HystrixAutoConfiguration;
+import org.springframework.cloud.netflix.hystrix.HystrixCircuitBreakerAutoConfiguration;
+import org.springframework.cloud.netflix.hystrix.HystrixCircuitBreakerConfiguration;
+import org.springframework.cloud.netflix.hystrix.ReactiveHystrixCircuitBreakerAutoConfiguration;
 import org.springframework.cloud.netflix.hystrix.dashboard.EnableHystrixDashboard;
+import org.springframework.cloud.netflix.hystrix.security.HystrixSecurityAutoConfiguration;
 import org.springframework.cloud.netflix.turbine.EnableTurbine;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.cloud.openfeign.FeignClientFactoryBean;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCollapser;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import com.netflix.hystrix.contrib.javanica.aop.aspectj.HystrixCommandAspect;
+import com.netflix.hystrix.contrib.javanica.command.GenericCommand;
+import com.netflix.hystrix.contrib.javanica.command.HystrixCommandFactory;
 import com.netflix.loadbalancer.AvailabilityFilteringRule;
 import com.netflix.loadbalancer.BestAvailableRule;
 import com.netflix.loadbalancer.RandomRule;
@@ -47,12 +60,32 @@ import com.wy.crl.HystrixCrl;
  * Feigin接口实体类参数只能有一个,不管是何种请求类型;若传多个实体参数,需要封装到一个实体类或Map中
  * </pre>
  * 
+ * Feign核心流程-AOP:
+ * 
+ * <pre>
+ * {@link EnableFeignClients}:自动注入{@link #FeignClientsRegistrar}
+ * {@link #FeignClientsRegistrar#registerBeanDefinitions}:注册bean定义信息
+ * {@link #FeignClientsRegistrar#registerDefaultConfiguration}:将FeignClient的全局默认配置注入到容器中
+ * {@link #FeignClientsRegistrar#registerFeignClients}:将被@FeignClient修饰的类注入到容器中
+ * {@link FeignClientFactoryBean}:Feign代理工厂类,主要是产生Feign接口的代理类
+ * </pre>
+ * 
  * Hystrix:断路器,其他见{@link HystrixCrl}
  * 
  * <pre>
  * {@link EnableHystrixDashboard}:开启Web页面监控.在Web打开使用了该注解的ip:port/actuator/hystrix,
  * 		输入需要监控的微服务地址ip:port/actuator/hystrix.stream,点击监控之后可以实时监控微服务的远程调用请求情况
  * {@link EnableHystrix},{@link EnableCircuitBreaker}:作用相同,开启断路器,EnableHystrix更见名知义
+ * {@link EnableCircuitBreakerImportSelector}:由SpringFactoryImportSelector指定的泛型spring.factories中导入自动配置类,
+ * 		此处为EnableCircuitBreaker,则从spring.factories中导入key为EnableCircuitBreaker的自动配置类{@link HystrixCircuitBreakerConfiguration}
+ * {@link HystrixCircuitBreakerConfiguration}:注入{@link HystrixCommandAspect},{@link HystrixShutdownHook},{@link HasFeatures}
+ * {@link HystrixCommandAspect}:切面,Hystrix核心类,主要拦截{@link HystrixCommand}和{@link HystrixCollapser}注解
+ * ->{@link HystrixCommandFactory#create}:构建hystrix工厂执行器
+ * ->{@link GenericCommand}:构造函数构建通用执行命令
+ * {@link HystrixAutoConfiguration}:普通自动导入
+ * {@link HystrixCircuitBreakerAutoConfiguration}:普通自动导入
+ * {@link ReactiveHystrixCircuitBreakerAutoConfiguration}:普通自动导入
+ * {@link HystrixSecurityAutoConfiguration}:普通自动导入
  * </pre>
  * 
  * Turbine:类似hystrix.stream的监控,但是他监控的是整个集群的情况,只会监控使用Hystrix的服务.参考application-turbine.yml

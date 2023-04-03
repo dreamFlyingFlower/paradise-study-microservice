@@ -4,8 +4,10 @@ spring:
       server-addr: localhost:8848
     sentinel: 
       transport:
-        # sentinel dashborad通信地址
+        # sentinel dashborad console地址
         dashboard: 192.168.0.150:9100
+        # sentinel服务与本服务进行交互的端口,默认8719
+        port: 8719
       # 取消控制台懒加载
       eager: true
       datasource: 

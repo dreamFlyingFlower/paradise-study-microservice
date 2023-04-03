@@ -1,4 +1,4 @@
-package com.wy.oauth2;
+package com.wy.oauth.jdbc;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
@@ -80,7 +80,7 @@ import com.wy.config.SecurityConfig;
  */
 // @Configuration
 // @EnableAuthorizationServer
-public class OAuth2JdbcAuthenticationServer extends AuthorizationServerConfigurerAdapter {
+public class JdbcAuthenticationServer extends AuthorizationServerConfigurerAdapter {
 
 	/**
 	 * 授权管理器.不同的版本可能不一样,高版本一般不要.在{@link SecurityConfig#authenticationManagerBean}中设置

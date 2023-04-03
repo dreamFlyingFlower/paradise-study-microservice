@@ -9,6 +9,12 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 import org.springframework.security.oauth2.provider.client.JdbcClientDetailsService;
 import org.springframework.security.oauth2.provider.endpoint.AuthorizationEndpoint;
 import org.springframework.security.oauth2.provider.endpoint.TokenEndpoint;
+import org.springframework.security.oauth2.provider.token.TokenStore;
+import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
+import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
+import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
+import org.springframework.security.oauth2.provider.token.store.jwk.JwkTokenStore;
+import org.springframework.security.oauth2.provider.token.store.redis.RedisTokenStore;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -58,6 +64,16 @@ import org.springframework.web.bind.annotation.RestController;
  * oauth_access_token:id,client_id,user_id,token,expiretime,scope,createtime,updatetime
  * oauth_refresh_token:id,client_id,user_id,token,expiretime,scope,createtime,updatetime
  * oauth_authorization_code:id,client_id,user_id,code,redirect_uri,expiretime,scope,createtime,updatetime
+ * </pre>
+ * 
+ * {@link TokenStore}:Token存储方式接口
+ * 
+ * <pre>
+ * {@link InMemoryTokenStore}:内存存储,重启失效
+ * {@link JdbcTokenStore}:数据库存储
+ * {@link JwtTokenStore}:JWT存储
+ * {@link JwkTokenStore}:JWK存储,JWT的密钥或者密钥对
+ * {@link RedisTokenStore}:Redis存储
  * </pre>
  * 
  * @author 飞花梦影

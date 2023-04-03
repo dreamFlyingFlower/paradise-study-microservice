@@ -1,4 +1,4 @@
-package com.wy.oauth2;
+package com.wy.oauth.jdbc;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

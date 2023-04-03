@@ -1,4 +1,4 @@
-package com.wy.config;
+package com.wy.oauth.jdbc.config;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -7,6 +7,8 @@ import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.jwt.JwtHelper;
 import org.springframework.security.jwt.crypto.sign.RsaSigner;
 import org.springframework.security.jwt.crypto.sign.RsaVerifier;
@@ -48,6 +50,15 @@ public class OAuth2JdbcConfig {
 	@Autowired
 	private DataSource dataSource;
 
+	/**
+	 * 设置默认加密方式
+	 * 
+	 * @return
+	 */
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
 	/**
 	 * redisTokenStore存储令牌
 	 * 
