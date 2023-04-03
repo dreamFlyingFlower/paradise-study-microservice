@@ -153,8 +153,8 @@ import com.wy.crl.UserCrl;
  * {@link SecurityContextHolderAwareRequestFilter}:针对ServletRequest进行了一次包装,使得request具有更加丰富的API
  * {@link RememberMeAuthenticationFilter}:记住我拦截器,会根据请求中的session进行自动登录
  * {@link SocialAuthenticationFilter}:第三方服务登录,在新的SpringBoot版本中已经移到SpringOAuth项目中
- * {@link OAuth2AuthenticationProcessingFilter}:
- * {@link OAuth2ClientAuthenticationProcessingFilter}:
+ * {@link OAuth2AuthenticationProcessingFilter}:整合OAuth2时使用
+ * {@link OAuth2ClientAuthenticationProcessingFilter}:整合OAuth2时使用
  * {@link AnonymousAuthenticationFilter}:允许匿名访问时的过滤器
  * {@link SessionManagementFilter}:拦截会话伪造攻击,利用SecurityContextRepository限制同一用户开启多个会话的数量
  * {@link ExceptionTranslationFilter}:异常拦截器,位于SecurityFilterChain的后方,接收FilterSecurityInterceptor抛出的异常

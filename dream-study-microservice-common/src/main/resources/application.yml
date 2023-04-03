@@ -16,7 +16,7 @@ server:
   
 spring:
   application:
-    name: paradise-study-microservice-common
+    name: dream-study-microservice-common
   profiles:
     active: dev
   mvc:
