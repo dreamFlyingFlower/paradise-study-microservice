@@ -1,19 +1,18 @@
-package com.wy.config;
+package com.wy.oauth.memory.config;
+
+import java.util.Collections;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
-import com.wy.oauth.jdbc.LoginSuccessHandler;
-import com.wy.properties.ConfigProperties;
-import com.wy.security.UserAuthenticationProvider;
+import com.wy.properties.SecurityProperties;
 
 /**
  * Security配置类,必须设置Order高一点,否则会有调用问题,默认是100
@@ -22,19 +21,16 @@ import com.wy.security.UserAuthenticationProvider;
  * @date 2021-07-02 16:36:46
  * @git {@link https://github.com/dreamFlyingFlower }
  */
-@Configuration
-@EnableWebSecurity
-@Order(2)
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+// @Configuration
+// @EnableWebSecurity
+// @Order(2)
+public class SecurityMemoryConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
-	private ConfigProperties config;
+	private SecurityProperties securityProperties;
 
 	@Autowired
-	private LoginSuccessHandler loginSuccessHandler;
-
-	@Autowired
-	private UserAuthenticationProvider provider;
+	private PasswordEncoder passwordEncoder;
 
 	@Override
 	public void configure(WebSecurity web) throws Exception {
@@ -58,16 +54,22 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http.authorizeRequests()
 				// 过滤swagger相关资源
 				.antMatchers("/authenticate", "/swagger-resources/**", "/swagger-ui/**", "/v3/api-docs", "/webjars/**")
-				.permitAll().antMatchers(config.getSecurity().getPermitAllSources()).permitAll().anyRequest()
-				.authenticated().and().formLogin().successHandler(loginSuccessHandler).and().csrf().disable();
+				.permitAll().antMatchers(securityProperties.getPermitAllSources()).permitAll().anyRequest()
+				.authenticated().and().formLogin().and().csrf().disable();
 	}
 
 	/**
-	 * 使用数据库中的数据来判断登录是否成功,在登录请求时会自动拦截请求,并进入验证
+	 * 使用内存中的数据来判断登录是否成功,在登录请求时会自动拦截请求,并进入验证
+	 * 
+	 * guest:Bcrpt加密->$2a$10$dXULkWNhddYNVH9yQkzwQeJinGE0e22iL4CSEdkm7sRPwa.A27iEi
+	 * 123456:Bcrpt加密->$2a$10$lg5hcqs13V3c6FVjr1/mjO31clz7fkjlIKnppDhNDdxJVaWxh/xB6
+	 * password:Bcrpt加密->$2a$10$owjsydvplVmh0wI6f.xOM.4TKBc/CoKYTvX.HmnS6Yeu7qlyukAPO
 	 */
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		auth.authenticationProvider(provider);
+		auth.inMemoryAuthentication().withUser(new User("guest",
+				"$2a$10$lg5hcqs13V3c6FVjr1/mjO31clz7fkjlIKnppDhNDdxJVaWxh/xB6", Collections.emptyList()))
+				.passwordEncoder(passwordEncoder);
 	}
 
 	/**

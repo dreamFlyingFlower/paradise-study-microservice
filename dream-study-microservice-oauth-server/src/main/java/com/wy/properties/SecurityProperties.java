@@ -1,5 +1,8 @@
 package com.wy.properties;
 
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,13 +15,15 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@Configuration
+@ConfigurationProperties("config.security")
 public class SecurityProperties {
 
 	/**
 	 * 不需要验证的资源URL,需要从根路径开始填写
 	 */
 	private String[] permitAllSources = { "/images/**", "/user/getCode/**", "/user/login/**", "/html/**", "/plugins/**",
-	        "/actuator/**", "/oauth/authorize**", "/oauth/**", "/oauth/token_key", "/messages/**", "/oauth/error",
-	        "/swagger-ui.html", "/swagger-ui/*", "/swagger-resources/**", "/v2/api-docs", "/v3/api-docs", "/webjars/**",
-	        "/login" };
+			"/actuator/**", "/oauth/authorize**", "/oauth/**", "/oauth/token_key", "/messages/**", "/oauth/error",
+			"/swagger-ui.html", "/swagger-ui/*", "/swagger-resources/**", "/v2/api-docs", "/v3/api-docs", "/webjars/**",
+			"/login" };
 }

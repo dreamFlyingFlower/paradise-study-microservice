@@ -8,6 +8,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
 
+import com.wy.oauth.jdbc.config.SecurityJdbcConfig;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import springfox.documentation.builders.ApiInfoBuilder;
@@ -28,7 +30,7 @@ import springfox.documentation.spring.web.plugins.Docket;
 /**
  * 使用Swagger3自动生成文档,文档查看地址http://ip:port/swagger-ui/index.html
  * 
- * SpringSecurity+Swagger:需要过滤Swagger相关资源,见{@link SecurityConfig#configure(WebSecurity)},{@link SecurityConfig#configure(WebSecurity)}
+ * SpringSecurity+Swagger:需要过滤Swagger相关资源,见{@link SecurityJdbcConfig#configure(WebSecurity)},{@link SecurityJdbcConfig#configure(WebSecurity)}
  * 
  * @auther 飞花梦影
  * @date 2021-07-05 23:19:22

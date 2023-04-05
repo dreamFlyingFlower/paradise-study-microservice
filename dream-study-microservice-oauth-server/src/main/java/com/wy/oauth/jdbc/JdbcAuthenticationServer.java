@@ -29,7 +29,7 @@ import org.springframework.security.oauth2.provider.token.TokenEnhancer;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 
-import com.wy.config.SecurityConfig;
+import com.wy.oauth.jdbc.config.SecurityJdbcConfig;
 
 /**
  * OAuth2使用数据库进行认证服务
@@ -83,7 +83,7 @@ import com.wy.config.SecurityConfig;
 public class JdbcAuthenticationServer extends AuthorizationServerConfigurerAdapter {
 
 	/**
-	 * 授权管理器.不同的版本可能不一样,高版本一般不要.在{@link SecurityConfig#authenticationManagerBean}中设置
+	 * 授权管理器.不同的版本可能不一样,高版本一般不要.在{@link SecurityJdbcConfig#authenticationManagerBean}中设置
 	 */
 	@Autowired
 	private AuthenticationManager authenticationManager;

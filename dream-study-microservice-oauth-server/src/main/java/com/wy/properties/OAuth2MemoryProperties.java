@@ -1,5 +1,8 @@
 package com.wy.properties;
 
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,16 +15,18 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class OAuth2Properties {
+@Configuration
+@ConfigurationProperties("config.oauth2.memory")
+public class OAuth2MemoryProperties {
 
 	/** 第三方游客登录本系统的clientId */
-	private String clientIdGuest = "guest";
+	private String clientIdGuest = "client_id";
 
 	/** 第三方游客登录本系统的clientSecret */
 	private String clientSecretGuest = "guest";
 
 	/** 第三方游客登录本系统的授权模式 */
-	private String[] grantTypes = { "authorization_code", "refresh_token", "password","client_credentials" };
+	private String[] grantTypes = { "authorization_code", "refresh_token", "password", "client_credentials" };
 
 	/** 第三方游客登录本系统的访问权限 */
 	private String[] scopes = { "message.read", "message.write", "guest", "openId" };

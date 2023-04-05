@@ -3,7 +3,6 @@ package com.wy.security;
 import java.util.Collection;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,7 +21,7 @@ import com.wy.service.UserService;
  * @date 2021-07-06 15:48:34
  * @git {@link https://github.com/dreamFlyingFlower }
  */
-@Configuration
+// @Configuration
 public class UserAuthenticationProvider implements AuthenticationProvider {
 
 	@Autowired

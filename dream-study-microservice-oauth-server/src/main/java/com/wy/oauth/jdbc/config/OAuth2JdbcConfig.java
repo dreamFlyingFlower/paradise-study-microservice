@@ -92,9 +92,9 @@ public class OAuth2JdbcConfig {
 	}
 
 	/**
-	 * 使用JWT存储令牌
+	 * JWT令牌解析器
 	 * 
-	 * @return
+	 * @return JwtAccessTokenConverter
 	 */
 	@Bean
 	// @ConditionalOnProperty(prefix = "config.oauth2", name = "storeType",
