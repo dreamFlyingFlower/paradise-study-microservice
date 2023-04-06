@@ -11,14 +11,14 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Aut
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.code.AuthorizationCodeServices;
 import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
-import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
+import org.springframework.security.oauth2.provider.token.TokenStore;
 
 import com.wy.oauth.OAuth2Config;
 import com.wy.oauth.memory.config.SecurityMemoryConfig;
 import com.wy.properties.OAuth2MemoryProperties;
 
 /**
- * 内存模式认证服务器
+ * 内存模式用户名密码认证服务器
  * 
  * 获取token,固定接口/oauth/token,在浏览器访问
  * http://ip:55100/oauthServer/oauth/token?client_id=client_id&client_secret=guest&grant_type=password&username=guest&password=123456
@@ -49,6 +49,24 @@ import com.wy.properties.OAuth2MemoryProperties;
  * 
  * 重新获取token,仍然使用/oauth/token,单是grant_type换成refresh_token,同时带上第一次获取到的refresh_token,用户名和密码也不需要
  * http://ip:55100/oauthServer/oauth/token?client_id=client_id&client_secret=guest&grant_type=refresh_token&refresh_token=
+ * 
+ * 内存模式授权码认证服务器
+ * 
+ * <pre>
+ * 第一次先获得code: http://ip:port/oauth/authorize?response_type=code&state=123456&client_id=client_id&scope=all&redirect_uri=http://otherappurl
+ * 返回http://otherappurl?code=ycjU3F&state=123456可以拿到ycjU3F这个code
+ * 
+ * response_type:请求模式,授权码认证
+ * state:状态,非必须
+ * client_id:第三方客户端client_id
+ * scope:权限域
+ * redirect_uri:获得code的请求地址
+ * 
+ * 第二次获得token:http://ip:port/oauth/token?client_id=client_id&client_secret=guest&grant_type=authorization_code&code=ycjU3F&redirect_uri=http://otherappurl
+ * 
+ * grant_type:授权码认证
+ * code:从第一部获得的code
+ * </pre>
  *
  * @author 飞花梦影
  * @date 2023-04-03 21:52:24
@@ -77,7 +95,7 @@ public class MemoryAuthorizationServer extends AuthorizationServerConfigurerAdap
 	private AuthorizationCodeServices memoryAuthorizationCodeServices;
 
 	@Autowired
-	private JwtTokenStore jwtTokenStore;
+	private TokenStore tokenStore;
 
 	@Autowired
 	@Qualifier("memoryAuthorizationServerTokenServices")
@@ -115,6 +133,7 @@ public class MemoryAuthorizationServer extends AuthorizationServerConfigurerAdap
 	 */
 	@Override
 	public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
+		System.out.println(tokenStore);
 		endpoints
 				// 认证管理器
 				.authenticationManager(authenticationManager)
@@ -125,8 +144,8 @@ public class MemoryAuthorizationServer extends AuthorizationServerConfigurerAdap
 				// 以内存的方式存储token
 				// .tokenStore(new InMemoryTokenStore())
 				// 以JWT的方式存储token
-				.tokenStore(jwtTokenStore)
-				// 允许方法token的请求方式
+				.tokenStore(tokenStore)
+				// 允许获得token的请求方式
 				.allowedTokenEndpointRequestMethods(HttpMethod.POST, HttpMethod.GET, HttpMethod.PATCH);
 	}
 

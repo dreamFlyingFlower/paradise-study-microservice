@@ -1,18 +1,20 @@
 package com.wy.oauth2;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
-import org.springframework.security.oauth2.provider.token.RemoteTokenServices;
+import org.springframework.security.oauth2.provider.token.TokenStore;
 
 import com.wy.handler.SelfAccessDeniedHandler;
 import com.wy.handler.SelfAuthenticationEntryHandler;
 import com.wy.properties.ConfigProperties;
 
 /**
- * OAuth2资源服务器,如果和认证服务器放在一起报异常,则分开放在不同的项目
+ * OAuth2资源服务器,如果和认证服务器放在一起报异常,则分开放在不同的项目,使用JWT进行token验证
  * 
  * 在页面访问 http://localhost:55200/oauthResource/test/test1 可直接访问
  * 
@@ -22,12 +24,15 @@ import com.wy.properties.ConfigProperties;
  * @date 2021-07-02 16:26:41
  * @git {@link https://github.com/dreamFlyingFlower }
  */
-// @Configuration
-// @EnableResourceServer
-public class OAuth2ResourcesServer extends ResourceServerConfigurerAdapter {
+@Configuration
+@EnableResourceServer
+public class OAuth2JwtResourcesServer extends ResourceServerConfigurerAdapter {
 
 	@Autowired
 	private ConfigProperties config;
+
+	@Autowired
+	private TokenStore tokenStore;
 
 	@Autowired
 	private SelfAccessDeniedHandler selfAccessDeniedHandler;
@@ -43,21 +48,11 @@ public class OAuth2ResourcesServer extends ResourceServerConfigurerAdapter {
 	 */
 	@Override
 	public void configure(ResourceServerSecurityConfigurer resources) throws Exception {
-		// 该情况适用于非jwt请求访问,直接远程访问认证服务器来鉴定access_token是否存在,有效,是否在有效期
-		// 定义token服务对象(token校验就应该靠token服务对象)
-		RemoteTokenServices remoteTokenServices = new RemoteTokenServices();
-		// 校验端点/接口设置
-		remoteTokenServices.setCheckTokenEndpointUrl("http://localhost:55100/oauthServer/oauth/check_token");
-		// 或者使用resttemplate进行远程访问,认证服务必须进行了注册
-		// remoteTokenServices.setRestTemplate(new RestTemplate());
-		// remoteTokenServices.setCheckTokenEndpointUrl("http://dream-study-microservice-oauth-server/oauthServer/oauth/check_token");
-		// 携带客户端id和客户端安全码
-		remoteTokenServices.setClientId("client_id");
-		remoteTokenServices.setClientSecret("guest");
-		// 设置当前资源服务的资源id
-		resources.resourceId("oauth-resource").tokenServices(remoteTokenServices)
+		// 该情况适用于直接从JWT中获得token并进行存储认证
+		resources.resourceId("oauth-resource")
 				// 自定义权限验证失败方式
-				.accessDeniedHandler(selfAccessDeniedHandler).authenticationEntryPoint(selfAuthenticationEntryHandler);
+				.accessDeniedHandler(selfAccessDeniedHandler).authenticationEntryPoint(selfAuthenticationEntryHandler)
+				.tokenStore(tokenStore).stateless(true);
 	}
 
 	/**

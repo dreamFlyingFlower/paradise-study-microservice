@@ -1,7 +1,6 @@
 package com.wy.oauth.memory.config;
 
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.security.jwt.crypto.sign.MacSigner;
 import org.springframework.security.oauth2.provider.code.AuthorizationCodeServices;
 import org.springframework.security.oauth2.provider.code.InMemoryAuthorizationCodeServices;
@@ -18,7 +17,7 @@ import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
  * @date 2021-07-02 16:51:40
  * @git {@link https://github.com/dreamFlyingFlower }
  */
-@Configuration
+// @Configuration
 public class OAuth2JwtConfig {
 
 	/**

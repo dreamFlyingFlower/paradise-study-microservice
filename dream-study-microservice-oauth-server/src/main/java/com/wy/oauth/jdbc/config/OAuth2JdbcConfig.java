@@ -7,6 +7,7 @@ import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.jwt.JwtHelper;
@@ -44,7 +45,7 @@ import com.wy.util.JwtUtil;
  * @date 2021-07-02 16:51:40
  * @git {@link https://github.com/dreamFlyingFlower }
  */
-// @Configuration
+@Configuration
 public class OAuth2JdbcConfig {
 
 	@Autowired

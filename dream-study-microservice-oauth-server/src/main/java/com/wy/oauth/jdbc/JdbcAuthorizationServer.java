@@ -1,6 +1,7 @@
 package com.wy.oauth.jdbc;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -78,9 +79,9 @@ import com.wy.oauth.jdbc.config.SecurityJdbcConfig;
  * @date 2021-07-02 15:10:26
  * @git {@link https://github.com/dreamFlyingFlower }
  */
-// @Configuration
-// @EnableAuthorizationServer
-public class JdbcAuthenticationServer extends AuthorizationServerConfigurerAdapter {
+@Configuration
+@EnableAuthorizationServer
+public class JdbcAuthorizationServer extends AuthorizationServerConfigurerAdapter {
 
 	/**
 	 * 授权管理器.不同的版本可能不一样,高版本一般不要.在{@link SecurityJdbcConfig#authenticationManagerBean}中设置
