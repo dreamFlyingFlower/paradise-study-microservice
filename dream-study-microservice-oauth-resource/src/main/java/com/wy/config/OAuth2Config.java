@@ -1,20 +1,18 @@
 package com.wy.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.security.jwt.crypto.sign.MacSigner;
-import org.springframework.security.oauth2.provider.approval.ApprovalStore;
-import org.springframework.security.oauth2.provider.approval.InMemoryApprovalStore;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
-import org.springframework.security.oauth2.provider.token.store.redis.RedisTokenStore;
 
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.KeyUse;
 import com.nimbusds.jose.jwk.RSAKey;
+import com.wy.oauth2.SelfAccessTokenConverter;
 import com.wy.util.JwtUtil;
 
 /**
@@ -27,6 +25,9 @@ import com.wy.util.JwtUtil;
 @Configuration
 public class OAuth2Config {
 
+	@Autowired
+	private SelfAccessTokenConverter selfAccessTokenConverter;
+
 	/**
 	 * redisTokenStore存储令牌
 	 * 
@@ -35,9 +36,10 @@ public class OAuth2Config {
 	// @Bean
 	// @ConditionalOnProperty(prefix = "config.oauth2", name = "storeType",
 	// havingValue = "redis")
-	public TokenStore redisTokenStore(RedisConnectionFactory redisConnectionFactory) {
-		return new RedisTokenStore(redisConnectionFactory);
-	}
+	// public TokenStore redisTokenStore(RedisConnectionFactory
+	// redisConnectionFactory) {
+	// return new RedisTokenStore(redisConnectionFactory);
+	// }
 
 	/**
 	 * 使用JWT存储令牌access_token
@@ -116,10 +118,12 @@ public class OAuth2Config {
 
 		// 第三种方式
 		JwtAccessTokenConverter jwtAccessTokenConverter = new JwtAccessTokenConverter();
-		// 设置签名密钥
+		// 设置签名密钥,需要和认证服务器的一直
 		jwtAccessTokenConverter.setSigningKey("test");
 		// 设置验证时使用的密钥,和签名密钥保持一致
 		jwtAccessTokenConverter.setVerifier(new MacSigner("test"));
+		// 解析从认证服务器返回的额外信息并存入到本服务器中的认证信息中
+		jwtAccessTokenConverter.setAccessTokenConverter(selfAccessTokenConverter);
 		return jwtAccessTokenConverter;
 	}
 
@@ -133,10 +137,5 @@ public class OAuth2Config {
 		RSAKey.Builder builder = new RSAKey.Builder(JwtUtil.getVerifierKey()).keyUse(KeyUse.SIGNATURE)
 				.algorithm(JWSAlgorithm.RS256).keyID(JwtUtil.VERIFIER_KEY_ID);
 		return new JWKSet(builder.build());
-	}
-
-	@Bean
-	public ApprovalStore inMemoryApprovalStore() {
-		return new InMemoryApprovalStore();
 	}
 }

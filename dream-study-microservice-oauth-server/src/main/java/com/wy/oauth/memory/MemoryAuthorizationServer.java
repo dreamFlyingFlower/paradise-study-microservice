@@ -133,7 +133,6 @@ public class MemoryAuthorizationServer extends AuthorizationServerConfigurerAdap
 	 */
 	@Override
 	public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-		System.out.println(tokenStore);
 		endpoints
 				// 认证管理器
 				.authenticationManager(authenticationManager)
@@ -146,7 +145,7 @@ public class MemoryAuthorizationServer extends AuthorizationServerConfigurerAdap
 				// 以JWT的方式存储token
 				.tokenStore(tokenStore)
 				// 允许获得token的请求方式
-				.allowedTokenEndpointRequestMethods(HttpMethod.POST, HttpMethod.GET, HttpMethod.PATCH);
+				.allowedTokenEndpointRequestMethods(HttpMethod.POST, HttpMethod.GET);
 	}
 
 	/**

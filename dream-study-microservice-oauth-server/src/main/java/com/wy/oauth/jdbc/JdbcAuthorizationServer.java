@@ -16,7 +16,6 @@ import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.security.oauth2.provider.CompositeTokenGranter;
 import org.springframework.security.oauth2.provider.TokenGranter;
 import org.springframework.security.oauth2.provider.TokenRequest;
-import org.springframework.security.oauth2.provider.approval.UserApprovalHandler;
 import org.springframework.security.oauth2.provider.client.InMemoryClientDetailsService;
 import org.springframework.security.oauth2.provider.client.JdbcClientDetailsService;
 import org.springframework.security.oauth2.provider.code.AuthorizationCodeServices;
@@ -25,11 +24,14 @@ import org.springframework.security.oauth2.provider.code.JdbcAuthorizationCodeSe
 import org.springframework.security.oauth2.provider.endpoint.AuthorizationEndpoint;
 import org.springframework.security.oauth2.provider.endpoint.TokenEndpoint;
 import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
+import org.springframework.security.oauth2.provider.token.DefaultAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenEnhancer;
 import org.springframework.security.oauth2.provider.token.TokenStore;
+import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 
+import com.wy.oauth.jdbc.config.OAuth2JdbcConfig;
 import com.wy.oauth.jdbc.config.SecurityJdbcConfig;
 
 /**
@@ -66,6 +68,8 @@ import com.wy.oauth.jdbc.config.SecurityJdbcConfig;
  * ---->{@link TokenStore}:令牌的存储
  * ---->{@link TokenEnhancer}:令牌增强器,当临牌生成之后,可以对令牌信息进行改造
  * {@link OAuth2AccessToken}:最终的令牌,scope等信息的集合
+ * {@link JwtAccessTokenConverter}:JWT令牌生成器,里面的信息默认使用{@link DefaultAccessTokenConverter}生成
+ * {@link DefaultAccessTokenConverter#convertAccessToken()}:JWT令牌中的默认信息生成器,重写该方法可自定义令牌传输信息
  * </pre>
  * 
  * SpringOAuth2相关类:
@@ -74,6 +78,52 @@ import com.wy.oauth.jdbc.config.SecurityJdbcConfig;
  * {@link AuthorizationServerConfigurerAdapter}:继承该类可以对OAuth2登录做些自定义的配置
  * {@link AuthorizationServerEndpointsConfigurer}:SpringOAuth其他入口点配置,如TokenEndpoint
  * </pre>
+ * 
+ * 数据库模式用户名密码认证服务器
+ * 
+ * 获取token,固定接口/oauth/token,在浏览器访问
+ * http://ip:55100/oauthServer/oauth/token?client_id=client_id&client_secret=guest&grant_type=password&username=guest&password=123456
+ * 
+ * 请求参数:
+ * 
+ * <pre>
+ * client_id:第三方客户端client_id,
+ * client_secret:第三方客户端密码,如果服务器没有做特殊处理,该值不能加密或编码
+ * grant_type:第三方客户端访问OAuth2认证服务器的方式
+ * username:登录SpringSecurity服务的用户名和密码,实际情况下不应该有该参数.正常情况下应该先登录到本系统获得认证的token,
+ * 		之后请求头中携带认证的token才能继续访问OAuth2认证服务器.或者SpringSecurity对所有的第三方请求都无需认证,则可不带该参数
+ * password:同username,如果Security没有做任何密码的其他操作,传参时不能加密,要原文传输
+ * </pre>
+ * 
+ * 返回值:
+ * 
+ * <pre>
+ * access_token:OAuth2认证服务器返回的token,以后访问所有请求都要携带该token,否则无法访问
+ * token_tpye:令牌类型
+ * refresh_token:access_token到期时获取下一次access_token时的刷新token
+ * expires_in:access_token过期时间
+ * scope:权限域
+ * </pre>
+ * 
+ * 检查token是否失效,固定接口/oauth/check_token,在浏览器访问
+ * http://ip:55100/oauthServer/oauth/check_token?token=
+ * 
+ * 重新获取token,仍然使用/oauth/token,单是grant_type换成refresh_token,同时带上第一次获取到的refresh_token,用户名和密码也不需要
+ * http://ip:55100/oauthServer/oauth/token?client_id=client_id&client_secret=guest&grant_type=refresh_token&refresh_token=
+ * 
+ * 内存模式授权码认证服务器
+ * 
+ * <pre>
+ * 第一次先获得code:
+ * http://ip:port/oauth/authorize?response_type=code&state=123456&client_id=client_id&scope=all&redirect_uri=http://otherappurl
+ * 返回http://otherappurl?code=ycjU3F&state=123456可以拿到ycjU3F这个code
+ * 
+ * response_type:请求模式,授权码认证 state:状态,非必须 client_id:第三方客户端client_id scope:权限域
+ * redirect_uri:获得code的请求地址
+ * 
+ * 第二次获得token:http://ip:port/oauth/token?client_id=client_id&client_secret=guest&grant_type=authorization_code&code=ycjU3F&redirect_uri=http://otherappurl
+ * 
+ * grant_type:授权码认证 code:从第一部获得的code
  *
  * @author 飞花梦影
  * @date 2021-07-02 15:10:26
@@ -89,21 +139,17 @@ public class JdbcAuthorizationServer extends AuthorizationServerConfigurerAdapte
 	@Autowired
 	private AuthenticationManager authenticationManager;
 
-	// @Autowired
-	// private TokenStore redisTokenStore;
-
+	/**
+	 * 此处为{@link JdbcTokenStore},见{@link OAuth2JdbcConfig}
+	 */
 	@Autowired
-	private TokenStore jdbcTokenStore;
+	private TokenStore tokenStore;
 
+	/**
+	 * 此处为{@link JdbcClientDetailsService},见{@link OAuth2JdbcConfig}
+	 */
 	@Autowired
-	private JwtAccessTokenConverter jwtAccessTokenConverter;
-
-	@Autowired
-	private UserApprovalHandler userApprovalHandler;
-
-	/** 用户认证业务 */
-	@Autowired
-	private UserDetailsService userDetailsService;
+	private JdbcClientDetailsService jdbcClientDetailsService;
 
 	@Autowired
 	private AuthorizationCodeServices jdbcAuthorizationCodeServices;
@@ -111,8 +157,15 @@ public class JdbcAuthorizationServer extends AuthorizationServerConfigurerAdapte
 	@Autowired
 	private AuthorizationServerTokenServices jdbcAuthorizationServerTokenServices;
 
-	@Autowired
-	private JdbcClientDetailsService jdbcClientDetailsService;
+	// @Autowired
+	// private JwtAccessTokenConverter jwtAccessTokenConverter;
+	//
+	// @Autowired
+	// private UserApprovalHandler userApprovalHandler;
+	//
+	// /** 用户认证业务 */
+	// @Autowired
+	// private UserDetailsService userDetailsService;
 
 	/**
 	 * 管理令牌:令牌生成和存储
@@ -156,17 +209,18 @@ public class JdbcAuthorizationServer extends AuthorizationServerConfigurerAdapte
 	@Override
 	public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
 		endpoints
-				// 用于支持密码模式
-				.authenticationManager(authenticationManager).accessTokenConverter(jwtAccessTokenConverter)
-				.userDetailsService(userDetailsService).userApprovalHandler(userApprovalHandler)
+				// 认证管理器
+				.authenticationManager(authenticationManager)
+				// .accessTokenConverter(jwtAccessTokenConverter)
+				// .userDetailsService(userDetailsService).userApprovalHandler(userApprovalHandler)
 				// 授权码存储
 				.authorizationCodeServices(jdbcAuthorizationCodeServices)
 				// token服务
 				.tokenServices(jdbcAuthorizationServerTokenServices)
 				// 从数据库查看来源数据
-				.tokenStore(jdbcTokenStore)
+				.tokenStore(tokenStore)
 				// 支持的请求类型
-				.allowedTokenEndpointRequestMethods(HttpMethod.POST);
+				.allowedTokenEndpointRequestMethods(HttpMethod.POST, HttpMethod.GET);
 		// if (null == jwtTokenStore) {
 		// endpoints.tokenStore(redisTokenStore);
 		// } else {
@@ -189,12 +243,13 @@ public class JdbcAuthorizationServer extends AuthorizationServerConfigurerAdapte
 	 */
 	@Override
 	public void configure(AuthorizationServerSecurityConfigurer oauthServer) throws Exception {
-		// 获得签名的signkey,需要身份验证才行,默认是denyAll(),这是SpringSecurity的权限表达式
 		oauthServer
-				// token_key公开
+				// 开启端口/oauth/token_key的访问权限(允许所有),可获得公钥signKey,默认是denyAll(),是SpringSecurity的权限表达式
 				.tokenKeyAccess("permitAll()")
-				// 必须是认证的
-				.checkTokenAccess("isAuthenticated()")
+				// 开启端口/oauth/check_token的访问权限(允许所有)
+				.checkTokenAccess("permitAll()")
+				// 值允许已经认证了的用户访问
+				// .checkTokenAccess("isAuthenticated()")
 				// 允许以表单的方式将token传递到服务
 				.allowFormAuthenticationForClients();
 		// oauthServer.tokenKeyAccess("isAnonymous() ||

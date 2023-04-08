@@ -3,6 +3,7 @@ package com.wy.crl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,6 +32,8 @@ public class UserCrl {
 
 	@GetMapping("getAuthenticaiton")
 	public Result<?> getAuthenticaiton(Authentication authentication) {
+		System.out.println(SecurityContextHolder.getContext().getAuthentication());
+		System.out.println(authentication.getDetails());
 		return Result.ok(authentication);
 	}
 

@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 
@@ -21,9 +22,10 @@ import com.wy.result.Result;
  * 若使用fastjson处理json,则此处使用使用fastjson的相关方法转换结果,否则fastjson的配置将无效
  * 
  * @author 飞花梦影
- * @date 2019-01-25 15:41:58
+ * @date 2023-04-08 11:21:53
+ * @git {@link https://gitee.com/dreamFlyingFlower}
  */
-// @Configuration
+@Configuration
 public class LoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
 
 	@Autowired
@@ -32,7 +34,7 @@ public class LoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessH
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
 			Authentication authentication) throws IOException, ServletException {
-		// 什么都不做的话，那就直接调用父类的方法
+		// 什么都不做的话,那就直接调用父类的方法
 		// super.onAuthenticationSuccess(request, response, authentication);
 
 		// 允许跨域
@@ -41,14 +43,14 @@ public class LoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessH
 		response.setHeader("Access-Control-Allow-Headers",
 				"token, Accept, Origin, X-Requested-With, Content-Type, Last-Modified");
 
-		// 这里可以根据实际情况，来确定是跳转到页面或者json格式。
-		// 如果是返回json格式，那么我们这么写
+		// 这里可以根据实际情况,来确定是跳转到页面或者json格式
 
+		// 如果是返回json格式
 		Result<?> result = Result.ok("登录成功", null);
 		response.setContentType("application/json;charset=UTF-8");
 		response.getWriter().write(objectMapper.writeValueAsString(result));
 
-		// 如果是要跳转到某个页面的，比如我们的那个whoim的则
-		// new DefaultRedirectStrategy().sendRedirect(request, response, "/whoim");
+		// 如果是要跳转到某个页面的,比如home
+		// new DefaultRedirectStrategy().sendRedirect(request, response, "/home");
 	}
 }

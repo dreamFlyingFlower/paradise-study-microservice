@@ -6,3 +6,6 @@ spring:
       password: 123456
       
     url: jdbc:mysql://localhost:3306/dream_basic?autoReconnect=true&useUnicode=true&serverTimezone=GMT&useSSL=false
+    
+mybatis:
+  mapper-locations: classpath:mapper/**.xml

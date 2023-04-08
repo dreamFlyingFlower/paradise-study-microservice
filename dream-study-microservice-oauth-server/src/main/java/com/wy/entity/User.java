@@ -32,7 +32,7 @@ public class User implements UserDetails {
 
 	private static final long serialVersionUID = 1L;
 
-	private Integer userId;
+	private Long id;
 
 	private String username;
 

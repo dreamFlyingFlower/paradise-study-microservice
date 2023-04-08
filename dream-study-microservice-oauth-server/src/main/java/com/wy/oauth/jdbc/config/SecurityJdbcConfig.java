@@ -64,10 +64,16 @@ public class SecurityJdbcConfig extends WebSecurityConfigurerAdapter {
 
 	/**
 	 * 使用数据库中的数据来判断登录是否成功,在登录请求时会自动拦截请求,并进入验证
+	 * 
+	 * guest:Bcrpt加密->$2a$10$dXULkWNhddYNVH9yQkzwQeJinGE0e22iL4CSEdkm7sRPwa.A27iEi
+	 * 123456:Bcrpt加密->$2a$10$lg5hcqs13V3c6FVjr1/mjO31clz7fkjlIKnppDhNDdxJVaWxh/xB6
+	 * password:Bcrpt加密->$2a$10$owjsydvplVmh0wI6f.xOM.4TKBc/CoKYTvX.HmnS6Yeu7qlyukAPO
 	 */
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 		auth.authenticationProvider(provider);
+		// 同上
+		// auth.userDetailsService(userService).passwordEncoder(passwordEncoder);
 	}
 
 	/**
