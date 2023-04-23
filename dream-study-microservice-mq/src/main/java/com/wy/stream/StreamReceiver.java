@@ -20,17 +20,12 @@ import org.springframework.stereotype.Component;
 public class StreamReceiver {
 
 	/**
-	 * 若是直接从一个输入到输出,则不需要写sendto,直接监听即可
+	 * 若是直接从一个输入到输出,则不需要写sendto;若是需要将监听的消息发送到另外一个队列,可使用sendto,将消息发送到另外的队列
 	 * 
 	 * @param msgObject 监听的消息
 	 */
-	@StreamListener("msgClient")
-	/**
-	 * 若是需要将监听的消息发送到另外一个队列,可使用sendto,将消息发送到另外的队列
-	 * 
-	 * @param msgObject
-	 */
 	@SendTo("otherClient")
+	@StreamListener("msgClient")
 	public void process(Object msgObject) {
 		System.out.println(msgObject);
 	}
