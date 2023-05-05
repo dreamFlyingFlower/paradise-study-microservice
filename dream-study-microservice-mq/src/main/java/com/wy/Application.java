@@ -35,6 +35,23 @@ import org.springframework.jms.annotation.EnableJms;
  * 
  * Kafka:需要配置zk集群的地址
  * 
+ * Disruptor:单个线程每秒处理600W订单,速度最快的MQ.基于内存的MQ,不存磁盘.无锁(CAS),单机支持高并发.
+ * 使用环形Buffer,直接覆盖(不清除)旧数据,降低GC频率.实现了基于事件的生产者消费者模式
+ * 
+ * Disruptor等待策略:
+ * 
+ * <pre>
+ * BlockingWaitStrategy:通过线程阻塞的方式,等待生产者唤醒,被唤醒后,再循环检查依赖的sequence是否已经消费
+ * BusySpinWaitStrategy:线程一直自旋等待,可能比较耗cpu
+ * LiteBlockingWaitStrategy:线程阻塞等待生产者唤醒,与BlockingWaitStrategy相比,区别在signalNeeded.getAndSet,
+ * 		如果两个线程同时访问一个访问waitfor,一个访问signalAll时,可以减少lock加锁次数
+ * LiteTimeoutBlockingWaitStrategy:与LiteBlockingWaitStrategy相比,设置了阻塞时间,超过时间后抛异常
+ * PhasedBackoffWaitStrategy:根据时间参数和传入的等待策略来决定使用哪种等待策略
+ * TimeoutBlockingWaitStrategy:相对于BlockngWaitStrategy来说,设置了等待时间,超过后抛异常
+ * YieldingWaitStrategy:尝试100次,然后Thread.yield0让出cpu
+ * SleepingWaitStrategy:sleep
+ * </pre>
+ * 
  * @author ParadiseWY
  * @date 2020-12-07 16:56:43
  * @git {@link https://github.com/mygodness100}
