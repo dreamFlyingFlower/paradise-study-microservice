@@ -51,6 +51,7 @@ public class Procuder02Listener implements RocketMQLocalTransactionListener {
 	 */
 	@Override
 	public RocketMQLocalTransactionState checkLocalTransaction(Message msg) {
+		// TODO 消息回查
 		// 查询日志记录,从数据库查询
 		TxLog txLog = new TxLog();
 		if (txLog == null) {

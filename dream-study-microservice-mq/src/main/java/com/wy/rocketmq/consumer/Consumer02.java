@@ -1,8 +1,10 @@
 package com.wy.rocketmq.consumer;
 
+import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
 import org.apache.rocketmq.common.message.MessageExt;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
 import org.apache.rocketmq.spring.core.RocketMQListener;
+import org.apache.rocketmq.spring.core.RocketMQPushConsumerLifecycleListener;
 import org.springframework.stereotype.Component;
 
 /**
@@ -14,7 +16,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @RocketMQMessageListener(topic = "test-rocket-topic", consumerGroup = "test-rocket-group")
-public class Consumer02 implements RocketMQListener<MessageExt> {
+public class Consumer02 implements RocketMQListener<MessageExt>, RocketMQPushConsumerLifecycleListener {
 
 	/**
 	 * 监听队列中的消息,可以是同步,异步,单向
@@ -31,5 +33,11 @@ public class Consumer02 implements RocketMQListener<MessageExt> {
 		if (times > 5) {
 			// 其他处理
 		}
+	}
+
+	@Override
+	public void prepareStart(DefaultMQPushConsumer defaultMQPushConsumer) {
+		// 设置最大重试次数
+		defaultMQPushConsumer.setMaxReconsumeTimes(2);
 	}
 }

@@ -27,7 +27,7 @@ public class Procuder02 {
 
 	public void createOrderBefore(Order order) {
 		String txId = UUID.randomUUID().toString();
-		// 发送半事务消息
+		// 发送半事务消息,该消息不会被消费
 		rocketMQTemplate.sendMessageInTransaction("tx_producer_group",
 				MessageBuilder.withPayload(order).setHeader("txId", txId).build(), order);
 	}
