@@ -1,5 +1,7 @@
 package com.wy.kafka.producer;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -12,6 +14,8 @@ import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
+import org.apache.kafka.common.header.Header;
+import org.apache.kafka.common.header.internals.RecordHeader;
 
 /**
  * Producer,是线程安全的,即使是循环发送,但是内部仍然是批量发送,见 {@link KafkaProducer#doSend}
@@ -71,11 +75,17 @@ public class ProducerKafka {
 		// Producer的主对象
 		Producer<String, String> producer = new KafkaProducer<>(properties);
 
+		// 自定义消息头信息
+		List<Header> headers = new ArrayList<>();
+		headers.add(new RecordHeader("server.name", "order".getBytes()));
+
 		// 消息对象 - ProducerRecoder
 		for (int i = 0; i < 10; i++) {
 			String key = "key-" + i;
 			ProducerRecord<String, String> record = new ProducerRecord<>(TOPIC_NAME, key, "value-" + i);
+			// new ProducerRecord<>(TOPIC_NAME, 0, key, i, headers);
 
+			// 发送消息
 			Future<RecordMetadata> send = producer.send(record);
 			// 会阻塞
 			RecordMetadata recordMetadata = send.get();
@@ -89,8 +99,14 @@ public class ProducerKafka {
 		producer.close();
 	}
 
+	/**
+	 * 构建kafka配置,使用Properties或Map都可以
+	 * 
+	 * @return Properties
+	 */
 	private static Properties buildProperties() {
 		Properties properties = new Properties();
+		// kafka服务地址,多个用逗哥分割
 		properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "192.168.1.150:9092");
 		// ACK机制:
 		// 0:不需要进行ACK确认,且不会进行重试(重试配置无效),返回的offset总是为-1

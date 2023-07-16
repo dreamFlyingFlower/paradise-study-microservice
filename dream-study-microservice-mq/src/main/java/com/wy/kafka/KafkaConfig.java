@@ -26,7 +26,7 @@ import org.springframework.context.annotation.Configuration;
  * 
  * @author 飞花梦影
  * @date 2020-12-08 12:59:49
- * @git {@link https://github.com/mygodness100}
+ * @git {@link https://github.com/dreamFlyingFlower}
  */
 @Configuration
 public class KafkaConfig {

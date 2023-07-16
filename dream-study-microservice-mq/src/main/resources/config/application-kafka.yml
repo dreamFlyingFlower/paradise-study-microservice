@@ -12,7 +12,7 @@ spring:
     - 127.0.0.1:9093
     # 生产者配置
     producer:
-      # 生产者缓冲区大小
+      # 生产者缓冲区大小,32M
       buffer-memory: 33554432
       # Kafka提供的序列化和反序列化类
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
@@ -23,11 +23,14 @@ spring:
       acks: 1
       # 批量大小
       batch-size: 16384
+      # 消息压缩类型,默认none,有none,gzip,snappy,lz4可选
+      compression-type: gzip
       properties:
         # 提交延时
-        linger.ms: 0
+        linger:
+          ms: 0
         # 自定义分区器
-        # partitioner.class=com.ssi.kafka.CustomizePartitiner
+        # partitioner.class: com.wy.kafka.CustomizePartitiner
     # 消费者配置
     consumer: 
       # 批量消费每次最多消费多少条消息
