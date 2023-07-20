@@ -160,8 +160,44 @@ public class ConsumerKafka {
 			// 消费订阅哪一个Topic或者几个Topic
 			// consumer.subscribe(Arrays.asList(TOPIC_NAME));
 
-			// 消费订阅某个Topic的某个分区
+			// 手动指定消费者订阅某个Topic的某个分区
+			// 手动分配分区不支持增量分配,如果先前有分配分区,则该操作会覆盖之前的分配
+			// 如果给出的主题分区是空的,则等价于调用unsubscribe方法
+			// 手动分配主题分区的方法不使用消费组管理功能,当消费组成员变了,或者集群或主题的元数据改变了,不会触发分区分配的再平衡
+			// 手动分区分配assign(Collection)不能和自动分区分配subscribe(Collection,
+			// ConsumerRebalanceListener)一起使用
+			// 如果启用了自动提交偏移量,则在新的分区分配替换旧的分区分配之前,会对旧的分区分配中的消费偏移量进行异步提交
 			consumer.assign(Arrays.asList(p0));
+
+			// 获取给当前消费者分配的分区集合.如果订阅是通过调用assign()直接分配主题分区,则返回相同的集合
+			// 如果使用了主题订阅,该方法返回当前分配给该消费者的主题分区集合;如果分区订阅还没开始进行分区分配,或者正在重新分配分区,则会返回none
+			consumer.assignment();
+
+			// 获取对用户授权的所有主题分区元数据.该方法会对服务器发起远程调用
+			consumer.listTopics();
+
+			// 获取指定主题的分区元数据.如果当前消费者没有关于该主题的元数据,就会对服务器发起远程调用
+			consumer.partitionsFor(TOPIC_NAME);
+
+			// 对于给定的主题分区,列出它们第一个消息的偏移量.如果指定的分区不存在,该方法可能会永远阻塞
+			// 该方法不改变分区的当前消费者偏移量
+			// consumer.beginningOffsets(null);
+
+			// 将偏移量移动到每个给定分区的最后一个.该方法延迟执行,只有当调用过poll()或position()之后才可以使用
+			// 如果没有指定分区,则将当前消费者分配的所有分区的消费者偏移量移动到最后
+			// 如果设置了隔离级别为:isolation.level=read_committed,则会将消费偏移量移动到最后一个稳定的偏移量,即下一个要消费的现在还是未提交状态的事务消息
+			// consumer.seekToEnd(null);
+
+			// 将给定主题分区的消费偏移量移动到指定的偏移量,即当前消费者下一条要消费的消息偏移量
+			// 若该方法多次调用,则最后一次的覆盖前面的.如果在消费中间随意使用,可能会丢失数据
+			// consumer.seek(p1, 0);
+
+			// 将给定每个分区的消费者偏移量移动到它们的起始偏移量.
+			// 该方法懒执行,只有当调用过poll()或position()之后才会执行;如果没有提供分区,则将所有分配给当前消费者的分区消费偏移量移动到起始偏移量
+			// consumer.seekToBeginning(null);
+
+			// 检查指定主题分区的消费偏移量
+			consumer.position(p1);
 
 			while (true) {
 				ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(10000));
@@ -201,7 +237,7 @@ public class ConsumerKafka {
 			while (true) {
 				// 手动指定offset起始位置
 				// 人为控制offset起始位置,如果出现程序错误,重复消费一次
-				// 第一次从0消费【一般情况】 
+				// 第一次从0消费【一般情况】
 				// 比如一次消费了100条, offset置为101并且存入Redis
 				// 每次poll之前,从redis中获取最新的offset位置
 				// 每次从这个位置开始消费
