@@ -1,6 +1,6 @@
 package com.wy.rocketmq;
 
-import com.wy.rocketmq.consumer.Consumer03;
+import com.wy.rocketmq.consumer.Consumer02;
 
 /**
  * RocketMQ消息队列:支持事务;支持延迟消息;支持集群,负载均衡;支持指定次数和时间间隔的失败消息重发.只支持Java
@@ -19,7 +19,7 @@ import com.wy.rocketmq.consumer.Consumer03;
  * Topic:主题,相当于消息的一级分类,具有相同Topic的消息将发送到该Topic下的消息队列中
  * 消息体:消息的内容,可以是字符串,对象等,最大长度是4M
  * 消息Flag:消息的一个标记,RocketMQ不处理,业务中自行处理
- * Tag:相当于消息的二级分类,用于消费消息时进行过滤,可为null,见 {@link Consumer03}
+ * Tag:相当于消息的二级分类,用于消费消息时进行过滤,可为null,见 {@link Consumer02}
  * Keys:Message索引建,在运维中可以根据这些key快速检索到消息,可为null
  * WaitStoreMsgOK:消息发送时是否等消息存储完成后再返回
  * Message:主要包括消息所属Topic,消息Flag,扩展属性,消息体

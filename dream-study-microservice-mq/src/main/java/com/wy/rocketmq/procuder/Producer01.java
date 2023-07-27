@@ -3,6 +3,7 @@ package com.wy.rocketmq.procuder;
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.client.producer.SendCallback;
 import org.apache.rocketmq.client.producer.SendResult;
+import org.apache.rocketmq.common.message.MessageConst;
 import org.apache.rocketmq.remoting.exception.RemotingException;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,7 @@ import org.springframework.stereotype.Component;
  * @git {@link https://github.com/dreamFlyingFlower}
  */
 @Component
-public class Procuder01 {
+public class Producer01 {
 
 	@Autowired
 	private RocketMQTemplate rocketMQTemplate;
@@ -89,7 +90,9 @@ public class Procuder01 {
 	 */
 	public void syncSendDelay(String topic, Object msg) {
 		// spring的Message对象
-		Message<Object> message = MessageBuilder.withPayload(msg).build();
+		Message<Object> message = MessageBuilder.withPayload(msg)
+				// 设置消息的tag
+				.setHeader(MessageConst.PROPERTY_TAGS, "A").build();
 		// 发消息的超时时间,默认单位毫秒
 		rocketMQTemplate.syncSend(topic, message, 3);
 		// 发消息的超时时间,队列中消息延迟时间等级,从1s/5s/10s/30s/1m/2m/3m/4m...10m/20m/30m/1h/2h,总共18等级

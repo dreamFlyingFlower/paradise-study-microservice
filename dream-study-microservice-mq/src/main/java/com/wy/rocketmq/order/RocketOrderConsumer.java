@@ -27,7 +27,7 @@ public class RocketOrderConsumer {
 		 */
 		consumer.setConsumeFromWhere(ConsumeFromWhere.CONSUME_FROM_FIRST_OFFSET);
 
-		consumer.subscribe("TopicTest", "*");
+		consumer.subscribe("topic_roder", "*");
 
 		// 使用顺序监听器监听消息
 		consumer.registerMessageListener(new MessageListenerOrderly() {

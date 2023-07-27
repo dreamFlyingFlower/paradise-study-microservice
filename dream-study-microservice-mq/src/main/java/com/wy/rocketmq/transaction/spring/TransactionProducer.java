@@ -1,4 +1,4 @@
-package com.wy.rocketmq.procuder;
+package com.wy.rocketmq.transaction.spring;
 
 import java.util.Date;
 import java.util.UUID;
@@ -20,7 +20,7 @@ import lombok.Data;
  * @git {@link https://github.com/dreamFlyingFlower}
  */
 @Component
-public class Procuder02 {
+public class TransactionProducer {
 
 	@Autowired
 	private RocketMQTemplate rocketMQTemplate;

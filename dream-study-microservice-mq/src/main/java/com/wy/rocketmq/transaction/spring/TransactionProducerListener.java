@@ -1,4 +1,4 @@
-package com.wy.rocketmq.listener;
+package com.wy.rocketmq.transaction.spring;
 
 import java.util.Date;
 import java.util.UUID;
@@ -28,9 +28,15 @@ import lombok.Data;
 @RocketMQTransactionListener
 @ExtRocketMQTemplateConfiguration(group = "tx_producer_group")
 @SuppressWarnings({ "unused", "rawtypes" })
-public class Procuder02Listener implements RocketMQLocalTransactionListener {
+public class TransactionProducerListener implements RocketMQLocalTransactionListener {
 
-	// 执行本地事物
+	/**
+	 * 如果半消息发送成功,执行本地事物
+	 * 
+	 * @param msg
+	 * @param arg
+	 * @return
+	 */
 	@Override
 	public RocketMQLocalTransactionState executeLocalTransaction(Message msg, Object arg) {
 		try {

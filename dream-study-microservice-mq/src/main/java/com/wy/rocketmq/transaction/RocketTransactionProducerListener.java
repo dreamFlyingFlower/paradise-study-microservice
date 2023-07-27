@@ -1,4 +1,4 @@
-package com.wy.rocketmq.listener;
+package com.wy.rocketmq.transaction;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,7 +15,7 @@ import org.apache.rocketmq.common.message.MessageExt;
  * @date 2022-05-29 11:54:44
  * @git {@link https://gitee.com/dreamFlyingFlower}
  */
-public class Producer04Listener implements TransactionListener {
+public class RocketTransactionProducerListener implements TransactionListener {
 
 	// 模拟记录消息事务状态,应该放在数据库或redis
 	private static Map<String, LocalTransactionState> STATE_MAP = new HashMap<>();

@@ -17,7 +17,7 @@ import org.apache.rocketmq.remoting.exception.RemotingException;
  * @date 2022-05-28 23:55:20
  * @git {@link https://gitee.com/dreamFlyingFlower}
  */
-public class Producer03 {
+public class Producer02 {
 
 	/**
 	 * 发送同步消息

@@ -1,4 +1,4 @@
-package com.wy.rocketmq.consumer;
+package com.wy.rocketmq.transaction;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -16,7 +16,7 @@ import org.apache.rocketmq.common.message.MessageExt;
  * @date 2022-05-29 11:55:52
  * @git {@link https://gitee.com/dreamFlyingFlower}
  */
-public class Consumer04 {
+public class RocketTransactionConsumer {
 
 	public static void main(String[] args) throws Exception {
 		DefaultMQPushConsumer consumer = new DefaultMQPushConsumer("group");

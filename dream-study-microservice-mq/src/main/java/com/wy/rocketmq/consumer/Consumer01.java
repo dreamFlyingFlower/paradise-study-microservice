@@ -18,7 +18,9 @@ import org.springframework.stereotype.Component;
 		// 消费模式:无序和有序
 		consumeMode = ConsumeMode.CONCURRENTLY,
 		// 消息模式:广播和集群,默认集群
-		messageModel = MessageModel.CLUSTERING)
+		messageModel = MessageModel.CLUSTERING,
+		// 消息过滤
+		selectorExpression = "A||B")
 public class Consumer01 implements RocketMQListener<String> {
 
 	/**
