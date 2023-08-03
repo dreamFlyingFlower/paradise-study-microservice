@@ -36,6 +36,10 @@ public class Producer02 {
 		// 设置消息发送失败重试次数
 		producer.setRetryTimesWhenSendFailed(3);
 		producer.setRetryTimesWhenSendAsyncFailed(3);
+		// 设置发送超时时限为5s,默认3s
+		producer.setSendMsgTimeout(5000);
+		// 指定新创建的Topic的Queue数量为4,默认为4
+		producer.setDefaultTopicQueueNums(4);
 		// 建立连接
 		producer.start();
 		Message message = new Message("topic", "tag", msg.getBytes());
@@ -66,10 +70,17 @@ public class Producer02 {
 		producer.send(message, 3000);
 		// 消息id
 		System.out.println(sendResult.getMsgId());
+		// 消息发送结果
+		// SEND_OK:成功
+		// FLUSH_DISK_TIMEOUT:刷盘超时.当Broker设置的刷盘策略为同步刷盘时才可能出现这种异常状态.异步刷盘不会出现
+		// FLUSH_SLAVE_TIMEOUT:Slave同步超时.当Broker集群设置的Master-Slave的复制方式为同步复制时才可能出现这种异常状态.异步复制不会出现
+		// SLAVE_NOT_AVAILABLE:没有可用的Slave.当Broker集群设置为Master-Slave的复制方式为同步复制时才可能出现这种异常状态.异步复制不会出现
+		System.out.println(sendResult.getSendStatus());
 		// 消息队列
 		System.out.println(sendResult.getMessageQueue());
 		// 消息offset值
 		System.out.println(sendResult.getQueueOffset());
+		// 异步若关闭太快会接收不到消息,生产环境不会关闭
 		producer.shutdown();
 	}
 }

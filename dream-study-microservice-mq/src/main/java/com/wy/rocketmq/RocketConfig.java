@@ -66,6 +66,18 @@ import com.wy.rocketmq.consumer.Consumer02;
  * 7.Broker收到回查接口信息后再次执行第4步
  * </pre>
  * 
+ * 批量发送消息:
+ * 
+ * <pre>
+ * 批量发送的消息必须具有相同的Topic
+ * 批量发送的消息必须具有相同的刷盘策略
+ * 批量发送的消息不能是延时消息与事务消息
+ * 
+ * 默认一批发送的消息总大小不能超过4MB字节,如果想超出该值,有两种解决方案:
+ * 方案一:将批量消息进行拆分,拆分为若干不大于4M的消息集合分多次批量发送
+ * 方案二:在Producer端与Broker端修改属性:Producer需要在发送前设置maxMessageSize;Broker需要修改配置文件中的maxMessageSize
+* </pre>
+ * 
  * @author 飞花梦影
  * @date 2021-04-09 11:26:24
  * @git {@link https://github.com/dreamFlyingFlower}
