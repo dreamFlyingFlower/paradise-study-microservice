@@ -38,6 +38,7 @@ import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenCo
  * @git {@link https://github.com/dreamFlyingFlower }
  */
 @Configuration
+@SuppressWarnings("deprecation")
 public class OAuth2Config {
 
 	/**
@@ -145,7 +146,7 @@ public class OAuth2Config {
 	 */
 	@Bean
 	public AuthorizationServerTokenServices
-	        authorizationServerTokenServices(ClientDetailsService clientDetailsService) {
+			authorizationServerTokenServices(ClientDetailsService clientDetailsService) {
 		DefaultTokenServices defaultTokenServices = new DefaultTokenServices();
 		defaultTokenServices.setClientDetailsService(clientDetailsService);
 		defaultTokenServices.setSupportRefreshToken(true);

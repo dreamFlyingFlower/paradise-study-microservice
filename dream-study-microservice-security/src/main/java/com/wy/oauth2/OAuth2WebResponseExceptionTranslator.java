@@ -21,6 +21,7 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
  * @date 2022-06-17 17:43:08
  * @git {@link https://github.com/dreamFlyingFlower }
  */
+@SuppressWarnings("deprecation")
 public class OAuth2WebResponseExceptionTranslator implements WebResponseExceptionTranslator<OAuth2Exception> {
 
 	private ThrowableAnalyzer throwableAnalyzer = new DefaultThrowableAnalyzer();
@@ -29,27 +30,27 @@ public class OAuth2WebResponseExceptionTranslator implements WebResponseExceptio
 	public ResponseEntity<OAuth2Exception> translate(Exception e) throws Exception {
 		Throwable[] causeChain = this.throwableAnalyzer.determineCauseChain(e);
 		Exception ase =
-		        (OAuth2Exception) this.throwableAnalyzer.getFirstThrowableOfType(OAuth2Exception.class, causeChain);
+				(OAuth2Exception) this.throwableAnalyzer.getFirstThrowableOfType(OAuth2Exception.class, causeChain);
 		if (ase != null) {
 			return this.handleOAuth2Exception((OAuth2Exception) ase);
 		}
 		ase = (AuthenticationException) this.throwableAnalyzer.getFirstThrowableOfType(AuthenticationException.class,
-		        causeChain);
+				causeChain);
 		if (ase != null) {
 			return this.handleOAuth2Exception(new UnauthorizedException(e.getMessage(), e));
 		}
 		ase = (AccessDeniedException) this.throwableAnalyzer.getFirstThrowableOfType(AccessDeniedException.class,
-		        causeChain);
+				causeChain);
 		if (ase instanceof AccessDeniedException) {
 			return this.handleOAuth2Exception(new ForbiddenException(ase.getMessage(), ase));
 		}
 
 		ase = (HttpRequestMethodNotSupportedException) this.throwableAnalyzer
-		        .getFirstThrowableOfType(HttpRequestMethodNotSupportedException.class, causeChain);
+				.getFirstThrowableOfType(HttpRequestMethodNotSupportedException.class, causeChain);
 		return ase instanceof HttpRequestMethodNotSupportedException
-		        ? this.handleOAuth2Exception(new MethodNotAllowed(ase.getMessage(), ase))
-		        : this.handleOAuth2Exception(
-		                new ServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), e));
+				? this.handleOAuth2Exception(new MethodNotAllowed(ase.getMessage(), ase))
+				: this.handleOAuth2Exception(
+						new ServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), e));
 
 	}
 
@@ -65,7 +66,7 @@ public class OAuth2WebResponseExceptionTranslator implements WebResponseExceptio
 		RestOAuth2Exception restOAuth2Exception = new RestOAuth2Exception(e.getMessage(), e);
 
 		ResponseEntity<OAuth2Exception> response =
-		        new ResponseEntity<>(restOAuth2Exception, headers, HttpStatus.valueOf(status));
+				new ResponseEntity<>(restOAuth2Exception, headers, HttpStatus.valueOf(status));
 		return response;
 	}
 

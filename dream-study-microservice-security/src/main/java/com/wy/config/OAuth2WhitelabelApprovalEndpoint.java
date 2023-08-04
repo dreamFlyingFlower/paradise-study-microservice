@@ -25,6 +25,7 @@ import org.springframework.web.util.HtmlUtils;
  * @date 2021-07-01 14:40:35
  * @git {@link https://github.com/dreamFlyingFlower }
  */
+@SuppressWarnings("deprecation")
 public class OAuth2WhitelabelApprovalEndpoint {
 
 	/**

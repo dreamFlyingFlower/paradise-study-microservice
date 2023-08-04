@@ -17,6 +17,7 @@ import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
  */
 // @Configuration
 // @EnableAuthorizationServer
+@SuppressWarnings("deprecation")
 public class SsoAuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
 
 	@Autowired

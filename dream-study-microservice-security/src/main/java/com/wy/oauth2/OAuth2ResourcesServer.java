@@ -22,6 +22,7 @@ import com.wy.security.LoginFailureHandler;
  */
 @Configuration
 @EnableResourceServer
+@SuppressWarnings("deprecation")
 public class OAuth2ResourcesServer extends ResourceServerConfigurerAdapter {
 
 	@Autowired

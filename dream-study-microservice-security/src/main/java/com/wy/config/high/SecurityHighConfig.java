@@ -1,11 +1,16 @@
 package com.wy.config.high;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -14,6 +19,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandlerImpl;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -27,6 +33,8 @@ import com.wy.service.UserService;
 
 /**
  * SpringSecurity5.7以上配置,WebSecurityConfigurerAdapter在该版本中已废弃
+ * 
+ * 自定义数据库用户登录参考{@link JdbcUserDetailsManager}
  *
  * @author 飞花梦影
  * @date 2023-02-01 16:51:06
@@ -45,40 +53,55 @@ public class SecurityHighConfig {
 	 * jwt 校验过滤器,从 http 头部 Authorization 字段读取 token 并校验
 	 */
 	@Bean
-	public JwtTokenFilter jwtTokenFilter() {
+	JwtTokenFilter jwtTokenFilter() {
 		return new JwtTokenFilter();
 	}
 
 	@Bean
-	public PasswordEncoder passwordEncoder() {
+	PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
 
 	/**
-	 * 获取AuthenticationManager(认证管理器),登录时认证使用
+	 * 使用一种方式登录,和下面的无参方法不能同时存在
 	 * 
-	 * @param authenticationConfiguration
-	 * @return
-	 * @throws Exception
-	 */
-	@Bean
-	public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
-			throws Exception {
-		return authenticationConfiguration.getAuthenticationManager();
-	}
-
-	/**
-	 * 使用自定义的基于数据库与JWT的认证方案
-	 * 
-	 * @param httpSecurity
-	 * @return
+	 * @return AuthenticationManager
 	 * @throws Exception
 	 */
 	@Bean
 	AuthenticationManager authenticationManager(HttpSecurity httpSecurity) throws Exception {
-		AuthenticationManager authenticationManager = httpSecurity.getSharedObject(AuthenticationManagerBuilder.class)
-				.userDetailsService(userService).passwordEncoder(passwordEncoder()).and().build();
-		return authenticationManager;
+		return httpSecurity.getSharedObject(AuthenticationManagerBuilder.class).userDetailsService(userService)
+				.passwordEncoder(passwordEncoder()).and().build();
+	}
+
+	/**
+	 * 使用多种自定义方式登录
+	 * 
+	 * @return AuthenticationManager
+	 */
+	@Bean
+	AuthenticationManager authenticationManager() {
+		List<AuthenticationProvider> authenticationProviders = new ArrayList<>();
+		// 普通数据库登录方式
+		authenticationProviders.add(daoAuthenticationProvider());
+		// 可以添加更多方式的登录方式
+		// authenticationProviders.add(mobileAuthenticationProvider());
+		// authenticationProviders.add(weixinAuthenticationProvider());
+		ProviderManager providerManager = new ProviderManager(authenticationProviders);
+		return providerManager;
+	}
+
+	/**
+	 * 普通用户数据库用户名密码登录
+	 * 
+	 * @return DaoAuthenticationProvider
+	 */
+	@Bean
+	DaoAuthenticationProvider daoAuthenticationProvider() {
+		DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
+		daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
+		daoAuthenticationProvider.setUserDetailsService(userService);
+		return daoAuthenticationProvider;
 	}
 
 	/**
@@ -113,7 +136,7 @@ public class SecurityHighConfig {
 	 * 相当于{@link WebSecurityConfigurerAdapter#configure(org.springframework.security.config.annotation.web.builders.WebSecurity)}
 	 */
 	@Bean
-	public WebSecurityCustomizer webSecurityCustomizer() {
+	WebSecurityCustomizer webSecurityCustomizer() {
 		return (web) -> web.ignoring().antMatchers("/ignore1", "/ignore2");
 	}
 
@@ -135,4 +158,28 @@ public class SecurityHighConfig {
 		source.registerCorsConfiguration("/**", corsConfiguration);
 		return source;
 	}
+
+	/**
+	 * LDAP相关配置,需要引入ldap相关jar
+	 * 
+	 * @return
+	 */
+	// @Bean
+	// public EmbeddedLdapServerContextSourceFactoryBean contextSourceFactoryBean()
+	// {
+	// EmbeddedLdapServerContextSourceFactoryBean contextSourceFactoryBean =
+	// EmbeddedLdapServerContextSourceFactoryBean.fromEmbeddedLdapServer();
+	// contextSourceFactoryBean.setPort(0);
+	// return contextSourceFactoryBean;
+	// }
+	//
+	// @Bean
+	// AuthenticationManager ldapAuthenticationManager(BaseLdapPathContextSource
+	// contextSource) {
+	// LdapBindAuthenticationManagerFactory factory = new
+	// LdapBindAuthenticationManagerFactory(contextSource);
+	// factory.setUserDnPatterns("uid={0},ou=people");
+	// factory.setUserDetailsContextMapper(new PersonContextMapper());
+	// return factory.createAuthenticationManager();
+	// }
 }

@@ -19,6 +19,7 @@ import org.springframework.security.oauth2.provider.token.store.redis.RedisToken
  * @date 2021-07-01 10:16:13
  * @git {@link https://github.com/dreamFlyingFlower }
  */
+@SuppressWarnings("deprecation")
 @Configuration
 public class TokenStoreConfig {
 
@@ -43,7 +44,7 @@ public class TokenStoreConfig {
 	 */
 	@Bean
 	@ConditionalOnProperty(prefix = "config.security.oauth2.token", name = "storeType", havingValue = "jwt",
-	        matchIfMissing = true)
+			matchIfMissing = true)
 	public TokenStore jwtTokenStore() {
 		return new JwtTokenStore(jwtAccessTokenConverter());
 	}
@@ -55,7 +56,7 @@ public class TokenStoreConfig {
 	 */
 	@Bean
 	@ConditionalOnProperty(prefix = "config.security.oauth2.token", name = "storeType", havingValue = "jwt",
-	        matchIfMissing = true)
+			matchIfMissing = true)
 	public JwtAccessTokenConverter jwtAccessTokenConverter() {
 		JwtAccessTokenConverter jwtAccessTokenConverter = new JwtAccessTokenConverter();
 		jwtAccessTokenConverter.setSigningKey("密钥,可配置");

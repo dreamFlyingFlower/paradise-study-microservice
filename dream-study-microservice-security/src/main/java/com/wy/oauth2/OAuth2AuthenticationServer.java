@@ -76,6 +76,7 @@ import org.springframework.security.oauth2.provider.token.store.redis.RedisToken
  * @date 2019-09-26 22:42:52
  * @git {@link https://github.com/dreamFlyingFlower}
  */
+@SuppressWarnings("deprecation")
 @Configuration
 @EnableAuthorizationServer
 public class OAuth2AuthenticationServer extends AuthorizationServerConfigurerAdapter {
@@ -145,20 +146,20 @@ public class OAuth2AuthenticationServer extends AuthorizationServerConfigurerAda
 		// endpoints.tokenServices(tokenService)
 
 		endpoints.authenticationManager(authenticationManager)
-		        // 若无refresh_token会有UserDetailsService is required错误
-		        .authorizationCodeServices(authorizationCodeServices)
-		        .pathMapping("/oauth/confirm_access", "/confirm_access").pathMapping("/oauth/error", "/oauth_error")
-		        // 只允许POST方式访问
-		        .allowedTokenEndpointRequestMethods(HttpMethod.POST)
-		        // 使用默认的tokenService,默认实现 DefaultTokenServices
-		        // .tokenServices(defaulAuthorizationServerTokenServices)
-		        // 使用自定义的tokenService,改造后的 DefaultTokenServices
-		        .tokenServices(authorizationServerTokenServices)
-		        // 使用redis存储第三方客户端相关信息
-		        .tokenStore(redisTokenStore).userDetailsService(userDetailsService)
-		        .userApprovalHandler(userApprovalHandler)
-		        // 自定义异常
-		        .exceptionTranslator(new OAuth2WebResponseExceptionTranslator());
+				// 若无refresh_token会有UserDetailsService is required错误
+				.authorizationCodeServices(authorizationCodeServices)
+				.pathMapping("/oauth/confirm_access", "/confirm_access").pathMapping("/oauth/error", "/oauth_error")
+				// 只允许POST方式访问
+				.allowedTokenEndpointRequestMethods(HttpMethod.POST)
+				// 使用默认的tokenService,默认实现 DefaultTokenServices
+				// .tokenServices(defaulAuthorizationServerTokenServices)
+				// 使用自定义的tokenService,改造后的 DefaultTokenServices
+				.tokenServices(authorizationServerTokenServices)
+				// 使用redis存储第三方客户端相关信息
+				.tokenStore(redisTokenStore).userDetailsService(userDetailsService)
+				.userApprovalHandler(userApprovalHandler)
+				// 自定义异常
+				.exceptionTranslator(new OAuth2WebResponseExceptionTranslator());
 		// 不使用authorizationServerTokenServices,直接使用JWT处理token
 		if (null != jwtAccessTokenConverter && null != jwtTokenEnhancer) {
 			TokenEnhancerChain tokenEnhancerChain = new TokenEnhancerChain();
@@ -176,9 +177,9 @@ public class OAuth2AuthenticationServer extends AuthorizationServerConfigurerAda
 	@Override
 	public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
 		security.tokenKeyAccess("permitAll()").checkTokenAccess("permitAll()")
-		        // 获得签名的signkey,需要身份验证才行,默认是denyAll(),这是SpringSecurity的权限表达式
-		        .tokenKeyAccess("isAuthenticated()")
-		        // 允许表单认证
-		        .allowFormAuthenticationForClients();
+				// 获得签名的signkey,需要身份验证才行,默认是denyAll(),这是SpringSecurity的权限表达式
+				.tokenKeyAccess("isAuthenticated()")
+				// 允许表单认证
+				.allowFormAuthenticationForClients();
 	}
 }

@@ -39,6 +39,7 @@ import com.wy.lang.StrTool;
  * @date 2019-09-29 16:55:39
  * @git {@link https://github.com/dreamFlyingFlower}
  */
+@SuppressWarnings("deprecation")
 public class ClientLoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
 
 	@Autowired

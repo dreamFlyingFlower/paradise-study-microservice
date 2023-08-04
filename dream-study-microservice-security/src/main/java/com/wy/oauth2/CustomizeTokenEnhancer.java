@@ -19,6 +19,7 @@ import com.google.common.collect.ImmutableMap;
  * @date 2021-07-01 10:37:29
  * @git {@link https://github.com/dreamFlyingFlower }
  */
+@SuppressWarnings("deprecation")
 public class CustomizeTokenEnhancer implements TokenEnhancer {
 
 	@Override

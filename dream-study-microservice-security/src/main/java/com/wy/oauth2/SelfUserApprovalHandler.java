@@ -14,11 +14,13 @@ import com.wy.service.OauthService;
  * @date 2022-09-13 17:30:38
  * @git {@link https://github.com/dreamFlyingFlower }
  */
+@SuppressWarnings("deprecation")
 public class SelfUserApprovalHandler extends TokenStoreUserApprovalHandler {
 
 	private OauthService oauthService;
 
-	public SelfUserApprovalHandler() {}
+	public SelfUserApprovalHandler() {
+	}
 
 	@Override
 	public boolean isApproved(AuthorizationRequest authorizationRequest, Authentication userAuthentication) {

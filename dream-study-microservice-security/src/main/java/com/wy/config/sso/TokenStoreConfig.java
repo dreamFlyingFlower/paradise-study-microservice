@@ -17,6 +17,7 @@ import org.springframework.security.oauth2.provider.token.store.redis.RedisToken
  * @git {@link https://github.com/dreamFlyingFlower }
  */
 // @Configuration
+@SuppressWarnings("deprecation")
 public class TokenStoreConfig {
 
 	@Autowired

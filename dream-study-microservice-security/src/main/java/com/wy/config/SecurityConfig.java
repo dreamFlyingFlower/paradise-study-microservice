@@ -1,21 +1,36 @@
 package com.wy.config;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.access.ExceptionTranslationFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
+import org.springframework.security.web.savedrequest.RequestCache;
+import org.springframework.security.web.util.matcher.AndRequestMatcher;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
+import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.web.accept.ContentNegotiationStrategy;
+import org.springframework.web.accept.HeaderContentNegotiationStrategy;
 
 import com.wy.config.high.SecurityHighConfig;
 import com.wy.filters.VerifyFilter;
@@ -192,6 +207,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				// 使用记住密码功能需要使用数据库,只是服务端记住,而非浏览器,浏览器关掉之后仍然需要重新登录
 				.and().rememberMe().tokenRepository(persistentTokenRepository()).tokenValiditySeconds(1209600)
 				.userDetailsService(userService).and()
+				// .requestCache().requestCache(getRequestCache(http))
 				// 退出的自定义配置
 				.logout()
 				// 清除所有的认证
@@ -212,5 +228,47 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	public void configure(WebSecurity web) throws Exception {
 		// 配置需要忽略检查的web url
 		web.ignoring().antMatchers("/js/**", "/css/**", "/images/**");
+	}
+
+	protected RequestCache getRequestCache(HttpSecurity http) {
+		RequestCache result = http.getSharedObject(RequestCache.class);
+		if (result != null) {
+			return result;
+		}
+		HttpSessionRequestCache defaultCache = new HttpSessionRequestCache();
+		defaultCache.setRequestMatcher(createDefaultSavedRequestMatcher(http));
+		return defaultCache;
+	}
+
+	private RequestMatcher createDefaultSavedRequestMatcher(HttpSecurity http) {
+		ContentNegotiationStrategy contentNegotiationStrategy = http.getSharedObject(ContentNegotiationStrategy.class);
+		if (contentNegotiationStrategy == null) {
+			contentNegotiationStrategy = new HeaderContentNegotiationStrategy();
+		}
+
+		RequestMatcher notFavIcon = new NegatedRequestMatcher(new AntPathRequestMatcher("/**/favicon.ico"));
+
+		MediaTypeRequestMatcher jsonRequest =
+				new MediaTypeRequestMatcher(contentNegotiationStrategy, MediaType.APPLICATION_JSON);
+		jsonRequest.setIgnoredMediaTypes(Collections.singleton(MediaType.ALL));
+		RequestMatcher notJson = new NegatedRequestMatcher(jsonRequest);
+
+		// RequestMatcher notXRequestedWith =
+		// new NegatedRequestMatcher(new RequestHeaderRequestMatcher("X-Requested-With",
+		// "XMLHttpRequest"));
+
+		@SuppressWarnings("unchecked")
+		boolean isCsrfEnabled = http.getConfigurer(CsrfConfigurer.class) != null;
+
+		List<RequestMatcher> matchers = new ArrayList<>();
+		if (isCsrfEnabled) {
+			RequestMatcher getRequests = new AntPathRequestMatcher("/**", "GET");
+			matchers.add(0, getRequests);
+		}
+		matchers.add(notFavIcon);
+		matchers.add(notJson);
+		// matchers.add(notXRequestedWith);
+
+		return new AndRequestMatcher(matchers);
 	}
 }
