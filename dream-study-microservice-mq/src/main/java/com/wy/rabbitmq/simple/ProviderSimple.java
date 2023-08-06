@@ -31,9 +31,9 @@ public class ProviderSimple {
 		// 开启生产者的消息确认机制,默认不开启,高并发下不建议开启
 		channel.confirmSelect();
 		// 批量发送消息时,存储唯一编号和消息
-		ConcurrentSkipListMap<Long, String> concurrentSkipListMap = new ConcurrentSkipListMap<>();
+		final ConcurrentSkipListMap<Long, String> concurrentSkipListMap = new ConcurrentSkipListMap<>();
 		// 消息异步确认回调
-		channel.addConfirmListener((long deliveryTag, boolean multiple) -> {
+		channel.addConfirmListener((deliveryTag, multiple) -> {
 			System.out.println("消息发送成功");
 			if (multiple) {
 				// 如果是批量确认,从concurrentSkipListMap中剔除deliveryTag

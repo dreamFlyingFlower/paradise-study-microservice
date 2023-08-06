@@ -33,13 +33,34 @@ public class Producer02 {
 		DefaultMQProducer producer = new DefaultMQProducer("group");
 		// 设置nameserver地址
 		producer.setNamesrvAddr("192.168.1.150:9876");
+		// 客户端本机IP地址.某些机器会发生无法识别客户端IP地址情况,需要应用在代码中强制指定
+		producer.setClientIP("127.0.0.1");
+		// 客户端实例名称.客户端创建的多个 Producer、Consumer实际是共用一个内部实例,这个实例包含网络连接、线程资源等
+		producer.setInstanceName("instanceName");
+		// 通信层异步回调线程数
+		producer.setClientCallbackExecutorThreads(4);
+		// 轮询Name Server间隔时间,单位毫秒
+		producer.setPollNameServerInterval(30000);
+		// 向Broker发送心跳间隔时间,单位毫秒
+		producer.setHeartbeatBrokerInterval(30000);
+		// 持久化Consumer消费进度间隔时间,单位毫秒
+		producer.setPersistConsumerOffsetInterval(5000);
+
 		// 设置消息发送失败重试次数
 		producer.setRetryTimesWhenSendFailed(3);
 		producer.setRetryTimesWhenSendAsyncFailed(3);
-		// 设置发送超时时限为5s,默认3s
-		producer.setSendMsgTimeout(5000);
+		// 在发送消息时,自动创建服务器不存在的topic,需要指定Key,该Key可用于配置发送消息所在topic的默认路由
+		producer.setCreateTopicKey("topic");
 		// 指定新创建的Topic的Queue数量为4,默认为4
 		producer.setDefaultTopicQueueNums(4);
+		// 设置发送超时时限为5s,默认3s
+		producer.setSendMsgTimeout(5000);
+		// 消息Body超过多大开始压缩(Consumer收到消息会自动解压缩),单位字节
+		producer.setCompressMsgBodyOverHowmuch(4096);
+		// 如果发送消息返回sendResult,但是sendStatus!=SEND_OK,是否重试发送
+		producer.setRetryAnotherBrokerWhenNotStoreOK(false);
+		// 客户端限制的消息大小,超过报错,同时服务端也会限制,所以需要跟服务端配合使用.默认4M,单位字节
+		// producer.setMaxMessageSize(4096);
 		// 建立连接
 		producer.start();
 		Message message = new Message("topic", "tag", msg.getBytes());

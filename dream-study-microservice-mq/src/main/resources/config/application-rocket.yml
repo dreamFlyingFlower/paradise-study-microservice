@@ -2,5 +2,25 @@ rocketmq:
   # rocketmq服务地址
   name-server: 127.0.0.1:9876
   producer:
-    # 生产组
+    # 生产组名
     group: test-rocket-producer
+    # rocketmq的用户名和密码
+    access-key: test
+    secret-key: test
+    # 消息压缩的最小值
+    compress-message-body-threshold: 4096
+    # 是否自定义消息追踪topic名
+    enable-msg-trace: true
+    # 自定义消息追踪topic名
+    customized-trace-topic: trace-topic
+    # 客户端限制的消息大小,超过报错,同时服务端也会限制,所以需要跟服务端配合使用.默认4M,单位字节
+    max-message-size: 0
+    # 消息发送失败重试时是否更换topic
+    retry-next-server: false
+    # 异步消息发送失败重试次数
+    retry-times-when-send-async-failed: 2
+    # 同步消息发送失败重试次数
+    retry-times-when-send-failed: 2
+    # 发送消息超时时间
+    send-message-timeout: 3000
+    
