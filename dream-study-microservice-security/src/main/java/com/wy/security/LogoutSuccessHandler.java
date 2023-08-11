@@ -17,9 +17,9 @@ import com.wy.result.Result;
 /**
  * 登出
  * 
- * @author ParadiseWY
- * @date 2019年2月13日 上午10:42:55
- * @git {@link https://github.com/mygodness100}
+ * @author 飞花梦影
+ * @date 2019-02-13 10:42:55
+ * @git {@link https://github.com/dreamFlyingFlower }
  */
 @Configuration
 public class LogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler {
