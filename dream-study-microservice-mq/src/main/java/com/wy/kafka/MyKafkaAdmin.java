@@ -96,6 +96,7 @@ public class MyKafkaAdmin {
 		AdminClient adminClient = adminClient();
 		// 是否查看internal选项
 		ListTopicsOptions options = new ListTopicsOptions();
+		// 列出内部主题
 		options.listInternal(true);
 		// ListTopicsResult listTopicsResult = adminClient.listTopics();
 		ListTopicsResult listTopicsResult = adminClient.listTopics(options);
@@ -108,6 +109,10 @@ public class MyKafkaAdmin {
 		// 打印topicListings
 		topicListings.stream().forEach((topicList) -> {
 			System.out.println(topicList);
+			// 是否是内部主题
+			System.out.println(topicList.isInternal());
+			// 主题名称
+			System.out.println(topicList.name());
 		});
 	}
 
