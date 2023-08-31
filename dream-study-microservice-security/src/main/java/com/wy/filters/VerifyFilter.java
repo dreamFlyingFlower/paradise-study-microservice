@@ -18,9 +18,9 @@ import org.springframework.util.AntPathMatcher;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.wy.collection.ListTool;
+import com.wy.collection.ListHelper;
 import com.wy.common.AuthException;
-import com.wy.lang.StrTool;
+import com.wy.lang.StrHelper;
 import com.wy.properties.UserProperties;
 import com.wy.verify.VerifyHandlerFactory;
 import com.wy.verify.VerifyInfo;
@@ -82,7 +82,7 @@ public class VerifyFilter extends OncePerRequestFilter implements InitializingBe
 	 */
 	protected void handlerVerifyUrl() {
 		List<String> imageVerifyUrls = userProperties.getVerify().getImage().getUrls();
-		if (ListTool.isNotEmpty(imageVerifyUrls)) {
+		if (ListHelper.isNotEmpty(imageVerifyUrls)) {
 			defaultFilterUrls.addAll(imageVerifyUrls);
 		}
 	}
@@ -117,7 +117,7 @@ public class VerifyFilter extends OncePerRequestFilter implements InitializingBe
 		for (String url : defaultFilterUrls) {
 			if (pathMatcher.match(url, request.getRequestURI())) {
 				String requestType = request.getParameter("verifyType");
-				if (StrTool.isBlank(requestType)) {
+				if (StrHelper.isBlank(requestType)) {
 					throw new AuthException("未指定登录验证类型verifyType");
 				}
 				VerifyInfo verifyInfo = verifyHandlerFactory.getVerifyInfo(requestType);

@@ -7,8 +7,8 @@ import java.util.List;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.wy.entity.OauthClientDetails;
-import com.wy.lang.StrTool;
-import com.wy.util.DateTimeTool;
+import com.wy.lang.StrHelper;
+import com.wy.util.DateTimeHelper;
 import com.wy.util.GuidGenerator;
 
 import lombok.AllArgsConstructor;
@@ -56,7 +56,7 @@ public class OauthClientDetailsDTO implements Serializable {
 		this.clientId = clientDetails.clientId();
 		this.clientSecret = clientDetails.clientSecret();
 		this.scope = clientDetails.scope();
-		this.createTime = DateTimeTool.formatDateTime(clientDetails.createTime());
+		this.createTime = DateTimeHelper.formatDateTime(clientDetails.createTime());
 		this.archived = clientDetails.archived();
 		this.resourceIds = clientDetails.resourceIds();
 		this.webServerRedirectUri = clientDetails.webServerRedirectUri();
@@ -109,18 +109,18 @@ public class OauthClientDetailsDTO implements Serializable {
 		        .clientSecret(new BCryptPasswordEncoder().encode(clientSecret)).resourceIds(resourceIds)
 		        .authorizedGrantTypes(authorizedGrantTypes).scope(scope);
 
-		if (StrTool.isNotBlank(webServerRedirectUri)) {
+		if (StrHelper.isNotBlank(webServerRedirectUri)) {
 			clientDetails.webServerRedirectUri(webServerRedirectUri);
 		}
 
-		if (StrTool.isNotBlank(authorities)) {
+		if (StrHelper.isNotBlank(authorities)) {
 			clientDetails.authorities(authorities);
 		}
 
 		clientDetails.accessTokenValidity(accessTokenValidity).refreshTokenValidity(refreshTokenValidity)
 		        .trusted(trusted);
 
-		if (StrTool.isNotEmpty(additionalInformation)) {
+		if (StrHelper.isNotEmpty(additionalInformation)) {
 			clientDetails.additionalInformation(additionalInformation);
 		}
 

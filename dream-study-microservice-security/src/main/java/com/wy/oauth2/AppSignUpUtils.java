@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.WebRequest;
 
 import com.wy.common.AuthException;
-import com.wy.lang.StrTool;
+import com.wy.lang.StrHelper;
 
 /**
  * 系统默认第三方登录成功后使用{@link ProviderSignInUtils}从session中获取用户信息,但是手机登录是没有session的,要重写
@@ -53,7 +53,7 @@ public class AppSignUpUtils {
 	private String getKey(WebRequest request) {
 		// 从请求头中获取app的设备编号或其他唯一标识
 		String deviceId = request.getHeader("deviceId");
-		if (StrTool.isBlank(deviceId)) {
+		if (StrHelper.isBlank(deviceId)) {
 			throw new AuthException("请求设备id不能为空");
 		}
 		return "app_login_social_" + deviceId;

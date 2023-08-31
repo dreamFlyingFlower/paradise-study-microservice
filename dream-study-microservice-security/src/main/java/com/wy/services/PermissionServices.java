@@ -7,7 +7,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import com.wy.collection.ListTool;
+import com.wy.collection.ListHelper;
 import com.wy.common.AuthException;
 import com.wy.common.Constants;
 import com.wy.entity.PermissionVo;
@@ -15,7 +15,7 @@ import com.wy.entity.Role;
 import com.wy.entity.User;
 import com.wy.enums.Permission;
 import com.wy.enums.TipEnum;
-import com.wy.lang.StrTool;
+import com.wy.lang.StrHelper;
 import com.wy.util.SecurityUtils;
 
 /**
@@ -37,7 +37,7 @@ public class PermissionServices {
 	 * @return 用户信息
 	 */
 	private User getLoginUser(String... param) {
-		if (StrTool.isBlank(param)) {
+		if (StrHelper.isBlank(param)) {
 			return null;
 		}
 		User loginUser = SecurityUtils.getLoginUser();
@@ -54,7 +54,7 @@ public class PermissionServices {
 	 * @return true or false
 	 */
 	private boolean assertAdmin(List<Role> roles) {
-		if (ListTool.isEmpty(roles)) {
+		if (ListHelper.isEmpty(roles)) {
 			throw new AuthException(TipEnum.TIP_USER_NOT_DISTRIBUTE_ROLE);
 		}
 		for (Role role : roles) {
@@ -101,7 +101,7 @@ public class PermissionServices {
 			return true;
 		}
 		List<PermissionVo> permissionVos = loginUser.getPermissions();
-		if (ListTool.isEmpty(permissionVos)) {
+		if (ListHelper.isEmpty(permissionVos)) {
 			return false;
 		}
 		for (String permission : permissions) {
@@ -121,10 +121,10 @@ public class PermissionServices {
 	 */
 	private boolean hasPermissions(List<PermissionVo> permissions, String permission) {
 		String[] roleAndPermissions = permission.split(":");
-		if (StrTool.isBlank(roleAndPermissions) || roleAndPermissions.length != 2) {
+		if (StrHelper.isBlank(roleAndPermissions) || roleAndPermissions.length != 2) {
 			return false;
 		}
-		if (StrTool.isBlank(roleAndPermissions[0]) || StrTool.isBlank(roleAndPermissions[1])) {
+		if (StrHelper.isBlank(roleAndPermissions[0]) || StrHelper.isBlank(roleAndPermissions[1])) {
 			return false;
 		}
 		// 权限数组

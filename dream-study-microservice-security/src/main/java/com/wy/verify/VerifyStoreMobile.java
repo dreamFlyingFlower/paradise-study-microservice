@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.context.request.ServletWebRequest;
 
-import com.wy.lang.StrTool;
+import com.wy.lang.StrHelper;
 import com.wy.properties.UserProperties;
 import com.wy.result.ResultException;
 
@@ -33,7 +33,7 @@ public class VerifyStoreMobile implements VerifyStore {
 	private String getDeviceId(ServletWebRequest webRequest) {
 		String deviceId = webRequest.getRequest()
 				.getParameter(userProperties.getVerify().getMobile().getDeviceIdParam());
-		if (StrTool.isBlank(deviceId)) {
+		if (StrHelper.isBlank(deviceId)) {
 			throw new ResultException("手机设备编号为空");
 		}
 		return deviceId;

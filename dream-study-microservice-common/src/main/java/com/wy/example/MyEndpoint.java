@@ -7,7 +7,7 @@ import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 import org.springframework.boot.actuate.endpoint.annotation.WriteOperation;
 import org.springframework.stereotype.Component;
 
-import com.wy.collection.MapTool;
+import com.wy.collection.MapHelper;
 
 /**
  * 自定义端点,类似于info,health等监控地址
@@ -27,7 +27,7 @@ public class MyEndpoint {
 	 */
 	@ReadOperation
 	public Map<String, Object> read() {
-		return MapTool.builder().put("info", "test").build();
+		return MapHelper.builder().put("info", "test").build();
 	}
 
 	/**

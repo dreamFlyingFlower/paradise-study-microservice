@@ -11,7 +11,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 
 import com.alibaba.fastjson2.JSON;
-import com.wy.lang.StrTool;
+import com.wy.lang.StrHelper;
 import com.wy.result.Result;
 
 /**
@@ -36,7 +36,7 @@ public class LoginAuthEntryPoint extends LoginUrlAuthenticationEntryPoint {
 		response.setContentType("application/json;charset=utf-8");
 		PrintWriter out = response.getWriter();
 		out.write(JSON.toJSONString(Result.builder().code(501)
-		        .msg(StrTool.isBlank(authException.getMessage()) ? "您还未登录,请登录!" : authException.getMessage()).build()));
+		        .msg(StrHelper.isBlank(authException.getMessage()) ? "您还未登录,请登录!" : authException.getMessage()).build()));
 		out.flush();
 		out.close();
 	}

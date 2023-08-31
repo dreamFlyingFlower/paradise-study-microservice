@@ -2,7 +2,7 @@ package com.wy.util;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.wy.lang.StrTool;
+import com.wy.lang.StrHelper;
 
 public class WebUtils {
 
@@ -39,6 +39,6 @@ public class WebUtils {
 	}
 
 	private static boolean isUnAvailableIp(String ip) {
-		return StrTool.isEmpty(ip) || "unknown".equalsIgnoreCase(ip);
+		return StrHelper.isEmpty(ip) || "unknown".equalsIgnoreCase(ip);
 	}
 }

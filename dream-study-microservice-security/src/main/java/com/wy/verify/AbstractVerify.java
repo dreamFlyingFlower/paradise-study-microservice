@@ -10,7 +10,7 @@ import org.springframework.web.context.request.ServletWebRequest;
 
 import com.wy.common.AuthException;
 import com.wy.enums.VerifyType;
-import com.wy.lang.StrTool;
+import com.wy.lang.StrHelper;
 
 /**
  * 验证码校验主要类,可以使用短信和验证码
@@ -76,9 +76,9 @@ public abstract class AbstractVerify<C extends VerifyEntity> implements VerifyHa
 	 */
 	private VerifyStore getVerifyStore(ServletWebRequest webRequest) {
 		String requestSource = webRequest.getRequest().getHeader("requestSource");
-		if (StrTool.isBlank(requestSource)) {
+		if (StrHelper.isBlank(requestSource)) {
 			requestSource = webRequest.getRequest().getParameter("requestSource");
-			if (StrTool.isBlank(requestSource)) {
+			if (StrHelper.isBlank(requestSource)) {
 				throw new AuthException("请求中缺少requestSource参数");
 			}
 		}
@@ -115,7 +115,7 @@ public abstract class AbstractVerify<C extends VerifyEntity> implements VerifyHa
 		} catch (ServletRequestBindingException e) {
 			throw new AuthException("获取验证码的值失败");
 		}
-		if (StrTool.isBlank(requestCode)) {
+		if (StrHelper.isBlank(requestCode)) {
 			throw new AuthException("验证码的值不能为空");
 		}
 		if (verifyEntity.isExpried()) {

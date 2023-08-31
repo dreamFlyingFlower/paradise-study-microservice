@@ -9,11 +9,11 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import com.wy.collection.ListTool;
+import com.wy.collection.ListHelper;
 import com.wy.common.AuthException;
 import com.wy.entity.User;
 import com.wy.enums.TipEnum;
-import com.wy.lang.StrTool;
+import com.wy.lang.StrHelper;
 
 /**
  * 安全服务工具类
@@ -102,9 +102,9 @@ public class SecurityUtils {
 	 */
 	public static void setLoginUser(User user, String password, Collection<? extends GrantedAuthority> authorities) {
 		User newUser = Objects.isNull(user) ? getLoginUser() : user;
-		Object newPwd = StrTool.isBlank(password) ? getAuthentication().getCredentials() : password;
+		Object newPwd = StrHelper.isBlank(password) ? getAuthentication().getCredentials() : password;
 		Collection<? extends GrantedAuthority> newAuthorities =
-				ListTool.isEmpty(authorities) ? getAuthentication().getAuthorities() : authorities;
+				ListHelper.isEmpty(authorities) ? getAuthentication().getAuthorities() : authorities;
 		SecurityContextHolder.getContext()
 				.setAuthentication(new UsernamePasswordAuthenticationToken(newUser, newPwd, newAuthorities));
 	}
