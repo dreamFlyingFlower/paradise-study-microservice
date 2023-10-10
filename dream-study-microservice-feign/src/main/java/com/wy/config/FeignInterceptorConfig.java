@@ -1,4 +1,4 @@
-package com.wy.configs;
+package com.wy.config;
 
 import java.util.Enumeration;
 import java.util.concurrent.CompletableFuture;
@@ -12,7 +12,6 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import feign.RequestInterceptor;
-import feign.RequestTemplate;
 
 /**
  * Feign被调用之前的拦截器,可以解决Feign被调用时请求头丢失或其他关于request的问题,包括session,cookie等
@@ -28,25 +27,21 @@ import feign.RequestTemplate;
 public class FeignInterceptorConfig {
 
 	@Bean
-	public RequestInterceptor requestInterceptor() {
-		return new RequestInterceptor() {
-
-			@Override
-			public void apply(RequestTemplate requestTemplate) {
-				// 拿到刚进来的这个请求
-				ServletRequestAttributes requestAttributes =
-				        (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-				HttpServletRequest request = requestAttributes.getRequest();
-				// 同步请求头数据
-				requestTemplate.header("Cookie", request.getHeader("Cookie"));
-				// 将请求头中所有数据进行同步
-				Enumeration<String> headerNames = request.getHeaderNames();
-				if (headerNames != null) {
-					while (headerNames.hasMoreElements()) {
-						String name = headerNames.nextElement();
-						String values = request.getHeader(name);
-						requestTemplate.header(name, values);
-					}
+	RequestInterceptor requestInterceptor() {
+		return (requestTemplate) -> {
+			// 拿到刚进来的这个请求
+			ServletRequestAttributes requestAttributes =
+					(ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+			HttpServletRequest request = requestAttributes.getRequest();
+			// 同步请求头数据
+			requestTemplate.header("Cookie", request.getHeader("Cookie"));
+			// 将请求头中所有数据进行同步
+			Enumeration<String> headerNames = request.getHeaderNames();
+			if (headerNames != null) {
+				while (headerNames.hasMoreElements()) {
+					String name = headerNames.nextElement();
+					String values = request.getHeader(name);
+					requestTemplate.header(name, values);
 				}
 			}
 		};

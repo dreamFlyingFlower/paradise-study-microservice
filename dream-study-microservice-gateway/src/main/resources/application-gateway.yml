@@ -8,12 +8,25 @@ spring:
         # 请求头中标识令牌桶填充速率的属性
         replenish-rate-header:  
       globalcors:
+        # 解决options请求被拦截问题.options请求就是一种询问服务器是否浏览器可以跨域的请求
+        # 如果每次跨域都询问服务器是否可以跨域,对性能也是损耗,可以配置本次跨域检测的有效期maxAge
+        # 在maxAge设置的时间范围内,不去询问,统统允许跨域
+        #add-to-simple-url-handler-mapping: true
         # 全局允许跨域请求
         cors-configurations:
+          # 需要进行跨域设置的URL请求地址
           '[/**]':
+            # 允许跨域请求的网站
             allowedOrigins: "*"
+            # 允许跨域的请求头
             allowedHeaders: "*"
-            allowedMethods: "*"
+            # 允许跨域的请求方式
+            allowedMethods: POST, GET, PUT, OPTIONS, DELETE, PATCH
+            #allowedMethods: "*"
+            # 允许在请求中携带cookie
+            allowCredentials: true
+            # 本次跨域检测的有效期(单位毫秒),在有效期内,跨域请求不会一直发option请求去增大服务器压力
+            #maxAge: 360000
       default-filters:
         # 会调用DedupeResponseHeaderGatewayFilterFactory中的dedupe方法
       - DedupeResponseHeader=Vary Access-Control-Allow-Origin Access-Control-Allow-Credentials

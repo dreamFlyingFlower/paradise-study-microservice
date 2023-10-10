@@ -39,9 +39,9 @@ import reactor.core.publisher.Mono;
 /**
  * {@link GatewayFilter}:局部过滤器,应用到单个路由或者一个分组的路由上
  * 
- * 自定义局部过滤器,类名结尾必须是GatewayFilterFactory,
+ * 自定义局部过滤器,类名结尾必须是GatewayFilterFactory
  * 
- * Gateway内置局部过滤器,在配置中的key只需要写剔除GatewayFilterFactory的值即可,如-AddRequestHeader=xxx:
+ * Gateway内置局部过滤器,在配置中的key只需要写剔除GatewayFilterFactory的值即可,如-AddRequestHeader=key,value:
  * 
  * <pre>
  * {@link AddRequestHeaderGatewayFilterFactory}:为原始请求添加Header,参数为Header的名称及值
@@ -72,6 +72,8 @@ import reactor.core.publisher.Mono;
  * {@link ModifyRequestBodyGatewayFilterFactory}:在转发请求之前修改原始请求体内容,参数为修改后的请求体内容
  * {@link ModifyResponseBodyGatewayFilterFactory}:修改原始响应体的内容.参数为修改后的响应体内容
  * </pre>
+ * 
+ * 有三种过滤器,执行顺序如下:默认过滤器default-filters->只对具体某个路由生效的局部过滤器filters->使用java代码编写的全局过滤器GlobalFilter
  *
  * @author 飞花梦影
  * @date 2021-12-27 16:20:54

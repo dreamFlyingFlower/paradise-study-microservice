@@ -1,4 +1,4 @@
-package com.wy.configs;
+package com.wy.config;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 

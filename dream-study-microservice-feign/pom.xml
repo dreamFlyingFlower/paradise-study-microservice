@@ -53,8 +53,7 @@
 		</dependency>
 		<dependency>
 			<groupId>dream.flying.flower</groupId>
-			<artifactId>dream-tool-http</artifactId>
-			<version>0.0.1</version>
+			<artifactId>dream-framework-core</artifactId>
 		</dependency>
 
 		<dependency>

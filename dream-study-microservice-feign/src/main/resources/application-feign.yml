@@ -2,6 +2,11 @@
 feign: 
   hystrix:
     enabled: true
+  # 集成oauth2
+  oauth2:
+    enabled: true
+    # 启用负载均衡
+    load-balanced: true
   client:
     config: 
       # 定义FeginClient的名称,default对所有有效
@@ -34,3 +39,10 @@ feign:
 hystrix:
   # 是否将SpringSecurity的SecurityContext从主线程中传输到HystrixCommand注解标注的方法中使用
   shareSecurityContext: true
+  
+# 设置feign客户端超时时间(OpenFeign默认支持ribbon)
+ribbon:
+  # 建立连接所用的时间,适用于网络状况正常的情况下,两端连接超时时间,默认1S
+  ReadTimeout: 5000
+  # 建立连接后从服务器读取到可用资源所用的超时时间,默认1S
+  ConnectTimeout: 5000

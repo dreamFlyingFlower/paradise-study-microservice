@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ServerWebExchange;
 
-import com.wy.lang.StrTool;
+import com.wy.lang.StrHelper;
 
 import reactor.core.publisher.Mono;
 
@@ -51,7 +51,7 @@ public class MyGatewayFilter implements GlobalFilter {
 	@Override
 	public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
 		String token = exchange.getRequest().getQueryParams().getFirst("token");
-		if (StrTool.isBlank(token)) {
+		if (StrHelper.isBlank(token)) {
 			System.out.println("鉴权失败");
 			exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
 			// return exchange.getResponse().setComplete();

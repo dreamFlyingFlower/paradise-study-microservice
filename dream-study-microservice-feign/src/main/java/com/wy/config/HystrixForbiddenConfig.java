@@ -1,4 +1,4 @@
-package com.wy.configs;
+package com.wy.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

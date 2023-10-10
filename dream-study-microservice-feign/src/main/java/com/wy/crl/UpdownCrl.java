@@ -17,9 +17,9 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.wy.http.HttpTools;
 import com.wy.service.UpdownService;
 
+import dream.framework.core.http.HttpHelpers;
 import feign.Response;
 
 /**
@@ -44,7 +44,7 @@ public class UpdownCrl {
 	 */
 	@GetMapping("exportForm")
 	public ResponseEntity<byte[]> exportForm(HttpServletRequest request) {
-		Response response = updownService.exportForm(HttpTools.transReq(request));
+		Response response = updownService.exportForm(HttpHelpers.transReq(request));
 		Response.Body body = response.body();
 		try (InputStream inputStream = body.asInputStream()) {
 			byte[] b = new byte[inputStream.available()];

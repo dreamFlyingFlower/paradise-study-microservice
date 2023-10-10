@@ -1,4 +1,4 @@
-package com.wy.configs;
+package com.wy.config;
 
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
