@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import com.wy.collection.ListTool;
+import com.wy.collection.ListHelper;
 import com.wy.result.Result;
 import com.wy.valid.ValidCreates;
 import com.wy.valid.ValidEdits;
@@ -61,7 +61,7 @@ public abstract class AbstractCrl<T> extends QueryCrl<T> {
 	@ApiOperation("根据主键批量删除表中数据,主键类型是数字类型")
 	@PostMapping("removes")
 	public Result<?> removes(@RequestBody List<Integer> ids) {
-		if (ListTool.isEmpty(ids)) {
+		if (ListHelper.isEmpty(ids)) {
 			return Result.error("集合数据为空");
 		}
 		return Result.ok(abstractService.deletes(ids));
