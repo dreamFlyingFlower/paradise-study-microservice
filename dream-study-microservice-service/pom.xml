@@ -34,7 +34,7 @@
 		<dependency>
 			<groupId>org.mybatis.generator</groupId>
 			<artifactId>mybatis-generator-core</artifactId>
-			<version>1.4.0</version>
+			<version>1.4.2</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.pagehelper</groupId>
@@ -56,10 +56,6 @@
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
 		</dependency>
-		<!-- <dependency> -->
-		<!-- <groupId>org.springframework.cloud</groupId> -->
-		<!-- <artifactId>spring-cloud-starter-openfeign</artifactId> -->
-		<!-- </dependency> -->
 
 		<dependency>
 			<groupId>io.springfox</groupId>

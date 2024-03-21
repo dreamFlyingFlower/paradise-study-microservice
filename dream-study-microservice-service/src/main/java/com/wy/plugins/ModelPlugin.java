@@ -146,7 +146,8 @@ public class ModelPlugin extends PluginAdapter {
 		}
 		// 若从数据库发现主键自增
 		if (introspectedColumn.isIdentity()) {
-			if (introspectedTable.getTableConfiguration().getGeneratedKey().getRuntimeSqlStatement().equals("JDBC")) {
+			if (introspectedTable.getTableConfiguration().getGeneratedKey().get().getRuntimeSqlStatement()
+					.equals("JDBC")) {
 				topLevelClass.addImportedType("javax.persistence.GeneratedValue");
 				field.addAnnotation("@GeneratedValue(generator = \"JDBC\")");
 			} else {
@@ -158,8 +159,8 @@ public class ModelPlugin extends PluginAdapter {
 			// 在 Oracle 中,如果需要是 SEQ_TABLENAME,那么可以配置为 select SEQ_{1}
 			String tableName = introspectedTable.getFullyQualifiedTableNameAtRuntime();
 			String sql = MessageFormat.format(
-					introspectedTable.getTableConfiguration().getGeneratedKey().getRuntimeSqlStatement(), tableName,
-					tableName.toUpperCase());
+					introspectedTable.getTableConfiguration().getGeneratedKey().get().getRuntimeSqlStatement(),
+					tableName, tableName.toUpperCase());
 			topLevelClass.addImportedType("javax.persistence.GeneratedValue");
 			topLevelClass.addImportedType("javax.persistence.GenerationType");
 			field.addAnnotation("@GeneratedValue(strategy = GenerationType.IDENTITY, generator = \"" + sql + "\")");

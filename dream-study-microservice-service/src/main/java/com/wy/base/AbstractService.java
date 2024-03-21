@@ -14,18 +14,19 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson2.JSON;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.wy.collection.ListTool;
-import com.wy.db.annotation.Sort;
-import com.wy.db.annotation.Unique;
-import com.wy.excel.ExcelModelTools;
-import com.wy.lang.NumberTool;
-import com.wy.lang.StrTool;
+import com.wy.annotation.Sort;
+import com.wy.annotation.Unique;
+import com.wy.collection.ListHelper;
+import com.wy.lang.NumberHelper;
+import com.wy.lang.StrHelper;
 import com.wy.result.Result;
 import com.wy.result.ResultException;
+
+import dream.framework.core.excel.ExcelModelHelpers;
 
 /**
  * 基础service层,通用service方法
@@ -68,9 +69,9 @@ public abstract class AbstractService<T> implements BaseService<T> {
 	public Page<Object> startPage(AbstractPager pager) {
 		String pageDirection = pager.getPageDirection();
 		if (pager.hasPager()) {
-			if (StrTool.isNotBlank(pager.getPageOrder())) {
+			if (StrHelper.isNotBlank(pager.getPageOrder())) {
 				return PageHelper.startPage(pager.getPageIndex(), pager.getPageSize(),
-						pager.getPageOrder() + " " + (StrTool.isBlank(pageDirection) ? " desc " : pageDirection));
+						pager.getPageOrder() + " " + (StrHelper.isBlank(pageDirection) ? " desc " : pageDirection));
 			} else {
 				return PageHelper.startPage(pager.getPageIndex(), pager.getPageSize());
 			}
@@ -133,26 +134,26 @@ public abstract class AbstractService<T> implements BaseService<T> {
 						}
 					} else {
 						// 当更新时,检查原始值和新值是否相同,若相同,不用再查数据库,且需要将实体类中的该字段值置空
-						Unique unique = field.getAnnotation(Unique.class);
-						String oriName = unique.oriName();
-						if (StrTool.isBlank(oriName)) {
-							oriName = "ori" + StrTool.firstUpper(field.getName());
-						}
-						Field actualField = clazz.getDeclaredField(oriName);
-						actualField.setAccessible(true);
-						Object object = actualField.get(model);
-						if (Objects.equals(object, field.get(model))) {
-							field.set(model, null);
-						} else {
-							Map<String, Object> temp = new HashMap<>();
-							temp.put(field.getName(), field.get(model));
-							if (hasValue(JSON.parseObject(JSON.toJSONString(temp), clazz))) {
-								throw new ResultException("参数有重复值,请检查");
-							}
-						}
+						// 需修改
+						// Unique unique = field.getAnnotation(Unique.class);
+						// String oriName = unique.oriName();
+						// if (StrHelper.isBlank(oriName)) {
+						// oriName = "ori" + StrHelper.firstUpper(field.getName());
+						// }
+						// Field actualField = clazz.getDeclaredField(oriName);
+						// actualField.setAccessible(true);
+						// Object object = actualField.get(model);
+						// if (Objects.equals(object, field.get(model))) {
+						// field.set(model, null);
+						// } else {
+						// Map<String, Object> temp = new HashMap<>();
+						// temp.put(field.getName(), field.get(model));
+						// if (hasValue(JSON.parseObject(JSON.toJSONString(temp), clazz))) {
+						// throw new ResultException("参数有重复值,请检查");
+						// }
+						// }
 					}
-				} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException
-						| SecurityException e) {
+				} catch (IllegalArgumentException | IllegalAccessException | SecurityException e) {
 					e.printStackTrace();
 				}
 			}
@@ -181,7 +182,7 @@ public abstract class AbstractService<T> implements BaseService<T> {
 		try {
 			Object value = field.get(model);
 			if (Objects.nonNull(value)) {
-				Long number = NumberTool.toLong(field.get(model).toString());
+				Long number = NumberHelper.toLong(field.get(model).toString());
 				if (number > 0) {
 					return number;
 				}
@@ -191,7 +192,7 @@ public abstract class AbstractService<T> implements BaseService<T> {
 			return -1l;
 		}
 		Sort sort = field.getAnnotation(Sort.class);
-		return baseMapper.getMaxValue(StrTool.isBlank(sort.value()) ? field.getName() : sort.value());
+		return baseMapper.getMaxValue(StrHelper.isBlank(sort.value()) ? field.getName() : sort.value());
 	}
 
 	@Override
@@ -267,7 +268,7 @@ public abstract class AbstractService<T> implements BaseService<T> {
 	}
 
 	public void getLeaf(List<T> trees, Map<String, Object> params) {
-		if (ListTool.isEmpty(trees)) {
+		if (ListHelper.isEmpty(trees)) {
 			return;
 		}
 		for (T t : trees) {
@@ -298,8 +299,8 @@ public abstract class AbstractService<T> implements BaseService<T> {
 	public void getExport(T t, HttpServletRequest request, HttpServletResponse response) {
 		Result<List<T>> entitys = getEntitys(t);
 		String excelName =
-				StrTool.isBlank(request.getParameter("excelName")) ? "数据导出" : request.getParameter("excelName");
-		ExcelModelTools.getInstance().exportExcel(entitys.getData(), response, excelName);
+				StrHelper.isBlank(request.getParameter("excelName")) ? "数据导出" : request.getParameter("excelName");
+		ExcelModelHelpers.getInstance().exportExcel(entitys.getData(), response, excelName);
 	}
 
 	@Override
@@ -307,16 +308,16 @@ public abstract class AbstractService<T> implements BaseService<T> {
 		if (params == null) {
 			return Result.ok(baseMapper.selectLists(new HashMap<>()));
 		}
-		if (params.get("pageIndex") == null || NumberTool.toInt(params.get("pageIndex").toString()) < 0) {
+		if (params.get("pageIndex") == null || NumberHelper.toInt(params.get("pageIndex").toString()) < 0) {
 			return Result.ok(baseMapper.selectLists(params));
 		}
 		int pageSize = 0;
-		if (params.get("pageSize") == null || NumberTool.toInt(params.get("pageSize").toString()) <= 0) {
+		if (params.get("pageSize") == null || NumberHelper.toInt(params.get("pageSize").toString()) <= 0) {
 			pageSize = 10;
 		} else {
-			pageSize = NumberTool.toInt(params.get("pageSize").toString());
+			pageSize = NumberHelper.toInt(params.get("pageSize").toString());
 		}
-		PageHelper.startPage(NumberTool.toInt(params.get("pageIndex").toString()), pageSize);
+		PageHelper.startPage(NumberHelper.toInt(params.get("pageIndex").toString()), pageSize);
 		List<Map<String, Object>> lists = baseMapper.selectLists(params);
 		PageInfo<Map<String, Object>> pageInfo = new PageInfo<>(lists);
 		return Result.page(lists, pageInfo.getPageNum(), pageInfo.getPageSize(), pageInfo.getTotal());

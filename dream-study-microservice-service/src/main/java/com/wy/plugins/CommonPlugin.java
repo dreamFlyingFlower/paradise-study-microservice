@@ -12,6 +12,7 @@ import org.mybatis.generator.config.Context;
 
 /**
  * 全局配置以及不需要生成的方法
+ * 
  * @description 1.validate:表示该文件是否被调用解析
  *              2.clientGenerated(Interface,TopLevelClass,IntrospectedTable):生成Mapper接口
  *              3.clientXXXMethodGenerated(Method,Interface,IntrospectedTable):生成Mapper接口中抽象方法
@@ -91,21 +92,19 @@ public class CommonPlugin extends PluginAdapter {
 		configuration.addProperty("swagger2", this.context.getProperty("swagger2"));
 		configuration.addProperty("baseModel", this.context.getProperty("baseModel"));
 		this.context.setCommentGeneratorConfiguration(configuration);
-		context.getJdbcConnectionConfiguration().addProperty("remarksReporting", "true");
+		context.getConnectionFactoryConfiguration().addProperty("remarksReporting", "true");
 	}
 
 	// 不生成getter和setter
 	@Override
 	public boolean modelGetterMethodGenerated(Method method, TopLevelClass topLevelClass,
-			IntrospectedColumn introspectedColumn, IntrospectedTable introspectedTable,
-			ModelClassType modelClassType) {
+			IntrospectedColumn introspectedColumn, IntrospectedTable introspectedTable, ModelClassType modelClassType) {
 		return false;
 	}
 
 	@Override
 	public boolean modelSetterMethodGenerated(Method method, TopLevelClass topLevelClass,
-			IntrospectedColumn introspectedColumn, IntrospectedTable introspectedTable,
-			ModelClassType modelClassType) {
+			IntrospectedColumn introspectedColumn, IntrospectedTable introspectedTable, ModelClassType modelClassType) {
 		return false;
 	}
 }
