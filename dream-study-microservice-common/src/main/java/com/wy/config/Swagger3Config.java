@@ -34,7 +34,8 @@ import springfox.documentation.spring.web.plugins.Docket;
  * 使用Swagger3自动生成文档,文档查看地址http://ip:port/swagger-ui/index.html
  * 导出可见:{@link http://www.leftso.com/blog/402.html}
  * 
- * 若整合了SpringSecurity,需要在SpringSecurity中过滤相关资源,见 {@link dream-study-microservice.oauth-server/com.wy.config.SecurityConfig}
+ * 若整合了SpringSecurity,需要在SpringSecurity中过滤相关资源,见
+ * {@link dream-study-microservice.oauth-server/com.wy.config.SecurityConfig}
  * 
  * 若字段以大写开头,则需要加上jackjson以下2个注解,否则swagger将无法显示字段注释:
  * {@link JsonNaming}:JsonNaming(PropertyNamingStrategy.UpperCamelCaseStrategy.class),表示字段以大写开头
@@ -50,29 +51,29 @@ import springfox.documentation.spring.web.plugins.Docket;
 public class Swagger3Config {
 
 	@Bean
-	public Docket createRestApi() {
+	Docket createRestApi() {
 		// springfox3添加公共请求头
 		List<RequestParameter> requestParameters = new ArrayList<>();
 		requestParameters.add(new RequestParameterBuilder().name("token").description("token").in(ParameterType.HEADER)
-		        .required(false).build());
+				.required(false).build());
 		requestParameters
-		        .add(new RequestParameterBuilder().name("Authorization").description("JWT").in(ParameterType.HEADER)
-		                .required(false).accepts(Collections.singleton(MediaType.APPLICATION_JSON)).build());
+				.add(new RequestParameterBuilder().name("Authorization").description("JWT").in(ParameterType.HEADER)
+						.required(false).accepts(Collections.singleton(MediaType.APPLICATION_JSON)).build());
 
 		return new Docket(DocumentationType.OAS_30).groupName("API文档").host("localhost:55555").apiInfo(apiInfo())
-		        .select()
-		        // 扫描指定包路径,只能写一个,不支持匹配正则
-		        .apis(RequestHandlerSelectors.basePackage("com.wy.crl"))
-		        // 扫描标识有指定注解的类
-		        .apis(RequestHandlerSelectors.withClassAnnotation(Api.class))
-		        // 扫描标识有指定注解的方法
-		        .apis(RequestHandlerSelectors.withMethodAnnotation(ApiOperation.class)).paths(PathSelectors.any())
-		        .build()
-		        // 忽略指定类
-		        .ignoredParameterTypes()
-		        // 为请求的header中自动添加参数
-		        .globalRequestParameters(requestParameters).securityContexts(securityContext())
-		        .securitySchemes(securitySchemes());
+				.select()
+				// 扫描指定包路径,只能写一个,不支持匹配正则
+				.apis(RequestHandlerSelectors.basePackage("com.wy.crl"))
+				// 扫描标识有指定注解的类
+				.apis(RequestHandlerSelectors.withClassAnnotation(Api.class))
+				// 扫描标识有指定注解的方法
+				.apis(RequestHandlerSelectors.withMethodAnnotation(ApiOperation.class)).paths(PathSelectors.any())
+				.build()
+				// 忽略指定类
+				.ignoredParameterTypes()
+				// 为请求的header中自动添加参数
+				.globalRequestParameters(requestParameters).securityContexts(securityContext())
+				.securitySchemes(securitySchemes());
 	}
 
 	private ApiInfo apiInfo() {

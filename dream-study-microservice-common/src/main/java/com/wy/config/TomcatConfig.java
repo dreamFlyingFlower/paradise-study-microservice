@@ -7,24 +7,24 @@ import org.apache.coyote.http11.Http11NioProtocol;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 
 /**
  * 自定义配置Tomcat参数,配置https访问
  * 
- * JDK生成密钥证书:keytool -genkey -alias 别名 -storetype 仓库类型 -keyalg 算法 -keysize 长度 -keystore 文件名 -validity 有效期
- * 仓库类型:JKS,JCEKS,PKCS12等
- * 算法:RSA,DSA
- * 长度:例如2048
+ * JDK生成密钥证书:keytool -genkey -alias 别名 -storetype 仓库类型 -keyalg 算法 -keysize 长度
+ * -keystore 文件名 -validity 有效期 仓库类型:JKS,JCEKS,PKCS12等 算法:RSA,DSA 长度:例如2048
  *
  * @author 飞花梦影
  * @date 2021-09-27 11:26:25
  * @git {@link https://github.com/dreamFlyingFlower }
  */
+@Configuration
 public class TomcatConfig {
 
 	@Bean
-	public ServletWebServerFactory servletWebServerFactory() {
+	ServletWebServerFactory servletWebServerFactory() {
 		TomcatServletWebServerFactory webServerFactory = new TomcatServletWebServerFactory();
 		webServerFactory.addAdditionalTomcatConnectors(buildConnector());
 		return webServerFactory;
