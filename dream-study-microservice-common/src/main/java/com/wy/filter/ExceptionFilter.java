@@ -22,9 +22,9 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import org.yaml.snakeyaml.constructor.DuplicateKeyException;
 
 import com.alibaba.fastjson2.JSONException;
-import com.wy.enums.TipFormatEnum;
-import com.wy.result.Result;
-import com.wy.result.ResultException;
+import com.dream.enums.TipFormatEnum;
+import com.dream.result.Result;
+import com.dream.result.ResultException;
 
 import lombok.extern.slf4j.Slf4j;
 
