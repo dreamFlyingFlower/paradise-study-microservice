@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import com.wy.collection.ListHelper;
-import com.wy.result.Result;
+import com.dream.collection.ListHelper;
+import com.dream.result.Result;
 import com.wy.valid.ValidCreates;
 import com.wy.valid.ValidEdits;
 

@@ -1,11 +1,13 @@
 package com.wy.mapper;
 
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
 import com.wy.base.BaseMapper;
 import com.wy.model.Button;
 import com.wy.model.ButtonExample;
-import java.util.List;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface ButtonMapper extends BaseMapper<Button> {

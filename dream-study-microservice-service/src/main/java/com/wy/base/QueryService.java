@@ -6,7 +6,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.wy.result.Result;
+import com.dream.result.Result;
 
 /**
  * 只负责查询的业务接口

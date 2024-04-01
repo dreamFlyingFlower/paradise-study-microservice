@@ -1,11 +1,13 @@
 package com.wy.mapper;
 
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
 import com.wy.base.BaseMapper;
 import com.wy.model.Menu;
 import com.wy.model.MenuExample;
-import java.util.List;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface MenuMapper extends BaseMapper<Menu> {

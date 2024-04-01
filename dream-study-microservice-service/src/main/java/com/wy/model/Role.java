@@ -1,6 +1,7 @@
 package com.wy.model;
 
 import com.wy.base.AbstractModel;
+
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
