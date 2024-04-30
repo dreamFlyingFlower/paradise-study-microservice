@@ -14,10 +14,11 @@ import lombok.extern.slf4j.Slf4j;
  * @date 2021-12-23 14:37:36
  * @git {@link https://github.com/dreamFlyingFlower }
  */
-@RabbitListener(queues = "DEAD-CLOSE-QUEUE")
+@RabbitListener(queues = TtlQueueConfig.DEAD_QUEUE)
 @Slf4j
-public class TtlConsumer {
+public class DeadConsumer {
 
+	// @RabbitListener(queues = TtlQueueConfig.DEAD_QUEUE)
 	@RabbitHandler
 	public void orderConsumer(String msg) {
 		log.info(">死信队列消费订单消息:msg{}<<", msg);

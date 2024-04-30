@@ -31,7 +31,7 @@ public class DeadQueueConfig {
 	 * @return
 	 */
 	@Bean
-	public TopicExchange topicExchange() {
+	TopicExchange topicExchange() {
 		return new TopicExchange("spring.test.exchange", true, false);
 	}
 
@@ -41,7 +41,7 @@ public class DeadQueueConfig {
 	 * @return
 	 */
 	@Bean
-	public Queue queue() {
+	Queue queue() {
 		Map<String, Object> arguments = new HashMap<>();
 		// 以下参数都可以在RabbitMQ的管理界面看到
 		// x-dead-letter-exchange:固定写法.声明当前队列绑定的死信交换机
@@ -63,7 +63,7 @@ public class DeadQueueConfig {
 	 * @return
 	 */
 	@Bean
-	public Binding binding() {
+	Binding binding() {
 		return new Binding("spring.test.queue", Binding.DestinationType.QUEUE, "spring.test.exchange", "a.b", null);
 	}
 
@@ -73,7 +73,7 @@ public class DeadQueueConfig {
 	 * @return
 	 */
 	@Bean
-	public TopicExchange deadExchange() {
+	TopicExchange deadExchange() {
 		return new TopicExchange(rabbit.getDead().getExchange(), true, false);
 	}
 
@@ -83,7 +83,7 @@ public class DeadQueueConfig {
 	 * @return
 	 */
 	@Bean
-	public Queue deadQueue() {
+	Queue deadQueue() {
 		return new Queue(rabbit.getDead().getQueue(), true, false, false);
 	}
 
@@ -93,7 +93,7 @@ public class DeadQueueConfig {
 	 * @return
 	 */
 	@Bean
-	public Binding deadBinding() {
+	Binding deadBinding() {
 		return new Binding(rabbit.getDead().getQueue(), Binding.DestinationType.QUEUE, rabbit.getDead().getExchange(),
 				rabbit.getDead().getRoutingKey(), null);
 	}

@@ -28,7 +28,7 @@ public class RocketDelayProducer {
 
 		for (int i = 0; i < 10; i++) {
 			// 参数:消息主题Topic,消息Tag,消息内容
-			Message msg = new Message("DelayTopic", "Tag1", ("Hello World" + i).getBytes());
+			Message msg = new Message("DelayTopic", "delayTag", ("Hello World" + i).getBytes());
 			// 设定延迟时间,此处的2是延迟等级2,不是2S,而是5S,索引从1开始
 			msg.setDelayTimeLevel(2);
 			SendResult result = producer.send(msg);

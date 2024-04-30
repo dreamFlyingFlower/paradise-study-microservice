@@ -39,9 +39,11 @@ public class MyKafkaStream {
 		// 构建foreachStream
 		foreachStream(builder);
 
-		final KafkaStreams streams = new KafkaStreams(builder.build(), props);
+		KafkaStreams streams = new KafkaStreams(builder.build(), props);
 
 		streams.start();
+		// do something...
+		streams.close();
 	}
 
 	/**

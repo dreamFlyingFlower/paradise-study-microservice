@@ -20,7 +20,10 @@ public class RocketDealyConsumer {
 	public static void main(String[] args) throws Exception {
 		DefaultMQPushConsumer consumer = new DefaultMQPushConsumer("group1");
 		consumer.setNamesrvAddr("192.168.25.135:9876;192.168.25.138:9876");
+		// 消费者消费延迟队列下所有消息
 		consumer.subscribe("DelayTopic", "*");
+		// 根据tag进行消费
+		// consumer.subscribe("DelayTopic", MessageSelector.byTag("delayTag"));
 
 		consumer.registerMessageListener(new MessageListenerConcurrently() {
 
