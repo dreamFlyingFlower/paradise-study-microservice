@@ -14,6 +14,8 @@ import org.springframework.context.annotation.Configuration;
 /**
  * 利用RabbitMQ延迟插件rabbitmq_delayed_message_exchange实现通用延迟队列
  * 
+ * 该插件解决了延迟消息队列中前面的消息过期时间比后面的消息过期时间更长时,后面的消息不被立刻丢到死信队列的问题
+ * 
  * @author 飞花梦影
  * @date 2021-01-04 23:39:44
  * @git {@link https://github.com/dreamFlyingFlower}
