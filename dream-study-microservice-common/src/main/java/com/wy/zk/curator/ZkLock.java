@@ -44,7 +44,7 @@ public class ZkLock {
 	}
 
 	/**
-	 * 获取锁
+	 * 获取锁,可重入锁
 	 * 
 	 * @param lockPath
 	 * @throws Exception
@@ -53,7 +53,8 @@ public class ZkLock {
 		InterProcessMutex interProcessMutex = new InterProcessMutex(client, lockPath);
 		// 获取锁
 		interProcessMutex.acquire();
-		boolean acquire = interProcessMutex.acquire(0, TimeUnit.SECONDS);
+		// 获取可过期锁
+		boolean acquire = interProcessMutex.acquire(30, TimeUnit.SECONDS);
 		System.out.println(acquire);
 		// 释放锁
 		interProcessMutex.release();
