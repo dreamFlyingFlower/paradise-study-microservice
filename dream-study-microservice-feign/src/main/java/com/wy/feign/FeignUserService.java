@@ -21,17 +21,15 @@ import feign.Headers;
 /**
  * FeignClient:使用注解的方式进行类似轮询的负载均衡调用
  * 
- * {@link FeignClient#value()}:指定负载均衡调用的服务名
- * {@link FeignClient#contextId()}:同一个项目中相同的value只能有一个,如果必须存在多个, 可使用contextId进行区分
- * {@link FeignClient#configuration()}:指定Feign的自定义配置上下文,见{@link FeignConfig}
+ * {@link FeignClient#value()}:指定负载均衡调用的服务名 {@link FeignClient#contextId()}:同一个项目中相同的value只能有一个,如果必须存在多个,
+ * 可使用contextId进行区分 {@link FeignClient#configuration()}:指定Feign的自定义配置上下文,见{@link FeignConfig}
  * {@link FeignClient#fallback()}:指定Hystrix断路器降级熔断时的调用方法,只能指定方法,不能处理异常,超时等信息
  * {@link FeignClient#fallbackFactory()}:作用同fallback(),但是可以处理远程调用的异常以及一些自定义操作,
  * 该属性指向的类必须实现{@link feign.hystrix.FallbackFactory<T>},而泛型则是当前接口
  * {@link FeignClient#fallback()},{@link FeignClient#fallbackFactory()}同时存在时,fallback()优先级高,也可能出现其他错误
  * 
  * 继承FeignService接口,但是feign暂不支持获取接口上的requestmapping注解,必须重写实现接口
- * feign中不需要任何其他的实体类.直接可用object代替,客户端可正常使用get,post的restful方式接收参数
- * 之所以要继承FeignService,是为了使用通用方法减少重复代码的使用
+ * feign中不需要任何其他的实体类.直接可用object代替,客户端可正常使用get,post的restful方式接收参数 之所以要继承FeignService,是为了使用通用方法减少重复代码的使用
  * 
  * 若getmapping或postmapping注解不可使用,可改成requestmapping,传多参数,对象到客户端时,必须是post方式
  * 
@@ -110,8 +108,8 @@ public interface FeignUserService extends FeignService {
 	 * 
 	 * @return
 	 */
-	@Headers({ "Content-Type: application/json;charset=UTF-8" })
+	@Headers({ "Content-Type: application/json;charset=UTF-8", "Authorization:{authorization}" })
 	@GetMapping(headers = { "Content-Type=application/json;charset=UTF-8" })
-	Object setHeader(@RequestHeader("Authorization") @RequestParam("token") String token,
+	Object setHeader(@RequestHeader("authorization") @RequestParam("token") String authorization,
 			@RequestHeader MultiValueMap<String, String> headers);
 }

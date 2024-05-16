@@ -24,6 +24,7 @@
 	</properties>
 
 	<modules>
+		<module>dream-study-microservice-async</module>
 		<module>dream-study-microservice-bus</module>
 		<module>dream-study-microservice-cache</module>
 		<module>dream-study-microservice-common</module>

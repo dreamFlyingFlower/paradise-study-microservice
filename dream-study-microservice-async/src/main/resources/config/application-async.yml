@@ -1,0 +1,6 @@
+dream:
+  async:
+    enabled: true
+    # 自定义队列名称前缀,默认应用名称
+    mq:
+      topic: ${spring.application.name}

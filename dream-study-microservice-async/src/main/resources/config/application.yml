@@ -1,0 +1,7 @@
+server:
+  port: 55560
+spring:
+  application:
+    name: dream-study-microservice-async
+  profiles:
+    active: kafka,async
