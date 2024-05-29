@@ -86,7 +86,7 @@ import zipkin2.server.internal.EnableZipkinServer;
  * {@link BeanDefinitionRegistry#registerBeanDefinition()}:通过{@link GenericBeanDefinition}将某个类注入到Spring上下文
  * {@link SingletonBeanRegistry#registerSingleton()}:通过{@link DefaultSingletonBeanRegistry}注册单例的bean到Spring上下文中
  * </pre>
- *
+ * 
  * @author 飞花梦影
  * @date 2020-12-05 23:58:47
  * @git {@link https://github.com/dreamFlyingFlower}

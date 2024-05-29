@@ -17,13 +17,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ServerWebExchange;
 
-import com.wy.lang.StrHelper;
+import com.dream.lang.StrHelper;
 
 import reactor.core.publisher.Mono;
 
 /**
- * {@link GlobalFilter}:全局拦截器,应用到所有的路由上,可以实现权限统一校验,安全验证等
- * {@link GatewayFilter}:应用到单个或一个分组的路由上
+ * {@link GlobalFilter}:全局拦截器,应用到所有的路由上,可以实现权限统一校验,安全验证等 {@link GatewayFilter}:应用到单个或一个分组的路由上
  * 
  * <pre>
  * {@link ReactiveLoadBalancerClientFilter}:通过负载均衡客户端根据路由URL解析转换成真实URL
