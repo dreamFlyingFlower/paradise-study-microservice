@@ -7,7 +7,7 @@ import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 import org.springframework.boot.actuate.endpoint.annotation.WriteOperation;
 import org.springframework.stereotype.Component;
 
-import com.dream.collection.MapHelper;
+import dream.flying.flower.collection.MapHelper;
 
 /**
  * 自定义端点,类似于info,health等监控地址
