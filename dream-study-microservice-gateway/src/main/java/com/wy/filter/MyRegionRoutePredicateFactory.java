@@ -15,6 +15,7 @@ import org.springframework.cloud.gateway.handler.predicate.HostRoutePredicateFac
 import org.springframework.cloud.gateway.handler.predicate.MethodRoutePredicateFactory;
 import org.springframework.cloud.gateway.handler.predicate.PathRoutePredicateFactory;
 import org.springframework.cloud.gateway.handler.predicate.QueryRoutePredicateFactory;
+import org.springframework.cloud.gateway.handler.predicate.RemoteAddrRoutePredicateFactory;
 import org.springframework.cloud.gateway.handler.predicate.WeightRoutePredicateFactory;
 import org.springframework.web.server.ServerWebExchange;
 
