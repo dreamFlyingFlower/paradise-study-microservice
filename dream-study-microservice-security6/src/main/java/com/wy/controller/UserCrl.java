@@ -22,11 +22,11 @@ import org.springframework.web.context.request.ServletWebRequest;
 import com.google.common.collect.ImmutableMap;
 import com.wy.entity.User;
 import com.wy.entity.UserSocial;
-import com.wy.jwt.S_Jwt;
 import com.wy.oauth2.AppSignUpUtils;
 import com.wy.verify.VerifyHandler;
 import com.wy.verify.VerifyHandlerFactory;
 
+import dream.flying.flower.framework.core.helper.JwtHelpers;
 import dream.flying.flower.result.Result;
 import dream.flying.flower.result.ResultException;
 import jakarta.servlet.http.Cookie;
@@ -82,7 +82,7 @@ public class UserCrl {
 	public Result<?> login(String username, String password, HttpServletResponse response) {
 		if (Objects.equals("admin", username) && Objects.equals("123456", password)) {
 			Map<String, String> params = ImmutableMap.of("test1", "test1", "test2", "test2");
-			String token = S_Jwt.genericToken(params);
+			String token = JwtHelpers.encode("secretKey", params);
 			Cookie cookie = new Cookie("token", token);
 			cookie.setPath("/");
 			response.addCookie(cookie);

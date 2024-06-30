@@ -3,19 +3,20 @@ package com.wy.config.high;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
@@ -26,12 +27,15 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import com.wy.jwt.JwtTokenFilter;
+import com.wy.config.jwt.JwtAuthenticationFilter;
+import com.wy.properties.DreamSecurityProperties;
 import com.wy.security.LoginAuthEntryPoint;
 import com.wy.service.UserService;
 
+import lombok.AllArgsConstructor;
+
 /**
- * SpringSecurity5.7以上配置,WebSecurityConfigurerAdapter在该版本中已废弃
+ * SpringSecurity6以上配置
  * 
  * 自定义数据库用户登录参考{@link JdbcUserDetailsManager}
  *
@@ -39,21 +43,22 @@ import com.wy.service.UserService;
  * @date 2023-02-01 16:51:06
  * @git {@link https://github.com/dreamFlyingFlower }
  */
-@SuppressWarnings("deprecation")
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
+@AllArgsConstructor
 public class SecurityHighConfig {
 
-	@Autowired
-	private UserService userService;
+	private final DreamSecurityProperties dreamSecurityProperties;
+
+	private final UserService userService;
 
 	/**
 	 * jwt 校验过滤器,从 http 头部 Authorization 字段读取 token 并校验
 	 */
 	@Bean
-	JwtTokenFilter jwtTokenFilter() {
-		return new JwtTokenFilter();
+	JwtAuthenticationFilter jwtAuthenticationFilter() {
+		return new JwtAuthenticationFilter(dreamSecurityProperties, userService);
 	}
 
 	@Bean
@@ -104,29 +109,60 @@ public class SecurityHighConfig {
 	}
 
 	/**
-	 * 通过创建 SecurityFilterChain 来配置 HttpSecurity,相当于
-	 * {@link WebSecurityConfigurerAdapter#configure(org.springframework.security.config.annotation.web.builders.HttpSecurity)}
+	 * 通过创建 SecurityFilterChain 来配置 HttpSecurity
 	 * 
 	 * @param http HttpSecurity
 	 * @throws Exception
 	 */
 	@Bean
-	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		http.authorizeHttpRequests((authz) -> authz.anyRequest().authenticated())
+	SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
+		httpSecurity.authorizeHttpRequests((authz) -> authz.anyRequest().authenticated())
 				// 自定义认证处理器,默认为 ProviderManager
 				.authenticationManager(new SelfAuthenticationManager());
-		return http.csrf().disable()
+
+		return httpSecurity
+				// 禁用csrf
+				.csrf(csrf -> csrf.disable())
+				// 使用默认的登录方式,添加UsernamePasswordAuthenticationFilter,
+				// 自动生成登录页面和注销页面的DefaultLoginPageGeneratingFilter和DefaultLogoutPageGeneratingFilter
+				.formLogin(Customizer.withDefaults())
+				// 自定义登录配置,仍然会添加UsernamePasswordAuthenticationFilter
+				.formLogin(formLogin -> formLogin
+						// 自定义登录页面,不使用内置的自动生成页面,若定义该参数,其他默认配置失效,见FormLoginConfigurer#initDefaultLoginFilter
+						.loginPage("/login")
+						// 访问login页面不需要认证和鉴权
+						.permitAll())
+				// oauth2配置
+				// .oauth2Login(null)
+				// saml配置
+				// .saml2Login(null)
 				// 基于 token,不需要 session
-				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+				.sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				// 设置 jwtAuthError 处理认证失败,鉴权失败
-				.exceptionHandling().authenticationEntryPoint(new LoginAuthEntryPoint(null))
-				// 自定义权限错误处理器
-				.accessDeniedHandler(new AccessDeniedHandlerImpl()).and()
-				// 下面开始设置权限
-				.authorizeRequests(authorize -> authorize.requestMatchers("/**").permitAll().requestMatchers("/**")
-						.permitAll().anyRequest().authenticated())
+				.exceptionHandling(handling -> handling.authenticationEntryPoint(new LoginAuthEntryPoint(null))
+						// 自定义权限错误处理器
+						.accessDeniedHandler(new AccessDeniedHandlerImpl()))
+				// 设置权限,相当于打开了鉴权模块,它会注册AuthorizationFilter到SecurityFilterChain的最后
+				.authorizeHttpRequests(request -> request
+						// "/admin"要求有ADD_USER的权限
+						.requestMatchers("/admin").hasAuthority("ADD_USER")
+						// "/hello"要求有"ROLE_USER"角色权限
+						.requestMatchers("/hello").hasRole("USER")
+						// 所有请求无需验证即可通过
+						.requestMatchers("/**").permitAll()
+						// 其他请求只需要身份验证即可,无需其他特殊权限
+						.anyRequest().authenticated())
 				// 添加 JWT 过滤器,JWT 过滤器在用户名密码认证过滤器之前
-				.addFilterBefore(jwtTokenFilter(), UsernamePasswordAuthenticationFilter.class)
+				.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+				// 登出操作
+				.logout(configurer ->
+				// 自定义登录API
+				configurer.logoutUrl("/api/v1/auth/logout")
+						// 自定义登录处理器
+						.addLogoutHandler(null)
+						// 登出成功操作
+						.logoutSuccessHandler(
+								(request, response, authentication) -> SecurityContextHolder.clearContext()))
 				// 认证用户时用户信息加载配置
 				.userDetailsService(userService).build();
 	}

@@ -7,7 +7,7 @@ import org.springframework.security.web.authentication.AbstractAuthenticationPro
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.util.Assert;
 
-import com.wy.common.Constants;
+import com.wy.common.ConstSecurity;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -18,7 +18,7 @@ import jakarta.servlet.http.HttpServletResponse;
  * @date 2019年9月24日
  */
 public class SmsAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
-	private String mobileParameter = Constants.DEFAULT_PARAMETER_NAME_MOBILE;
+	private String mobileParameter = ConstSecurity.DEFAULT_PARAMETER_NAME_MOBILE;
 
 	private boolean postOnly = true;
 

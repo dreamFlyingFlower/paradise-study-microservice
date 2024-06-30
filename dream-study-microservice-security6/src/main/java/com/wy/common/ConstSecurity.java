@@ -7,7 +7,7 @@ package com.wy.common;
  * @date 2019-09-23 00:10:52
  * @git {@link https://github.com/dreamFlyingFlower}
  */
-public interface Constants {
+public interface ConstSecurity {
 
 	/** 超级管理员角色编码 */
 	String SUPER_ADMIN = "SUPER_ADMIN";
@@ -32,4 +32,10 @@ public interface Constants {
 
 	/** session失效默认的跳转地址 */
 	String DEFAULT_SESSION_INVALID_URL = "/session/invalid";
+
+	/** 请求头中的Authorization字段 */
+	String HEADER_AUTHORIZATION = "Authorization";
+
+	/** 请求头中的Authorization字段值的前缀 */
+	String HEADER_AUTHORIZATION_BEARER = "Bearer ";
 }

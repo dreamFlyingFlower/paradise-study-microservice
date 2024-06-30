@@ -6,7 +6,7 @@ import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.ServletRequestUtils;
 import org.springframework.web.context.request.ServletWebRequest;
 
-import com.wy.common.Constants;
+import com.wy.common.ConstSecurity;
 import com.wy.verify.AbstractVerify;
 import com.wy.verify.VerifyEntity;
 
@@ -23,7 +23,7 @@ public class SmsVerifyHandler extends AbstractVerify<VerifyEntity> {
 
 	@Override
 	protected void handler(ServletWebRequest request, VerifyEntity validateCode) {
-		String paramName = Constants.DEFAULT_PARAMETER_NAME_MOBILE;
+		String paramName = ConstSecurity.DEFAULT_PARAMETER_NAME_MOBILE;
 		try {
 			String mobile = ServletRequestUtils.getRequiredStringParameter(request.getRequest(), paramName);
 			smsSend.sendSms(mobile, validateCode.getVerityCode());

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import com.wy.common.AuthException;
-import com.wy.common.Constants;
+import com.wy.common.ConstSecurity;
 import com.wy.entity.PermissionVo;
 import com.wy.entity.Role;
 import com.wy.entity.User;
@@ -131,7 +131,7 @@ public class PermissionServices {
 		// 权限数组
 		String[] roleArray = roleAndPermissions[0].split(",");
 		User loginUser = SecurityUtils.getLoginUser();
-		if (loginUser.getRoles().get(0).getRoleCode().equalsIgnoreCase(Constants.SUPER_ADMIN)) {
+		if (loginUser.getRoles().get(0).getRoleCode().equalsIgnoreCase(ConstSecurity.SUPER_ADMIN)) {
 			return true;
 		}
 		for (PermissionVo permissionVo : permissions) {

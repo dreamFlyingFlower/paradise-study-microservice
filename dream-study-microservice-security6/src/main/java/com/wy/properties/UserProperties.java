@@ -23,7 +23,7 @@ public class UserProperties {
 
 	private SocialProperties social = new SocialProperties();
 
-	private SecurityProperties security = new SecurityProperties();
+	private DreamSecurityProperties security = new DreamSecurityProperties();
 
 	private VerifyProperties verify = new VerifyProperties();
 }

@@ -5,7 +5,7 @@ import org.springframework.social.connect.web.HttpSessionSessionStrategy;
 import org.springframework.social.connect.web.SessionStrategy;
 import org.springframework.web.context.request.ServletWebRequest;
 
-import com.wy.common.Constants;
+import com.wy.common.ConstSecurity;
 
 /**
  * @apiNote 电脑端存储验证码
@@ -24,7 +24,7 @@ public class VerifyStorePc implements VerifyStore {
 
 	@Override
 	public String generateKey(ServletWebRequest webRequest) {
-		return Constants.SESSION_KEY_PREFIX;
+		return ConstSecurity.SESSION_KEY_PREFIX;
 	}
 
 	@Override

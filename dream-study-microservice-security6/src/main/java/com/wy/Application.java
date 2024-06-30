@@ -2,361 +2,182 @@ package com.wy;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.security.SecurityDataConfiguration;
 import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth2Sso;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration;
-import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
-import org.springframework.security.access.AccessDecisionManager;
-import org.springframework.security.access.AccessDecisionVoter;
-import org.springframework.security.access.ConfigAttribute;
-import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.expression.SecurityExpressionRoot;
-import org.springframework.security.access.expression.method.MethodSecurityExpressionOperations;
-import org.springframework.security.access.intercept.AbstractSecurityInterceptor;
-import org.springframework.security.access.prepost.PostAuthorize;
-import org.springframework.security.access.prepost.PostFilter;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.access.prepost.PreFilter;
-import org.springframework.security.access.vote.AbstractAccessDecisionManager;
-import org.springframework.security.access.vote.AffirmativeBased;
-import org.springframework.security.access.vote.ConsensusBased;
-import org.springframework.security.access.vote.RoleVoter;
-import org.springframework.security.access.vote.UnanimousBased;
+import org.springframework.boot.web.servlet.DelegatingFilterProxyRegistrationBean;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.authentication.AnonymousAuthenticationProvider;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.CachingUserDetailsService;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.AbstractConfiguredSecurityBuilder;
-import org.springframework.security.config.annotation.AbstractSecurityBuilder;
-import org.springframework.security.config.annotation.SecurityConfigurer;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.authorization.AuthenticatedAuthorizationManager;
+import org.springframework.security.authorization.AuthorityAuthorizationManager;
+import org.springframework.security.authorization.AuthorizationManager;
+import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
+import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer.AuthorizedUrl;
+import org.springframework.security.config.annotation.web.configurers.FormLoginConfigurer;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.context.SecurityContextImpl;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.oauth2.client.filter.OAuth2ClientAuthenticationProcessingFilter;
-import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationManager;
-import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationProcessingFilter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.provisioning.JdbcUserDetailsManager;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.FilterChainProxy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.access.ExceptionTranslationFilter;
-import org.springframework.security.web.access.expression.WebExpressionVoter;
-import org.springframework.security.web.access.intercept.DefaultFilterInvocationSecurityMetadataSource;
-import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
+import org.springframework.security.web.access.intercept.AuthorizationFilter;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
-import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.security.web.authentication.RememberMeServices;
-import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
-import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.logout.LogoutFilter;
-import org.springframework.security.web.authentication.rememberme.AbstractRememberMeServices;
-import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
-import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
-import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter;
-import org.springframework.security.web.authentication.session.NullAuthenticatedSessionStrategy;
-import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 import org.springframework.security.web.authentication.ui.DefaultLoginPageGeneratingFilter;
 import org.springframework.security.web.authentication.ui.DefaultLogoutPageGeneratingFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.security.web.context.SecurityContextHolderFilter;
-import org.springframework.security.web.context.SecurityContextPersistenceFilter;
-import org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter;
+import org.springframework.security.web.context.AbstractSecurityWebApplicationInitializer;
 import org.springframework.security.web.csrf.CsrfFilter;
-import org.springframework.security.web.header.HeaderWriterFilter;
-import org.springframework.security.web.savedrequest.RequestCacheAwareFilter;
-import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter;
-import org.springframework.security.web.session.SessionManagementFilter;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
-import org.springframework.social.security.SocialAuthenticationFilter;
 import org.springframework.web.filter.DelegatingFilterProxy;
 
-import com.wy.config.ExtraMethodSecurityExpressionHandler;
-import com.wy.config.ExtraSecurityExpressionRoot;
-import com.wy.controller.UserCrl;
-
-import jakarta.annotation.security.DenyAll;
-import jakarta.annotation.security.PermitAll;
-import jakarta.annotation.security.RolesAllowed;
-
 /**
- * SpringSecurity默认的登录请求是/login,而且必须是post请求<br>
- * https://blog.csdn.net/abcwanglinyong/article/details/80981389<br>
- * https://blog.csdn.net/qq_29580525/article/details/79317969<br>
- * https://blog.csdn.net/XlxfyzsFdblj/article/details/82083443 实现动态权限控制<br>
- * {@link https://www.cnblogs.com/softidea/p/7068149.html}<br>
- *
- * SpringSecurity基本原理就是过滤器,其中主要的过滤器如下:
- *
- * <pre>
- * {@link DelegatingFilterProxy}:如果是XML配置,需要配置servlet-filter,引入SecurityFilterChain->FilterChainProxy
- * 1.{@link DelegatingFilterProxy#doFilter}:拦截器方法调用initDelegate()
- * ->1.1.{@link DelegatingFilterProxy#initDelegate}:获得实现了Filter的指定拦截器,此处为 FilterChainProxy,之后继续执行方法1
- * ->1.2.{@link DelegatingFilterProxy#invokeDelegate}:执行方法1.1返回的拦截器的doFilter()
- * 2.{@link FilterChainProxy#doFilter}:执行所有的SecurityFilterChain,清楚SecurityContextHolder上下文
- * ->2.1.{@link FilterChainProxy#doFilterInternal}:执行所有的SecurityFilterChain的doFilter()
- * ->2.1.1.{@link FilterChainProxy#getFilters}:从所有的SecurityFilterChain中找出符合条件的SecurityFilterChain并返回
- * ->2.1.2.如果2.1.1中没有符合条件的SecurityFilterChain,重置请求,继续执行其他的Filter的doFilter()
- * ->2.1.3.如果2.1.1中有符合条件的SecurityFilterChain,创建一个VirtualFilterChain,执行所有的SecurityFilterChain的doFilter()
+ * SpringSecurity6主要是通过{@link SecurityFilterChain}过滤链来实现权限,默认实现为{@link DefaultSecurityFilterChain}
  * 
- * {@link SecurityAutoConfiguration}:自动配置,引入#SpringBootWebSecurityConfiguration->SecurityFilterChain->FilterChainProxy
- * ->1.1.{@link SpringBootWebSecurityConfiguration}:注册SecurityFilterChain,引入EnableWebSecurity
- * ->1.2.{@link EnableWebSecurity}:引入4个关键注解,包括Web,Http,OAuth2等自动配置
- * ->1.3.{@link WebSecurityConfiguration}:注入webSecurityConfigurers,该参数为所有的继承或实现SecurityConfigurer的类集合,
- * 		自定义的Web配置继承的 WebSecurityConfigurerAdapter 实现了SecurityConfigurer
- * ->1.3.1.{@link WebSecurityConfiguration#springSecurityFilterChain}:构建springSecurityFilterChain的过滤器bean
- * ->1.3.1.1.{@link AbstractSecurityBuilder#build()}:调用AbstractConfiguredSecurityBuilder
- * ->1.3.1.2. {@link AbstractConfiguredSecurityBuilder#doBuild()}:构建过滤器链,执行配置
- * ->1.3.1.3.{@link AbstractConfiguredSecurityBuilder#init()}:构建springSecurityFilterChain过滤器链,
- * 		该类的configurers属性包含用户自定义的配置类
- * ->1.3.1.3.1.{@link SecurityConfigurer#init}:调用WebSecurityConfigurerAdapter
- * ->1.3.1.3.2.{@link WebSecurityConfigurerAdapter#init}:构建HttpSecurity,配置webSecurity以及过滤器 FilterSecurityInterceptor
- * 		HttpSecurity 包含各种默认的Filter以及配置,	在用户自定义的类(继承当前类)可利用configure()对该对象进行修改.
- * ->1.3.1.4.{@link AbstractConfiguredSecurityBuilder#configure()}:调用系统或自定义的configure配置方法,如URL匹配等.
- * 		该方法在会调用WebSecurityConfigurerAdapter的configure(WebSecurity)
- * ->1.3.1.5.{@link AbstractConfiguredSecurityBuilder#performBuild}:调用WebSecurity
- * ->1.3.1.5.1.{@link WebSecurity#performBuild}:最终构建SecurityFilterChain,FilterChainProxy,排序等,返回FilterChainProxy
- * ->1.3.2.{@link WebSecurityConfiguration#setFilterChainProxySecurityConfigurer}:获得所有的SecurityConfigurer实例bean
- * {@link SecurityFilterAutoConfiguration}:将所有的springSecurityFilterChain添加到ServletRegistrationBean集合中
- * {@link UserDetailsServiceAutoConfiguration}:添加默认用户到内存的认证管理器中
- * {@link SecurityFilterChain}:SpringSecurity的过滤器链,最终生成的过滤器都是Filter,最后被FilterChainProxy处理
- * ->1.{@link DefaultSecurityFilterChain}:默认实现
- * {@link SecurityContextPersistenceFilter}:使用SecurityContextRepository在session中保存SecurityContext,以便给之后的过滤器使用.
- * 		已废弃,推荐使用{@link SecurityContextHolderFilter}
- * {@link SecurityContextHolderFilter}:替代SecurityContextPersistenceFilter,但可自定义存储SecurityContext的方式,默认Session存储
- * {@link AbstractAuthenticationProcessingFilter}:处理form登录过滤器,默认拦截post的/login请求,
- * 		Web默认实现为UsernamePasswordAuthenticationFilter
- * {@link WebAsyncManagerIntegrationFilter}:集成SecurityContext到Spring异步执行机制中的WebAsyncManager
- * {@link HeaderWriterFilter}:向请求的Header中添加相应的信息,可在http标签内部使用security:headers来控制
- * {@link CsrfFilter}:跨域请求伪造,SpringSecurity会对所有post请求验证是否包含系统生成的csrf的token信息.如果不包含,则报错
- * {@link LogoutFilter}:匹配URL为/logout的请求,实现用户退出,清除认证信息
- * {@link UsernamePasswordAuthenticationFilter}:默认的登录拦截器,使用用户名和密码登录
- * {@link DefaultLoginPageGeneratingFilter}:如果没有在配置文件中指定认证页面,则由该过滤器生成一个默认认证页面,默认是/login
- * {@link DefaultLogoutPageGeneratingFilter}:生产一个默认的退出登录页面
- * {@link BasicAuthenticationFilter}:Basic登录认证,拦截请求头中的Authorization:Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==
- * {@link RequestCacheAwareFilter}:通过HttpSessionRequestCache内部维护了一个RequestCache,用于缓存HttpServletRequest
- * {@link SecurityContextHolderAwareRequestFilter}:针对ServletRequest进行了一次包装,使得request具有更加丰富的API
- * {@link RememberMeAuthenticationFilter}:记住我拦截器,会根据请求中的session进行自动登录
- * {@link SocialAuthenticationFilter}:第三方服务登录,在新的SpringBoot版本中已经移到SpringOAuth项目中
- * {@link OAuth2AuthenticationProcessingFilter}:整合OAuth2时使用
- * {@link OAuth2ClientAuthenticationProcessingFilter}:整合OAuth2时使用
- * {@link AnonymousAuthenticationFilter}:允许匿名访问时的过滤器
- * {@link SessionManagementFilter}:拦截会话伪造攻击,利用SecurityContextRepository限制同一用户开启多个会话的数量
- * {@link ExceptionTranslationFilter}:异常拦截器,位于SecurityFilterChain的后方,接收FilterSecurityInterceptor抛出的异常
- * {@link FilterSecurityInterceptor}:获取配置资源访问的授权信息,根据SecurityContextHolder中的用户信息决定其是否能访问程序API
- * {@link FilterChainProxy}:对上述拦截器按照指定顺序完整功能
- * REST API
+ * {@link EnableWebSecurity}:使用SpringSecurity
+ * ->{@link WebSecurityConfiguration}:被引入,会初始化名为{@link AbstractSecurityWebApplicationInitializer#DEFAULT_FILTER_NAME}的bean
+ * ->#HttpSecurityConfiguration:被引入,初始化{@link HttpSecurity}等相关bean
+ * 
+ * {@link SecurityFilterChain}:包含了一个Filter数组,可以使用多个拦截器
+ * ->{@link SecurityFilterChain#matches}:规则匹配
+ * ->{@link SecurityFilterChain#getFilters()}:获得所有的拦截器
+ * {@link CsrfFilter}:防止跨站点请求伪造攻击,这也是导致所有POST请求都失败的原因.基于Token验证的API服务可以选择关闭,而一般Web页面需要开启
+ * {@link BasicAuthenticationFilter}:支持HTTP的标准Basic Auth的身份验证模块
+ * {@link UsernamePasswordAuthenticationFilter}:支持Form表单形式的身份验证模块
+ * {@link DefaultLoginPageGeneratingFilter}:用于自动生成登录页面
+ * {@link DefaultLogoutPageGeneratingFilter}:用于自动生成注销页面
+ * 
+ * {@link SecurityAutoConfiguration}:SpringSecurity自动注入
+ * ->#SpringBootWebSecurityConfiguration:默认配置,引入了基本的Form表单和Basic认证方式
+ * ->{@link SecurityDataConfiguration}:整合Spring Data
+ * {@link SecurityFilterAutoConfiguration}:SecurittyFilter自动注入类,
+ * 会拿bean为{@link AbstractSecurityWebApplicationInitializer#DEFAULT_FILTER_NAME}的{@link DelegatingFilterProxyRegistrationBean}
+ * {@link DelegatingFilterProxy#doFilter}:将Servlet中的Filter请求委托给Spring容器中的具体bean处理,实现Servlet和Spring的无缝连接
+ * ->{@link DelegatingFilterProxy#initDelegate}:获得{@link AbstractSecurityWebApplicationInitializer#DEFAULT_FILTER_NAME}的bean
+ * {@link FilterChainProxy#doFilter}:被DelegatingFilterProxy用来处理SecurityFilterChain的bean,是SpringSecurity拦截器的主要方法,DEBUG入口
+ * ->{@link FilterChainProxy#getFilters}:遍历SecurityFilterChain,根据request获得匹配的SecurityFilterChain
+ * 
+ * {@link FormLoginConfigurer}:表单登录配置,注入了{@link UsernamePasswordAuthenticationFilter}
+ * {@link FormLoginConfigurer#initDefaultLoginFilter}:默认表单配置,如果自定义了{@link FormLoginConfigurer#loginPage},初始化方法失效
+ * 
+ * {@link SecurityConfigurerAdapter}:自定义复杂Security
+ * Filter配置,通过{@link HttpSecurity#apply}来配置注入.
+ * 参照FormLoginConfigurer,CsrfConfigurer等,在执行{@link HttpSecurity#build()}时,会调用这些配置类的configure(),
+ * 根据用户的自定义配置,创建一个或者多个Security Filter,并将其注册到SecurityFilterChain
+ * 
+ * {@link HttpSecurity#addFilter}:添加自定义的简单Security Filter
+ * 
+ * 登录认证流程,以用户名密码方式登录为例:
+ * 
+ * <pre>
+ * {@link UsernamePasswordAuthenticationFilter}:请求进来后,该类会从请求中获取用户名密码,
+ * 		利用这些信息创建一个UsernamePasswordAuthenticationToken对象
+ * {@link AuthenticationManager}:实际调用ProviderManager,负责对接受到的UsernamePasswordAuthenticationToken进行认证
+ * {@link ProviderManager}:遍历所有的AuthenticationProvider,查找可处理UsernamePasswordAuthenticationToken的AuthenticationProvider进行认证,
+ * {@link DaoAuthenticationProvider}:负责对UsernamePasswordAuthenticationToken进行认证.会先调用UserDetailService获取用户信息,
+ * 		然后将获取到的密码委托给PasswordEncoder进行验证:
+ * ->认证失败,DaoAuthenticationProvider会抛出AuthenticationException的子类异常
+ * ->认证成功,返回处理后的UsernamePasswordAuthenticationToken对象,该对象除了包含原本信息外,还包含认证通过状态以及该用户的权限列表
+ * {@link SecurityContext}:认证结果会被放入该对象中,其他模块如果需要这个结果(包括用户信息和权限列表),就可以通过以下方法获取:
+ * 		SecurityContextHolder.getContext().getAuthentication()
  * </pre>
  * 
- * SpringSecurity用户登录主要流程:
+ * {@link AbstractAuthenticationProcessingFilter}:大部分认证方式都会继承该抽象拦截器
  * 
  * <pre>
- * 1.{@link SecurityContextPersistenceFilter}:过滤器链最前面,使用SecurityContextRepository在session中保存SecurityContext
- * 2.{@link AbstractAuthenticationProcessingFilter#doFilter()}:调用拦截器
- * 2.1.{@link AbstractAuthenticationProcessingFilter#attemptAuthentication()}:调用实现UsernamePasswordAuthenticationFilter
- * 3.{@link UsernamePasswordAuthenticationFilter#attemptAuthentication()}:调用认证方法,将认证信息存入 Authentication.
- * 		此处的Authentication为UsernamePasswordAuthenticationToken
- * 3.1.{@link UsernamePasswordAuthenticationToken}:构建一个未认证的token对象
- * 3.2.{@link AuthenticationManager#authenticate}:调用认证方法对token对象进行认证,默认调用 ProviderManager
- * 4.{@link ProviderManager#authenticate()}:验证登录管理器进行验证,主要管理验证的方式,如用户名密码,第三方等
- * 4.1.{@link AuthenticationProvider#support}:判断AuthenticationProvider是否是参数的子类
- * 		此处参数为UsernamePasswordAuthenticationToken,而所有的AuthenticationProvider实现类中,
- * 		只有{@link AbstractUserDetailsAuthenticationProvider}符合条件,而该抽象类的实现类为DaoAuthenticationProvider
- * 4.2.{@link AuthenticationProvider#authenticate()}:根据4.1的结果进行不同方式的认证.如用户名密码登录,第三方登录等
- * 4.3.{@link DaoAuthenticationProvider#authenticate()}:用户名密码默认使用该类进行验证,由抽象父类验证,不同方式使用不同类
- * 4.3.1.{@link AbstractUserDetailsAuthenticationProvider#authenticate()}:DaoAuthenticationProvider调用抽象父类接口进行验证
- * 4.3.2.{@link AbstractUserDetailsAuthenticationProvider#retrieveUser()}:调用子类DaoAuthenticationProvider
- * 4.3.3.{@link DaoAuthenticationProvider#retrieveUser()}:使用自定义的 UserDetailsService 实现类获得数据库用户名和密码
- * 4.3.3.1.{@link UserDetailsService#loadUserByUsername()}:调用用户自定义用户名密码登录校验接口
- * 4.3.4.{@link AbstractUserDetailsAuthenticationProvider.DefaultPreAuthenticationChecks#check}:前置检查用户权限,状态等
- * 4.3.5.{@link AbstractUserDetailsAuthenticationProvider#additionalAuthenticationChecks}:调用子类DaoAuthenticationProvider
- * 4.3.6.{@link DaoAuthenticationProvider#additionalAuthenticationChecks}:检查数据库密码和前端密码是否匹配
- * 4.3.7.{@link AbstractUserDetailsAuthenticationProvider.DefaultPostAuthenticationChecks#check}:后置检查密码是否过期
- * 4.3.8.{@link AbstractUserDetailsAuthenticationProvider#createSuccessAuthentication}:构建一个认证成功的token对象
- * 5.{@link SessionAuthenticationStrategy#onAuthentication()}:调用默认对象NullAuthenticatedSessionStrategy
- * 5.1.{@link NullAuthenticatedSessionStrategy#onAuthentication}:Session处理,默认无session策略
- * 6.{@link AbstractAuthenticationProcessingFilter#successfulAuthentication}:认证成功,将认证信息存入SecurityContextHolder
- * 		{@link SecurityContextHolder}:默认实现类{@link SecurityContextImpl},该类会将认证信息存入{@link SecurityContext}中
- * 6.1.{@link AuthenticationSuccessHandler#onAuthenticationSuccess}:调用 SavedRequestAwareAuthenticationSuccessHandler
- * 6.2.{@link SavedRequestAwareAuthenticationSuccessHandler#onAuthenticationSuccess}:登录成功之后的处理,可自定义,
- * 		在{@link WebSecurityConfigurerAdapter#configure}中进行设置,详情参见{@link SecurityConfig#configure}
- * 7.{@link AbstractAuthenticationProcessingFilter#unsuccessfulAuthentication}:认证失败,清除SpringSecurity上下文
- * 7.1.{@link AuthenticationFailureHandler#onAuthenticationFailure}:调用SimpleUrlAuthenticationFailureHandler
- * 7.2.{@link SimpleUrlAuthenticationFailureHandler#onAuthenticationFailure}:认证失败的处理方法,同认证成功的处理方法,可自定义
- * 8.{@link BasicAuthenticationFilter}...
- * 9.{@link ExceptionTranslationFilter}->{@link FilterSecurityInterceptor}->REST API
+ * {@link AbstractAuthenticationProcessingFilter#doFilter}:模板方法,定义了整个认证流程
+ * ->{@link AbstractAuthenticationProcessingFilter#requiresAuthentication}:判断该请求是否是认证请求或者登录请求
+ * ->{@link AbstractAuthenticationProcessingFilter#attemptAuthentication}:实际认证逻辑,由子类重写,返回Authentication
+ * -->{@link UsernamePasswordAuthenticationFilter#attemptAuthentication}:用户名密码登录拦截器,返回UsernamePasswordAuthenticationToken
+ * --->{@link AuthenticationManager#authenticate}:根据不同的登录类型对Authentication处理
+ * ---->{@link ProviderManager#authenticate}:AuthenticationManager的通用实现类,将具体的认证工作委托给一系列的AuthenticationProvider
+ * ----->{@link AuthenticationProvider#authenticate}:具体的认证工作
  * 
- * {@link OAuth2AuthenticationManager}:功能和ProviderManager一样,但是是对OAuth2方式认证的用户进行校验,非普通方式
- * 
- * 1.用户提交用户名密码被SecurityFilterChain中的 UsernamePasswordAuthenticationFilter 拦截,封装为请求Authentication(接口),
- * 		默认实现为 UsernamePasswordAuthenticationToken
- * 2.过滤器将Authentication提交至认证管理器 AuthenticationManager 进行认证
- * 3.认证成功后, AuthenticationManager 返回携带了权限信息,身份信息,细节信息的 Authentication 实例
- * 4.SecurityContextHolder 安全上下文容器将第3步携带信息的 Authentication 设置到其中
- * 5.AuthenticationManager 是认证相关的核心接口,也是发起认证的出发点,默认实现为 ProviderManager.
- * 		ProviderManager维护着一个List<AuthenticationProvider>,存放多种认证方式,最终实际的认证工作由AuthenticationProvider完成
- * 		Web表单对应的AuthenticationProvider类为DaoAuthenticationProvider,它维护着一个UserDetailsService负责UserDetails的获取,
- * 		最终AuthenticationProvider将UserDetails填充至Authentication
- * 6.流程图见dream-study-notes/Spring/img/SpringSecurity001.png
+ * ->{@link AbstractAuthenticationProcessingFilter#successfulAuthentication}:认证成功.将Authentication放到SecurityContext中,
+ * 后续需要认证结果时都从SecurityContext获取.还会处理其它一些相关功能,如RememberMe,事件发布,最后调用AuthenticationSuccessHandler
+ * ->{@link AbstractAuthenticationProcessingFilter#unsuccessfulAuthentication}:认证失败.清空SecurityContext,
+ * 调用RememberMe相关服务和AuthenticationFailureHandler来处理认证失败后的回调逻辑,比如跳转到错误页面
  * </pre>
  * 
- * SpringSecurity记住我主要流程,主要基于cookie:
+ * {@link Authentication}:认证结果接口
  * 
  * <pre>
- * ->{@link AbstractAuthenticationProcessingFilter#successfulAuthentication}:认证成功的调用方法,会调用自定义的认证成功处理类
- * ->{@link RememberMeAuthenticationFilter}:记住我认证拦截器,在{@link UsernamePasswordAuthenticationFilter}之前后调用
- * ->{@link RememberMeServices#loginSuccess()}:当验证成功并将登录写入context之后,该方法将处理记住我
- * -->{@link AbstractRememberMeServices#loginSuccess()}:RememberMeServices的实现类,真实调用方法
- * --->{@link PersistentTokenBasedRememberMeServices#onLoginSuccess()}:将token持久化写入数据库,并将cookie写入浏览器中
- * ---->{@link JdbcTokenRepositoryImpl}:会在数据库中创建记住我的表,检查token
+ * {@link Authentication#getAuthorities()}:当前认证用户拥有的权限列表
+ * {@link Authentication#getPrincipal()}:用户的一个身份标识,通常就是用户名,认证后一般是用户对象
+ * {@link Authentication#getCredentials()}:可用于证明用户身份的一个凭证,通常就是用户密码
+ * {@link Authentication#isAuthenticated()}:当前用户是否认证通过
+ * {@link Authentication#setAuthenticated()}:更新用户的认证状态
+ * {@link Authentication#getDetails()}:获取附加的详情信息,比如原始的Http请求体等
  * 
- * ->{@link RememberMeAuthenticationFilter}:记住我拦截器,会根据请求中的session进行自动登录
- * -->{@link AbstractRememberMeServices#autoLogin()}:自动登录
- * --->{@link PersistentTokenBasedRememberMeServices#processAutoLoginCookie()}:将token从数据库取出并和请求中的token比对
- * ---->之后的流程大部分同登录流程
+ * {@link AbstractAuthenticationToken}:抽象认证结果
+ * {@link AnonymousAuthenticationToken}:匿名登录用户认证结果
+ * {@link UsernamePasswordAuthenticationToken}:用户名密码认证结果
+ * {@link JwtAuthenticationToken}:JWT认证结果
  * </pre>
  * 
- * SpringSecurity授权控制:
+ * {@link AuthenticationProvider}:具体的Authentication认证方式
  * 
  * <pre>
- * 1.{@link FilterSecurityInterceptor#doFilter()}:拦截器调用
- * 2.{@link FilterSecurityInterceptor#invoke()}:根据资源权限判断当前请求是否能访问资源,登录成功之后才会调用,是最后一个拦截器
- * 2.1.{@link FilterSecurityInterceptor#beforeInvocation()}:调用父类AbstractSecurityInterceptor
- * 2.2.{@link AbstractSecurityInterceptor#beforeInvocation()}:判断当前请求是否有权限访问资源
- * 2.2.1.{@link DefaultFilterInvocationSecurityMetadataSource#getAttributes()}:获得所有配置的拦截,验证等URL匹配信息,
- * 		即{@link WebSecurityConfigurerAdapter#configure(HttpSecurity)}中需要重写的URL拦截信息,封装到{@link ConfigAttribute}中
- * 2.2.2.{@link AbstractSecurityInterceptor#authenticateIfRequired()}:获得登录的验证信息
- * 2.2.3.{@link AbstractSecurityInterceptor#attemptAuthorization}:判断权限资源等
- * 2.2.3.1.{@link AccessDecisionManager#decide}:权限管理接口,管理一组AccessDecisionVoter
- * 2.2.3.2.{@link AffirmativeBased#decide}:一组投票中只要有一个投票通过,则请求通过,默认实现
- * 2.2.3.2.1.{@link AffirmativeBased#getDecisionVoters}:在web环境中,默认只有WebExpressionVoter投票器
- * 2.2.3.2.2.{@link AccessDecisionVoter#vote()}:对请求进行投票,验证当前URL请求权限是否能通过
- * 2.2.3.2.2.1.{@link WebExpressionVoter#vote()}:在Web环境下,所有投票器都由该类决定是否通过
- * 2.2.3.2.2.{@link ConsensusBased}:比较通过和不通过的票数多少,谁多就根据谁决定是否通过
- * 2.2.3.2.3.{@link UnanimousBased}:一组投票中只要有一个不通过,则请求不通过
- * {@link ExceptionTranslationFilter#doFilter}:若抛出异常,会被该类拦截,根据异常不同进行不同的操作,同时会对匿名操作进行验证
- * 
- * 流程图见dream-study-notes/Spring/img/SpringSecurity002.png
+ * {@link AnonymousAuthenticationProvider}:匿名登录的认证方式
+ * {@link DaoAuthenticationProvider}:用户名密码的认证方式,通过UserDetailsService和PasswordEncoder来验证用户名和密码
+ * ->{@link UserDetailsService}:查找用户信息,默认是内存存储
+ * -->{@link InMemoryUserDetailsManager}:内存存储
+ * -->{@link JdbcUserDetailsManager}:数据库存储
+ * {@link JwtAuthenticationProvider}:JWT Token的认证方式
  * </pre>
  * 
- * SpringSecurity的主要接口类以及注解:
+ * {@link AuthorizationFilter}:鉴权,对登录后的用户访问行为做权限处理,鉴权DEBUG入口,在老版本中鉴权模块是FilterSecurityInterceptor
  * 
  * <pre>
- * {@link UserDetails}:具体的用户实现类需要实现该接口,权限方法等需要在该类中添加<br>
- * {@link UserDetails#getAuthorities()}:角色权限方法等需要在该类中添加,角色都要添加ROLE_前缀,权限不需要添加
- * {@link UserDetailsService#loadUserByUsername}:该方法定义登录时的具体行为
- * {@link CachingUserDetailsService}:从{@link UserDetailsService}中获取信息并放入到缓存中
- * {@link AuthenticationSuccessHandler}:自定义登录成功处理接口
- * {@link AuthenticationFailureHandler}:自定义登录失败处理接口
- * {@link Authentication}:SpringSecurity对权限信息的主要操作类
- * {@link Authentication#getCredentials()}:获取凭证,基本上相当于密码
- * {@link Authentication#getAuthorities()}:获取权限集合,由{@link UserDetails#getAuthorities()}注入
- * {@link Authentication#getDetails()}:获取认证的一些额外信息
- * {@link Authentication#getPrincipal()}:获取凭证,主要是在登录时存入到SecurityContext中的数据
- * {@link AbstractAccessDecisionManager}:自定义决策,可继承该抽象类,也可以实现接口,核心方法为supports.多权限时,需要重写该方法
- * {@link AccessDecisionVoter}:投票器,决定请求是否有权限访问资源
- * ->{@link RoleVoter}:角色投票器,根据角色判断是否有权限访问,主要方法为vote
- * ->{@link AffirmativeBased}:只要有一个投票器通过就允许访问,主要方法为decide
- * ->{@link ConsensusBased}:有一半以上的投票器通过就允许访问,主要方法为decide
- * ->{@link UnanimousBased}:所有投票器都通过才允许访问,主要方法为decide
+ * {@link AuthorizationFilter#doFilter}:负责鉴权模块,在老版本中鉴权模块是FilterSecurityInterceptor,是整个SecurityFilterChain的最后一个Filter
+ * {@link AuthorizationManager#check}:替代之前的AccessDecisionManager和AccessDecisionVoter,校验Authentication,执行鉴权
+ * {@link AuthorityAuthorizationManager}:常用鉴权类,调用Authentication#getAuthorities()获取用户的权限列表,将这些权限与请求需要的权限进行匹配
+ * {@link AuthenticatedAuthorizationManager}:只需要通过身份认证的请求就可以访问的处理
  * 
- * {@link EnableGlobalMethodSecurity}:开启Security安全管理
- * {@link EnableGlobalMethodSecurity#prePostEnabled()}:是否开启{PreAuthorize PostAuthorize}注解,默认不开启
- * {@link PreAuthorize}:该注解用来管理角色,权限等,值为SpringEL表达式,解析规则{@link SecurityExpressionRoot}
- * ->角色比较:在写入角色时需要在角色之前添加ROLE_,但是使用的时候是直接使用角色即可
- * -->如写入时为ROLE_ADMIN,拦截的时候写ADMIN即可,hasAnyRole('ADMIN','USER')或hasRole('ADMIN')
- * -->若需要同时满足多个角色条件,可以使用AND,如hasRole('ADMIN') AND hasRole('USER')
- * ->权限比较:写入权限时和使用时写一样的即可,即hasAnyAuthority('create')或hasAuthority('create')
- * ->在EL表达式中可以直接使用的变量有:authentication,principal,都是在登录时存入的信息,authentication包含principal
- * {@link AuthenticationPrincipal}:不需要依托EnableGlobalMethodSecurity,修饰参数时直接取得Authentication中的用户信息,
- * 		即直接取得在登录时存入session的实现了UserDetails的类信息
- * {@link SecurityContext}:存储了当前用户的认证以及权限信息
+ * {@link AuthorizedUrl#hasAuthority}:细粒度权限配置,主要是增删改查,也可以是角色.配置角色最好使用hasRole
+ * {@link AuthorizedUrl#hasRole}:角色权限配置,会自动添加ROLE_前缀
+ * {@link AuthorizedUrl#withRoleHierarchy}:打开角色继承的功能,角色继承允许一个角色继承另一个角色的所有权限,从而简化权限配置
+ * {@link AuthorizedUrl#access}:将AuthorityAuthorizationManager实例注册到权限控制中,可自定义实现
  * </pre>
  * 
- * 自定义权限:
+ * 以一个标准的鉴权流程为例
  * 
  * <pre>
- * 1.直接使用@permissionService.methodname(args),其中@后面必须接一个spring中的组件标识,
- * methodname是该组件中的方法名,args是传入其中的参数,返回值必须是boolean,详见{@link UserCrl#test}
- * 2.继承{@link SecurityExpressionRoot},实现{@link MethodSecurityExpressionOperations},
- * 所有需要实现的方法可以直接从MethodSecurityExpressionRoot中复制,该类是私有的,
- * 详见{@link ExtraSecurityExpressionRoot}和{@link ExtraMethodSecurityExpressionHandler}
+ * 一个请求进来,经过了一系列Security Filter后,最终来到AuthorizationFilter,进而调用AuthorizationManager#check()进行权限校验
+ * 实际的校验工作继续委托给AuthoritiesAuthorizationManager
+ * AuthoritiesAuthorizationManager先从SecurityContext中获取到Authentication,然后基于其权限列表构建GrantedAuthority列表,用于权限项的匹配
+ * 最终会返回一个AuthorizationDecision表示权限校验结果
  * </pre>
  * 
- * 权限表达式:
+ * 异常处理
  * 
  * <pre>
- * permitAll:只要匹配表达式,任意请求都可以访问,无需登录校验
- * denyAll:所有的请求都拦截
- * anonymous:匿名用户才通过
- * rememberMe:只有当前用户是记住用户时通过
- * authenticated:当前用户不是anonymous时通过
- * fullAuthenticated:当前用户既不是anonymous也不是rememberme,且校验通过
- * hasRole:用户拥有指定的角色
- * hasAnyRole:拥有指定的任意一种角色
- * hasAuthority:用户拥有指定权限
- * hasAnyAuthority:用户有任意一个指定的权限
- * hasIpAddress:请求发送的ip匹配时才通过
- * </pre>
- * 
- * {@link PostAuthorize}:该注解在方法执行完之后判断是否有权限,可以用returnObject表示返回值对象
- * 
- * {@link PreFilter}:对Collection类型的方法参数进行拦截,只能用在实现了Collection的类型上,数组也不行
- * {@link PreFilter#filterTarget()}:被拦截的形参名,若方法中只有一个参数,可以不指定
- * {@link PreFilter#value()}:对参数的处理,可以是SpringEl表达式,可以使用filterObject代表实际参数中的单个值
- * 
- * {@link PostFilter}:作用等同于{@link PreFilter},只不过是在方法执行完之后过滤,filterObject表示实际结果的单个值
- * 
- * {@link EnableGlobalMethodSecurity#securedEnabled()}:是否开启{@link Secured}注解,默认不开启
- * {@link Secured}:该注解功能和{@link PreAuthorize}类似,但是没有它全面,只能判断角色,不能判断权限,
- * 且在UserDetails中写入的角色和拦截时候的角色一样,如写入时是ROLE_ADMIN,则拦截时也要写ROLE_ADMIN
- * 
- * {@link EnableGlobalMethodSecurity#jsr250Enabled()}:是否开启jsr250相关注解,默认不开启.相关注解包括如下:
- * {@link RolesAllowed}:同{@link Secured};{@link DenyAll}:全部拒绝;{@link PermitAll}:全部允许
- * 
- * {@link EnableRedisHttpSession}:通过redis开启session的集群共享功能,或者通过配置文件的sorttype配置
- * 
- * SpringSecurity的权限设计不够精细,可以结合自定义权限,更精细控制权限:
- * 
- * <pre>
- * 用户表->用户组织关联表->组织表->组织角色关联表->角色表
- * 用户表->用户职位(部门)关联表->职位表->职位角色关联表->角色表(可选)
- * 用户表->用户组关联表->用户组表->用户组角色关联表->角色表(可选,用户组概念基本和角色一样)
- * 角色表->角色菜单权限关联表->菜单权限表
- * 角色表->角色按钮(数据)权限关联表->按钮(数据)权限表
- * 角色表->角色文件权限关联表->文件表(可选)
- * 菜单表->菜单按钮(权限)表->按钮(数据)表
- * </pre>
- * 
- * API安全:
- * 
- * <pre>
- * 传输安全:将比较敏感的信息进行RSA加密,同时要将时间戳拼接到信息中同时加密.
- * 		时间戳用来判断过期时间,但是会存在服务器和客户端时间不同步的问题,这样可能会导致请求一直不成功
- * 加密串存储:为了更好的防止黑客利用上一次的请求在过期时间内再次请求,可以将加密串在服务器中利用Map进行存储,
- * 		当请求再次被调用时,先从内存中Map中查找加密字符串是否使用过,使用过就不能再调用
- * 请求防篡改:请求签名(MD5),对参数进行MD5加密,同时要指定盐(salt),salt不会随着请求进行传输,但客户端和服务器都要存
- * CSRF攻击:跨站请求伪造,SpringSecurity会对所有post请求验证是否携带系统生成的csrf token信息,没有就报错
+ * {@link ExceptionTranslationFilter}:捕获并处理SpringSecurity异常
+ * {@link AuthenticationEntryPoint#commence}:处理认证异常错误AuthenticationException及其子类
+ * {@link AccessDeniedHandler#handle}:处理鉴权错误AccessDeniedException及其子类
  * </pre>
  * 
  * @author 飞花梦影
  * @date 2019-01-31 00:09:33
  * @git {@link https://github.com/dreamFlyingFlower}
  */
-@SuppressWarnings("deprecation")
 @EnableRedisHttpSession
 @SpringBootApplication
 @EnableOAuth2Sso
