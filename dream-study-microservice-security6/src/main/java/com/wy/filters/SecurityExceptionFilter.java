@@ -108,7 +108,7 @@ public class SecurityExceptionFilter {
 	}
 
 	/**
-	 * 权限访问异常,
+	 * 权限访问异常
 	 */
 	@ExceptionHandler(AuthenticationException.class)
 	public Object AuthenticationExceptionHandler(AuthenticationException e) {

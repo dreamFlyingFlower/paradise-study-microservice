@@ -14,7 +14,7 @@ import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.wy.common.AuthException;
-import com.wy.properties.UserProperties;
+import com.wy.properties.DreamSecurityProperties;
 import com.wy.verify.VerifyHandlerFactory;
 import com.wy.verify.VerifyInfo;
 
@@ -61,7 +61,7 @@ public class VerifyFilter extends OncePerRequestFilter implements InitializingBe
 	 * 用户自定义配置信息
 	 */
 	@Autowired
-	private UserProperties userProperties;
+	private DreamSecurityProperties dreamSecurityProperties;
 
 	/**
 	 * 验证请求url与配置的url是否匹配的工具类
@@ -81,7 +81,7 @@ public class VerifyFilter extends OncePerRequestFilter implements InitializingBe
 	 * 将系统中配置的需要校验验证码的URL根据校验的类型放入map
 	 */
 	protected void handlerVerifyUrl() {
-		List<String> imageVerifyUrls = userProperties.getVerify().getImage().getUrls();
+		List<String> imageVerifyUrls = dreamSecurityProperties.getVerify().getImage().getUrls();
 		if (ListHelper.isNotEmpty(imageVerifyUrls)) {
 			defaultFilterUrls.addAll(imageVerifyUrls);
 		}
@@ -90,7 +90,7 @@ public class VerifyFilter extends OncePerRequestFilter implements InitializingBe
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 			throws ServletException, IOException {
-		if (userProperties.getVerify().isEnabled()) {
+		if (dreamSecurityProperties.getVerify().isEnabled()) {
 			try {
 				VerifyInfo type = getVerifyType(request);
 				if (type != null) {

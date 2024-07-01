@@ -45,11 +45,11 @@ import org.springframework.social.security.provider.SocialAuthenticationService;
 
 import com.wy.controller.UserCrl;
 import com.wy.entity.UserQq;
-import com.wy.properties.UserProperties;
+import com.wy.properties.DreamSecurityProperties;
 import com.wy.social.qq.QqConnectionFactory;
 import com.wy.social.qq.QqConnectionSignUp;
 import com.wy.social.qq.QqOAuth2Template;
-import com.wy.social.qq.QqSocialConfigurer;
+import com.wy.social.qq.QqSocialSecurityConfigurer;
 
 /**
  * Social相关配置,必须要开启{@link EnableSocial}
@@ -137,7 +137,7 @@ import com.wy.social.qq.QqSocialConfigurer;
 public class SocialConfig extends SocialConfigurerAdapter {
 
 	@Autowired
-	private UserProperties properties;
+	private DreamSecurityProperties dreamSecurityProperties;
 
 	@Autowired
 	private DataSource dataSource;
@@ -152,8 +152,9 @@ public class SocialConfig extends SocialConfigurerAdapter {
 	public void addConnectionFactories(ConnectionFactoryConfigurer connectionFactoryConfigurer,
 			Environment environment) {
 		QqConnectionFactory qqConnectionFactory =
-				new QqConnectionFactory(properties.getSocial().getQq().getProviderId(),
-						properties.getSocial().getQq().getAppId(), properties.getSocial().getQq().getAppSecret());
+				new QqConnectionFactory(dreamSecurityProperties.getSocial().getQq().getProviderId(),
+						dreamSecurityProperties.getSocial().getQq().getAppId(),
+						dreamSecurityProperties.getSocial().getQq().getAppSecret());
 		connectionFactoryConfigurer.addConnectionFactory(qqConnectionFactory);
 	}
 
@@ -182,7 +183,7 @@ public class SocialConfig extends SocialConfigurerAdapter {
 	 */
 	@Bean
 	SpringSocialConfigurer userSocialConfigurer() {
-		QqSocialConfigurer configurer = new QqSocialConfigurer("filterUrl");
+		QqSocialSecurityConfigurer configurer = new QqSocialSecurityConfigurer("filterUrl");
 		/**
 		 * 自定义注册页面,默认是/signin.在自定义上文的getUsersConnectionRepository方法中设置ConnectionSignUp的实现类即可
 		 */

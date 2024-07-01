@@ -7,21 +7,23 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.context.request.ServletWebRequest;
 
-import com.wy.properties.UserProperties;
+import com.wy.properties.DreamSecurityProperties;
 
 import dream.flying.flower.lang.StrHelper;
 import dream.flying.flower.result.ResultException;
 
 /**
- * @apiNote 手机存储验证
- * @author ParadiseWY
- * @date 2019年9月29日
+ * 手机存储验证
+ *
+ * @author 飞花梦影
+ * @date 2019-09-29 23:40:32
+ * @git {@link https://github.com/dreamFlyingFlower}
  */
 @Configuration
 public class VerifyStoreMobile implements VerifyStore {
 
 	@Autowired
-	private UserProperties userProperties;
+	private DreamSecurityProperties dreamSecurityProperties;
 
 	@Autowired
 	private RedisTemplate<Object, Object> redisTemplate;
@@ -33,7 +35,7 @@ public class VerifyStoreMobile implements VerifyStore {
 
 	private String getDeviceId(ServletWebRequest webRequest) {
 		String deviceId = webRequest.getRequest()
-				.getParameter(userProperties.getVerify().getMobile().getDeviceIdParam());
+				.getParameter(dreamSecurityProperties.getVerify().getMobile().getDeviceIdParam());
 		if (StrHelper.isBlank(deviceId)) {
 			throw new ResultException("手机设备编号为空");
 		}
@@ -42,7 +44,7 @@ public class VerifyStoreMobile implements VerifyStore {
 
 	@Override
 	public String generateKey(ServletWebRequest webRequest) {
-		return webRequest.getRequest().getParameter(userProperties.getVerify().getMobile().getDeviceIdParam());
+		return webRequest.getRequest().getParameter(dreamSecurityProperties.getVerify().getMobile().getDeviceIdParam());
 	}
 
 	@Override

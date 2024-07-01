@@ -1,4 +1,4 @@
-package com.wy.config.jwt;
+package com.wy.filters;
 
 import java.io.IOException;
 import java.util.ArrayList;

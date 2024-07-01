@@ -23,7 +23,7 @@ import dream.flying.flower.lang.StrHelper;
  * @date 2021-06-29 00:08:46
  * @git {@link https://github.com/dreamFlyingFlower}
  */
-public class SecurityUtils {
+public class SecurityHelpers {
 
 	/**
 	 * 获取Authentication认证信息

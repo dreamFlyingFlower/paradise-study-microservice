@@ -1,4 +1,4 @@
-package com.wy.authentication.sms;
+package com.wy.sms;
 
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;

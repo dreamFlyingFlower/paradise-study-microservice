@@ -2,8 +2,6 @@ package com.wy.properties;
 
 import java.util.List;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,7 +14,6 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-@ConfigurationProperties(prefix = "user.filter")
 public class FilterProperties {
 
 	/**

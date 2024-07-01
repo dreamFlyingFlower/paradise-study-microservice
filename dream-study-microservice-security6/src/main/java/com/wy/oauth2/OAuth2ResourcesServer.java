@@ -6,7 +6,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 
-import com.wy.properties.UserProperties;
+import com.wy.properties.DreamSecurityProperties;
 import com.wy.security.LoginFailureHandler;
 
 /**
@@ -26,7 +26,7 @@ import com.wy.security.LoginFailureHandler;
 public class OAuth2ResourcesServer extends ResourceServerConfigurerAdapter {
 
 	@Autowired
-	private UserProperties userProperties;
+	private DreamSecurityProperties dreamSecurityProperties;
 
 	@Autowired
 	private ClientLoginSuccessHandler clientLoginSuccessHandler;
@@ -36,9 +36,9 @@ public class OAuth2ResourcesServer extends ResourceServerConfigurerAdapter {
 
 	@Override
 	public void configure(HttpSecurity http) throws Exception {
-		http.authorizeRequests().requestMatchers(userProperties.getSecurity().getPermitSources()).permitAll()
-				.anyRequest().authenticated().and().formLogin().loginProcessingUrl("/user/login")
-				.usernameParameter("username").passwordParameter("password").successHandler(clientLoginSuccessHandler)
+		http.authorizeRequests().requestMatchers(dreamSecurityProperties.getPermitSources()).permitAll().anyRequest()
+				.authenticated().and().formLogin().loginProcessingUrl("/user/login").usernameParameter("username")
+				.passwordParameter("password").successHandler(clientLoginSuccessHandler)
 				.failureHandler(loginFailHandler).and().csrf().disable();
 	}
 }

@@ -4,7 +4,6 @@ import java.util.UUID;
 
 import org.springframework.security.oauth2.common.util.RandomValueStringGenerator;
 
-@SuppressWarnings("deprecation")
 public abstract class GuidGenerator {
 
 	private static RandomValueStringGenerator defaultClientSecretGenerator = new RandomValueStringGenerator(32);

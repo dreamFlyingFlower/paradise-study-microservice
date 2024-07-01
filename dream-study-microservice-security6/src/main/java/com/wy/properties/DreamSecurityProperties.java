@@ -29,8 +29,14 @@ public class DreamSecurityProperties {
 	 */
 	private String jwtSecurityKey = "";
 
+	private FilterProperties filter = new FilterProperties();
+
+	private SocialProperties social = new SocialProperties();
+
+	private MailProperties mail = new MailProperties();
+
 	/**
 	 * 验证码,短信等验证配置
 	 */
-	private VerifyProperties code = new VerifyProperties();
+	private VerifyProperties verify = new VerifyProperties();
 }

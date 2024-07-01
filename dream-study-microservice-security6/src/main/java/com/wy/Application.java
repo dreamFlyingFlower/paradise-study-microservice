@@ -18,6 +18,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.authorization.AuthenticatedAuthorizationManager;
 import org.springframework.security.authorization.AuthorityAuthorizationManager;
 import org.springframework.security.authorization.AuthorizationManager;
+import org.springframework.security.config.annotation.SecurityConfigurer;
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -60,7 +61,6 @@ import org.springframework.web.filter.DelegatingFilterProxy;
  * ->{@link SecurityFilterChain#getFilters()}:获得所有的拦截器
  * {@link CsrfFilter}:防止跨站点请求伪造攻击,这也是导致所有POST请求都失败的原因.基于Token验证的API服务可以选择关闭,而一般Web页面需要开启
  * {@link BasicAuthenticationFilter}:支持HTTP的标准Basic Auth的身份验证模块
- * {@link UsernamePasswordAuthenticationFilter}:支持Form表单形式的身份验证模块
  * {@link DefaultLoginPageGeneratingFilter}:用于自动生成登录页面
  * {@link DefaultLogoutPageGeneratingFilter}:用于自动生成注销页面
  * 
@@ -77,17 +77,17 @@ import org.springframework.web.filter.DelegatingFilterProxy;
  * {@link FormLoginConfigurer}:表单登录配置,注入了{@link UsernamePasswordAuthenticationFilter}
  * {@link FormLoginConfigurer#initDefaultLoginFilter}:默认表单配置,如果自定义了{@link FormLoginConfigurer#loginPage},初始化方法失效
  * 
- * {@link SecurityConfigurerAdapter}:自定义复杂Security
- * Filter配置,通过{@link HttpSecurity#apply}来配置注入.
+ * {@link SecurityConfigurer}:自定义复杂SecurityFilter配置,通过{@link HttpSecurity#apply}来配置注入,
+ * {@link SecurityConfigurerAdapter}:自定义复杂SecurityFilter配置,通过{@link HttpSecurity#with}来配置注入,
  * 参照FormLoginConfigurer,CsrfConfigurer等,在执行{@link HttpSecurity#build()}时,会调用这些配置类的configure(),
- * 根据用户的自定义配置,创建一个或者多个Security Filter,并将其注册到SecurityFilterChain
+ * 根据用户的自定义配置,创建一个或者多个SecurityFilter,并将其注册到SecurityFilterChain
  * 
  * {@link HttpSecurity#addFilter}:添加自定义的简单Security Filter
  * 
  * 登录认证流程,以用户名密码方式登录为例:
  * 
  * <pre>
- * {@link UsernamePasswordAuthenticationFilter}:请求进来后,该类会从请求中获取用户名密码,
+ * {@link UsernamePasswordAuthenticationFilter}:支持Form表单形式的身份验证模块,请求进来后,该类会从请求中获取用户名密码,
  * 		利用这些信息创建一个UsernamePasswordAuthenticationToken对象
  * {@link AuthenticationManager}:实际调用ProviderManager,负责对接受到的UsernamePasswordAuthenticationToken进行认证
  * {@link ProviderManager}:遍历所有的AuthenticationProvider,查找可处理UsernamePasswordAuthenticationToken的AuthenticationProvider进行认证,

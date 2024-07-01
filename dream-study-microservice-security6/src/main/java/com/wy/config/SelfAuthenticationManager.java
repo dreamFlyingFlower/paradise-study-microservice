@@ -1,4 +1,4 @@
-package com.wy.config.high;
+package com.wy.config;
 
 import org.springframework.security.authentication.ProviderManager;
 

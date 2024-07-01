@@ -6,7 +6,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 
 import com.wy.config.SocialConfig;
-import com.wy.social.qq.QqSocialConfigurer;
+import com.wy.social.qq.QqSocialSecurityConfigurer;
 
 /**
  * 在{@link SocialConfig#userSocialConfigurer()}中设置跳到的登录页面是Web页面才有的,APP需要另行设置,
@@ -34,7 +34,7 @@ public class SpringSocialConfigurerPostProcessor implements BeanPostProcessor {
 	@Override
 	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
 		if (Objects.equals(beanName, "userSocialConfigurer")) {
-			QqSocialConfigurer configure = (QqSocialConfigurer) bean;
+			QqSocialSecurityConfigurer configure = (QqSocialSecurityConfigurer) bean;
 			configure.signupUrl("/social/app/signUp");
 			return configure;
 		}

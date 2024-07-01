@@ -13,7 +13,7 @@ import com.wy.entity.PermissionVo;
 import com.wy.entity.Role;
 import com.wy.entity.User;
 import com.wy.enums.Permission;
-import com.wy.util.SecurityUtils;
+import com.wy.util.SecurityHelpers;
 
 import dream.flying.flower.collection.ListHelper;
 import dream.flying.flower.enums.TipEnum;
@@ -41,7 +41,7 @@ public class PermissionServices {
 		if (StrHelper.isBlank(param)) {
 			return null;
 		}
-		User loginUser = SecurityUtils.getLoginUser();
+		User loginUser = SecurityHelpers.getLoginUser();
 		if (Objects.isNull(loginUser) || CollectionUtils.isEmpty(loginUser.getRoles())) {
 			return null;
 		}
@@ -130,7 +130,7 @@ public class PermissionServices {
 		}
 		// 权限数组
 		String[] roleArray = roleAndPermissions[0].split(",");
-		User loginUser = SecurityUtils.getLoginUser();
+		User loginUser = SecurityHelpers.getLoginUser();
 		if (loginUser.getRoles().get(0).getRoleCode().equalsIgnoreCase(ConstSecurity.SUPER_ADMIN)) {
 			return true;
 		}

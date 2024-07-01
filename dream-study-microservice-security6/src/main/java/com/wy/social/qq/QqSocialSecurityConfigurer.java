@@ -10,11 +10,11 @@ import org.springframework.social.security.SpringSocialConfigurer;
  * @date 2019-09-26 09:41:35
  * @git {@link https://github.com/dreamFlyingFlower}
  */
-public class QqSocialConfigurer extends SpringSocialConfigurer {
+public class QqSocialSecurityConfigurer extends SpringSocialConfigurer {
 
 	private String filterProcessUrl;
 
-	public QqSocialConfigurer(String filterProcessUrl) {
+	public QqSocialSecurityConfigurer(String filterProcessUrl) {
 		this.filterProcessUrl = filterProcessUrl;
 	}
 

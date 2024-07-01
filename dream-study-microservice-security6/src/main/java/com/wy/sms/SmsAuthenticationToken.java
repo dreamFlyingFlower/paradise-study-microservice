@@ -1,4 +1,4 @@
-package com.wy.authentication.sms;
+package com.wy.sms;
 
 import java.util.Collection;
 

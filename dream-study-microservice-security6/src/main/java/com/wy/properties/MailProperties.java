@@ -4,13 +4,16 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * @apiNote 邮件配置
- * @author ParadiseWY
- * @date 2019年9月25日
+ * 邮件配置
+ *
+ * @author 飞花梦影
+ * @date 2019-09-25 23:35:30
+ * @git {@link https://github.com/dreamFlyingFlower}
  */
 @Getter
 @Setter
 public class MailProperties {
+
 	/**
 	 * 用户名
 	 */

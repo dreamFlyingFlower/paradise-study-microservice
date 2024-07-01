@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.ServletRequestUtils;
 import org.springframework.web.context.request.ServletWebRequest;
 
-import com.wy.properties.UserProperties;
+import com.wy.properties.DreamSecurityProperties;
 import com.wy.verify.VerifyGenerator;
 
 /**
@@ -25,14 +25,14 @@ import com.wy.verify.VerifyGenerator;
 public class ImageVerifyGenerator implements VerifyGenerator {
 
 	@Autowired
-	private UserProperties userProperties;
+	private DreamSecurityProperties dreamSecurityProperties;
 
 	@Override
 	public ImageVerifyEntity generateVerify(ServletWebRequest request) {
 		int width = ServletRequestUtils.getIntParameter(request.getRequest(), "width",
-				userProperties.getVerify().getImage().getWidth());
+				dreamSecurityProperties.getVerify().getImage().getWidth());
 		int height = ServletRequestUtils.getIntParameter(request.getRequest(), "height",
-				userProperties.getVerify().getImage().getHeight());
+				dreamSecurityProperties.getVerify().getImage().getHeight());
 		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		Graphics g = image.getGraphics();
 		Random random = new Random();
@@ -48,14 +48,14 @@ public class ImageVerifyGenerator implements VerifyGenerator {
 			g.drawLine(x, y, x + xl, y + yl);
 		}
 		String sRand = "";
-		for (int i = 0; i < userProperties.getVerify().getImage().getLength(); i++) {
+		for (int i = 0; i < dreamSecurityProperties.getVerify().getImage().getLength(); i++) {
 			String rand = String.valueOf(random.nextInt(10));
 			sRand += rand;
 			g.setColor(new Color(20 + random.nextInt(110), 20 + random.nextInt(110), 20 + random.nextInt(110)));
 			g.drawString(rand, 13 * i + 6, 16);
 		}
 		g.dispose();
-		return new ImageVerifyEntity(image, sRand, userProperties.getVerify().getImage().getExpireSeconds());
+		return new ImageVerifyEntity(image, sRand, dreamSecurityProperties.getVerify().getImage().getExpireSeconds());
 	}
 
 	/**

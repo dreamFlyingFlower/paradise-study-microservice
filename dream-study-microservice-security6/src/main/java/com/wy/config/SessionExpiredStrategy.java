@@ -4,13 +4,16 @@ import java.io.IOException;
 
 import org.springframework.security.web.session.SessionInformationExpiredEvent;
 import org.springframework.security.web.session.SessionInformationExpiredStrategy;
+import org.springframework.security.web.session.SimpleRedirectSessionInformationExpiredStrategy;
 
 import jakarta.servlet.ServletException;
 
 /**
- * @apiNote 定义session失效时的事件
- * @author ParadiseWY
- * @date 2019年9月27日
+ * 自定义定义session失效时的事件,参照{@link SimpleRedirectSessionInformationExpiredStrategy}
+ *
+ * @author 飞花梦影
+ * @date 2019-09-27 21:25:31
+ * @git {@link https://github.com/dreamFlyingFlower}
  */
 public class SessionExpiredStrategy implements SessionInformationExpiredStrategy {
 
