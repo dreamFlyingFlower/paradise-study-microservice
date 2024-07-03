@@ -2,20 +2,26 @@ package com.wy.config;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.function.Supplier;
 
-import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.access.SecurityConfig;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
+import org.springframework.security.authorization.AuthorizationDecision;
+import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.web.access.intercept.RequestMatcherDelegatingAuthorizationManager;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * 自定义鉴权管理器,根据URL资源权限和用户角色权限进行鉴权,用在登录时,不能应用于{@link PreAuthorize}等注解
+ * 
+ * 参照{@link RequestMatcherDelegatingAuthorizationManager}
  * 
  * @author 飞花梦影
  * @date 2021-01-21 10:50:54
@@ -23,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 // @Component
 @Slf4j
-public class DevelopAccessDecisionManager implements AccessDecisionManager {
+public class DevelopAccessDecisionManager implements AuthorizationManager<HttpServletRequest> {
 
 	/**
 	 * 权限鉴定
@@ -33,8 +39,9 @@ public class DevelopAccessDecisionManager implements AccessDecisionManager {
 	 * @param configAttributes from MetaDataSource.getAttributes(),已经被框架做了非空判断
 	 */
 	@Override
-	public void decide(Authentication authentication, Object object, Collection<ConfigAttribute> configAttributes)
-			throws AccessDeniedException, InsufficientAuthenticationException {
+	public AuthorizationDecision check(Supplier<HttpServletRequest> authentication, HttpServletRequest httpServletRequest) {
+		// TODO Auto-generated method stub
+
 		log.info("[资源权限]: {}", configAttributes);
 		log.info("[用户权限]: {}", authentication.getAuthorities());
 		Iterator<ConfigAttribute> it = configAttributes.iterator();
@@ -52,21 +59,7 @@ public class DevelopAccessDecisionManager implements AccessDecisionManager {
 			}
 		}
 		throw new AccessDeniedException("权限不足");
-	}
-
-	/**
-	 * 被AbstractSecurityInterceptor调用,遍历ConfigAttribute集合,筛选出不支持的attribute
-	 */
-	@Override
-	public boolean supports(ConfigAttribute attribute) {
-		return true;
-	}
-
-	/**
-	 * 被AbstractSecurityInterceptor调用,验证AccessDecisionManager是否支持这个安全对象的类型
-	 */
-	@Override
-	public boolean supports(Class<?> clazz) {
-		return true;
+	
+		return null;
 	}
 }

@@ -11,7 +11,6 @@ import org.springframework.security.oauth2.provider.client.JdbcClientDetailsServ
  * @date 2022-09-13 16:18:07
  * @git {@link https://github.com/dreamFlyingFlower }
  */
-@SuppressWarnings("deprecation")
 public class SelfJdbcClientDetailsService extends JdbcClientDetailsService {
 
 	private static final String SELECT_CLIENT_DETAILS_SQL =

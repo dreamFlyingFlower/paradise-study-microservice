@@ -38,7 +38,6 @@ import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenCo
  * @git {@link https://github.com/dreamFlyingFlower }
  */
 @Configuration
-@SuppressWarnings("deprecation")
 public class OAuth2Config {
 
 	/**
@@ -69,12 +68,12 @@ public class OAuth2Config {
 	// private OauthService oauthService;
 
 	@Bean
-	public PasswordEncoder passwordEncoder() {
+	PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
 
 	@Bean
-	public ClientDetailsService clientDetailsService(DataSource dataSource) {
+	ClientDetailsService clientDetailsService(DataSource dataSource) {
 		// 使用默认的数据库处理数据
 		JdbcClientDetailsService clientDetailsService = new JdbcClientDetailsService(dataSource);
 		clientDetailsService.setPasswordEncoder(passwordEncoder);
@@ -97,13 +96,13 @@ public class OAuth2Config {
 	 * @return AuthorizationCodeServices
 	 */
 	@Bean
-	public AuthorizationCodeServices authorizationCodeServices(DataSource dataSource) {
+	AuthorizationCodeServices authorizationCodeServices(DataSource dataSource) {
 		// return new InMemoryAuthorizationCodeServices();
 		return new JdbcAuthorizationCodeServices(dataSource);
 	}
 
 	@Bean
-	public UserApprovalHandler userApprovalHandler(DataSource dataSource) {
+	UserApprovalHandler userApprovalHandler(DataSource dataSource) {
 		ApprovalStoreUserApprovalHandler userApprovalHandler = new ApprovalStoreUserApprovalHandler();
 		userApprovalHandler.setApprovalStore(new JdbcApprovalStore(dataSource));
 		// 通过token统计结果
@@ -123,7 +122,7 @@ public class OAuth2Config {
 	}
 
 	@Bean
-	public TokenEnhancer tokenEnhancer() {
+	TokenEnhancer tokenEnhancer() {
 		return new TokenEnhancer() {
 
 			@Override
@@ -145,8 +144,7 @@ public class OAuth2Config {
 	 * @return AuthorizationServerTokenServices
 	 */
 	@Bean
-	public AuthorizationServerTokenServices
-			authorizationServerTokenServices(ClientDetailsService clientDetailsService) {
+	AuthorizationServerTokenServices authorizationServerTokenServices(ClientDetailsService clientDetailsService) {
 		DefaultTokenServices defaultTokenServices = new DefaultTokenServices();
 		defaultTokenServices.setClientDetailsService(clientDetailsService);
 		defaultTokenServices.setSupportRefreshToken(true);

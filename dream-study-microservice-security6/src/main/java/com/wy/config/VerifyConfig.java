@@ -20,19 +20,19 @@ public class VerifyConfig {
 
 	@Bean
 	@ConditionalOnMissingBean(name = "imageVerifyGenerator")
-	public VerifyGenerator imageVerifyGenerator() {
+	VerifyGenerator imageVerifyGenerator() {
 		return new ImageVerifyGenerator();
 	}
 
 	@Bean
 	@ConditionalOnMissingBean(name = "smsVerifyGenerator")
-	public VerifyGenerator smsVerifyGenerator() {
+	VerifyGenerator smsVerifyGenerator() {
 		return new SmsVerifyGenerator();
 	}
 
 	@Bean
 	@ConditionalOnMissingBean(DefaultSmsSend.class)
-	public SmsSend smsSend() {
+	SmsSend smsSend() {
 		return new DefaultSmsSend();
 	}
 }

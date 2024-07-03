@@ -29,8 +29,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 /**
- * 该类是第三方登录到授权服务器成功的自定义回调,和 LoginSuccessHandler 一样,只不过本类并不直接返回结果,
- * 而是在第三方登录成功之后自定义返回token
+ * 该类是第三方登录到授权服务器成功的自定义回调,和 LoginSuccessHandler 一样,只不过本类并不直接返回结果, 而是在第三方登录成功之后自定义返回token
  * 
  * {@link BasicAuthenticationFilter#doFilterInternal}:参照从中获取请求头信息的代码
  * ->{@link BasicAuthenticationConverter#convert}:获取请求头信息
@@ -39,7 +38,6 @@ import jakarta.servlet.http.HttpServletResponse;
  * @date 2019-09-29 16:55:39
  * @git {@link https://github.com/dreamFlyingFlower}
  */
-@SuppressWarnings("deprecation")
 public class ClientLoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
 
 	@Autowired

@@ -21,7 +21,6 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
  * @date 2022-06-17 17:43:08
  * @git {@link https://github.com/dreamFlyingFlower }
  */
-@SuppressWarnings("deprecation")
 public class OAuth2WebResponseExceptionTranslator implements WebResponseExceptionTranslator<OAuth2Exception> {
 
 	private ThrowableAnalyzer throwableAnalyzer = new DefaultThrowableAnalyzer();

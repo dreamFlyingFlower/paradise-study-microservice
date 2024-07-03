@@ -1,8 +1,10 @@
 package com.wy.config.sso;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
+import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
@@ -15,9 +17,8 @@ import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
  * @date 2021-07-01 12:04:23
  * @git {@link https://github.com/dreamFlyingFlower }
  */
-// @Configuration
-// @EnableAuthorizationServer
-@SuppressWarnings("deprecation")
+@Configuration
+@EnableAuthorizationServer
 public class SsoAuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
 
 	@Autowired

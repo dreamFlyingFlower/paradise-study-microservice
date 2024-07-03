@@ -11,7 +11,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
  * @date 2022-09-13 16:42:16
  * @git {@link https://github.com/dreamFlyingFlower }
  */
-@SuppressWarnings("deprecation")
 @JsonSerialize(using = RestOAuth2ExceptionSerializer.class)
 public class RestOAuth2Exception extends OAuth2Exception {
 

@@ -19,15 +19,14 @@ import com.wy.service.UserService;
 /**
  * 自定义登录的验证方法.可实现{@link AuthenticationProvider}或继承{@link AbstractUserDetailsAuthenticationProvider}
  * 
- * 若需要登录验证,则请求的url中必须携带验证参数verifyType,该参数的值必须和需要验证的参数key相同,
- * 如verifyType=image,则需要验证的值的key必须是image,如image=需要验证的值
+ * 若需要登录验证,则请求的url中必须携带验证参数verifyType,该参数的值必须和需要验证的参数key相同, 如verifyType=image,则需要验证的值的key必须是image,如image=需要验证的值
  *
  * @author 飞花梦影
  * @date 2022-05-18 23:49:28
  * @git {@link https://gitee.com/dreamFlyingFlower}
  */
 @Configuration
-public class UserAuthenticationProvider implements AuthenticationProvider {
+public class CustomizerAuthenticationProvider implements AuthenticationProvider {
 
 	@Autowired
 	private UserService userService;
@@ -55,10 +54,10 @@ public class UserAuthenticationProvider implements AuthenticationProvider {
 	}
 
 	/**
-	 * 返回true表示支持这个执行
+	 * 返回true表示支持相应的{@link Authentication}实现类
 	 */
 	@Override
 	public boolean supports(Class<?> authentication) {
-		return true;
+		return UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication);
 	}
 }

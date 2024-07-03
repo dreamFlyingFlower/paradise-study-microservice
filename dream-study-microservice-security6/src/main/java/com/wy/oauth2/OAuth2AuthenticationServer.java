@@ -76,7 +76,6 @@ import org.springframework.security.oauth2.provider.token.store.redis.RedisToken
  * @date 2019-09-26 22:42:52
  * @git {@link https://github.com/dreamFlyingFlower}
  */
-@SuppressWarnings("deprecation")
 @Configuration
 @EnableAuthorizationServer
 public class OAuth2AuthenticationServer extends AuthorizationServerConfigurerAdapter {
@@ -114,8 +113,7 @@ public class OAuth2AuthenticationServer extends AuthorizationServerConfigurerAda
 	private UserApprovalHandler userApprovalHandler;
 
 	/**
-	 * 客户端相关配置,如有那些客户端会访问服务器,认证服务器会给那些客户端发令牌等信息.
-	 * 重写该方法后,写在配置文件中的security.oauth2.client.client-id和client-secret都将无效
+	 * 客户端相关配置,如有那些客户端会访问服务器,认证服务器会给那些客户端发令牌等信息. 重写该方法后,写在配置文件中的security.oauth2.client.client-id和client-secret都将无效
 	 */
 	@Override
 	public void configure(ClientDetailsServiceConfigurer clients) throws Exception {

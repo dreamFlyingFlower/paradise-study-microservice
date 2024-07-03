@@ -44,11 +44,11 @@ import org.springframework.web.accept.HeaderContentNegotiationStrategy;
 
 import com.wy.filters.JwtAuthenticationFilter;
 import com.wy.filters.VerifyFilter;
+import com.wy.security.CustomizerAuthenticationProvider;
 import com.wy.security.LoginAuthEntryPoint;
 import com.wy.security.LoginFailureHandler;
 import com.wy.security.LoginSuccessHandler;
 import com.wy.security.LogoutSuccessHandler;
-import com.wy.security.UserAuthenticationProvider;
 import com.wy.service.UserService;
 import com.wy.sms.SmsSecurityConfigurer;
 import com.wy.social.qq.QqSocialSecurityConfigurer;
@@ -72,7 +72,7 @@ public class SecurityConfig {
 
 	private final UserService userService;
 
-	private final UserAuthenticationProvider provider;
+	private final CustomizerAuthenticationProvider customizerAuthenticationProvider;
 
 	private final DataSource dataSource;
 
@@ -108,30 +108,6 @@ public class SecurityConfig {
 	}
 
 	/**
-	 * 使用一种方式登录,和下面的无参方法不能同时存在
-	 * 
-	 * @return AuthenticationManager
-	 * @throws Exception
-	 */
-	@Bean
-	AuthenticationManager authenticationManager(HttpSecurity httpSecurity) throws Exception {
-		return httpSecurity.getSharedObject(AuthenticationManagerBuilder.class).userDetailsService(userService)
-				.passwordEncoder(passwordEncoder()).and().build();
-	}
-
-	/**
-	 * 使用数据库中的数据来判断登录是否成功,在登录请求时会自动拦截请求,并进入验证
-	 */
-	void configure(AuthenticationManagerBuilder auth) throws Exception {
-		auth.authenticationProvider(provider);
-
-		// 在内存中添加一些内置的用户,当其他微服务访问当前服务时,使用这些内置的用户即可
-		auth.inMemoryAuthentication().passwordEncoder(new BCryptPasswordEncoder()).withUser("test")
-				.password(new BCryptPasswordEncoder().encode("123456")).roles("USER").and().withUser("admin")
-				.password(new BCryptPasswordEncoder().encode("123456")).roles("USER", "ADMIN");
-	}
-
-	/**
 	 * 使用多种自定义方式登录
 	 * 
 	 * @return AuthenticationManager
@@ -141,6 +117,8 @@ public class SecurityConfig {
 		List<AuthenticationProvider> authenticationProviders = new ArrayList<>();
 		// 普通数据库登录方式
 		authenticationProviders.add(daoAuthenticationProvider());
+		// 添加自定义的provider,此处和daoAuthenticationProvider类似
+		authenticationProviders.add(customizerAuthenticationProvider);
 		// 可以添加更多方式的登录方式
 		// authenticationProviders.add(mobileAuthenticationProvider());
 		// authenticationProviders.add(weixinAuthenticationProvider());
@@ -198,9 +176,11 @@ public class SecurityConfig {
 	 */
 	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-		httpSecurity.authorizeHttpRequests((authz) -> authz.anyRequest().authenticated())
-				// 自定义认证处理器,默认为 ProviderManager
-				.authenticationManager(new SelfAuthenticationManager());
+		// 在内存中添加一些内置的用户,当其他微服务访问当前服务时,使用这些内置的用户即可
+		httpSecurity.getSharedObject(AuthenticationManagerBuilder.class).inMemoryAuthentication()
+				.passwordEncoder(new BCryptPasswordEncoder()).withUser("test")
+				.password(new BCryptPasswordEncoder().encode("123456")).roles("USER").and().withUser("admin")
+				.password(new BCryptPasswordEncoder().encode("123456")).roles("USER", "ADMIN");
 
 		// 自定义请求头
 		httpSecurity.headers(headers -> headers
