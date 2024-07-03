@@ -30,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 // @Component
 @Slf4j
-public class DevelopFilterSecurityMetadataSource implements FilterInvocationSecurityMetadataSource {
+public class CustomizerFilterSecurityMetadataSource implements FilterInvocationSecurityMetadataSource {
 
 	/** key是url+method,value是对应url资源的角色列表 */
 	private static Map<RequestMatcher, Collection<ConfigAttribute>> permissionMap;
@@ -38,7 +38,7 @@ public class DevelopFilterSecurityMetadataSource implements FilterInvocationSecu
 	/** 从数据库取出权限数据 */
 	private PermissionMapper permissionMapper;
 
-	DevelopFilterSecurityMetadataSource(PermissionMapper permissionMapper) {
+	CustomizerFilterSecurityMetadataSource(PermissionMapper permissionMapper) {
 		this.permissionMapper = permissionMapper;
 	}
 

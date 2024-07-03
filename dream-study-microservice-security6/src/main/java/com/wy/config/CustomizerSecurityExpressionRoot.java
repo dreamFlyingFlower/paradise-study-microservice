@@ -11,7 +11,7 @@ import org.springframework.security.core.Authentication;
  * @date 2021-01-21 10:31:06
  * @git {@link https://github.com/mygodness100}
  */
-public class ExtraSecurityExpressionRoot extends SecurityExpressionRoot implements MethodSecurityExpressionOperations {
+public class CustomizerSecurityExpressionRoot extends SecurityExpressionRoot implements MethodSecurityExpressionOperations {
 
 	private Object filterObject;
 
@@ -19,7 +19,7 @@ public class ExtraSecurityExpressionRoot extends SecurityExpressionRoot implemen
 
 	private Object target;
 
-	ExtraSecurityExpressionRoot(Authentication a) {
+	CustomizerSecurityExpressionRoot(Authentication a) {
 		super(a);
 	}
 

@@ -12,7 +12,7 @@ import org.springframework.security.core.Authentication;
  * @date 2021-01-21 10:33:33
  * @git {@link https://github.com/mygodness100}
  */
-public class ExtraMethodSecurityExpressionHandler extends DefaultMethodSecurityExpressionHandler {
+public class CustomizerMethodSecurityExpressionHandler extends DefaultMethodSecurityExpressionHandler {
 
 	/**
 	 * Creates the root object for expression evaluation.
@@ -20,7 +20,7 @@ public class ExtraMethodSecurityExpressionHandler extends DefaultMethodSecurityE
 	@Override
 	protected MethodSecurityExpressionOperations createSecurityExpressionRoot(Authentication authentication,
 			MethodInvocation invocation) {
-		ExtraSecurityExpressionRoot root = new ExtraSecurityExpressionRoot(authentication);
+		CustomizerSecurityExpressionRoot root = new CustomizerSecurityExpressionRoot(authentication);
 		root.setThis(invocation.getThis());
 		root.setPermissionEvaluator(getPermissionEvaluator());
 		root.setTrustResolver(getTrustResolver());

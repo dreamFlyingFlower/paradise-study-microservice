@@ -265,6 +265,9 @@ public class SecurityConfig {
 				// saml配置
 				.saml2Login(null);
 
+		// HttpBasic设置
+		httpSecurity.httpBasic(Customizer.withDefaults());
+
 		// 自定义权限,相当于打开了鉴权模块,它会注册AuthorizationFilter到SecurityFilterChain的最后
 		httpSecurity.authorizeHttpRequests(request -> request
 				// "/system"要求有ADD_USER的权限
@@ -289,12 +292,12 @@ public class SecurityConfig {
 				// 进行短信验证
 				.with(smsSecurityConfigurer, Customizer.withDefaults())
 				.with(qqSocialSecurityConfigurer, Customizer.withDefaults());
-
 		// .apply(new SmsAuthenticationSecurityConfig());
 		// 进行social验证
 		// .apply(qqSocialConfigurer)
+
 		// 认证用户时用户信息加载配置
-		// .userDetailsService(userService).build();
+		httpSecurity.userDetailsService(userService);
 		return httpSecurity.build();
 	}
 
@@ -346,14 +349,13 @@ public class SecurityConfig {
 		return web -> web.ignoring().requestMatchers("/js/**", "/css/**", "/images/**");
 	}
 
-	/**
-	 * LDAP相关配置,需要引入ldap相关jar
-	 * 
-	 * @return
-	 */
+	// /**
+	// * LDAP相关配置,需要引入ldap相关jar
+	// *
+	// * @return
+	// */
 	// @Bean
-	// public EmbeddedLdapServerContextSourceFactoryBean contextSourceFactoryBean()
-	// {
+	// EmbeddedLdapServerContextSourceFactoryBean contextSourceFactoryBean() {
 	// EmbeddedLdapServerContextSourceFactoryBean contextSourceFactoryBean =
 	// EmbeddedLdapServerContextSourceFactoryBean.fromEmbeddedLdapServer();
 	// contextSourceFactoryBean.setPort(0);
