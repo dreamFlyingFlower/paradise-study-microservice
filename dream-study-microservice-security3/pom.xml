@@ -5,13 +5,13 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>dream.flying.flower</groupId>
-		<artifactId>dream-parent17</artifactId>
+		<artifactId>dream-parent3</artifactId>
 		<version>0.0.1</version>
 		<relativePath />
 	</parent>
 
-	<artifactId>dream-study-microservice-security6</artifactId>
-	<name>dream-study-microservice-security6</name>
+	<artifactId>dream-study-microservice-security3</artifactId>
+	<name>dream-study-microservice-security3</name>
 	<description>study for spring cloud security6</description>
 
 	<properties>
@@ -21,7 +21,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>dream.flying.flower</groupId>
-			<artifactId>dream-framework-core17</artifactId>
+			<artifactId>dream-framework-core3</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

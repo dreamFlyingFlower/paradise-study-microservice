@@ -32,6 +32,7 @@
 		<module>dream-study-microservice-config-client</module>
 		<module>dream-study-microservice-feign</module>
 		<module>dream-study-microservice-gateway</module>
+		<module>dream-study-microservice-gateway3</module>
 		<module>dream-study-microservice-mq</module>
 		<module>dream-study-microservice-nacos</module>
 		<module>dream-study-microservice-oauth-client</module>
@@ -39,7 +40,7 @@
 		<module>dream-study-microservice-oauth-server</module>
 		<module>dream-study-microservice-ribbon</module>
 		<module>dream-study-microservice-security</module>
-		<module>dream-study-microservice-security6</module>
+		<module>dream-study-microservice-security3</module>
 		<module>dream-study-microservice-security-client</module>
 		<module>dream-study-microservice-security-resource</module>
 		<module>dream-study-microservice-server</module>

@@ -3,6 +3,7 @@ package com.wy.gray.instance;
 import org.springframework.cloud.loadbalancer.core.ServiceInstanceListSupplier;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * 替换默认服务实例筛选逻辑
@@ -11,6 +12,7 @@ import org.springframework.context.annotation.Bean;
  * @date 2024-05-29 16:57:18
  * @git {@link https://github.com/dreamFlyingFlower}
  */
+@Configuration
 public class VersionServiceInstanceListSupplierConfiguration {
 
 	@Bean
