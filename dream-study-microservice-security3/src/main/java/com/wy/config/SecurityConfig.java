@@ -17,6 +17,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.authorization.AuthorityAuthorizationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -124,6 +125,18 @@ public class SecurityConfig {
 		// authenticationProviders.add(weixinAuthenticationProvider());
 		ProviderManager providerManager = new ProviderManager(authenticationProviders);
 		return providerManager;
+	}
+
+	/**
+	 * 单一一种授权认证方式,与上面的只能使用一种
+	 * 
+	 * @param authConfig
+	 * @return
+	 * @throws Exception
+	 */
+	@Bean
+	AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+		return authConfig.getAuthenticationManager();
 	}
 
 	/**
