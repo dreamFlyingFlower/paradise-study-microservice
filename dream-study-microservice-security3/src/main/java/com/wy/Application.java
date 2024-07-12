@@ -56,17 +56,14 @@ import org.springframework.web.filter.DelegatingFilterProxy;
  * ->{@link WebSecurityConfiguration}:被引入,会初始化名为{@link AbstractSecurityWebApplicationInitializer#DEFAULT_FILTER_NAME}的bean
  * ->#HttpSecurityConfiguration:被引入,初始化{@link HttpSecurity}等相关bean
  * 
- * {@link SecurityFilterChain}:包含了一个Filter数组,可以使用多个拦截器
- * ->{@link SecurityFilterChain#matches}:规则匹配
+ * {@link SecurityFilterChain}:包含了一个Filter数组,可以使用多个拦截器 ->{@link SecurityFilterChain#matches}:规则匹配
  * ->{@link SecurityFilterChain#getFilters()}:获得所有的拦截器
  * {@link CsrfFilter}:防止跨站点请求伪造攻击,这也是导致所有POST请求都失败的原因.基于Token验证的API服务可以选择关闭,而一般Web页面需要开启
- * {@link BasicAuthenticationFilter}:支持HTTP的标准Basic Auth的身份验证模块
- * {@link DefaultLoginPageGeneratingFilter}:用于自动生成登录页面
+ * {@link BasicAuthenticationFilter}:支持HTTP的标准Basic Auth的身份验证模块 {@link DefaultLoginPageGeneratingFilter}:用于自动生成登录页面
  * {@link DefaultLogoutPageGeneratingFilter}:用于自动生成注销页面
  * 
  * {@link SecurityAutoConfiguration}:SpringSecurity自动注入
- * ->#SpringBootWebSecurityConfiguration:默认配置,引入了基本的Form表单和Basic认证方式
- * ->{@link SecurityDataConfiguration}:整合Spring Data
+ * ->#SpringBootWebSecurityConfiguration:默认配置,引入了基本的Form表单和Basic认证方式 ->{@link SecurityDataConfiguration}:整合Spring Data
  * {@link SecurityFilterAutoConfiguration}:SecurittyFilter自动注入类,
  * 会拿bean为{@link AbstractSecurityWebApplicationInitializer#DEFAULT_FILTER_NAME}的{@link DelegatingFilterProxyRegistrationBean}
  * {@link DelegatingFilterProxy#doFilter}:将Servlet中的Filter请求委托给Spring容器中的具体bean处理,实现Servlet和Spring的无缝连接
@@ -172,6 +169,12 @@ import org.springframework.web.filter.DelegatingFilterProxy;
  * {@link ExceptionTranslationFilter}:捕获并处理SpringSecurity异常
  * {@link AuthenticationEntryPoint#commence}:处理认证异常错误AuthenticationException及其子类
  * {@link AccessDeniedHandler#handle}:处理鉴权错误AccessDeniedException及其子类
+ * </pre>
+ * 
+ * SpringSecurity5废弃,SpringSecurity6可用的注解
+ * 
+ * <pre>
+ * {@link EnableOAuth2Sso}:5废弃,6可用,配置{@link SecurityFilterChain}时由{@link HttpSecurity}的oauth2Login参数指定
  * </pre>
  * 
  * @author 飞花梦影

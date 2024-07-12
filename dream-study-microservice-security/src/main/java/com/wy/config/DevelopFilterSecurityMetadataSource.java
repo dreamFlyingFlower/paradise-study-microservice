@@ -9,7 +9,6 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.access.SecurityConfig;
 import org.springframework.security.web.FilterInvocation;
@@ -40,7 +39,6 @@ public class DevelopFilterSecurityMetadataSource implements FilterInvocationSecu
 	/** 从数据库取出权限数据 */
 	private PermissionMapper permissionMapper;
 
-	@Autowired
 	DevelopFilterSecurityMetadataSource(PermissionMapper permissionMapper) {
 		this.permissionMapper = permissionMapper;
 	}

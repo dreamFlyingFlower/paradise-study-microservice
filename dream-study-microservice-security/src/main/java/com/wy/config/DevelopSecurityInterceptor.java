@@ -35,8 +35,8 @@ public class DevelopSecurityInterceptor extends AbstractSecurityInterceptor impl
 
 	private final DevelopAccessDecisionManager developAccessDecisionManager;
 
-	@Autowired
-	public DevelopSecurityInterceptor(DevelopFilterSecurityMetadataSource developFilterSecurityMetadataSource,
+	public DevelopSecurityInterceptor(
+			DevelopFilterSecurityMetadataSource developFilterSecurityMetadataSource,
 			DevelopAccessDecisionManager developAccessDecisionManager) {
 		this.developFilterSecurityMetadataSource = developFilterSecurityMetadataSource;
 		this.developAccessDecisionManager = developAccessDecisionManager;

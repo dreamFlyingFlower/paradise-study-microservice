@@ -354,6 +354,12 @@ import com.wy.crl.UserCrl;
  * CSRF攻击:跨站请求伪造,SpringSecurity会对所有post请求验证是否携带系统生成的csrf token信息,没有就报错
  * </pre>
  * 
+ * SpringSecurity5废弃与替代
+ * 
+ * <pre>
+ * {@link EnableOAuth2Sso}:废弃,配置{@link SecurityFilterChain}时由{@link HttpSecurity}的oauth2Login参数指定
+ * </pre>
+ * 
  * @author 飞花梦影
  * @date 2019-01-31 00:09:33
  * @git {@link https://github.com/dreamFlyingFlower}
@@ -361,7 +367,6 @@ import com.wy.crl.UserCrl;
 @SuppressWarnings("deprecation")
 @EnableRedisHttpSession
 @SpringBootApplication
-@EnableOAuth2Sso
 public class Application {
 
 	public static void main(String[] args) {

@@ -33,7 +33,7 @@ public class TokenStoreConfig {
 	 */
 	@Bean
 	@ConditionalOnProperty(prefix = "config.security.oauth2.token", name = "storeType", havingValue = "redis")
-	public TokenStore redisTokenStore() {
+	TokenStore redisTokenStore() {
 		return new RedisTokenStore(redisConnectionFactory);
 	}
 
@@ -45,7 +45,7 @@ public class TokenStoreConfig {
 	@Bean
 	@ConditionalOnProperty(prefix = "config.security.oauth2.token", name = "storeType", havingValue = "jwt",
 			matchIfMissing = true)
-	public TokenStore jwtTokenStore() {
+	TokenStore jwtTokenStore() {
 		return new JwtTokenStore(jwtAccessTokenConverter());
 	}
 
@@ -57,7 +57,7 @@ public class TokenStoreConfig {
 	@Bean
 	@ConditionalOnProperty(prefix = "config.security.oauth2.token", name = "storeType", havingValue = "jwt",
 			matchIfMissing = true)
-	public JwtAccessTokenConverter jwtAccessTokenConverter() {
+	JwtAccessTokenConverter jwtAccessTokenConverter() {
 		JwtAccessTokenConverter jwtAccessTokenConverter = new JwtAccessTokenConverter();
 		jwtAccessTokenConverter.setSigningKey("密钥,可配置");
 		return jwtAccessTokenConverter;
@@ -70,7 +70,7 @@ public class TokenStoreConfig {
 	 */
 	@Bean
 	@ConditionalOnMissingBean(name = "jwtTokenEnhancer")
-	public TokenEnhancer jwtTokenEnhancer() {
+	TokenEnhancer jwtTokenEnhancer() {
 		return new CustomizeTokenEnhancer();
 	}
 }

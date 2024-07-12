@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
 public class SessionInformationExpiredStrategyConfig {
 
 	@Bean
-	public SessionExpiredStrategy defaultSessionInformationExpiredStrategy() {
+	SessionExpiredStrategy defaultSessionInformationExpiredStrategy() {
 		return new SessionExpiredStrategy();
 	}
 }

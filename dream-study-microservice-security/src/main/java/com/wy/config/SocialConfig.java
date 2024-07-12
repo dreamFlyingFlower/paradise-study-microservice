@@ -181,7 +181,7 @@ public class SocialConfig extends SocialConfigurerAdapter {
 	 * 自定义security拦截的social登录,也不可以直接返回一个SpringSocialConfigurer
 	 */
 	@Bean
-	public SpringSocialConfigurer userSocialConfigurer() {
+	SpringSocialConfigurer userSocialConfigurer() {
 		QqSocialConfigurer configurer = new QqSocialConfigurer("filterUrl");
 		/**
 		 * 自定义注册页面,默认是/signin.在自定义上文的getUsersConnectionRepository方法中设置ConnectionSignUp的实现类即可
@@ -196,7 +196,7 @@ public class SocialConfig extends SocialConfigurerAdapter {
 	 * @param connectionFactoryLocator 连接
 	 */
 	@Bean
-	public ProviderSignInUtils providerSignInUtils(ConnectionFactoryLocator connectionFactoryLocator) {
+	ProviderSignInUtils providerSignInUtils(ConnectionFactoryLocator connectionFactoryLocator) {
 		return new ProviderSignInUtils(connectionFactoryLocator,
 				getUsersConnectionRepository(connectionFactoryLocator));
 	}
