@@ -1,14 +1,16 @@
 package com.wy.oauth2;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.token.RemoteTokenServices;
 
-import com.wy.handler.SelfAccessDeniedHandler;
-import com.wy.handler.SelfAuthenticationEntryHandler;
+import com.wy.handler.CustomizeAccessDeniedHandler;
+import com.wy.handler.CustomizeAuthenticationEntryHandler;
 import com.wy.properties.ConfigProperties;
 
 /**
@@ -22,21 +24,21 @@ import com.wy.properties.ConfigProperties;
  * @date 2021-07-02 16:26:41
  * @git {@link https://github.com/dreamFlyingFlower }
  */
-// @Configuration
-// @EnableResourceServer
+@Configuration
+@EnableResourceServer
 public class OAuth2ResourcesServer extends ResourceServerConfigurerAdapter {
 
 	@Autowired
 	private ConfigProperties config;
 
 	@Autowired
-	private SelfAccessDeniedHandler selfAccessDeniedHandler;
+	private CustomizeAccessDeniedHandler selfAccessDeniedHandler;
 
 	@Autowired
-	private SelfAuthenticationEntryHandler selfAuthenticationEntryHandler;
+	private CustomizeAuthenticationEntryHandler selfAuthenticationEntryHandler;
 
 	/**
-	 * 定义资源服务器向远程认证服务器服气请求,进行token校验等
+	 * 定义资源服务器向远程认证服务器请求,进行token校验等
 	 * 
 	 * @param security
 	 * @throws Exception
@@ -68,7 +70,7 @@ public class OAuth2ResourcesServer extends ResourceServerConfigurerAdapter {
 	 */
 	@Override
 	public void configure(HttpSecurity http) throws Exception {
-		http.authorizeRequests()
+		http.authorizeRequests(authorize -> authorize
 				// 白名单中的请求直接允许
 				.antMatchers(config.getSecurity().getPermitAllSources()).permitAll().antMatchers("/test/**").permitAll()
 				// 指定不同请求方式访问资源所需要的权限,一般查询是read,其余是write
@@ -82,22 +84,23 @@ public class OAuth2ResourcesServer extends ResourceServerConfigurerAdapter {
 				// 指定特殊请求权限
 				.antMatchers("/messages/**").access("#oauth2.hasScope('message.read')")
 				// 其他请求都需要进行认证
-				.anyRequest().authenticated()
+				.anyRequest().authenticated())
 				// 禁用session
-				.and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				// 指定请求头参数
-				.and().headers()
-				// 指定请求头
-				.addHeaderWriter((request, response) -> {
-					// 允许跨域
-					response.addHeader("Access-Control-Allow-Origin", "*");
-					// 如果是跨域的预检请求,则原封不动向下传达请求头信息
-					if (request.getMethod().equals("OPTIONS")) {
-						response.setHeader("Access-Control-Allow-Methods",
-								request.getHeader("AccessControl-Request-Method"));
-						response.setHeader("Access-Control-Allow-Headers",
-								request.getHeader("AccessControl-Request-Headers"));
-					}
-				}).and().csrf().disable();
+				.headers(header -> header
+						// 指定请求头
+						.addHeaderWriter((request, response) -> {
+							// 允许跨域
+							response.addHeader("Access-Control-Allow-Origin", "*");
+							// 如果是跨域的预检请求,则原封不动向下传达请求头信息
+							if (request.getMethod().equals("OPTIONS")) {
+								response.setHeader("Access-Control-Allow-Methods",
+										request.getHeader("AccessControl-Request-Method"));
+								response.setHeader("Access-Control-Allow-Headers",
+										request.getHeader("AccessControl-Request-Headers"));
+							}
+						}))
+				.csrf(csrf -> csrf.disable());
 	}
 }

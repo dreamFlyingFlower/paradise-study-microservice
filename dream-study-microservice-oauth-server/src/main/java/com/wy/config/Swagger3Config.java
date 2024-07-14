@@ -8,8 +8,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
 
-import com.wy.oauth.jdbc.config.SecurityJdbcConfig;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import springfox.documentation.builders.ApiInfoBuilder;
@@ -30,8 +28,6 @@ import springfox.documentation.spring.web.plugins.Docket;
 /**
  * 使用Swagger3自动生成文档,文档查看地址http://ip:port/swagger-ui/index.html
  * 
- * SpringSecurity+Swagger:需要过滤Swagger相关资源,见{@link SecurityJdbcConfig#configure(WebSecurity)},{@link SecurityJdbcConfig#configure(WebSecurity)}
- * 
  * @auther 飞花梦影
  * @date 2021-07-05 23:19:22
  * @git {@link https://github.com/dreamFlyingFlower}
@@ -42,20 +38,20 @@ import springfox.documentation.spring.web.plugins.Docket;
 public class Swagger3Config {
 
 	@Bean
-	public Docket createRestApi() {
+	Docket createRestApi() {
 		return new Docket(DocumentationType.OAS_30).apiInfo(apiInfo()).select()
-		        // 扫描指定包路径,只能写一个,不支持匹配正则
-		        .apis(RequestHandlerSelectors.basePackage("com.wy.crl"))
-		        // 扫描标识有指定注解的类
-		        .apis(RequestHandlerSelectors.withClassAnnotation(Api.class))
-		        // 扫描标识有指定注解的方法
-		        .apis(RequestHandlerSelectors.withMethodAnnotation(ApiOperation.class)).paths(PathSelectors.any())
-		        .build()
-		        // 忽略指定类
-		        .ignoredParameterTypes()
-		        // 为请求的header中自动添加参数
-		        .globalRequestParameters(authorizationParameter()).securityContexts(securityContext())
-		        .securitySchemes(securitySchemes());
+				// 扫描指定包路径,只能写一个,不支持匹配正则
+				.apis(RequestHandlerSelectors.basePackage("com.wy.controller"))
+				// 扫描标识有指定注解的类
+				.apis(RequestHandlerSelectors.withClassAnnotation(Api.class))
+				// 扫描标识有指定注解的方法
+				.apis(RequestHandlerSelectors.withMethodAnnotation(ApiOperation.class)).paths(PathSelectors.any())
+				.build()
+				// 忽略指定类
+				.ignoredParameterTypes()
+				// 为请求的header中自动添加参数
+				.globalRequestParameters(authorizationParameter()).securityContexts(securityContext())
+				.securitySchemes(securitySchemes());
 	}
 
 	private ApiInfo apiInfo() {
@@ -65,7 +61,7 @@ public class Swagger3Config {
 	private List<RequestParameter> authorizationParameter() {
 		RequestParameterBuilder builder = new RequestParameterBuilder();
 		builder.name("Authorization").description("JWT").required(false).in("header")
-		        .accepts(Collections.singleton(MediaType.APPLICATION_JSON)).build();
+				.accepts(Collections.singleton(MediaType.APPLICATION_JSON)).build();
 		return Collections.singletonList(builder.build());
 	}
 

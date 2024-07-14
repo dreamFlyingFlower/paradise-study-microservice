@@ -13,7 +13,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.WebRequest;
 
 import com.wy.common.AuthException;
-import com.wy.lang.StrHelper;
+
+import dream.flying.flower.lang.StrHelper;
 
 /**
  * 系统默认第三方登录成功后使用{@link ProviderSignInUtils}从session中获取用户信息,但是手机登录是没有session的,要重写

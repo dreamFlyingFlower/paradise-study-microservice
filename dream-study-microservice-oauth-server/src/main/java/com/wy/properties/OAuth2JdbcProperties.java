@@ -16,7 +16,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Configuration
-@ConfigurationProperties("config.oauth2.jdbc")
+@ConfigurationProperties("dream.oauth.server.jdbc")
 public class OAuth2JdbcProperties {
 
 	/** 第三方游客登录本系统的clientId */

@@ -12,7 +12,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.wy.result.Result;
+
+import dream.flying.flower.result.Result;
 
 /**
  * 安全登录成功的处理

@@ -1,21 +1,17 @@
 package com.wy.handler;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.wy.enums.TipEnum;
-import com.wy.result.Result;
-
+import dream.flying.flower.enums.TipEnum;
+import dream.flying.flower.framework.web.helper.WebHelpers;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -27,18 +23,13 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Component
 @Slf4j
-public class SelfAccessDeniedHandler implements AccessDeniedHandler {
-
-	@Autowired
-	private ObjectMapper objectMapper;
+public class CustomizeAccessDeniedHandler implements AccessDeniedHandler {
 
 	@Override
 	public void handle(HttpServletRequest request, HttpServletResponse response,
 			AccessDeniedException accessDeniedException) throws IOException, ServletException {
-		response.setContentType("application/json;charset=UTF-8");
+		log.info("CustomizeAccessDeniedHandler 用户无权访问 [{}]", accessDeniedException.getMessage());
 		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-		PrintWriter writer = response.getWriter();
-		log.info("MyAccessDeniedHandler 用户无权访问 [{}]", accessDeniedException.getMessage());
-		objectMapper.writeValue(writer, Result.error(TipEnum.TIP_AUTH_DENIED));
+		WebHelpers.writeError(response, TipEnum.TIP_AUTH_DENIED);
 	}
 }

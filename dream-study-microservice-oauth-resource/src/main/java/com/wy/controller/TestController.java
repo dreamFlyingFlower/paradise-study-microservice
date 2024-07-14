@@ -1,11 +1,11 @@
-package com.wy.crl;
+package com.wy.controller;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.wy.result.Result;
+import dream.flying.flower.result.Result;
 
 /**
  * 测试API
@@ -16,7 +16,7 @@ import com.wy.result.Result;
  */
 @RestController
 @RequestMapping("test")
-public class TestCrl {
+public class TestController {
 
 	@GetMapping("test1")
 	public Result<?> test1(Authentication authentication) {

@@ -12,7 +12,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
 
 import com.alibaba.fastjson2.JSON;
-import com.wy.result.Result;
+
+import dream.flying.flower.result.Result;
 
 /**
  * 登出

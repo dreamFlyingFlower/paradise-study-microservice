@@ -28,9 +28,9 @@ public class OAuth2ClientConfig {
 	 * 
 	 * @return 授权码模式资源配置详情对象
 	 */
-	@ConfigurationProperties(prefix = "config.oauth2-client-code")
+	@ConfigurationProperties("config.oauth2-client-code")
 	@Bean
-	public OAuth2ProtectedResourceDetails authorizationCodeResourceDetails() {
+	OAuth2ProtectedResourceDetails authorizationCodeResourceDetails() {
 		return new AuthorizationCodeResourceDetails();
 	}
 
@@ -39,9 +39,9 @@ public class OAuth2ClientConfig {
 	 * 
 	 * @return 客户端模式资源配置详情对象
 	 */
-	@ConfigurationProperties(prefix = "config.oauth2-client-credentials")
+	@ConfigurationProperties("config.oauth2-client-credentials")
 	@Bean
-	public OAuth2ProtectedResourceDetails clientCredentialsResourceDetails() {
+	OAuth2ProtectedResourceDetails clientCredentialsResourceDetails() {
 		return new ClientCredentialsResourceDetails();
 	}
 
@@ -50,9 +50,9 @@ public class OAuth2ClientConfig {
 	 * 
 	 * @return 用户名密码模式资源配置详情对象
 	 */
-	@ConfigurationProperties(prefix = "config.oauth2-client-password")
+	@ConfigurationProperties("config.oauth2-client-password")
 	@Bean
-	public OAuth2ProtectedResourceDetails resourceOwnerPasswordResourceDetails() {
+	OAuth2ProtectedResourceDetails resourceOwnerPasswordResourceDetails() {
 		return new ResourceOwnerPasswordResourceDetails();
 	}
 
@@ -64,7 +64,7 @@ public class OAuth2ClientConfig {
 	 * @return OAuth2RestTemplate
 	 */
 	@Bean
-	public OAuth2RestTemplate oauth2ClientCodeRestTemplate(
+	OAuth2RestTemplate oauth2ClientCodeRestTemplate(
 			@Qualifier("authorizationCodeResourceDetails") OAuth2ProtectedResourceDetails resourceDetails,
 			OAuth2ClientContext oauth2ClientContext) {
 		return new OAuth2RestTemplate(resourceDetails, oauth2ClientContext);
@@ -77,7 +77,7 @@ public class OAuth2ClientConfig {
 	 * @return OAuth2RestTemplate
 	 */
 	@Bean
-	public OAuth2RestTemplate oauth2ClientCredsRestTemplate(
+	OAuth2RestTemplate oauth2ClientCredsRestTemplate(
 			@Qualifier("clientCredentialsResourceDetails") OAuth2ProtectedResourceDetails resourceDetails) {
 		return new OAuth2RestTemplate(resourceDetails);
 	}
@@ -89,7 +89,7 @@ public class OAuth2ClientConfig {
 	 * @return OAuth2RestTemplate
 	 */
 	@Bean
-	public OAuth2RestTemplate oauth2ClientPasswordRestTemplate(
+	OAuth2RestTemplate oauth2ClientPasswordRestTemplate(
 			@Qualifier("resourceOwnerPasswordResourceDetails") OAuth2ProtectedResourceDetails resourceDetails) {
 		return new OAuth2RestTemplate(resourceDetails);
 	}

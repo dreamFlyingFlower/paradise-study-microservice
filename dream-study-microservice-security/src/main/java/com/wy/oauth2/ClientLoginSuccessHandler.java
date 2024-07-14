@@ -26,7 +26,8 @@ import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wy.common.AuthException;
-import com.wy.lang.StrHelper;
+
+import dream.flying.flower.lang.StrHelper;
 
 /**
  * 该类是第三方登录到授权服务器成功的自定义回调,和 LoginSuccessHandler 一样,只不过本类并不直接返回结果,

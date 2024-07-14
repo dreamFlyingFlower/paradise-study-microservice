@@ -26,7 +26,8 @@ import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wy.exception.AuthException;
-import com.wy.lang.StrTool;
+
+import dream.flying.flower.lang.StrHelper;
 
 /**
  * 该类是第三方登录到授权服务器成功的自定义回调,和 LoginSuccessHandler 一样,只不过本类并不直接返回结果,
@@ -92,7 +93,7 @@ public class ClientLoginSuccessHandler extends SavedRequestAwareAuthenticationSu
 		if (null == clientDetails) {
 			throw new BadCredentialsException("Invalid basic authentication token");
 		}
-		if (!StrTool.equalsIgnoreCase(clientDetails.getClientSecret(), password)) {
+		if (!StrHelper.equalsIgnoreCase(clientDetails.getClientSecret(), password)) {
 			throw new BadCredentialsException("clientId and clientSecret do not match");
 		}
 

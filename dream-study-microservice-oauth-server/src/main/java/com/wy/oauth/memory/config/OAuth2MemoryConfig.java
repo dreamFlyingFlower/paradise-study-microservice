@@ -1,6 +1,7 @@
 package com.wy.oauth.memory.config;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.provider.code.AuthorizationCodeServices;
 import org.springframework.security.oauth2.provider.code.InMemoryAuthorizationCodeServices;
 import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
@@ -14,14 +15,14 @@ import org.springframework.security.oauth2.provider.token.store.InMemoryTokenSto
  * @date 2021-07-02 16:51:40
  * @git {@link https://github.com/dreamFlyingFlower }
  */
-// @Configuration
+@Configuration
 public class OAuth2MemoryConfig {
 
 	/**
 	 * 将授权码存储在内存
 	 */
 	@Bean
-	public AuthorizationCodeServices memoryAuthorizationCodeServices() {
+	AuthorizationCodeServices memoryAuthorizationCodeServices() {
 		// 使用内存方式存储授权码
 		return new InMemoryAuthorizationCodeServices();
 	}
@@ -30,7 +31,7 @@ public class OAuth2MemoryConfig {
 	 * 令牌服务
 	 */
 	@Bean
-	public AuthorizationServerTokenServices memoryAuthorizationServerTokenServices() {
+	AuthorizationServerTokenServices memoryAuthorizationServerTokenServices() {
 		// 使用默认的token服务
 		DefaultTokenServices service = new DefaultTokenServices();
 		// 是否刷新令牌

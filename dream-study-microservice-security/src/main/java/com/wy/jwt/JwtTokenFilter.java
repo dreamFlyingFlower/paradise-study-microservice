@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.wy.collection.ListHelper;
+import dream.flying.flower.collection.ListHelper;
 
 /**
  * token过滤器,验证token有效性

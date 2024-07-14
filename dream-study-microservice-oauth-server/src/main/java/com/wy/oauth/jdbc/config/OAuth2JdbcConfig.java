@@ -72,7 +72,7 @@ public class OAuth2JdbcConfig {
 	 * @return TokenStore
 	 */
 	@Bean
-	public TokenStore tokenStore() {
+	TokenStore tokenStore() {
 		return new JwtTokenStore(jwtAccessTokenConverter());
 	}
 
@@ -82,7 +82,7 @@ public class OAuth2JdbcConfig {
 	 * @return JdbcClientDetailsService
 	 */
 	@Bean
-	public JdbcClientDetailsService jdbcClientDetailsService() {
+	JdbcClientDetailsService jdbcClientDetailsService() {
 		return new JdbcClientDetailsService(dataSource);
 	}
 
@@ -91,7 +91,7 @@ public class OAuth2JdbcConfig {
 	 */
 	@Bean
 	@Primary
-	public AuthorizationServerTokenServices authorizationServerTokenServices() {
+	AuthorizationServerTokenServices authorizationServerTokenServices() {
 		DefaultTokenServices service = new DefaultTokenServices();
 		// 客户端信息服务
 		service.setClientDetailsService(jdbcClientDetailsService());
@@ -121,7 +121,7 @@ public class OAuth2JdbcConfig {
 	@Bean
 	// @ConditionalOnProperty(prefix = "config.oauth2", name = "storeType",
 	// havingValue = "jwt", matchIfMissing = true)
-	public JwtAccessTokenConverter jwtAccessTokenConverter() {
+	JwtAccessTokenConverter jwtAccessTokenConverter() {
 		// 生成JWT令牌
 		// 第一种方式
 		// JwtAccessTokenConverter jwtAccessTokenConverter = new
@@ -192,7 +192,7 @@ public class OAuth2JdbcConfig {
 	 * @return ApprovalStore
 	 */
 	@Bean
-	public ApprovalStore jdbcApprovalStore() {
+	ApprovalStore jdbcApprovalStore() {
 		return new JdbcApprovalStore(dataSource);
 	}
 
@@ -202,7 +202,7 @@ public class OAuth2JdbcConfig {
 	 * @return AuthorizationCodeServices
 	 */
 	@Bean
-	public AuthorizationCodeServices authorizationCodeServices() {
+	AuthorizationCodeServices authorizationCodeServices() {
 		// 设置授权码模式的授权码存取在数据库中
 		return new JdbcAuthorizationCodeServices(dataSource);
 	}
@@ -213,19 +213,18 @@ public class OAuth2JdbcConfig {
 	 * @return JWK令牌
 	 */
 	@Bean
-	public JWKSet jwkSet() {
+	JWKSet jwkSet() {
 		RSAKey.Builder builder = new RSAKey.Builder(JwtUtil.getVerifierKey()).keyUse(KeyUse.SIGNATURE)
 				.algorithm(JWSAlgorithm.RS256).keyID(JwtUtil.VERIFIER_KEY_ID);
 		return new JWKSet(builder.build());
 	}
 
 	@Bean
-	public UserApprovalHandler userApprovalHandler() {
+	UserApprovalHandler userApprovalHandler() {
 		ApprovalStoreUserApprovalHandler userApprovalHandler = new ApprovalStoreUserApprovalHandler();
 		userApprovalHandler.setApprovalStore(jdbcApprovalStore());
 		userApprovalHandler.setClientDetailsService(jdbcClientDetailsService());
 		userApprovalHandler.setRequestFactory(new DefaultOAuth2RequestFactory(jdbcClientDetailsService()));
 		return userApprovalHandler;
 	}
-
 }

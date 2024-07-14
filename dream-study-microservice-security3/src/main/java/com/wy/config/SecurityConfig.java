@@ -128,6 +128,26 @@ public class SecurityConfig {
 	}
 
 	/**
+	 * 使用数据库中的数据来判断登录是否成功,在登录请求时会自动拦截请求,并进入验证
+	 * 
+	 * guest:Bcrpt加密->$2a$10$dXULkWNhddYNVH9yQkzwQeJinGE0e22iL4CSEdkm7sRPwa.A27iEi
+	 * 123456:Bcrpt加密->$2a$10$lg5hcqs13V3c6FVjr1/mjO31clz7fkjlIKnppDhNDdxJVaWxh/xB6
+	 * password:Bcrpt加密->$2a$10$owjsydvplVmh0wI6f.xOM.4TKBc/CoKYTvX.HmnS6Yeu7qlyukAPO
+	 */
+	@Bean
+	AuthenticationManager configure(AuthenticationManagerBuilder auth) throws Exception {
+		// 普通数据库登录方式
+		auth.authenticationProvider(daoAuthenticationProvider());
+		// 添加自定义的provider,此处和daoAuthenticationProvider类似
+		auth.authenticationProvider(customizerAuthenticationProvider);
+		// 可以添加更多方式的登录方式
+		// auth.add(mobileAuthenticationProvider());
+		// auth.add(weixinAuthenticationProvider());
+		// auth.userDetailsService(userService).passwordEncoder(passwordEncoder);
+		return auth.build();
+	}
+
+	/**
 	 * 单一一种授权认证方式,与上面的只能使用一种
 	 * 
 	 * @param authConfig
@@ -271,12 +291,19 @@ public class SecurityConfig {
 				// 自定义权限错误处理器
 				.accessDeniedHandler(new AccessDeniedHandlerImpl()));
 
-		// 自定义oauth2和saml配置
+		// 自定义oauth2
 		httpSecurity
-				// oauth2配置
-				.oauth2Login(null)
-				// saml配置
-				.saml2Login(null);
+				// 配置OAuth2 Client和OAuth2 Server交互,启用SSO
+				.oauth2Login(oauth2 -> oauth2
+						// 登录地址
+						.loginPage(null)
+						// 用户端点,自定义service
+						.userInfoEndpoint(userInfo -> userInfo.userService(null))
+						// 自定义登录成功方法
+						.successHandler(null));
+
+		// 自定义saml配置
+		httpSecurity.saml2Login(null);
 
 		// HttpBasic设置
 		httpSecurity.httpBasic(Customizer.withDefaults());

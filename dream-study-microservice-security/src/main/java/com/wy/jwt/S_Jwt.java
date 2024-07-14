@@ -8,7 +8,8 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator.Builder;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.wy.util.DateHelper;
+
+import dream.flying.flower.helper.DateHelper;
 
 /**
  * JWT鉴权,由3部分构成:头部信息(header).用户非隐私数据(payload).签名(signature),3部分中间用点(.)分割

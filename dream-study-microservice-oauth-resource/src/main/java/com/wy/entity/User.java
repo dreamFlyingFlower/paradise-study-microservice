@@ -1,4 +1,4 @@
-package com.wy.model;
+package com.wy.entity;
 
 /**
  * 用户实体类

@@ -1,6 +1,5 @@
 package com.wy.oauth.memory;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,9 +12,9 @@ import org.springframework.security.oauth2.provider.code.AuthorizationCodeServic
 import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 
-import com.wy.oauth.OAuth2Config;
-import com.wy.oauth.memory.config.SecurityMemoryConfig;
 import com.wy.properties.OAuth2MemoryProperties;
+
+import lombok.AllArgsConstructor;
 
 /**
  * 内存模式用户名密码认证服务器
@@ -74,32 +73,21 @@ import com.wy.properties.OAuth2MemoryProperties;
  */
 // @Configuration
 // @EnableAuthorizationServer
+@AllArgsConstructor
 public class MemoryAuthorizationServer extends AuthorizationServerConfigurerAdapter {
 
-	/**
-	 * 不同的版本可能不一样,高版本一般不要.在{@link SecurityMemoryConfig#authenticationManagerBean}中设置
-	 */
-	@Autowired
-	private AuthenticationManager authenticationManager;
+	private final AuthenticationManager authenticationManager;
 
-	@Autowired
-	private OAuth2MemoryProperties oAuth2MemoryProperties;
+	private final OAuth2MemoryProperties oauth2MemoryProperties;
 
-	/**
-	 * 在 {@link OAuth2Config#passwordEncoder}中设置
-	 */
-	@Autowired
-	private PasswordEncoder passwordEncoder;
+	private final PasswordEncoder passwordEncoder;
 
-	@Autowired
-	private AuthorizationCodeServices memoryAuthorizationCodeServices;
+	private final AuthorizationCodeServices memoryAuthorizationCodeServices;
 
-	@Autowired
-	private TokenStore tokenStore;
+	private final TokenStore tokenStore;
 
-	@Autowired
 	@Qualifier("memoryAuthorizationServerTokenServices")
-	private AuthorizationServerTokenServices memoryAuthorizationServerTokenServices;
+	private final AuthorizationServerTokenServices memoryAuthorizationServerTokenServices;
 
 	/**
 	 * 实际生产应该从数据库查询加载到内存中,内存中没有再从数据库查询,数据据没有则说明没有注册
@@ -113,16 +101,16 @@ public class MemoryAuthorizationServer extends AuthorizationServerConfigurerAdap
 		// 从内存中读取配置
 		clients.inMemory()
 				// client的id和密码
-				.withClient(oAuth2MemoryProperties.getClientIdGuest())
-				.secret(passwordEncoder.encode(oAuth2MemoryProperties.getClientSecretGuest()))
+				.withClient(oauth2MemoryProperties.getClientIdGuest())
+				.secret(passwordEncoder.encode(oauth2MemoryProperties.getClientSecretGuest()))
 				// token有效期
 				.accessTokenValiditySeconds(100)
 				// 该client可访问的资源服务器ID,每个资源服务器都可以自定义,可不写
 				.resourceIds("oauth-resource")
 				// 认证模式
-				.authorizedGrantTypes(oAuth2MemoryProperties.getGrantTypes())
+				.authorizedGrantTypes(oauth2MemoryProperties.getGrantTypes())
 				// 授权的范围,每个resource会设置自己的范围
-				.scopes(oAuth2MemoryProperties.getScopes());
+				.scopes(oauth2MemoryProperties.getScopes());
 	}
 
 	/**

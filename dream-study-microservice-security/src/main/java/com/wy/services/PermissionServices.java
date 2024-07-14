@@ -7,16 +7,17 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import com.wy.collection.ListHelper;
 import com.wy.common.AuthException;
 import com.wy.common.Constants;
 import com.wy.entity.PermissionVo;
 import com.wy.entity.Role;
 import com.wy.entity.User;
 import com.wy.enums.Permission;
-import com.wy.enums.TipEnum;
-import com.wy.lang.StrHelper;
 import com.wy.util.SecurityUtils;
+
+import dream.flying.flower.collection.ListHelper;
+import dream.flying.flower.enums.TipEnum;
+import dream.flying.flower.lang.StrHelper;
 
 /**
  * 利用{@link PreAuthorize}的SpringEl表达式自定义权限实现

@@ -16,7 +16,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Configuration
-@ConfigurationProperties("config.oauth2.memory")
+@ConfigurationProperties("dream.oauth.server.memory")
 public class OAuth2MemoryProperties {
 
 	/** 第三方游客登录本系统的clientId */

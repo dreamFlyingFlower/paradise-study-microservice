@@ -22,6 +22,7 @@ import com.wy.util.JwtUtil;
  * @date 2021-07-02 16:51:40
  * @git {@link https://github.com/dreamFlyingFlower }
  */
+@Deprecated
 @Configuration
 public class OAuth2Config {
 
@@ -47,7 +48,7 @@ public class OAuth2Config {
 	 * @return TokenStore
 	 */
 	@Bean
-	public TokenStore tokenStore() {
+	TokenStore tokenStore() {
 		JwtTokenStore jwtTokenStore = new JwtTokenStore(jwtAccessTokenConverter());
 		// 使用内存存储令牌
 		// jwtTokenStore.setApprovalStore(inMemoryApprovalStore());
@@ -62,7 +63,7 @@ public class OAuth2Config {
 	@Bean
 	// @ConditionalOnProperty(prefix = "config.oauth2", name = "storeType",
 	// havingValue = "jwt", matchIfMissing = true)
-	public JwtAccessTokenConverter jwtAccessTokenConverter() {
+	JwtAccessTokenConverter jwtAccessTokenConverter() {
 		// 生成JWT令牌
 		// 第一种方式
 		// JwtAccessTokenConverter jwtAccessTokenConverter = new
@@ -133,7 +134,7 @@ public class OAuth2Config {
 	 * @return JWK令牌
 	 */
 	@Bean
-	public JWKSet jwkSet() {
+	JWKSet jwkSet() {
 		RSAKey.Builder builder = new RSAKey.Builder(JwtUtil.getVerifierKey()).keyUse(KeyUse.SIGNATURE)
 				.algorithm(JWSAlgorithm.RS256).keyID(JwtUtil.VERIFIER_KEY_ID);
 		return new JWKSet(builder.build());

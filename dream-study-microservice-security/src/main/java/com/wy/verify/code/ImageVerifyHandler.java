@@ -7,9 +7,10 @@ import javax.imageio.ImageIO;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.ServletWebRequest;
 
-import com.wy.result.ResultException;
 import com.wy.verify.AbstractVerify;
 import com.wy.verify.VerifyEntity;
+
+import dream.flying.flower.result.ResultException;
 
 /**
  * 图片验证码处理,直接写到相应中即可

@@ -1,6 +1,7 @@
 package com.wy.oauth.memory.config;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.jwt.crypto.sign.MacSigner;
 import org.springframework.security.oauth2.provider.code.AuthorizationCodeServices;
 import org.springframework.security.oauth2.provider.code.InMemoryAuthorizationCodeServices;
@@ -17,7 +18,7 @@ import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
  * @date 2021-07-02 16:51:40
  * @git {@link https://github.com/dreamFlyingFlower }
  */
-// @Configuration
+@Configuration
 public class OAuth2JwtConfig {
 
 	/**
@@ -26,7 +27,7 @@ public class OAuth2JwtConfig {
 	 * @return AuthorizationCodeServices
 	 */
 	@Bean
-	public AuthorizationCodeServices memoryAuthorizationCodeServices() {
+	AuthorizationCodeServices memoryAuthorizationCodeServices() {
 		// 使用内存方式存储授权码
 		return new InMemoryAuthorizationCodeServices();
 	}
@@ -37,7 +38,7 @@ public class OAuth2JwtConfig {
 	 * @return AuthorizationServerTokenServices
 	 */
 	@Bean
-	public AuthorizationServerTokenServices memoryAuthorizationServerTokenServices() {
+	AuthorizationServerTokenServices memoryAuthorizationServerTokenServices() {
 		// 使用默认的token服务
 		DefaultTokenServices service = new DefaultTokenServices();
 		// 是否刷新令牌
@@ -60,7 +61,7 @@ public class OAuth2JwtConfig {
 	 * @return TokenStore
 	 */
 	@Bean
-	public TokenStore tokenStore() {
+	TokenStore tokenStore() {
 		return new JwtTokenStore(jwtAccessTokenConverter());
 	}
 
@@ -72,7 +73,7 @@ public class OAuth2JwtConfig {
 	@Bean
 	// @ConditionalOnProperty(prefix = "config.oauth2", name = "storeType",
 	// havingValue = "jwt", matchIfMissing = true)
-	public JwtAccessTokenConverter jwtAccessTokenConverter() {
+	JwtAccessTokenConverter jwtAccessTokenConverter() {
 		// 生成JWT令牌
 		// 第一种方式
 		// JwtAccessTokenConverter jwtAccessTokenConverter = new

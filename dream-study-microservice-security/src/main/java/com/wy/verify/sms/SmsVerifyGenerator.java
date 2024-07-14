@@ -4,9 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.request.ServletWebRequest;
 
 import com.wy.properties.UserProperties;
-import com.wy.util.RandomHelper;
 import com.wy.verify.VerifyEntity;
 import com.wy.verify.VerifyGenerator;
+
+import dream.flying.flower.helper.RandomHelper;
 
 /**
  * @apiNote 短信验证

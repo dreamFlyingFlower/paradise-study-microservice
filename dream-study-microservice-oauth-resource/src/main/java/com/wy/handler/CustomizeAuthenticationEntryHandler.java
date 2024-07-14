@@ -3,22 +3,19 @@ package com.wy.handler;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.common.exceptions.InvalidTokenException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.wy.enums.TipEnum;
 import com.wy.exception.AuthException;
-import com.wy.result.Result;
 
+import dream.flying.flower.enums.TipEnum;
+import dream.flying.flower.framework.web.helper.WebHelpers;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -30,24 +27,19 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Component
 @Slf4j
-public class SelfAuthenticationEntryHandler implements AuthenticationEntryPoint {
-
-	@Autowired
-	private ObjectMapper objectMapper;
+public class CustomizeAuthenticationEntryHandler implements AuthenticationEntryPoint {
 
 	@Override
 	public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException e)
 			throws IOException, ServletException {
-		log.error("MyAuthenticationEntryPoint :: {} {} ", e.getMessage(), request.getRequestURL());
-		response.setContentType("application/json;charset=UTF-8");
+		log.error("CustomizeAuthenticationEntryHandler :: {} {} ", e.getMessage(), request.getRequestURL());
 		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-		ServletOutputStream writer = response.getOutputStream();
 		String message = e.getMessage();
 		Integer code = HttpServletResponse.SC_UNAUTHORIZED;
 		if (e instanceof AuthException) {
-			AuthException be = (AuthException) e;
-			message = be.getMessage();
-			code = be.getCode();
+			AuthException ae = (AuthException) e;
+			message = ae.getMessage();
+			code = ae.getCode();
 		}
 		if (e instanceof InsufficientAuthenticationException) {
 			message = TipEnum.TIP_LOGIN_FAIL_NOT_LOGIN.getMsg();
@@ -58,6 +50,6 @@ public class SelfAuthenticationEntryHandler implements AuthenticationEntryPoint 
 				code = TipEnum.TIP_AUTH_TOKEN_ERROR.getCode();
 			}
 		}
-		objectMapper.writeValue(writer, Result.error(code, message));
+		WebHelpers.writeError(response, code, message);
 	}
 }

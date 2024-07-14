@@ -1,6 +1,6 @@
 package com.wy.enums;
 
-import com.wy.common.PropConverter;
+import dream.flying.flower.common.PropConverter;
 
 /**
  * 权限枚举

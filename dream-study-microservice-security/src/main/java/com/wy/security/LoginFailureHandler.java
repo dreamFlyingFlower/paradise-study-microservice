@@ -14,7 +14,8 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationFa
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wy.common.AuthException;
-import com.wy.result.Result;
+
+import dream.flying.flower.result.Result;
 
 /**
  * @description 安全登录失败的处理

@@ -10,16 +10,11 @@
 		<version>0.0.1</version>
 	</parent>
 
-	<groupId>dream.flying.flower</groupId>
 	<artifactId>dream-study-microservice-oauth-server</artifactId>
-	<version>0.0.1</version>
 	<name>dream-study-microservice-oauth-server</name>
 	<description>oauth2-server</description>
 
 	<properties>
-		<java.version>1.8</java.version>
-		<version.social>1.1.6.RELEASE</version.social>
-		<spring-cloud.version>Hoxton.SR11</spring-cloud.version>
 		<pagehelper-spring-boot-starter.version>1.2.13</pagehelper-spring-boot-starter.version>
 		<mybatis-spring-boot-starter.version>2.1.4</mybatis-spring-boot-starter.version>
 		<spring-security-jwt.version>1.0.9.RELEASE</spring-security-jwt.version>
@@ -51,7 +46,6 @@
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-jwt</artifactId>
-			<version>${spring-security-jwt.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.nimbusds</groupId>
@@ -64,30 +58,21 @@
 		<dependency>
 			<groupId>org.mybatis.spring.boot</groupId>
 			<artifactId>mybatis-spring-boot-starter</artifactId>
-			<version>${mybatis-spring-boot-starter.version}</version>
 		</dependency>
 		<!-- pagehelper 分页插件 -->
 		<dependency>
 			<groupId>com.github.pagehelper</groupId>
 			<artifactId>pagehelper-spring-boot-starter</artifactId>
-			<version>${pagehelper-spring-boot-starter.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.alibaba</groupId>
-			<artifactId>fastjson</artifactId>
-			<version>1.2.75</version>
 		</dependency>
 		<dependency>
 			<groupId>dream.flying.flower</groupId>
-			<artifactId>dream-tool-core</artifactId>
-			<version>0.0.1</version>
+			<artifactId>dream-framework-web</artifactId>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/io.springfox/springfox-boot-starter -->
 		<dependency>
 			<groupId>io.springfox</groupId>
 			<artifactId>springfox-boot-starter</artifactId>
-			<version>3.0.0</version>
 		</dependency>
 		<!-- Swagger2文档增强 -->
 		<!-- <dependency> -->
@@ -96,8 +81,8 @@
 		<!-- <version>3.0.2</version> -->
 		<!-- </dependency> -->
 		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
+			<groupId>com.mysql</groupId>
+			<artifactId>mysql-connector-j</artifactId>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
@@ -127,15 +112,4 @@
 		</dependency>
 	</dependencies>
 
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>org.springframework.cloud</groupId>
-				<artifactId>spring-cloud-dependencies</artifactId>
-				<version>${spring-cloud.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
 </project>

@@ -10,4 +10,5 @@ import org.springframework.security.core.userdetails.UserDetailsService;
  * @git {@link https://github.com/dreamFlyingFlower }
  */
 public interface UserService extends UserDetailsService {
+
 }

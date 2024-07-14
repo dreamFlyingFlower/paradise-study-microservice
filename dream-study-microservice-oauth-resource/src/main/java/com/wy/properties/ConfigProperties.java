@@ -16,7 +16,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Configuration
-@ConfigurationProperties(prefix = "config")
+@ConfigurationProperties(prefix = "dream.oauth2.resource")
 public class ConfigProperties {
 
 	private SecurityProperties security = new SecurityProperties();

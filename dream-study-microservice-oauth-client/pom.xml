@@ -10,9 +10,7 @@
 		<version>0.0.1</version>
 	</parent>
 
-	<groupId>dream.flying.flower</groupId>
 	<artifactId>dream-study-microservice-oauth-client</artifactId>
-	<version>0.0.1</version>
 	<name>dream-study-microservice-oauth-client</name>
 	<description>oauth2-client</description>
 
@@ -71,7 +69,6 @@
 		<dependency>
 			<groupId>dream.flying.flower</groupId>
 			<artifactId>dream-tool-core</artifactId>
-			<version>0.0.1</version>
 		</dependency>
 
 		<dependency>

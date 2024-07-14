@@ -6,7 +6,7 @@ import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.wy.result.ResultException;
+import dream.flying.flower.result.ResultException;
 
 @Component
 public class VerifyHandlerFactory {

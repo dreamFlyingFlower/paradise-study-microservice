@@ -28,10 +28,11 @@ import com.wy.entity.User;
 import com.wy.entity.UserSocial;
 import com.wy.jwt.S_Jwt;
 import com.wy.oauth2.AppSignUpUtils;
-import com.wy.result.Result;
-import com.wy.result.ResultException;
 import com.wy.verify.VerifyHandler;
 import com.wy.verify.VerifyHandlerFactory;
+
+import dream.flying.flower.result.Result;
+import dream.flying.flower.result.ResultException;
 
 @RestController
 @RequestMapping("user")

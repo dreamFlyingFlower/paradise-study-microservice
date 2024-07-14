@@ -7,7 +7,7 @@ import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.token.DefaultAccessTokenConverter;
 
-import com.wy.util.IpHelper;
+import dream.flying.flower.framework.web.helper.IpHelpers;
 
 /**
  * 自定义JWT令牌中传输的信息
@@ -23,7 +23,7 @@ public class JdbcAccessTokenConverter extends DefaultAccessTokenConverter {
 	@Override
 	public Map<String, ?> convertAccessToken(OAuth2AccessToken token, OAuth2Authentication authentication) {
 		Map<String, Object> result = (Map<String, Object>) super.convertAccessToken(token, authentication);
-		result.put("clientIp", IpHelper.getIp());
+		result.put("clientIp", IpHelpers.getIp());
 		return result;
 	}
 }

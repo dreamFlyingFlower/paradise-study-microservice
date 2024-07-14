@@ -1,10 +1,10 @@
 package com.wy.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.wy.entity.User;
 import com.wy.mapper.UserMapper;
 import com.wy.service.UserService;
 
@@ -25,7 +25,7 @@ public class UserServiceImpl implements UserService {
 	 * 实现UserDetailsService中的loadUserByUsername方法,用于加载用户数据
 	 */
 	@Override
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+	public User loadUserByUsername(String username) throws UsernameNotFoundException {
 		return userMapper.selectByUsername(username);
 	}
 }

@@ -5,9 +5,8 @@ import java.io.Serializable;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
-import com.wy.annotation.Pri;
-import com.wy.annotation.Unique;
-
+import dream.flying.flower.db.annotation.Pri;
+import dream.flying.flower.db.annotation.Unique;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

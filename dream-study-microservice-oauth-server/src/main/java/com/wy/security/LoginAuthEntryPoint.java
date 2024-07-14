@@ -12,8 +12,9 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 
 import com.alibaba.fastjson.JSON;
-import com.wy.lang.StrTool;
-import com.wy.result.Result;
+
+import dream.flying.flower.lang.StrHelper;
+import dream.flying.flower.result.Result;
 
 /**
  * 前后端分离时,未登录时不能跳转后台的登录页面,需要返回json数据给前端进行判断
@@ -37,7 +38,8 @@ public class LoginAuthEntryPoint extends LoginUrlAuthenticationEntryPoint {
 		response.setContentType("application/json;charset=utf-8");
 		PrintWriter out = response.getWriter();
 		out.write(JSON.toJSONString(Result.builder().code(501)
-				.msg(StrTool.isBlank(authException.getMessage()) ? "您还未登录,请登录!" : authException.getMessage()).build()));
+				.msg(StrHelper.isBlank(authException.getMessage()) ? "您还未登录,请登录!" : authException.getMessage())
+				.build()));
 		out.flush();
 		out.close();
 	}

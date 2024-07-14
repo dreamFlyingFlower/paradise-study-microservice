@@ -2,7 +2,7 @@ package com.wy.exception;
 
 import org.springframework.security.core.AuthenticationException;
 
-import com.wy.enums.TipEnum;
+import dream.flying.flower.enums.TipEnum;
 
 /**
  * 自定义安全认证请求异常

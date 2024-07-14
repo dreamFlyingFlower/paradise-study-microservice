@@ -10,14 +10,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.ExceptionTranslationFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
@@ -32,7 +34,6 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.accept.ContentNegotiationStrategy;
 import org.springframework.web.accept.HeaderContentNegotiationStrategy;
 
-import com.wy.config.high.SecurityHighConfig;
 import com.wy.filters.VerifyFilter;
 import com.wy.properties.UserProperties;
 import com.wy.security.LoginAuthEntryPoint;
@@ -58,7 +59,7 @@ import com.wy.service.UserService;
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+public class SecurityConfig {
 
 	@Autowired
 	private UserAuthenticationProvider provider;
@@ -100,7 +101,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	 * 自定义数据库中的token实现,当有记住我的时候,将会将token存入数据库
 	 */
 	@Bean
-	public PersistentTokenRepository persistentTokenRepository() {
+	PersistentTokenRepository persistentTokenRepository() {
 		JdbcTokenRepositoryImpl tokenRepository = new JdbcTokenRepositoryImpl();
 		tokenRepository.setDataSource(dataSource);
 		// 启动的时候新建表,但是重启后下一次启动的时候需要去掉该参数或设置成false
@@ -120,14 +121,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	/**
 	 * 使用数据库中的数据来判断登录是否成功,在登录请求时会自动拦截请求,并进入验证
 	 */
-	@Override
-	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+	@Bean
+	AuthenticationManager configure(AuthenticationManagerBuilder auth) throws Exception {
 		auth.authenticationProvider(provider);
 
 		// 在内存中添加一些内置的用户,当其他微服务访问当前服务时,使用这些内置的用户即可
 		auth.inMemoryAuthentication().passwordEncoder(new BCryptPasswordEncoder()).withUser("test")
 				.password(new BCryptPasswordEncoder().encode("123456")).roles("USER").and().withUser("admin")
 				.password(new BCryptPasswordEncoder().encode("123456")).roles("USER", "ADMIN");
+		return auth.build();
 	}
 
 	/**
@@ -162,24 +164,24 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	 * csrf.disabled:禁用csrf防御机制,即可跨域请求
 	 * </pre>
 	 */
-	@Override
-	protected void configure(HttpSecurity http) throws Exception {
-		http
+	@Bean
+	SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+		httpSecurity
 				// 设置在页面可以通过iframe访问受保护的页面,默认为不允许访问
-				// .headers().frameOptions().sameOrigin().and()
+				.headers(header -> header.frameOptions(frame -> frame.sameOrigin()))
 				// 进行短信验证
-				// .apply(new SmsAuthenticationSecurityConfig()).and()
+				// .apply(new SmsAuthenticationSecurityConfig())
 				// 进行social验证
-				// .apply(qqSocialConfigurer).and()
+				// .apply(qqSocialConfigurer)
 				// 在用户名和密码校验之后进行拦截
 				.addFilterBefore(verifyFilter, UsernamePasswordAuthenticationFilter.class)
 				// 添加jwt校验
 				// .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
 				// 对session的操作
-				// .sessionManagement()
+				// .sessionManagement(session -> session
 				// session失效之后跳转的地址,若是jsp则是页面,不是则为api接口地址,不需要安全验证
 				// .invalidSessionUrl("/session/invalid")
-				// .invalidSessionStrategy("session/")
+				// .invalidSessionStrategy(new SimpleRedirectInvalidSessionStrategy("session/"))
 				// 同一个用户的最大session数量,若再登录时则会将前面登录的session失效
 				// .maximumSessions(1)
 				// 当session达到最大数时,不让后面的用户再次登录;false则不限制
@@ -188,46 +190,65 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				// .expiredSessionStrategy(sessionExpiredStrategy)
 				// 不需要session
 				// .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-				// .and()
+				// )
 				// 验证开始
-				.authorizeRequests().antMatchers(userProperties.getSecurity().getPermitSources())
-				// 所有匹配的url请求不需要验证
-				.permitAll()
-				// 访问某些页面需要的权限,此处给的admin权限,是在用户登录时返回的,同时admin需要完全匹配
-				// 而给权限的时候需要加上ROLE_,每一种权限都需要加,否则不识别
-				// .antMatchers("/user").hasRole("admin")
-				// 效果等同于hasRole和hasIpAddress
-				// .access("hasRole('admin') and hasIpAddress('127.0.0.1')")
-				// 可以指定请求的类型,可以用通配符指定一类的请求
-				// .antMatchers(HttpMethod.GET,"user/*").hasRole("admin")
-				.anyRequest().authenticated().and().formLogin().loginProcessingUrl("/user/login")
-				.usernameParameter("username").passwordParameter("password").successHandler(loginSuccessHandler)
-				// 失败的自定义处理
-				.failureHandler(loginFailHandler)
+				.authorizeRequests(authorize -> authorize
+						// 所有匹配的url请求不需要验证
+						.antMatchers(userProperties.getSecurity().getPermitSources()).permitAll()
+						// 访问某些页面需要的权限,此处给的admin权限,是在用户登录时返回的,同时admin需要完全匹配
+						// 而给权限的时候需要加上ROLE_,每一种权限都需要加,否则不识别
+						// .antMatchers("/user").hasRole("admin")
+						// 效果等同于hasRole和hasIpAddress
+						// .access("hasRole('admin') and hasIpAddress('127.0.0.1')")
+						// 可以指定请求的类型,可以用通配符指定一类的请求
+						// .antMatchers(HttpMethod.GET,"user/*").hasRole("admin")
+						// 其他请求都需要普通验证
+						.anyRequest().authenticated())
+				.formLogin(form -> form.loginProcessingUrl("/user/login").usernameParameter("username")
+						.passwordParameter("password").successHandler(loginSuccessHandler)
+						// 失败的自定义处理
+						.failureHandler(loginFailHandler))
 				// 使用记住密码功能需要使用数据库,只是服务端记住,而非浏览器,浏览器关掉之后仍然需要重新登录
-				.and().rememberMe().tokenRepository(persistentTokenRepository()).tokenValiditySeconds(1209600)
-				.userDetailsService(userService).and()
-				// .requestCache().requestCache(getRequestCache(http))
+				.rememberMe(remember -> remember.tokenRepository(persistentTokenRepository())
+						// .requestCache().requestCache(getRequestCache(http))
+						.tokenValiditySeconds(1209600).userDetailsService(userService))
 				// 退出的自定义配置
-				.logout()
-				// 清除所有的认证
-				// .clearAuthentication(true)
-				// 删除指定的cookie,参数为cookie的名字
-				// .deleteCookies("JSESSIONID")
-				// 自定义退出的接口或页面,默认为logout
-				// .logoutUrl("/signout")
-				// 自定义退出成功的页面,默认退出到登录页
-				// .logoutSuccessUrl("/logoutsuccess.html")
-				// 自定义登出登录返回json字符串,若不定义则跳到默认地址,url和handler只能有一个生效
-				.logoutSuccessHandler(logoutSuccessHandler).and()
+				.logout(logout -> logout
+						// 清除所有的认证
+						// .clearAuthentication(true)
+						// 删除指定的cookie,参数为cookie的名字
+						// .deleteCookies("JSESSIONID")
+						// 自定义退出的接口或页面,默认为logout
+						// .logoutUrl("/signout")
+						// 自定义退出成功的页面,默认退出到登录页
+						// .logoutSuccessUrl("/logoutsuccess.html")
+						// 自定义登出登录返回json字符串,若不定义则跳到默认地址,url和handler只能有一个生效
+						.logoutSuccessHandler(logoutSuccessHandler))
 				// 自定义拦截未登录请求,若不定义则跳转到loginForm自定义地址或默认的/login
-				.exceptionHandling().authenticationEntryPoint(new LoginAuthEntryPoint(null)).and().csrf().disable();
+				.exceptionHandling(exception -> exception.authenticationEntryPoint(new LoginAuthEntryPoint(null)))
+				.csrf(csrf -> csrf.disable());
+
+		// 自定义oauth2
+		httpSecurity
+				// 配置OAuth2 Client和OAuth2 Server交互,启用SSO
+				.oauth2Login(oauth2 -> oauth2
+						// 登录地址
+						.loginPage(null)
+						// 用户端点,自定义service
+						.userInfoEndpoint(userInfo -> userInfo.userService(null))
+						// 自定义登录成功方法
+						.successHandler(null));
+
+		// 自定义saml配置
+		httpSecurity.saml2Login(null);
+
+		return httpSecurity.build();
 	}
 
-	@Override
-	public void configure(WebSecurity web) throws Exception {
+	@Bean
+	WebSecurityCustomizer webSecurityCustomizer() {
 		// 配置需要忽略检查的web url
-		web.ignoring().antMatchers("/js/**", "/css/**", "/images/**");
+		return web -> web.ignoring().antMatchers("/js/**", "/css/**", "/images/**");
 	}
 
 	protected RequestCache getRequestCache(HttpSecurity http) {

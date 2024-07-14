@@ -11,8 +11,9 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 
 import com.alibaba.fastjson2.JSON;
-import com.wy.lang.StrHelper;
-import com.wy.result.Result;
+
+import dream.flying.flower.lang.StrHelper;
+import dream.flying.flower.result.Result;
 
 /**
  * 前后端分离时,未登录时不能跳转后台的登录页面,需要返回json数据,

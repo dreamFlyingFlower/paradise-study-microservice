@@ -16,8 +16,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @Configuration
-@ConfigurationProperties("config.security")
-public class SecurityProperties {
+@ConfigurationProperties("dream.oauth.server.security")
+public class OAuthServerSecurityProperties {
 
 	/**
 	 * 不需要验证的资源URL,需要从根路径开始填写
@@ -26,4 +26,9 @@ public class SecurityProperties {
 			"/actuator/**", "/oauth/authorize**", "/oauth/**", "/oauth/token_key", "/messages/**", "/oauth/error",
 			"/swagger-ui.html", "/swagger-ui/*", "/swagger-resources/**", "/v2/api-docs", "/v3/api-docs", "/webjars/**",
 			"/login" };
+
+	/**
+	 * 生成JWT的RSA私钥
+	 */
+	private String jwtPrivateKey;
 }

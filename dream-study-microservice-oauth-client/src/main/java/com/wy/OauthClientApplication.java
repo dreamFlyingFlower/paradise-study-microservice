@@ -103,6 +103,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @date 2021-04-09 11:04:34
  * @git {@link https://github.com/dreamFlyingFlower}
  */
+@Deprecated
 @SpringBootApplication
 public class OauthClientApplication {
 

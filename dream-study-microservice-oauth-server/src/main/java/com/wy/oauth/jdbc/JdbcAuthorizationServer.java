@@ -1,6 +1,5 @@
 package com.wy.oauth.jdbc;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -32,7 +31,8 @@ import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 
 import com.wy.oauth.jdbc.config.OAuth2JdbcConfig;
-import com.wy.oauth.jdbc.config.SecurityJdbcConfig;
+
+import lombok.AllArgsConstructor;
 
 /**
  * OAuth2使用数据库进行认证服务
@@ -131,40 +131,33 @@ import com.wy.oauth.jdbc.config.SecurityJdbcConfig;
  */
 @Configuration
 @EnableAuthorizationServer
+@AllArgsConstructor
 public class JdbcAuthorizationServer extends AuthorizationServerConfigurerAdapter {
 
 	/**
-	 * 授权管理器.不同的版本可能不一样,高版本一般不要.在{@link SecurityJdbcConfig#authenticationManagerBean}中设置
+	 * 授权管理器
 	 */
-	@Autowired
 	private AuthenticationManager authenticationManager;
 
 	/**
 	 * 此处为{@link JdbcTokenStore},见{@link OAuth2JdbcConfig}
 	 */
-	@Autowired
 	private TokenStore tokenStore;
 
 	/**
 	 * 此处为{@link JdbcClientDetailsService},见{@link OAuth2JdbcConfig}
 	 */
-	@Autowired
 	private JdbcClientDetailsService jdbcClientDetailsService;
 
-	@Autowired
 	private AuthorizationCodeServices jdbcAuthorizationCodeServices;
 
-	@Autowired
 	private AuthorizationServerTokenServices jdbcAuthorizationServerTokenServices;
 
-	// @Autowired
 	// private JwtAccessTokenConverter jwtAccessTokenConverter;
 	//
-	// @Autowired
 	// private UserApprovalHandler userApprovalHandler;
 	//
 	// /** 用户认证业务 */
-	// @Autowired
 	// private UserDetailsService userDetailsService;
 
 	/**
