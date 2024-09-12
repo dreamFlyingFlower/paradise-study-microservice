@@ -29,11 +29,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandlerImpl;
+import org.springframework.security.web.access.expression.WebExpressionAuthorizationManager;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.security.web.savedrequest.RequestCache;
+import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
 import org.springframework.security.web.session.SimpleRedirectInvalidSessionStrategy;
 import org.springframework.security.web.util.matcher.AndRequestMatcher;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -42,6 +44,7 @@ import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.accept.ContentNegotiationStrategy;
 import org.springframework.web.accept.HeaderContentNegotiationStrategy;
+import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
 import com.wy.filters.JwtAuthenticationFilter;
 import com.wy.filters.VerifyFilter;
@@ -54,6 +57,7 @@ import com.wy.service.UserService;
 import com.wy.sms.SmsSecurityConfigurer;
 import com.wy.social.qq.QqSocialSecurityConfigurer;
 
+import jakarta.servlet.DispatcherType;
 import lombok.AllArgsConstructor;
 
 /**
@@ -173,6 +177,17 @@ public class SecurityConfig {
 	}
 
 	/**
+	 * 如果请求被映射到/security而不是/,如果想要授权的端点是/security/my/controller,则先需要定义MvcRequestMatcher.Builder,同时配合httpSecurity配置使用
+	 * 
+	 * @param introspector 路径控制器
+	 * @return 请求匹配
+	 */
+	@Bean
+	MvcRequestMatcher.Builder mvc(HandlerMappingIntrospector introspector) {
+		return new MvcRequestMatcher.Builder(introspector).servletPath("/security");
+	}
+
+	/**
 	 * 通过创建 SecurityFilterChain 来配置 HttpSecurity,登录认证的请求必须是POST
 	 * 
 	 * <pre>
@@ -185,10 +200,11 @@ public class SecurityConfig {
 	 * rememberMe:只有当前用户是记住用户时通过 
 	 * authenticated:当前用户不是anonymous时通过
 	 * fullAuthenticated:当前用户既不是anonymous也不是rememberme,且校验通过 
-	 * hasRole:用户拥有指定的角色
-	 * hasAnyRole:拥有指定的任意一种角色
-	 * hasAuthority:用户拥有指定权限
-	 * hasAnyAuthority:用户有任意一个指定的权限
+	 * hasRole:用户拥有指定的角色,注意前缀ROLE_
+	 * hasAnyRole:拥有指定的任意一种角色,注意前缀ROLE_
+	 * hasAuthority:用户拥有指定权限,对应GrantedAuthority
+	 * hasAnyAuthority:用户有任意一个指定的权限,对应GrantedAuthority
+	 * access:请求使用此自定义AuthorizationManager来确定访问权限
 	 * hasIpAddress:请求发送的ip匹配时才通过
 	 * anyrequest.authenticated:所有的请求登录后才可访问
 	 * formlogin:表示允许表单登录
@@ -208,12 +224,18 @@ public class SecurityConfig {
 	 * @throws Exception
 	 */
 	@Bean
-	SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+	SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, MvcRequestMatcher.Builder mvc) throws Exception {
 		// 在内存中添加一些内置的用户,当其他微服务访问当前服务时,使用这些内置的用户即可
-		httpSecurity.getSharedObject(AuthenticationManagerBuilder.class).inMemoryAuthentication()
-				.passwordEncoder(new BCryptPasswordEncoder()).withUser("test")
-				.password(new BCryptPasswordEncoder().encode("123456")).roles("USER").and().withUser("admin")
-				.password(new BCryptPasswordEncoder().encode("123456")).roles("USER", "ADMIN");
+		httpSecurity.getSharedObject(AuthenticationManagerBuilder.class)
+				.inMemoryAuthentication()
+				.passwordEncoder(new BCryptPasswordEncoder())
+				.withUser("test")
+				.password(new BCryptPasswordEncoder().encode("123456"))
+				.roles("USER")
+				.and()
+				.withUser("admin")
+				.password(new BCryptPasswordEncoder().encode("123456"))
+				.roles("USER", "ADMIN");
 
 		// 自定义请求头
 		httpSecurity.headers(headers -> headers
@@ -232,9 +254,11 @@ public class SecurityConfig {
 				// 自定义登录配置,仍然会添加UsernamePasswordAuthenticationFilter
 				.formLogin(formLogin -> formLogin
 						// 自定义登录页面,不使用内置的自动生成页面,若定义该参数,其他默认配置失效,见FormLoginConfigurer#initDefaultLoginFilter
-						.loginPage("/login").loginProcessingUrl("/login")
+						.loginPage("/login")
+						.loginProcessingUrl("/login")
 						// 自定义登录的用户名和密码传参字段
-						.usernameParameter("username").passwordParameter("password")
+						.usernameParameter("username")
+						.passwordParameter("password")
 						// 登录成功的自定义处理
 						.successHandler(loginSuccessHandler)
 						// 登录失败的自定义处理
@@ -276,7 +300,8 @@ public class SecurityConfig {
 				// 基于 token,不需要 session
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 				// session失效之后跳转的地址,若是jsp则是页面,不是则为api接口地址,不需要安全验证
-				.invalidSessionStrategy(new SimpleRedirectInvalidSessionStrategy("/login")).invalidSessionUrl("/login")
+				.invalidSessionStrategy(new SimpleRedirectInvalidSessionStrategy("/login"))
+				.invalidSessionUrl("/login")
 				// 同一个用户的最大session数量,若再登录时则会将前面登录的session失效
 				.maximumSessions(1)
 				// 当session达到最大数时,不让后面的用户再次登录;false则不限制
@@ -309,20 +334,40 @@ public class SecurityConfig {
 		httpSecurity.httpBasic(Customizer.withDefaults());
 
 		// 自定义权限,相当于打开了鉴权模块,它会注册AuthorizationFilter到SecurityFilterChain的最后
-		httpSecurity.authorizeHttpRequests(request -> request
+		httpSecurity.authorizeHttpRequests(authorize -> authorize
+				// 默认情况下,Spring Security授权所有调度程序类型,即使请求转发上建立的安全上下文会延续到后续dispatch中,
+				// 但细微的不匹配有时会导致意外的AccessDeniedException,如下可避免该问题
+				// FORWARD主要用于内置页面,当跳转到内置页面时,一次授权通过Controller跳转到指定方法,一次是渲染内置页面
+				.dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.ERROR)
+				.permitAll()
+				// 访问/system接口需要有ADD_USER的权限,如果有多个规则都匹配/system,按照定义的顺序,以第一个为准
 				// "/system"要求有ADD_USER的权限
-				.requestMatchers("/system").hasAuthority("ADD_USER")
+				.requestMatchers("/system")
+				.hasAuthority("ADD_USER")
 				// "/user"要求有"ROLE_USER"角色权限
-				.requestMatchers("/user").hasRole("USER")
+				.requestMatchers("/user")
+				.hasRole("USER")
 				// 效果等同于hasRole和hasIpAddress,hasIpAddress需要自定义SpEL表达式
-				.requestMatchers("/admin").access(AuthorityAuthorizationManager.hasRole("admin"))
+				.requestMatchers("/admin")
+				.access(AuthorityAuthorizationManager.hasRole("admin"))
 				// .access("hasRole('admin') and hasIpAddress('127.0.0.1')")
+				// 直接从请求中获取参数,如果是从URL后直接获取字符串,需自定义解析器
+				.requestMatchers("/user/{username}")
+				.access(new WebExpressionAuthorizationManager("#username == authentication.username"))
 				// 可以指定请求的类型,可以用通配符指定一类的请求
-				.requestMatchers(HttpMethod.GET, "/admin/*").hasRole("ADMIN")
+				.requestMatchers(HttpMethod.GET, "/admin/*")
+				.hasRole("ADMIN")
 				// 所有请求无需验证即可通过
-				.requestMatchers("/**").permitAll()
+				.requestMatchers("/**")
+				.permitAll()
+				// 配合MvcRequestMatcher.Builder一起使用,实际匹配的是/security/my/controller
+				.requestMatchers(mvc.pattern("/my/controller/**"))
+				.hasAuthority("controller")
+				.anyRequest()
+				.authenticated()
 				// 其他请求只需要身份验证即可,无需其他特殊权限
-				.anyRequest().authenticated());
+				.anyRequest()
+				.authenticated());
 
 		httpSecurity
 				// 添加JWT 过滤器,JWT过滤器在用户名密码认证过滤器之前

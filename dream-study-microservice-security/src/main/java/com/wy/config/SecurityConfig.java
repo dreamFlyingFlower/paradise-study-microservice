@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.servlet.DispatcherType;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -126,9 +127,16 @@ public class SecurityConfig {
 		auth.authenticationProvider(provider);
 
 		// 在内存中添加一些内置的用户,当其他微服务访问当前服务时,使用这些内置的用户即可
-		auth.inMemoryAuthentication().passwordEncoder(new BCryptPasswordEncoder()).withUser("test")
-				.password(new BCryptPasswordEncoder().encode("123456")).roles("USER").and().withUser("admin")
-				.password(new BCryptPasswordEncoder().encode("123456")).roles("USER", "ADMIN");
+		auth.inMemoryAuthentication()
+				.passwordEncoder(new BCryptPasswordEncoder())
+				.withUser("test")
+				.password(new BCryptPasswordEncoder().encode("123456"))
+				.roles("USER")
+				.and()
+				.withUser("admin")
+				.password(new BCryptPasswordEncoder().encode("123456"))
+				.roles("USER", "ADMIN");
+
 		return auth.build();
 	}
 
@@ -193,8 +201,14 @@ public class SecurityConfig {
 				// )
 				// 验证开始
 				.authorizeRequests(authorize -> authorize
+						// 默认情况下,Spring Security授权所有调度程序类型,即使请求转发上建立的安全上下文会延续到后续dispatch中,
+						// 但细微的不匹配有时会导致意外的AccessDeniedException,如下可避免该问题
+						// FORWARD主要用于内置页面,当跳转到内置页面时,一次授权通过Controller跳转到指定方法,一次是渲染内置页面
+						.dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.ERROR)
+						.permitAll()
 						// 所有匹配的url请求不需要验证
-						.antMatchers(userProperties.getSecurity().getPermitSources()).permitAll()
+						.antMatchers(userProperties.getSecurity().getPermitSources())
+						.permitAll()
 						// 访问某些页面需要的权限,此处给的admin权限,是在用户登录时返回的,同时admin需要完全匹配
 						// 而给权限的时候需要加上ROLE_,每一种权限都需要加,否则不识别
 						// .antMatchers("/user").hasRole("admin")
@@ -203,15 +217,19 @@ public class SecurityConfig {
 						// 可以指定请求的类型,可以用通配符指定一类的请求
 						// .antMatchers(HttpMethod.GET,"user/*").hasRole("admin")
 						// 其他请求都需要普通验证
-						.anyRequest().authenticated())
-				.formLogin(form -> form.loginProcessingUrl("/user/login").usernameParameter("username")
-						.passwordParameter("password").successHandler(loginSuccessHandler)
+						.anyRequest()
+						.authenticated())
+				.formLogin(form -> form.loginProcessingUrl("/user/login")
+						.usernameParameter("username")
+						.passwordParameter("password")
+						.successHandler(loginSuccessHandler)
 						// 失败的自定义处理
 						.failureHandler(loginFailHandler))
 				// 使用记住密码功能需要使用数据库,只是服务端记住,而非浏览器,浏览器关掉之后仍然需要重新登录
 				.rememberMe(remember -> remember.tokenRepository(persistentTokenRepository())
 						// .requestCache().requestCache(getRequestCache(http))
-						.tokenValiditySeconds(1209600).userDetailsService(userService))
+						.tokenValiditySeconds(1209600)
+						.userDetailsService(userService))
 				// 退出的自定义配置
 				.logout(logout -> logout
 						// 清除所有的认证
@@ -292,4 +310,5 @@ public class SecurityConfig {
 
 		return new AndRequestMatcher(matchers);
 	}
+
 }
