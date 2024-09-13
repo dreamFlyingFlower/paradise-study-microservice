@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -26,6 +27,8 @@ import org.springframework.security.config.annotation.web.configurers.CsrfConfig
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandlerImpl;
@@ -58,7 +61,7 @@ import com.wy.sms.SmsSecurityConfigurer;
 import com.wy.social.qq.QqSocialSecurityConfigurer;
 
 import jakarta.servlet.DispatcherType;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 /**
  * SpringSecurity6以上配置
@@ -72,8 +75,11 @@ import lombok.AllArgsConstructor;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+	@Value("${spring.security.oauth2.resourceserver.jwt.jwk-set-uri}")
+	private String jwkSetUri;
 
 	private final UserService userService;
 
@@ -174,6 +180,16 @@ public class SecurityConfig {
 		daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
 		daoAuthenticationProvider.setUserDetailsService(userService);
 		return daoAuthenticationProvider;
+	}
+
+	/**
+	 * 与OAuth2相关
+	 * 
+	 * @return JwtDecoder
+	 */
+	@Bean
+	JwtDecoder jwtDecoder() {
+		return NimbusJwtDecoder.withJwkSetUri(this.jwkSetUri).build();
 	}
 
 	/**
@@ -326,6 +342,9 @@ public class SecurityConfig {
 						.userInfoEndpoint(userInfo -> userInfo.userService(null))
 						// 自定义登录成功方法
 						.successHandler(null));
+
+		// 自定义oauth2资源服务器
+		httpSecurity.oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults()));
 
 		// 自定义saml配置
 		httpSecurity.saml2Login(null);

@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -258,7 +259,10 @@ public class SecurityConfig {
 						.successHandler(null));
 
 		// 自定义saml配置
-		httpSecurity.saml2Login(null);
+		httpSecurity.saml2Login(Customizer.withDefaults());
+
+		// 自定义oauth2资源服务器
+		httpSecurity.oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults()));
 
 		return httpSecurity.build();
 	}

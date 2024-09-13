@@ -9,10 +9,12 @@ spring:
     password: 52LDforever
     username: root
     driver-class-name: com.mysql.cj.jdbc.Driver
-  redis:
-    host: localhost
-    port: 6379
   profiles: 
     active: dev
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:8080/oauth2/jwks
 server: 
   port: 5550

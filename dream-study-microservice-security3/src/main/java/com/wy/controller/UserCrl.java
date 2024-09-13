@@ -130,9 +130,12 @@ public class UserCrl {
 	@GetMapping("/social/user")
 	public UserSocial getSocialUser(HttpServletRequest request) {
 		Connection<?> connection = providerSignUtils.getConnectionFromSession(new ServletWebRequest(request));
-		return UserSocial.builder().providerId(connection.getKey().getProviderId())
-				.providerUserId(connection.getKey().getProviderUserId()).nickname(connection.getDisplayName())
-				.socialimage(connection.getImageUrl()).build();
+		return UserSocial.builder()
+				.providerId(connection.getKey().getProviderId())
+				.providerUserId(connection.getKey().getProviderUserId())
+				.nickname(connection.getDisplayName())
+				.socialimage(connection.getImageUrl())
+				.build();
 	}
 
 	@Autowired
@@ -145,9 +148,12 @@ public class UserCrl {
 	@ResponseStatus(HttpStatus.UNAUTHORIZED)
 	public UserSocial socialAppSign(HttpServletRequest request) {
 		Connection<?> connection = providerSignUtils.getConnectionFromSession(new ServletWebRequest(request));
-		UserSocial userSocial = UserSocial.builder().providerId(connection.getKey().getProviderId())
-				.providerUserId(connection.getKey().getProviderUserId()).nickname(connection.getDisplayName())
-				.socialimage(connection.getImageUrl()).build();
+		UserSocial userSocial = UserSocial.builder()
+				.providerId(connection.getKey().getProviderId())
+				.providerUserId(connection.getKey().getProviderUserId())
+				.nickname(connection.getDisplayName())
+				.socialimage(connection.getImageUrl())
+				.build();
 		appSignUpUtils.saveData(new ServletWebRequest(request), connection.createData());
 		return userSocial;
 	}

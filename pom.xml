@@ -38,6 +38,7 @@
 		<module>dream-study-microservice-oauth-client</module>
 		<module>dream-study-microservice-oauth-resource</module>
 		<module>dream-study-microservice-oauth-server</module>
+		<module>dream-study-microservice-oauth-server3</module>
 		<module>dream-study-microservice-ribbon</module>
 		<module>dream-study-microservice-security</module>
 		<module>dream-study-microservice-security3</module>
