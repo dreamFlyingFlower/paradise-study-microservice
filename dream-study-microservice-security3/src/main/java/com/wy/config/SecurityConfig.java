@@ -338,7 +338,11 @@ public class SecurityConfig {
 				.oauth2Login(oauth2 -> oauth2
 						// 登录地址
 						.loginPage(null)
-						// 用户端点,自定义service
+						// 定制发起授权请求,有authorizationRequestResolver的扩展点
+						.authorizationEndpoint(null)
+						// 获取access_token,只有一个accessTokenResponseClient扩展点
+						.tokenEndpoint(null)
+						// 获取用户信息,自定义service,配置OAuth2UserService的实例
 						.userInfoEndpoint(userInfo -> userInfo.userService(null))
 						// 自定义登录成功方法
 						.successHandler(null));

@@ -28,6 +28,13 @@ import org.springframework.security.config.annotation.web.configurers.FormLoginC
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
+import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizationRequestResolver;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
@@ -56,14 +63,17 @@ import org.springframework.web.filter.DelegatingFilterProxy;
  * ->{@link WebSecurityConfiguration}:被引入,会初始化名为{@link AbstractSecurityWebApplicationInitializer#DEFAULT_FILTER_NAME}的bean
  * ->#HttpSecurityConfiguration:被引入,初始化{@link HttpSecurity}等相关bean
  * 
- * {@link SecurityFilterChain}:包含了一个Filter数组,可以使用多个拦截器 ->{@link SecurityFilterChain#matches}:规则匹配
+ * {@link SecurityFilterChain}:包含了一个Filter数组,可以使用多个拦截器
+ * ->{@link SecurityFilterChain#matches}:规则匹配
  * ->{@link SecurityFilterChain#getFilters()}:获得所有的拦截器
  * {@link CsrfFilter}:防止跨站点请求伪造攻击,这也是导致所有POST请求都失败的原因.基于Token验证的API服务可以选择关闭,而一般Web页面需要开启
- * {@link BasicAuthenticationFilter}:支持HTTP的标准Basic Auth的身份验证模块 {@link DefaultLoginPageGeneratingFilter}:用于自动生成登录页面
+ * {@link BasicAuthenticationFilter}:支持HTTP的标准Basic Auth的身份验证模块
+ * {@link DefaultLoginPageGeneratingFilter}:用于自动生成登录页面
  * {@link DefaultLogoutPageGeneratingFilter}:用于自动生成注销页面
  * 
  * {@link SecurityAutoConfiguration}:SpringSecurity自动注入
- * ->#SpringBootWebSecurityConfiguration:默认配置,引入了基本的Form表单和Basic认证方式 ->{@link SecurityDataConfiguration}:整合Spring Data
+ * ->#SpringBootWebSecurityConfiguration:默认配置,引入了基本的Form表单和Basic认证方式
+ * ->{@link SecurityDataConfiguration}:整合Spring Data
  * {@link SecurityFilterAutoConfiguration}:SecurittyFilter自动注入类,
  * 会拿bean为{@link AbstractSecurityWebApplicationInitializer#DEFAULT_FILTER_NAME}的{@link DelegatingFilterProxyRegistrationBean}
  * {@link DelegatingFilterProxy#doFilter}:将Servlet中的Filter请求委托给Spring容器中的具体bean处理,实现Servlet和Spring的无缝连接
@@ -175,6 +185,24 @@ import org.springframework.web.filter.DelegatingFilterProxy;
  * 
  * <pre>
  * {@link EnableOAuth2Sso}:5废弃,6可用,配置{@link SecurityFilterChain}时由{@link HttpSecurity}的oauth2Login参数指定
+ * </pre>
+ * 
+ * SpringSecurity整合OAuth2,在{@link HttpSecurity#oauth2Login()}中配置
+ * 
+ * <pre>
+ * {@link OAuth2AuthorizationRequestResolver}:生成授权请求对象{@link OAuth2AuthorizationRequest},
+ * 最终用于发起授权请求的地址authorizationRequestUri就是从OAuth2AuthorizationRequest对象中获取的
+ * ->{@link DefaultOAuth2AuthorizationRequestResolver#resolve()}:默认实现.生成过程依赖于OAuth2AuthorizationRequest.Builder,
+ * 		authorizationRequestCustomizer对象可以实现对Builder的定制
+ * ->{@link OAuth2AuthorizationRequest.Builder#buildAuthorizationRequestUri}:有两个扩展点:
+ * 		parametersConsumer:用于替换参数名称,以及调整参数顺序;
+ * 		authorizationRequestUriFunction:对UriBuilder作进一步的定制,用来添加"#wechat_redirect"
+ * {@link OAuth2AccessTokenResponseClient}:定义获取access_token的客户端操作
+ * ->{@link DefaultAuthorizationCodeTokenResponseClient}:授权码模式默认实现类,有两个扩展点:
+ * 		requestEntityConverter:调整参数
+ * 		RestOperations:支持响应的MediaType,以及默认填充token_type字段,再对RestTemplate做进一步定制
+ * {@link OAuth2UserService}:定义了发起获取用户信息请求的客户端操作
+ * ->{@link DefaultOAuth2UserService}:默认实现,有两个扩展点:requestEntityConverter和RestOperations,定制逻辑也基本类似
  * </pre>
  * 
  * @author 飞花梦影

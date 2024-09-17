@@ -1,0 +1,28 @@
+spring:
+  security:
+    oauth2:
+      client:
+        # 微信配置客户端
+        registration:
+          # 本系统在微信中注册时的信息
+          wechat:
+            # 客户端ID和密钥
+            client-id: 
+            client-secret: 
+            # 授权模式
+            authorization-grant-type: authorization_code
+            # 微信验证通过后重定向到本系统的地址
+            redirect-uri: "{baseUrl}/{action}/oauth2/code/{registrationId}"
+            # 权限,允许获取微信的用户信息
+            scope: snsapi_userinfo
+        provider:
+          # 微信信息
+          wechat:
+            # 微信认证地址
+            authorization-uri: https://open.weixin.qq.com/connect/oauth2/authorize
+            # 微信获取token地址
+            token-uri: https://api.weixin.qq.com/sns/oauth2/access_token
+            # 微信获取用户信息地址
+            user-info-uri: https://api.weixin.qq.com/sns/userinfo
+            # 用户名对应的属性名称,即微信昵称
+            user-name-attribute: nickname
