@@ -55,7 +55,7 @@ import lombok.RequiredArgsConstructor;
  * 		需加上配置文件中spring.security.oauth2.client.registration下的key使用,如微信为/oauth2/authorization/wechat
  * 3.客户端在页面或其他服务中访问/oauth2/authorization/wechat,请求被重定向到了https://open.weixin.qq.com/connect/oauth2/authorize这个地址
  * 4.此时客户端会跳转到微信授权页面
- * 5.点击同意后,服务端会重定向到redirect_uri的地址,即本项目地址/login/oauth2/code/wechat.
+ * 5.用户点击同意后,服务端会重定向到redirect_uri的地址,即本项目地址/login/oauth2/code/wechat.
  * 		若该地址后面携带了code和state参数,则表示code获取成功.回调地址中的state和此前发起请求时的state两个值是一样的
  * 6.通过日志可以看到,接着又发起了获取access_token的请求,如果获取成功,随即就会使用acces_token再请求获取用户信息的接口
  * 7.最后在得到用户数据后会创建对应的Authentication对象,并为其进行持久化操作,至此微信公众号网页授权的整个过程就完成了
