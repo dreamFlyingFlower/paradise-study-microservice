@@ -339,6 +339,10 @@ public class AuthorizationServerConfig {
 				// 客户端秘钥,使用密码解析器加密
 				.clientSecret(passwordEncoder.encode("123456"))
 				// 客户端认证方式,基于请求头的认证
+				// CLIENT_SECRET_BASIC:clientId和clientSecret放在请求头中发送请求
+				// CLIENT_SECRET_POST:clientId和clientSecret以POST方式放在请求体中发送请求
+				// CLIENT_SECRET_JWT:clientId和clientSecret经过JWT方式编码后放在请求头中发送请求
+				// PRIVATE_KEY_JWT:以公私钥方式经过JWT方式编码后放在请求头中发送请求
 				.clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
 				.clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_POST)
 				// 配置资源服务器使用该客户端获取授权时支持的方式
