@@ -7,7 +7,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import com.wy.common.AuthException;
 import com.wy.common.Constants;
 import com.wy.entity.PermissionVo;
 import com.wy.entity.Role;
@@ -17,6 +16,7 @@ import com.wy.util.SecurityUtils;
 
 import dream.flying.flower.collection.ListHelper;
 import dream.flying.flower.enums.TipEnum;
+import dream.flying.flower.framework.security.exception.AuthException;
 import dream.flying.flower.lang.StrHelper;
 
 /**
@@ -136,7 +136,8 @@ public class PermissionServices {
 		}
 		for (PermissionVo permissionVo : permissions) {
 			for (String role : roleArray) {
-				if (permissionVo.getRoleCode().equalsIgnoreCase(role) && (permissionVo.getPermissions().toLowerCase()
+				if (permissionVo.getRoleCode().equalsIgnoreCase(role) && (permissionVo.getPermissions()
+						.toLowerCase()
 						.contains(Permission.ALL.name().toLowerCase())
 						|| permissionVo.getPermissions().toLowerCase().contains(roleAndPermissions[1].toLowerCase()))) {
 					return true;

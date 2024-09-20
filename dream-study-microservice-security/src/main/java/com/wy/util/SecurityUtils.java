@@ -9,11 +9,11 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import com.wy.common.AuthException;
 import com.wy.entity.User;
 
 import dream.flying.flower.collection.ListHelper;
 import dream.flying.flower.enums.TipEnum;
+import dream.flying.flower.framework.security.exception.AuthException;
 import dream.flying.flower.lang.StrHelper;
 
 /**

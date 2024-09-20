@@ -1,19 +1,17 @@
-package com.wy.oauth2;
+package com.wy.config;
 
 import java.net.URI;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
@@ -36,6 +34,7 @@ import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationExch
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.security.oauth2.core.http.converter.OAuth2AccessTokenResponseHttpMessageConverter;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -43,47 +42,26 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import jakarta.annotation.Resource;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
- * SpringSecurity6+OAuth2+Wechat
- * 
- * <pre>
- * 1.需要在微信的官网上配置域名,域名要和项目的地址相同
- * 2.OAuth2AuthorizationRequestRedirectFilter.DEFAULT_AUTHORIZATION_REQUEST_BASE_URI:默认用户访问端点,
- * 		需加上配置文件中spring.security.oauth2.client.registration下的key使用,如微信为/oauth2/authorization/wechat
- * 3.客户端在页面或其他服务中访问/oauth2/authorization/wechat,请求被重定向到了https://open.weixin.qq.com/connect/oauth2/authorize这个地址
- * 4.此时客户端会跳转到微信授权页面
- * 5.用户点击同意后,服务端会重定向到redirect_uri的地址,即本项目地址/login/oauth2/code/wechat.
- * 		若该地址后面携带了code和state参数,则表示code获取成功.回调地址中的state和此前发起请求时的state两个值是一样的
- * 6.通过日志可以看到,接着又发起了获取access_token的请求,如果获取成功,随即就会使用acces_token再请求获取用户信息的接口
- * 7.最后在得到用户数据后会创建对应的Authentication对象,并为其进行持久化操作,至此微信公众号网页授权的整个过程就完成了
- * 8.SecurityContextHolder.getContext().getAuthentication().getName():获取实际的Authentication对象中的用户名
- * </pre>
- * 
+ * 用户通过本系统调用Wechat进行登录认证
+ *
  * @author 飞花梦影
- * @date 2023-02-01 16:51:06
- * @git {@link https://github.com/dreamFlyingFlower }
+ * @date 2024-09-17 21:25:37
+ * @git {@link https://github.com/dreamFlyingFlower}
  */
-@Configuration
+@Slf4j
 @EnableWebSecurity
-@EnableMethodSecurity(prePostEnabled = true)
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class SecurityWechatConfig {
 
-	@Resource
+	@Autowired
 	private ClientRegistrationRepository clientRegistrationRepository;
 
-	/**
-	 * 定义前端访问端点,此处直接使用了系统的/oauth2/authorization
-	 * 
-	 * @param clientRegistrationRepository 客户端认证服务
-	 * @return 认证请求认证解析器
-	 */
 	private OAuth2AuthorizationRequestResolver
 			authorizationRequestResolver(ClientRegistrationRepository clientRegistrationRepository) {
-		// 基础访问地址,实际访问需加上配置文件中spring.security.oauth2.client.registration下的key使用,如微信为/oauth2/authorization/wechat
 		String authorizationRequestBaseUri =
 				OAuth2AuthorizationRequestRedirectFilter.DEFAULT_AUTHORIZATION_REQUEST_BASE_URI;
 		// 参考框架内默认的实例构造方法
@@ -103,7 +81,7 @@ public class SecurityWechatConfig {
 		Object state = parameters.get(OAuth2ParameterNames.STATE);
 		// 清除掉原来所有的参数
 		parameters.clear();
-		// 重新调整顺序,修改clientId参数名称为appid
+		// 修改clientId参数名称为appid
 		parameters.put("appid", clientId);
 		parameters.put(OAuth2ParameterNames.REDIRECT_URI, redirectUri);
 		parameters.put(OAuth2ParameterNames.RESPONSE_TYPE, responseType);
@@ -125,7 +103,7 @@ public class SecurityWechatConfig {
 		// 创建一个OAuth2AccessTokenResponseHttpMessageConverter对象,设置支持的MediaType为text/plain
 		OAuth2AccessTokenResponseHttpMessageConverter messageConverter =
 				new OAuth2AccessTokenResponseHttpMessageConverter();
-		messageConverter.setSupportedMediaTypes(List.of(MediaType.TEXT_PLAIN));
+		messageConverter.setSupportedMediaTypes(Arrays.asList(MediaType.TEXT_PLAIN));
 		messageConverter.setAccessTokenResponseConverter(new WechatOAuth2AccessTokenResponseConverter());
 		// 其他配置照搬源码
 		RestTemplate restTemplate = new RestTemplate(Arrays.asList(new FormHttpMessageConverter(), messageConverter));
@@ -152,7 +130,7 @@ public class SecurityWechatConfig {
 	private static class WechatOAuth2AuthorizationCodeGrantRequestEntityConverter
 			extends OAuth2AuthorizationCodeGrantRequestEntityConverter {
 
-		// 参考父类的源码,重写createParameters(),根据微信的文档,依次添加appid,secret,grant_type,code这四个参数
+		// 参考父类的源码,依葫芦画瓢重写createParameters方法,根据微信的文档,依次添加appid,secret,grant_type,code这四个参数
 		@Override
 		protected MultiValueMap<String, String>
 				createParameters(OAuth2AuthorizationCodeGrantRequest authorizationCodeGrantRequest) {
@@ -174,8 +152,8 @@ public class SecurityWechatConfig {
 		userService.setRequestEntityConverter(new WechatOAuth2UserRequestEntityConverter());
 		// 创建一个MappingJackson2HttpMessageConverter对象,同样设置支持的MediaType为text/plain
 		MappingJackson2HttpMessageConverter messageConverter = new MappingJackson2HttpMessageConverter();
-		messageConverter.setSupportedMediaTypes(List.of(MediaType.TEXT_PLAIN));
-		RestTemplate restTemplate = new RestTemplate(List.of(messageConverter));
+		messageConverter.setSupportedMediaTypes(Arrays.asList(MediaType.TEXT_PLAIN));
+		RestTemplate restTemplate = new RestTemplate(Arrays.asList(messageConverter));
 		restTemplate.setErrorHandler(new OAuth2ErrorResponseErrorHandler());
 		userService.setRestOperations(restTemplate);
 		return userService;
@@ -199,26 +177,14 @@ public class SecurityWechatConfig {
 	}
 
 	@Bean
-	SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-		httpSecurity
-				// 自定义oauth2,配置OAuth2 Client和OAuth2 Server交互,启用SSO
-				.oauth2Login(oauth2 -> oauth2
-						// 登录地址
-						// .loginPage(null)
-						// 自定义登录成功方法
-						// .successHandler(null)
-						// 定制发起授权请求,有authorizationRequestResolver的扩展点
-						.authorizationEndpoint(authorization -> authorization.authorizationRequestResolver(
-								authorizationRequestResolver(clientRegistrationRepository)))
-						// 获取access_token,只有一个accessTokenResponseClient扩展点
-						.tokenEndpoint(token -> token.accessTokenResponseClient(accessTokenResponseClient()))
-						// 获取用户信息,自定义service,配置OAuth2UserService的实例
-						.userInfoEndpoint(userInfo -> userInfo.userService(userService())));
-
-		// 自定义oauth2资源服务器
-		// httpSecurity.oauth2ResourceServer((oauth2) ->
-		// oauth2.jwt(Customizer.withDefaults()));
-
-		return httpSecurity.build();
+	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+		http.oauth2Login(oauth2 -> oauth2
+				.authorizationEndpoint(authorization -> authorization
+						.authorizationRequestResolver(authorizationRequestResolver(clientRegistrationRepository)))
+				.tokenEndpoint(token -> token.accessTokenResponseClient(accessTokenResponseClient()))
+				.userInfoEndpoint(userInfo -> userInfo.userService(userService())));
+		DefaultSecurityFilterChain filterChain = http.build();
+		filterChain.getFilters().stream().map(Object::toString).forEach(log::info);
+		return filterChain;
 	}
 }

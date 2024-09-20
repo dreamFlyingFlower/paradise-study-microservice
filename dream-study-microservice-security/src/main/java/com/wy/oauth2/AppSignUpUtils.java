@@ -12,8 +12,7 @@ import org.springframework.social.connect.web.ProviderSignInUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.WebRequest;
 
-import com.wy.common.AuthException;
-
+import dream.flying.flower.framework.security.exception.AuthException;
 import dream.flying.flower.lang.StrHelper;
 
 /**

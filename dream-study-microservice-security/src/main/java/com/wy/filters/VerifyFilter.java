@@ -18,12 +18,12 @@ import org.springframework.util.AntPathMatcher;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.wy.common.AuthException;
 import com.wy.properties.UserProperties;
 import com.wy.verify.VerifyHandlerFactory;
 import com.wy.verify.VerifyInfo;
 
 import dream.flying.flower.collection.ListHelper;
+import dream.flying.flower.framework.security.exception.AuthException;
 import dream.flying.flower.lang.StrHelper;
 
 /**
@@ -96,8 +96,8 @@ public class VerifyFilter extends OncePerRequestFilter implements InitializingBe
 				VerifyInfo type = getVerifyType(request);
 				if (type != null) {
 					logger.info("校验请求(" + request.getRequestURI() + ")中的验证码,验证码类型" + type);
-					verifyHandlerFactory.getHandler(type).verify(new ServletWebRequest(request, response),
-							type.getVerifyType());
+					verifyHandlerFactory.getHandler(type)
+							.verify(new ServletWebRequest(request, response), type.getVerifyType());
 					logger.info("验证码校验通过");
 				}
 			} catch (AuthException e) {

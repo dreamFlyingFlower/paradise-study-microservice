@@ -25,8 +25,8 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.wy.common.AuthException;
 
+import dream.flying.flower.framework.security.exception.AuthException;
 import dream.flying.flower.lang.StrHelper;
 
 /**
