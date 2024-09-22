@@ -6,18 +6,22 @@ spring:
         registration:
           # 本系统在微信中注册时的信息
           wechat:
-            # 客户端ID和密钥
+            # oauth认证提供者配置,和下边配置的认证提供者关联起来,若不配置,默认为当前配置的key,即wechat
+            provider: wechat
+            # 第三方授权服务器颁发给客户端的ID和密钥
             client-id: 
             client-secret: 
-            # 授权模式
+            # 第三方授权服务器指定客户端的授权模式
             authorization-grant-type: authorization_code
-            # 微信验证通过后重定向到本系统的地址
+            # 微信验证通过后调用客户端验证码的地址
             redirect-uri: "{baseUrl}/{action}/oauth2/code/{registrationId}"
-            # 权限,允许获取微信的用户信息
+            # 第三方授权服务器提供给客户端的权限,允许获取微信的用户信息
             scope: snsapi_userinfo
         provider:
           # 微信信息
           wechat:
+            # 可以是OpenID连接发现端点,也可以是RFC 8414定义的OAuth 2.0授权服务器元数据端点
+            issuer-uri: 
             # 微信认证地址
             authorization-uri: https://open.weixin.qq.com/connect/oauth2/authorize
             # 微信获取token地址

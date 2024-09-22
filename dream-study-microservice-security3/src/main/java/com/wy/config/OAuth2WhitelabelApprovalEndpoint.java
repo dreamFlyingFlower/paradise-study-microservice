@@ -1,134 +1,134 @@
-package com.wy.config;
-
-import java.util.Map;
-
-import org.springframework.security.oauth2.provider.AuthorizationRequest;
-import org.springframework.security.oauth2.provider.endpoint.FrameworkEndpoint;
-import org.springframework.security.oauth2.provider.endpoint.WhitelabelApprovalEndpoint;
-import org.springframework.security.web.csrf.CsrfToken;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.View;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import org.springframework.web.util.HtmlUtils;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
-/**
- * 配置不需要点授权,直接跳过授权页面
- * 
- * {@link WhitelabelApprovalEndpoint}:在用户登录完成之后会再点一下授权的按钮,该类实际上类似一个controller,
- * {@link FrameworkEndpoint}类似于Controller,但是如果有同样的url,会先走程序中的url,而不走该类的代码
- *
- * @author 飞花梦影
- * @date 2021-07-01 14:40:35
- * @git {@link https://github.com/dreamFlyingFlower }
- */
-public class OAuth2WhitelabelApprovalEndpoint {
-
-	/**
-	 * 覆盖OAuth2中的同名url,让程序走自定义的方法
-	 * 
-	 * @param model
-	 * @param request
-	 * @return
-	 * @throws Exception
-	 */
-	@GetMapping("/oauth/confirm_access")
-	@PostMapping("/oauth/confirm_access")
-	public ModelAndView getAccessConfirmation(Map<String, Object> model, HttpServletRequest request) throws Exception {
-		final String approvalContent = createTemplate(model, request);
-		if (request.getAttribute("_csrf") != null) {
-			model.put("_csrf", request.getAttribute("_csrf"));
-		}
-		View approvalView = new View() {
-
-			@Override
-			public String getContentType() {
-				return "text/html";
-			}
-
-			@Override
-			public void render(Map<String, ?> model, HttpServletRequest request, HttpServletResponse response)
-					throws Exception {
-				response.setContentType(getContentType());
-				response.getWriter().append(approvalContent);
-			}
-		};
-		return new ModelAndView(approvalView, model);
-	}
-
-	protected String createTemplate(Map<String, Object> model, HttpServletRequest request) {
-		AuthorizationRequest authorizationRequest = (AuthorizationRequest) model.get("authorizationRequest");
-		String clientId = authorizationRequest.getClientId();
-
-		// 直接复制了WhitelabelApprovalEndpoint里的代码,隐藏所有的内容,同时自动提交表单,很粗糙,需要自己改
-		StringBuilder builder = new StringBuilder();
-		builder.append("<html><body ><div style='display:none'><h1>OAuth Approval</h1>");
-		builder.append("<p>Do you authorize \"").append(HtmlUtils.htmlEscape(clientId));
-		builder.append("\" to access your protected resources?</p>");
-		builder.append("<form id=\"confirmationForm\" name=\"confirmationForm\" action=\"");
-
-		String requestPath = ServletUriComponentsBuilder.fromContextPath(request).build().getPath();
-		if (requestPath == null) {
-			requestPath = "";
-		}
-
-		builder.append(requestPath).append("/oauth/authorize\" method=\"post\">");
-		builder.append("<input name=\"user_oauth_approval\" value=\"true\" type=\"hidden\"/>");
-
-		String csrfTemplate = null;
-		CsrfToken csrfToken =
-				(CsrfToken) (model.containsKey("_csrf") ? model.get("_csrf") : request.getAttribute("_csrf"));
-		if (csrfToken != null) {
-			csrfTemplate = "<input type=\"hidden\" name=\"" + HtmlUtils.htmlEscape(csrfToken.getParameterName())
-					+ "\" value=\"" + HtmlUtils.htmlEscape(csrfToken.getToken()) + "\" />";
-		}
-		if (csrfTemplate != null) {
-			builder.append(csrfTemplate);
-		}
-
-		String authorizeInputTemplate =
-				"<label><input name=\"authorize\" value=\"Authorize\" type=\"submit\"/></label></form>";
-
-		if (model.containsKey("scopes") || request.getAttribute("scopes") != null) {
-			builder.append(createScopes(model, request));
-			builder.append(authorizeInputTemplate);
-		} else {
-			builder.append(authorizeInputTemplate);
-			builder.append("<form id=\"denialForm\" name=\"denialForm\" action=\"");
-			builder.append(requestPath).append("/oauth/authorize\" method=\"post\">");
-			builder.append("<input name=\"user_oauth_approval\" value=\"false\" type=\"hidden\"/>");
-			if (csrfTemplate != null) {
-				builder.append(csrfTemplate);
-			}
-			builder.append("<label><input name=\"deny\" value=\"Deny\" type=\"submit\"/></label></form>");
-		}
-
-		builder.append("</div><script>document.getElementById('confirmationForm').submit();</script></body></html>");
-
-		return builder.toString();
-	}
-
-	private CharSequence createScopes(Map<String, Object> model, HttpServletRequest request) {
-		StringBuilder builder = new StringBuilder("<ul>");
-		@SuppressWarnings("unchecked")
-		Map<String, String> scopes = (Map<String,
-				String>) (model.containsKey("scopes") ? model.get("scopes") : request.getAttribute("scopes"));
-		for (String scope : scopes.keySet()) {
-			String approved = "true".equals(scopes.get(scope)) ? " checked" : "";
-			String denied = !"true".equals(scopes.get(scope)) ? " checked" : "";
-			scope = HtmlUtils.htmlEscape(scope);
-
-			builder.append("<li><div class=\"form-group\">");
-			builder.append(scope).append(": <input type=\"radio\" name=\"");
-			builder.append(scope).append("\" value=\"true\"").append(approved).append(">Approve</input> ");
-			builder.append("<input type=\"radio\" name=\"").append(scope).append("\" value=\"false\"");
-			builder.append(denied).append(">Deny</input></div></li>");
-		}
-		builder.append("</ul>");
-		return builder.toString();
-	}
-}
+//package com.wy.config;
+//
+//import java.util.Map;
+//
+//import org.springframework.security.oauth2.provider.AuthorizationRequest;
+//import org.springframework.security.oauth2.provider.endpoint.FrameworkEndpoint;
+//import org.springframework.security.oauth2.provider.endpoint.WhitelabelApprovalEndpoint;
+//import org.springframework.security.web.csrf.CsrfToken;
+//import org.springframework.web.bind.annotation.GetMapping;
+//import org.springframework.web.bind.annotation.PostMapping;
+//import org.springframework.web.servlet.ModelAndView;
+//import org.springframework.web.servlet.View;
+//import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+//import org.springframework.web.util.HtmlUtils;
+//
+//import jakarta.servlet.http.HttpServletRequest;
+//import jakarta.servlet.http.HttpServletResponse;
+//
+///**
+// * 配置不需要点授权,直接跳过授权页面
+// * 
+// * {@link WhitelabelApprovalEndpoint}:在用户登录完成之后会再点一下授权的按钮,该类实际上类似一个controller,
+// * {@link FrameworkEndpoint}类似于Controller,但是如果有同样的url,会先走程序中的url,而不走该类的代码
+// *
+// * @author 飞花梦影
+// * @date 2021-07-01 14:40:35
+// * @git {@link https://github.com/dreamFlyingFlower }
+// */
+//public class OAuth2WhitelabelApprovalEndpoint {
+//
+//	/**
+//	 * 覆盖OAuth2中的同名url,让程序走自定义的方法
+//	 * 
+//	 * @param model
+//	 * @param request
+//	 * @return
+//	 * @throws Exception
+//	 */
+//	@GetMapping("/oauth/confirm_access")
+//	@PostMapping("/oauth/confirm_access")
+//	public ModelAndView getAccessConfirmation(Map<String, Object> model, HttpServletRequest request) throws Exception {
+//		final String approvalContent = createTemplate(model, request);
+//		if (request.getAttribute("_csrf") != null) {
+//			model.put("_csrf", request.getAttribute("_csrf"));
+//		}
+//		View approvalView = new View() {
+//
+//			@Override
+//			public String getContentType() {
+//				return "text/html";
+//			}
+//
+//			@Override
+//			public void render(Map<String, ?> model, HttpServletRequest request, HttpServletResponse response)
+//					throws Exception {
+//				response.setContentType(getContentType());
+//				response.getWriter().append(approvalContent);
+//			}
+//		};
+//		return new ModelAndView(approvalView, model);
+//	}
+//
+//	protected String createTemplate(Map<String, Object> model, HttpServletRequest request) {
+//		AuthorizationRequest authorizationRequest = (AuthorizationRequest) model.get("authorizationRequest");
+//		String clientId = authorizationRequest.getClientId();
+//
+//		// 直接复制了WhitelabelApprovalEndpoint里的代码,隐藏所有的内容,同时自动提交表单,很粗糙,需要自己改
+//		StringBuilder builder = new StringBuilder();
+//		builder.append("<html><body ><div style='display:none'><h1>OAuth Approval</h1>");
+//		builder.append("<p>Do you authorize \"").append(HtmlUtils.htmlEscape(clientId));
+//		builder.append("\" to access your protected resources?</p>");
+//		builder.append("<form id=\"confirmationForm\" name=\"confirmationForm\" action=\"");
+//
+//		String requestPath = ServletUriComponentsBuilder.fromContextPath(request).build().getPath();
+//		if (requestPath == null) {
+//			requestPath = "";
+//		}
+//
+//		builder.append(requestPath).append("/oauth/authorize\" method=\"post\">");
+//		builder.append("<input name=\"user_oauth_approval\" value=\"true\" type=\"hidden\"/>");
+//
+//		String csrfTemplate = null;
+//		CsrfToken csrfToken =
+//				(CsrfToken) (model.containsKey("_csrf") ? model.get("_csrf") : request.getAttribute("_csrf"));
+//		if (csrfToken != null) {
+//			csrfTemplate = "<input type=\"hidden\" name=\"" + HtmlUtils.htmlEscape(csrfToken.getParameterName())
+//					+ "\" value=\"" + HtmlUtils.htmlEscape(csrfToken.getToken()) + "\" />";
+//		}
+//		if (csrfTemplate != null) {
+//			builder.append(csrfTemplate);
+//		}
+//
+//		String authorizeInputTemplate =
+//				"<label><input name=\"authorize\" value=\"Authorize\" type=\"submit\"/></label></form>";
+//
+//		if (model.containsKey("scopes") || request.getAttribute("scopes") != null) {
+//			builder.append(createScopes(model, request));
+//			builder.append(authorizeInputTemplate);
+//		} else {
+//			builder.append(authorizeInputTemplate);
+//			builder.append("<form id=\"denialForm\" name=\"denialForm\" action=\"");
+//			builder.append(requestPath).append("/oauth/authorize\" method=\"post\">");
+//			builder.append("<input name=\"user_oauth_approval\" value=\"false\" type=\"hidden\"/>");
+//			if (csrfTemplate != null) {
+//				builder.append(csrfTemplate);
+//			}
+//			builder.append("<label><input name=\"deny\" value=\"Deny\" type=\"submit\"/></label></form>");
+//		}
+//
+//		builder.append("</div><script>document.getElementById('confirmationForm').submit();</script></body></html>");
+//
+//		return builder.toString();
+//	}
+//
+//	private CharSequence createScopes(Map<String, Object> model, HttpServletRequest request) {
+//		StringBuilder builder = new StringBuilder("<ul>");
+//		@SuppressWarnings("unchecked")
+//		Map<String, String> scopes = (Map<String,
+//				String>) (model.containsKey("scopes") ? model.get("scopes") : request.getAttribute("scopes"));
+//		for (String scope : scopes.keySet()) {
+//			String approved = "true".equals(scopes.get(scope)) ? " checked" : "";
+//			String denied = !"true".equals(scopes.get(scope)) ? " checked" : "";
+//			scope = HtmlUtils.htmlEscape(scope);
+//
+//			builder.append("<li><div class=\"form-group\">");
+//			builder.append(scope).append(": <input type=\"radio\" name=\"");
+//			builder.append(scope).append("\" value=\"true\"").append(approved).append(">Approve</input> ");
+//			builder.append("<input type=\"radio\" name=\"").append(scope).append("\" value=\"false\"");
+//			builder.append(denied).append(">Deny</input></div></li>");
+//		}
+//		builder.append("</ul>");
+//		return builder.toString();
+//	}
+//}

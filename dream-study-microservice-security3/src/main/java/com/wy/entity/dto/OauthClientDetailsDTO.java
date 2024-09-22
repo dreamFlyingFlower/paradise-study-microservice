@@ -7,8 +7,8 @@ import java.util.List;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.wy.entity.OauthClientDetails;
-import com.wy.util.GuidGenerator;
 
+import dream.flying.flower.digest.DigestHelper;
 import dream.flying.flower.helper.DateTimeHelper;
 import dream.flying.flower.lang.StrHelper;
 import lombok.AllArgsConstructor;
@@ -29,12 +29,12 @@ public class OauthClientDetailsDTO implements Serializable {
 	private boolean archived;
 
 	@Builder.Default
-	private String clientId = GuidGenerator.generate();
+	private String clientId = DigestHelper.uuid();
 
 	private String resourceIds;
 
 	@Builder.Default
-	private String clientSecret = GuidGenerator.generateClientSecret();
+	private String clientSecret = DigestHelper.uuid();
 
 	private String scope;
 
@@ -105,9 +105,11 @@ public class OauthClientDetailsDTO implements Serializable {
 
 	public OauthClientDetails createDomain() {
 		OauthClientDetails clientDetails = new OauthClientDetails().clientId(clientId)
-		        // encrypted client secret
-		        .clientSecret(new BCryptPasswordEncoder().encode(clientSecret)).resourceIds(resourceIds)
-		        .authorizedGrantTypes(authorizedGrantTypes).scope(scope);
+				// encrypted client secret
+				.clientSecret(new BCryptPasswordEncoder().encode(clientSecret))
+				.resourceIds(resourceIds)
+				.authorizedGrantTypes(authorizedGrantTypes)
+				.scope(scope);
 
 		if (StrHelper.isNotBlank(webServerRedirectUri)) {
 			clientDetails.webServerRedirectUri(webServerRedirectUri);
@@ -117,8 +119,9 @@ public class OauthClientDetailsDTO implements Serializable {
 			clientDetails.authorities(authorities);
 		}
 
-		clientDetails.accessTokenValidity(accessTokenValidity).refreshTokenValidity(refreshTokenValidity)
-		        .trusted(trusted);
+		clientDetails.accessTokenValidity(accessTokenValidity)
+				.refreshTokenValidity(refreshTokenValidity)
+				.trusted(trusted);
 
 		if (StrHelper.isNotEmpty(additionalInformation)) {
 			clientDetails.additionalInformation(additionalInformation);
