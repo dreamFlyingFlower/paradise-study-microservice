@@ -26,6 +26,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 
+import dream.flying.flower.reflect.ReflectHelper;
 import dream.framework.core.excel.ExcelModelHelpers;
 
 /**
@@ -123,7 +124,7 @@ public abstract class AbstractService<T> implements BaseService<T> {
 		for (Field field : fields) {
 			// 检查是否有unique字段
 			if (field.isAnnotationPresent(Unique.class)) {
-				field.setAccessible(true);
+				ReflectHelper.fixAccessible(field);
 				try {
 					if (saveOrUpdate) {
 						// 当新增时可以直接加入检查唯一的map中,不可多字段同时检查
@@ -141,7 +142,7 @@ public abstract class AbstractService<T> implements BaseService<T> {
 						// oriName = "ori" + StrHelper.firstUpper(field.getName());
 						// }
 						// Field actualField = clazz.getDeclaredField(oriName);
-						// actualField.setAccessible(true);
+						// ReflectHelper.fixAccessible(actualField);
 						// Object object = actualField.get(model);
 						// if (Objects.equals(object, field.get(model))) {
 						// field.set(model, null);
@@ -178,7 +179,7 @@ public abstract class AbstractService<T> implements BaseService<T> {
 	}
 
 	private Long validSort(Field field, T model) {
-		field.setAccessible(true);
+		ReflectHelper.fixAccessible(field);
 		try {
 			Object value = field.get(model);
 			if (Objects.nonNull(value)) {
