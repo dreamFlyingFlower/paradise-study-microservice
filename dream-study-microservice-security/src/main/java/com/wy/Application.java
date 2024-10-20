@@ -42,6 +42,7 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.oauth2.client.CommonOAuth2Provider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContext;
@@ -359,6 +360,8 @@ import com.wy.crl.UserCrl;
  * <pre>
  * {@link EnableOAuth2Sso}:废弃,配置{@link SecurityFilterChain}时由{@link HttpSecurity}的oauth2Login参数指定
  * </pre>
+ * 
+ * {@link CommonOAuth2Provider}:枚举类,里面事先定义好了几种常用的三方登录授权服务器的各种参数
  * 
  * @author 飞花梦影
  * @date 2019-01-31 00:09:33
