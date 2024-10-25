@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
@@ -30,8 +31,8 @@ import com.wy.exception.AuthException;
 import dream.flying.flower.lang.StrHelper;
 
 /**
- * 该类是第三方登录到授权服务器成功的自定义回调,和 LoginSuccessHandler 一样,只不过本类并不直接返回结果,
- * 而是在第三方登录成功之后自定义返回token
+ * Client登录到授权服务器成功的自定义回调,和 LoginSuccessHandler 一样,只不过本类并不直接返回结果,
+ * 而是在Client登录成功之后自定义返回token
  * 
  * {@link BasicAuthenticationFilter#doFilterInternal}:参照从中获取请求头信息的代码
  * ->{@link BasicAuthenticationConverter#convert}:获取请求头信息
@@ -40,7 +41,8 @@ import dream.flying.flower.lang.StrHelper;
  * @date 2019-09-29 16:55:39
  * @git {@link https://github.com/dreamFlyingFlower}
  */
-// @Configuration
+@Deprecated
+@Configuration
 public class ClientLoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
 
 	@Autowired

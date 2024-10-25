@@ -27,6 +27,7 @@ import lombok.AllArgsConstructor;
  * @date 2023-04-03 22:40:38
  * @git {@link https://gitee.com/dreamFlyingFlower}
  */
+@Deprecated
 @Configuration
 @EnableWebSecurity
 @AllArgsConstructor
@@ -52,8 +53,9 @@ public class SecurityConfig {
 	AuthenticationManager authenticationManager(AuthenticationManagerBuilder auth) throws Exception {
 		auth.authenticationProvider(userAuthenticationProvider);
 		// auth.userDetailsService(userService).passwordEncoder(passwordEncoder);
-		auth.inMemoryAuthentication().withUser(new User("guest",
-				"$2a$10$lg5hcqs13V3c6FVjr1/mjO31clz7fkjlIKnppDhNDdxJVaWxh/xB6", Collections.emptyList()))
+		auth.inMemoryAuthentication()
+				.withUser(new User("guest", "$2a$10$lg5hcqs13V3c6FVjr1/mjO31clz7fkjlIKnppDhNDdxJVaWxh/xB6",
+						Collections.emptyList()))
 				.passwordEncoder(passwordEncoder);
 		return auth.build();
 	}
@@ -64,8 +66,12 @@ public class SecurityConfig {
 				// 过滤swagger相关资源
 				.antMatchers("/authenticate", "/oauth/authorize", "/swagger-resources/**", "/swagger-ui/**",
 						"/v3/api-docs", "/webjars/**")
-				.permitAll().antMatchers(oauthServerSecurityProperties.getPermitAllSources()).permitAll().anyRequest()
-				.authenticated()).formLogin(form -> form.successHandler(loginSuccessHandler))
+				.permitAll()
+				.antMatchers(oauthServerSecurityProperties.getPermitAllSources())
+				.permitAll()
+				.anyRequest()
+				.authenticated())
+				.formLogin(form -> form.successHandler(loginSuccessHandler))
 				.csrf(csrf -> csrf.disable());
 		return http.build();
 	}

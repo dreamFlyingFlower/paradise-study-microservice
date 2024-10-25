@@ -35,6 +35,7 @@ import com.wy.util.JwtUtil;
  * @date 2021-07-02 16:51:40
  * @git {@link https://github.com/dreamFlyingFlower }
  */
+@Deprecated
 @Configuration
 public class OAuth2JdbcConfig {
 
@@ -43,6 +44,7 @@ public class OAuth2JdbcConfig {
 
 	@Autowired
 	private JdbcAccessTokenConverter jdbcAccessTokenConverter;
+
 	/**
 	 * 使用redis存储令牌,无需建表
 	 * 
@@ -67,6 +69,17 @@ public class OAuth2JdbcConfig {
 	// }
 
 	/**
+	 * 授权码模式数据来源,将授权码存储在数据库
+	 * 
+	 * @return AuthorizationCodeServices
+	 */
+	@Bean
+	AuthorizationCodeServices authorizationCodeServices() {
+		// 设置授权码模式的授权码存取在数据库中
+		return new JdbcAuthorizationCodeServices(dataSource);
+	}
+
+	/**
 	 * 使用JWT存储令牌,无需建表
 	 * 
 	 * @return TokenStore
@@ -87,7 +100,7 @@ public class OAuth2JdbcConfig {
 	}
 
 	/**
-	 * 令牌服务
+	 * Token令牌服务
 	 */
 	@Bean
 	@Primary
@@ -95,16 +108,16 @@ public class OAuth2JdbcConfig {
 		DefaultTokenServices service = new DefaultTokenServices();
 		// 客户端信息服务
 		service.setClientDetailsService(jdbcClientDetailsService());
-		// 是否刷新令牌
-		service.setSupportRefreshToken(true);
 		// 令牌存储策略
 		service.setTokenStore(tokenStore());
 		// 针对JWT令牌的添加
 		service.setTokenEnhancer(jwtAccessTokenConverter());
 		// 令牌默认有效期2小时
-		service.setAccessTokenValiditySeconds(7200);
-		// 刷新令牌默认有效期3天
-		service.setRefreshTokenValiditySeconds(259200);
+		service.setAccessTokenValiditySeconds(60 * 60 * 2);
+		// 是否支持刷新令牌
+		service.setSupportRefreshToken(true);
+		// 刷新令牌默认有效期30天
+		service.setRefreshTokenValiditySeconds(60 * 60 * 24 * 30);
 
 		// 加入JWT配置
 		// TokenEnhancerChain tokenEnhancerChain = new TokenEnhancerChain();
@@ -197,17 +210,6 @@ public class OAuth2JdbcConfig {
 	}
 
 	/**
-	 * 授权码模式数据来源,将授权码存储在数据库
-	 * 
-	 * @return AuthorizationCodeServices
-	 */
-	@Bean
-	AuthorizationCodeServices authorizationCodeServices() {
-		// 设置授权码模式的授权码存取在数据库中
-		return new JdbcAuthorizationCodeServices(dataSource);
-	}
-
-	/**
 	 * 生成JWT令牌加密
 	 * 
 	 * @return JWK令牌
@@ -215,7 +217,8 @@ public class OAuth2JdbcConfig {
 	@Bean
 	JWKSet jwkSet() {
 		RSAKey.Builder builder = new RSAKey.Builder(JwtUtil.getVerifierKey()).keyUse(KeyUse.SIGNATURE)
-				.algorithm(JWSAlgorithm.RS256).keyID(JwtUtil.VERIFIER_KEY_ID);
+				.algorithm(JWSAlgorithm.RS256)
+				.keyID(JwtUtil.VERIFIER_KEY_ID);
 		return new JWKSet(builder.build());
 	}
 

@@ -16,6 +16,7 @@ import dream.flying.flower.framework.web.helper.IpHelpers;
  * @date 2023-04-08 13:16:38
  * @git {@link https://gitee.com/dreamFlyingFlower}
  */
+@Deprecated
 @Configuration
 public class JdbcAccessTokenConverter extends DefaultAccessTokenConverter {
 

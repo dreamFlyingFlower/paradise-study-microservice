@@ -1,14 +1,19 @@
 package com.wy.oauth.memory;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
+import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
+import org.springframework.security.oauth2.provider.TokenGranter;
 import org.springframework.security.oauth2.provider.code.AuthorizationCodeServices;
+import org.springframework.security.oauth2.provider.endpoint.AuthorizationEndpoint;
 import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 
@@ -17,62 +22,17 @@ import com.wy.properties.OAuth2MemoryProperties;
 import lombok.AllArgsConstructor;
 
 /**
- * 内存模式用户名密码认证服务器
+ * {@link Deprecated}:在SpringSecurity5.7以上版本中,该认证方式被废弃
  * 
- * 获取token,固定接口/oauth/token,在浏览器访问
- * http://ip:55100/oauthServer/oauth/token?client_id=client_id&client_secret=guest&grant_type=password&username=guest&password=123456
+ * OAuth2使用内存进行认证服务
  * 
- * 请求参数:
- * 
- * <pre>
- * client_id:第三方客户端client_id,
- * client_secret:第三方客户端密码,如果服务器没有做特殊处理,该值不能加密或编码
- * grant_type:第三方客户端访问OAuth2认证服务器的方式
- * username:登录SpringSecurity服务的用户名和密码,实际情况下不应该有该参数.正常情况下应该先登录到本系统获得认证的token,
- * 		之后请求头中携带认证的token才能继续访问OAuth2认证服务器.或者SpringSecurity对所有的第三方请求都无需认证,则可不带该参数
- * password:同username,如果Security没有做任何密码的其他操作,传参时不能加密,要原文传输
- * </pre>
- * 
- * 返回值:
- * 
- * <pre>
- * access_token:OAuth2认证服务器返回的token,以后访问所有请求都要携带该token,否则无法访问
- * token_tpye:令牌类型
- * refresh_token:access_token到期时获取下一次access_token时的刷新token
- * expires_in:access_token过期时间
- * scope:权限域
- * </pre>
- * 
- * 检查token是否失效,固定接口/oauth/check_token,在浏览器访问
- * http://ip:55100/oauthServer/oauth/check_token?token=
- * 
- * 重新获取token,仍然使用/oauth/token,单是grant_type换成refresh_token,同时带上第一次获取到的refresh_token,用户名和密码也不需要
- * http://ip:55100/oauthServer/oauth/token?client_id=client_id&client_secret=guest&grant_type=refresh_token&refresh_token=
- * 
- * 内存模式授权码认证服务器
- * 
- * <pre>
- * 第一次先获得code: http://ip:port/oauth/authorize?response_type=code&state=123456&client_id=client_id&scope=all&redirect_uri=http://otherappurl
- * 返回http://otherappurl?code=ycjU3F&state=123456可以拿到ycjU3F这个code
- * 
- * response_type:请求模式,授权码认证
- * state:状态,非必须
- * client_id:第三方客户端client_id
- * scope:权限域
- * redirect_uri:获得code的请求地址
- * 
- * 第二次获得token:http://ip:port/oauth/token?client_id=client_id&client_secret=guest&grant_type=authorization_code&code=ycjU3F&redirect_uri=http://otherappurl
- * 
- * grant_type:授权码认证
- * code:从第一部获得的code
- * </pre>
- *
  * @author 飞花梦影
  * @date 2023-04-03 21:52:24
  * @git {@link https://gitee.com/dreamFlyingFlower}
  */
-// @Configuration
-// @EnableAuthorizationServer
+@Deprecated
+@Configuration
+@EnableAuthorizationServer
 @AllArgsConstructor
 public class MemoryAuthorizationServer extends AuthorizationServerConfigurerAdapter {
 
@@ -89,6 +49,8 @@ public class MemoryAuthorizationServer extends AuthorizationServerConfigurerAdap
 	@Qualifier("memoryAuthorizationServerTokenServices")
 	private final AuthorizationServerTokenServices memoryAuthorizationServerTokenServices;
 
+	// private final PasswordEncoder passwordEncoder;
+
 	/**
 	 * 实际生产应该从数据库查询加载到内存中,内存中没有再从数据库查询,数据据没有则说明没有注册
 	 * 
@@ -98,23 +60,43 @@ public class MemoryAuthorizationServer extends AuthorizationServerConfigurerAdap
 	 */
 	@Override
 	public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-		// 从内存中读取配置
+		// 配置存储到内存的客户端信息
 		clients.inMemory()
-				// client的id和密码
+				// clientId:客户端ID,必须
 				.withClient(oauth2MemoryProperties.getClientIdGuest())
+				// secret:(可信客户端需要)客户机密码,没有可不填
 				.secret(passwordEncoder.encode(oauth2MemoryProperties.getClientSecretGuest()))
-				// token有效期
-				.accessTokenValiditySeconds(100)
-				// 该client可访问的资源服务器ID,每个资源服务器都可以自定义,可不写
-				.resourceIds("oauth-resource")
-				// 认证模式
+				// authorizedGrantTypes:授予客户端使用授权的类型,默认值为空
 				.authorizedGrantTypes(oauth2MemoryProperties.getGrantTypes())
-				// 授权的范围,每个resource会设置自己的范围
-				.scopes(oauth2MemoryProperties.getScopes());
+				// token有效期
+				.accessTokenValiditySeconds(60 * 60 * 2)
+				// scope:客户受限的范围.如果范围未定义或为空(默认),客户端不受范围限制.read write all或其他
+				.scopes(oauth2MemoryProperties.getScopes())
+				// 可访问的资源服务器编号,每个资源服务器都可以自定义,可不写
+				.resourceIds("oauth-resource")
+				// authorities:授予客户的授权机构(普通的Spring Security权威机构)
+				.authorities("authority1", "authority2")
+				// 执行认证操作的时候会跳转到一个授权页面
+				.autoApprove(true)
+				// 重定向地址
+				.redirectUris("http://");
 	}
 
 	/**
-	 * 配置Token相关
+	 * 配置客户端详细信息,客户端标识,客户端秘钥,资源列表等等
+	 * 
+	 * <pre>
+	 * {@link AuthorizationEndpoint}:可以通过以下方式配置支持的授权类型AuthorizationServerEndpointsConfigurer.
+	 * 默认情况下,所有授权类型均受支持,除了密码.以下属性会影响授权类型
+	 * {@link AuthenticationManager}:通过注入密码授权被打开AuthenticationManager
+	 * {@link UserDetailsService}:如果注入UserDetailsService,则刷新令牌授权将包含对用户详细信息的检查,以确保该帐户仍然活动
+	 * {@link AuthorizationCodeServices}:定义AuthorizationCodeServices授权代码授权的授权代码服务
+	 * {@link TokenGranter}:TokenGranter完全控制授予和忽略上述其他属性
+	 * 在XML授予类型中包含作为子元素authorization-server
+	 * 
+	 * /oauth/authorize:可以从该请求中获取所有数据,然后根据需要进行渲染,然后所有用户需要执行的操作都是回复有关批准或拒绝授权的信息
+	 * 请求参数直接传递给UserApprovalHandler,AuthorizationEndpoint
+	 * </pre>
 	 * 
 	 * @param endpoints
 	 * @throws Exception
@@ -126,11 +108,9 @@ public class MemoryAuthorizationServer extends AuthorizationServerConfigurerAdap
 				.authenticationManager(authenticationManager)
 				// 授权码存储
 				.authorizationCodeServices(memoryAuthorizationCodeServices)
-				// token生成服务
+				// token服务
 				.tokenServices(memoryAuthorizationServerTokenServices)
 				// 以内存的方式存储token
-				// .tokenStore(new InMemoryTokenStore())
-				// 以JWT的方式存储token
 				.tokenStore(tokenStore)
 				// 允许获得token的请求方式
 				.allowedTokenEndpointRequestMethods(HttpMethod.POST, HttpMethod.GET);
@@ -157,7 +137,12 @@ public class MemoryAuthorizationServer extends AuthorizationServerConfigurerAdap
 				.checkTokenAccess("permitAll()")
 				// 值允许已经认证了的用户访问
 				// .checkTokenAccess("isAuthenticated()")
+				// 密码解析
+				// .passwordEncoder(passwordEncoder)
 				// 允许客户端进行表单认证
 				.allowFormAuthenticationForClients();
+		// oauthServer.tokenKeyAccess("isAnonymous() ||
+		// hasAuthority('ROLE_TRUSTED_CLIENT')");
+		// oauthServer.checkTokenAccess("hasAuthority('ROLE_TRUSTED_CLIENT')");
 	}
 }

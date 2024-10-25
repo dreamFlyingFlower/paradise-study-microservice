@@ -14,10 +14,6 @@
 	<name>dream-study-microservice-oauth-server</name>
 	<description>oauth2-server</description>
 
-	<properties>
-		<spring-security-oauth2.version>2.3.8.RELEASE</spring-security-oauth2.version>
-	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>dream.flying.flower</groupId>
@@ -26,7 +22,6 @@
 		<dependency>
 			<groupId>org.springframework.security.oauth</groupId>
 			<artifactId>spring-security-oauth2</artifactId>
-			<version>${spring-security-oauth2.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -48,15 +43,7 @@
 			<groupId>org.mybatis.spring.boot</groupId>
 			<artifactId>mybatis-spring-boot-starter</artifactId>
 		</dependency>
-		<!-- pagehelper 分页插件 -->
-		<dependency>
-			<groupId>com.github.pagehelper</groupId>
-			<artifactId>pagehelper-spring-boot-starter</artifactId>
-		</dependency>
 
-
-		<!--
-		https://mvnrepository.com/artifact/io.springfox/springfox-boot-starter -->
 		<dependency>
 			<groupId>io.springfox</groupId>
 			<artifactId>springfox-boot-starter</artifactId>

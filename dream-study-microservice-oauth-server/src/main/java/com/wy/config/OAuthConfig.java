@@ -16,6 +16,7 @@ import com.wy.oauth.CustomizeTokenEnhancer;
  * @date 2024-07-13 23:46:23
  * @git {@link https://github.com/dreamFlyingFlower}
  */
+@Deprecated
 @Configuration
 public class OAuthConfig {
 

@@ -20,6 +20,7 @@ import dream.flying.flower.helper.DateTimeHelper;
  * @date 2024-07-14 00:09:38
  * @git {@link https://github.com/dreamFlyingFlower}
  */
+@Deprecated
 public class CustomizeTokenEnhancer implements TokenEnhancer {
 
 	private OAuthServerSecurityProperties oauthServerSecurityProperties;
