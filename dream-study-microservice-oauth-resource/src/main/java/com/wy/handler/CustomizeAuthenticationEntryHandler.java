@@ -25,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
  * @date 2023-04-05 23:16:15
  * @git {@link https://gitee.com/dreamFlyingFlower}
  */
+@Deprecated
 @Component
 @Slf4j
 public class CustomizeAuthenticationEntryHandler implements AuthenticationEntryPoint {

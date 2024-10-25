@@ -16,6 +16,7 @@ import org.springframework.security.oauth2.provider.token.store.KeyStoreKeyFacto
  * @date 2021-07-02 17:37:44
  * @git {@link https://github.com/dreamFlyingFlower }
  */
+@Deprecated
 public class JwtUtil {
 
 	private static final String KEY_STORE_FILE = "keystore-oauth2-demo";

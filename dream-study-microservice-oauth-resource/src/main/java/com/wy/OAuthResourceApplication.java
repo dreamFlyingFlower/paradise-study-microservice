@@ -11,9 +11,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @git {@link https://github.com/dreamFlyingFlower}
  */
 @SpringBootApplication
-public class OauthResourceApplication {
+public class OAuthResourceApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(OauthResourceApplication.class, args);
+		SpringApplication.run(OAuthResourceApplication.class, args);
 	}
 }

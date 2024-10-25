@@ -19,6 +19,8 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
  * @date 2021-07-03 10:58:55
  * @git {@link https://github.com/dreamFlyingFlower}
  */
+@SuppressWarnings("deprecation")
+@Deprecated
 @Configuration
 @EnableOAuth2Client
 public class OAuth2ClientConfig {

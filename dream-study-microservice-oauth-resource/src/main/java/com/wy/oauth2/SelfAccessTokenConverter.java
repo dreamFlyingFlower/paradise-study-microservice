@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
  * @date 2023-04-08 14:43:36
  * @git {@link https://gitee.com/dreamFlyingFlower}
  */
+@Deprecated
 @Component
 public class SelfAccessTokenConverter extends DefaultAccessTokenConverter {
 

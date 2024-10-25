@@ -3,12 +3,13 @@ package com.wy;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.security.oauth2.client.OAuth2RestTemplate;
+import org.springframework.security.oauth2.client.filter.OAuth2ClientContextFilter;
 import org.springframework.security.oauth2.client.token.grant.code.AuthorizationCodeResourceDetails;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.common.util.OAuth2Utils;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
-import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.provider.ClientDetails;
 import org.springframework.security.oauth2.provider.ClientDetailsService;
@@ -31,6 +32,8 @@ import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenCo
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 import org.springframework.security.oauth2.provider.token.store.jwk.JwkTokenStore;
 import org.springframework.security.oauth2.provider.token.store.redis.RedisTokenStore;
+import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
+import org.springframework.security.web.context.SecurityContextPersistenceFilter;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -38,7 +41,16 @@ import org.springframework.web.bind.annotation.RestController;
  * 
  * OAuth2认证服务器
  * 
- * 4种认证模式:授权码模式;密码模式;简化模式;客户端模式
+ * OAuth2规范有4种授权模式:授权码模式,用户名密码模式,简单模式,客户端模式,详情见notes/SpringCloud/OAuth2.0官方文档.pdf
+ * 
+ * OAuth2请求其他服务器资源中的角色:
+ * 
+ * <pre>
+ * ->资源拥有者:通常为用户,也可以使应用程序
+ * ->第三方应用:本身不存储资源,需要通过资源拥有者去请求资源服务器的资源
+ * ->授权服务器:也叫认证服务器,用于对资源拥有者身份认证,访问资源授权等,认证成功后发放授权码(access_token)给第三方
+ * ->资源服务器:存储拥有者资源的服务器,会给第三方应用一个客户端标识(client_id)和秘钥(client_secret),标识第三方的身份
+ * </pre>
  * 
  * 固定API:
  * 
@@ -47,7 +59,7 @@ import org.springframework.web.bind.annotation.RestController;
  * /oauth/token:令牌端点
  * /oauth/confirm_access:用户确认授权提交端点
  * /oauth/error:授权服务错误信息端点
- * /oauth/check_token:用于资源服务访问的令牌解析端点
+ * /oauth/check_token:用于资源服务访问的令牌解析端点,检查token是否失效.eg:http://ip:55100/oauthServer/oauth/check_token?token=
  * /oauth/token_key:提供公有密匙的端点,如果使用JWT令牌的话
  * </pre>
  * 
@@ -83,6 +95,9 @@ import org.springframework.web.bind.annotation.RestController;
  * -->认证服务器返回令牌(access_token)
  * 
  * 4.第三方从认证服务器获得令牌后,可用令牌请求资源服务器获得用户相关信息,令牌有时限,由认证服务器控制
+ * 
+ * 5./oauth/token:固定API,POST,重新获取令牌.grant_type换成refresh_token,同时带上第一次获取到的refresh_token,用户名和密码也不需要
+ * ->eg:http://ip:55100/oauthServer/oauth/token?client_id=client_id&client_secret=guest&grant_type=refresh_token&refresh_token=
  * </pre>
  * 
  * 
@@ -105,15 +120,6 @@ import org.springframework.web.bind.annotation.RestController;
  * -->scope:返回值.权限域
  * </pre>
  * 
- * 检查token是否失效,固定接口/oauth/check_token,在浏览器访问
- * http://ip:55100/oauthServer/oauth/check_token?token=
- * 
- * 重新获取token,仍然使用/oauth/token,单是grant_type换成refresh_token,同时带上第一次获取到的refresh_token,用户名和密码也不需要
- * http://ip:55100/oauthServer/oauth/token?client_id=client_id&client_secret=guest&grant_type=refresh_token&refresh_token=
- * 
- * 
- * 
- * 
  * 认证服务器和资源服务器,最好不要在同一个类或同一个工程中,可能会出现无法解决的问题:
  * 
  * <pre>
@@ -121,8 +127,6 @@ import org.springframework.web.bind.annotation.RestController;
  * 		类上添加该注解并继承{@link AuthorizationServerConfigurerAdapter}即可注册为认证服务器,
  * {@link AuthorizationServerConfigurerAdapter}:继承该类可以对OAuth2登录做些自定义的配置
  * ->{@link AuthorizationServerEndpointsConfigurer}:SpringOAuth其他入口点配置,如TokenEndpoint
- * {@link EnableResourceServer}:在SpringSecurity5.7以上版本中,该方式被废弃.
- * 		在类上只需要添加该注解即可注册为资源服务器
  * </pre>
  * 
  * 搭建自己的认证服务器,表结构如下,具体表字段参照{@link JdbcClientDetailsService}:
@@ -165,6 +169,32 @@ import org.springframework.web.bind.annotation.RestController;
  * {@link OAuth2AccessToken}:最终的令牌,scope等信息的集合
  * {@link JwtAccessTokenConverter}:JWT令牌生成器,里面的信息默认使用{@link DefaultAccessTokenConverter}生成
  * {@link DefaultAccessTokenConverter#convertAccessToken()}:JWT令牌中的默认信息生成器,重写该方法可自定义令牌传输信息
+ * </pre>
+ * 
+ * OAuth2主要拦截器:
+ * 
+ * <pre>
+ * ->{@link SecurityContextPersistenceFilter}
+ * ->{@link AbstractAuthenticationProcessingFilter}
+ * ->{@link OAuth2ClientContextFilter}
+ * ->{@link OAuth2RestTemplate}
+ * ->{@link SecurityContextPersistenceFilter}
+ * </pre>
+ * 
+ * 使用SpringOAuth2搭建:
+ * 
+ * <pre>
+ * dream-study-microservice-oauth-server:认证服务器
+ * dream-study-microservice-oauth-client:客户端调用
+ * dream-study-microservice-oauth-resource:资源服务器
+ * </pre>
+ * 
+ * SpringSecurity搭建:
+ * 
+ * <pre>
+ * dream-study-microservice-oauth-server:认证服务器,可直接使用作为认证服务器
+ * dream-study-microservice-security-client:客户端调用,和OAuth2略有不同,更简洁,详见代码
+ * dream-study-microservice-security-resource:资源服务器,和OAuth2搭建略有不同,更简洁,详见代码
  * </pre>
  * 
  * @author 飞花梦影

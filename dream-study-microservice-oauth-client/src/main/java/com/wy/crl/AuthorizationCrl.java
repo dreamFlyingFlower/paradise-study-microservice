@@ -22,6 +22,7 @@ import com.wy.properties.ConfigProperties;
  * @date 2021-07-03 10:55:37
  * @git {@link https://github.com/dreamFlyingFlower}
  */
+@Deprecated
 @Controller
 @RequestMapping("oauth")
 public class AuthorizationCrl {

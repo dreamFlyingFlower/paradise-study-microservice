@@ -19,25 +19,27 @@ import org.springframework.security.web.SecurityFilterChain;
  * @date 2021-07-03 11:00:36
  * @git {@link https://github.com/dreamFlyingFlower}
  */
+@Deprecated
 @EnableWebSecurity
 public class SecurtiyConfig {
 
 	@Bean
 	WebSecurityCustomizer webSecurityCustomizer() {
 		// 配置需要忽略检查的web url
-		return web -> web.ignoring().antMatchers(
-				// 过滤静态资源
-				"/public/**", "/static/**", "/resources/**", "/js/**", "/css/**", "/images/**",
-				// swagger api json
-				"/swagger**", "/swagger-ui.html", "/v2/api-docs",
-				// 用来获取支持的动作
-				"/swagger-resources/configuration/ui",
-				// 用来获取api-docs的URI
-				"/swagger-resources",
-				// 安全选项
-				"/swagger-resources/configuration/security", "/swagger-resources/**",
-				// 在搭建swagger接口文档时,通过浏览器控制台发现该/webjars路径下的文件被拦截,故加上此过滤条件
-				"/webjars/**");
+		return web -> web.ignoring()
+				.antMatchers(
+						// 过滤静态资源
+						"/public/**", "/static/**", "/resources/**", "/js/**", "/css/**", "/images/**",
+						// swagger api json
+						"/swagger**", "/swagger-ui.html", "/v2/api-docs",
+						// 用来获取支持的动作
+						"/swagger-resources/configuration/ui",
+						// 用来获取api-docs的URI
+						"/swagger-resources",
+						// 安全选项
+						"/swagger-resources/configuration/security", "/swagger-resources/**",
+						// 在搭建swagger接口文档时,通过浏览器控制台发现该/webjars路径下的文件被拦截,故加上此过滤条件
+						"/webjars/**");
 	}
 
 	@Bean
