@@ -4,14 +4,20 @@ management:
       server:
         # zipkin启动报错无法访问的解决方法
         auto-time-requests: false
+        request:
+          autotime:
+            enabled: false
 # 其他微服务的zipkin配置
-spring:  zipkin:    enabled: true
+spring:
+  zipkin:
+    enabled: true
     # 关闭服务发现,否则springcloud会把zipkin的url当服务名称
     discovery-client-enabled: false
     # zipkin的地址,其他微服务使用本服务的地址
     base-url: localhost:${server.port}
     # 发送跟踪数据到zipkin的类型
-    sender:      type: web
+    sender:
+      type: web
   sleuth: 
     sampler: 
       # 设置request抽样采集率为100%,默认0.1就是10%,即采样10%的请求数据

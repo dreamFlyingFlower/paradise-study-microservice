@@ -1,8 +1,0 @@
-server:
-  port: 55556
-spring: 
-  application:
-    name: dream-study-microservice-nacos
-  devtools:
-    restart:
-      enabled: true

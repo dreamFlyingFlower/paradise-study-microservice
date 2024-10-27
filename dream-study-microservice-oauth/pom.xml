@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>dream.flying.flower</groupId>
+		<artifactId>dream-parent2</artifactId>
+		<version>0.0.1</version>
+		<relativePath />
+	</parent>
+
+	<artifactId>dream-study-microservice-oauth</artifactId>
+	<packaging>pom</packaging>
+	<name>dream-study-microservice-oauth</name>
+	<description>Spring Security OAuth2.0</description>
+
+	<modules>
+		<module>dream-study-microservice-oauth-client</module>
+		<module>dream-study-microservice-oauth-resource</module>
+		<module>dream-study-microservice-oauth-server</module>
+	</modules>
+</project>

@@ -25,25 +25,17 @@
 
 	<modules>
 		<module>dream-study-microservice-async</module>
-		<module>dream-study-microservice-bus</module>
 		<module>dream-study-microservice-cache</module>
-		<module>dream-study-microservice-common</module>
 		<module>dream-study-microservice-config</module>
-		<module>dream-study-microservice-config-client</module>
-		<module>dream-study-microservice-feign</module>
 		<module>dream-study-microservice-gateway</module>
 		<module>dream-study-microservice-gateway3</module>
+		<module>dream-study-microservice-invocation</module>
 		<module>dream-study-microservice-mq</module>
-		<module>dream-study-microservice-nacos</module>
-		<module>dream-study-microservice-oauth-client</module>
-		<module>dream-study-microservice-oauth-resource</module>
-		<module>dream-study-microservice-oauth-server</module>
-		<module>dream-study-microservice-oauth-server3</module>
-		<module>dream-study-microservice-ribbon</module>
+		<module>dream-study-microservice-oauth</module>
+		<module>dream-study-microservice-oauth2</module>
+		<module>dream-study-microservice-oauth3</module>
 		<module>dream-study-microservice-security</module>
 		<module>dream-study-microservice-security3</module>
-		<module>dream-study-microservice-security-client</module>
-		<module>dream-study-microservice-security-resource</module>
 		<module>dream-study-microservice-server</module>
 		<module>dream-study-microservice-service</module>
 		<module>dream-study-microservice-sleuth</module>

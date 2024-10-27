@@ -43,7 +43,7 @@ import org.springframework.social.security.SpringSocialConfigurer;
 import org.springframework.social.security.provider.OAuth2AuthenticationService;
 import org.springframework.social.security.provider.SocialAuthenticationService;
 
-import com.wy.crl.UserCrl;
+import com.wy.controller.UserController;
 import com.wy.entity.UserQq;
 import com.wy.properties.UserProperties;
 import com.wy.social.qq.QqConnectionFactory;
@@ -191,7 +191,7 @@ public class SocialConfig extends SocialConfigurerAdapter {
 	}
 
 	/**
-	 * spring提供的注册工具类,会将授权服务器的信息提供给自定义的注册接口,见{@link UserCrl#getSocialUser()}
+	 * spring提供的注册工具类,会将授权服务器的信息提供给自定义的注册接口,见{@link UserController#getSocialUser()}
 	 * 
 	 * @param connectionFactoryLocator 连接
 	 */

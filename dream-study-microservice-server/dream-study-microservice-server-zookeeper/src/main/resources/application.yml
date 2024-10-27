@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: dream-study-microservice-server-zookeeper
+  cloud:
+    config:
+      # 决定override-system-properties属性是否生效,默认true
+      allow-override: true
+      # 扩展配置可以覆盖系统配置
+      override-system-properties: true
+      # 当allow-override为true时,该配置生效:true->远程配置优先级最低,且不能覆盖本地配置;false->远程配置优先级更高,会覆盖本地配置
+      override-none: true
+      
+    zookeeper:
+      # zookeeper服务连接地址,多个逗号分隔
+      connect-string:
+      # 服务配置 
+      config:
+        enabled: true
+        # 是否快速失败
+        fail-fast: false
+        # 命名空间,只有在同一个命名空间的服务才能使用服务名进行通讯
+        root: dev
+        # 服务名
+        name: dream-study-microservice-server-zookeeper
+      # 服务发现
+      discovery:
+        enabled: true
+        # 是否注册
+        register: true
+        # 实例ID
+        instance-id: 
+        # 服务IP地址,最好写固定IP,不要写localhost之类,否则可能找不到
+        instance-host:
+        # 命名空间,只有在同一个命名空间的服务才能使用服务名进行通讯
+        root: 

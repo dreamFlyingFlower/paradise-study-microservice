@@ -1,0 +1,16 @@
+server:
+  port: 55556
+spring: 
+  application:
+    name: dream-study-microservice-nacos
+  devtools:
+    restart:
+      enabled: true
+  cloud:
+    config:
+      # 决定override-system-properties属性是否生效,默认true
+      allow-override: true
+      # 扩展配置可以覆盖系统配置
+      override-system-properties: true
+      # 当allow-override为true时,该配置生效:true->远程配置优先级最低,且不能覆盖本地配置;false->远程配置优先级更高,会覆盖本地配置
+      override-none: true

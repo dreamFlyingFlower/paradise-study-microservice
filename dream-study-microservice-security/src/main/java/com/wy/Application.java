@@ -93,7 +93,7 @@ import org.springframework.web.filter.DelegatingFilterProxy;
 import com.wy.config.ExtraMethodSecurityExpressionHandler;
 import com.wy.config.ExtraSecurityExpressionRoot;
 import com.wy.config.SecurityConfig;
-import com.wy.crl.UserCrl;
+import com.wy.controller.UserController;
 
 /**
  * SpringSecurity默认的登录请求是/login,而且必须是post请求<br>
@@ -293,7 +293,7 @@ import com.wy.crl.UserCrl;
  * 
  * <pre>
  * 1.直接使用@permissionService.methodname(args),其中@后面必须接一个spring中的组件标识,
- * methodname是该组件中的方法名,args是传入其中的参数,返回值必须是boolean,详见{@link UserCrl#test}
+ * methodname是该组件中的方法名,args是传入其中的参数,返回值必须是boolean,详见{@link UserController#test}
  * 2.继承{@link SecurityExpressionRoot},实现{@link MethodSecurityExpressionOperations},
  * 所有需要实现的方法可以直接从MethodSecurityExpressionRoot中复制,该类是私有的,
  * 详见{@link ExtraSecurityExpressionRoot}和{@link ExtraMethodSecurityExpressionHandler}

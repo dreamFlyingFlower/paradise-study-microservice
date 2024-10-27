@@ -1,0 +1,36 @@
+server:
+  port: 55559
+
+spring:
+  application:
+    name: dream-study-microservice-server-client
+  profiles:
+    active:
+    - dev
+
+# eureka消费者(注册者)配置
+eureka:
+  instance:
+     # 服务组件注册在注册中心时显示的名称,默认是spring.application.name
+    appname: dream-study-microservice-service
+    #在信息列表显示的主机名
+    instance-id: ${spring.application.name}:${spring.cloud.client.ip-address}:${spring.application.instance_id:${server.port}}
+    # 与注册中心保持心跳的时间间隔,默认30S
+    #lease-renewal-interval-in-seconds: 10
+    # 与注册中心保持无心跳的最长时间,默认90S
+    #lease-expiration-duration-in-seconds: 30
+    # 访问的路径变为ip地址
+    #prefer-ip-address: true
+  client:
+    service-url:
+      # 向服务的注册中心注册的地址,多个逗号分隔
+      defaultZone: http://localhost:55555/eureka/
+      # 当注册中心开启了密码验证,则需要将用户名和密码拼接在url前面,用户名和密码用冒号分割,和url用@分割
+      # defaultZone: http://user:123456@localhost:55555/eureka/
+    # 是否注册到注册中心上,默认true注册
+    register-with-eureka: true
+    # 从注册服务中心多长时间拉取一次注册表信息,默认30S
+    registry-fetch-interval-seconds: 30
+    # 开启健康检查,需要actuator依赖
+    healthcheck:
+      enabled: true

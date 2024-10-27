@@ -1,8 +1,0 @@
-spring:
-  thymeleaf:    cache: false
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          # 认证服务器解析token令牌的密钥地址
-          jwk-set-uri: http://127.0.0.1:55100/oauthServer/oauth/token_key

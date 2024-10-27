@@ -1,0 +1,37 @@
+logging:
+  level:
+    '[org.springframework.security]': trace
+
+# 认证服务器配置
+spring:
+  security:
+    user:
+      name: "user"
+      password: "password"
+      roles:
+        - "USER"
+    oauth2:
+      client:
+        provider:
+          login-provider:
+            authorization-uri: 
+            issuer-uri: http://localhost:9000
+            jwk-set-uri: 
+            token-uri: 
+            user-info-authentication-method: 
+            user-info-uri: 
+            user-name-attribute: 
+        registration:
+          login-client:
+            authorization-grant-type: authorization_code,refresh_token,client_credentials
+            client-authentication-method: client_secret_basic
+            client-id: "login-client"
+            client-name: 
+            client-secret: "{noop}openid-connect"
+            provider: login-provider
+            redirect-uri: http://127.0.0.1:8080/login/oauth2/code/login-client,http://127.0.0.1:8080/authorized
+            scope:
+            - openid
+            - profile
+            - "message:read"
+            - "message:write"
