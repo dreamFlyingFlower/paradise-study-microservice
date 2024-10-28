@@ -23,8 +23,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.wy.core.CustomizerOAuth2ParameterNames;
-
 import dream.flying.flower.lang.StrHelper;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
@@ -89,7 +87,7 @@ public class AuthorizationServerEndpoint {
 			@RequestParam(OAuth2ParameterNames.CLIENT_ID) String clientId,
 			@RequestParam(OAuth2ParameterNames.SCOPE) String scope,
 			@RequestParam(OAuth2ParameterNames.STATE) String state,
-			@RequestParam(name = CustomizerOAuth2ParameterNames.USER_CODE, required = false) String userCode) {
+			@RequestParam(name = OAuth2ParameterNames.USER_CODE, required = false) String userCode) {
 
 		// Remove scopes that were already approved
 		Set<String> scopesToApprove = new HashSet<>();

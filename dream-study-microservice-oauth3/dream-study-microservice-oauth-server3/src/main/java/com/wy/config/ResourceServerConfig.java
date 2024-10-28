@@ -8,7 +8,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
-import dream.study.authorization.server.helpers.SecurityContextOAuth2Helpers;
+import com.wy.helpers.SecurityContextOAuth2Helpers;
 
 /**
  * SpringSecurity5.8.14资源服务器配置

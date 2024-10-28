@@ -20,7 +20,6 @@ import org.springframework.security.oauth2.server.authorization.settings.ClientS
 import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
 
 import dream.flying.flower.framework.security.constant.ConstAuthorization;
-import dream.study.authorization.server.core.CustomizerAuthorizationGrantType;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -102,7 +101,7 @@ public class AuthorizationClientConfig {
 				// 公共客户端
 				.clientAuthenticationMethod(ClientAuthenticationMethod.NONE)
 				// 设备码授权
-				.authorizationGrantType(CustomizerAuthorizationGrantType.DEVICE_CODE)
+				.authorizationGrantType(AuthorizationGrantType.DEVICE_CODE)
 				.authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
 				// 自定scope
 				.scope("message.read")

@@ -2,8 +2,6 @@ package com.wy.provider;
 
 import java.util.Objects;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -19,6 +17,7 @@ import com.wy.constant.ConstAuthorizationServerRedis;
 import dream.flying.flower.autoconfigure.redis.helper.RedisStrHelpers;
 import dream.flying.flower.framework.security.constant.ConstAuthorization;
 import dream.flying.flower.result.ResultException;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 
 /**
