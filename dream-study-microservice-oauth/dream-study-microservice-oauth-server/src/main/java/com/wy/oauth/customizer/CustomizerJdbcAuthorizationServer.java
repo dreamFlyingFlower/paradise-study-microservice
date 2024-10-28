@@ -1,4 +1,4 @@
-package com.wy.oauth.jdbc;
+package com.wy.oauth.customizer;
 
 import java.util.ArrayList;
 
@@ -25,7 +25,7 @@ import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 
 import com.wy.oauth.OAuth2WebResponseExceptionTranslator;
-import com.wy.oauth.jdbc.config.JdbcOAuth2Config;
+import com.wy.oauth.customizer.config.CustomizerOAuth2JdbcConfig;
 
 import lombok.AllArgsConstructor;
 
@@ -45,7 +45,7 @@ import lombok.AllArgsConstructor;
 @Configuration
 @EnableAuthorizationServer
 @AllArgsConstructor
-public class JdbcAuthorizationServer extends AuthorizationServerConfigurerAdapter {
+public class CustomizerJdbcAuthorizationServer extends AuthorizationServerConfigurerAdapter {
 
 	/**
 	 * 授权管理器
@@ -53,35 +53,35 @@ public class JdbcAuthorizationServer extends AuthorizationServerConfigurerAdapte
 	private AuthenticationManager authenticationManager;
 
 	/**
-	 * 根据配置使用,见{@link JdbcOAuth2Config#tokenStore()},
-	 * {@link JdbcOAuth2Config#redisTokenStore()},{@link JdbcOAuth2Config#jdbcTokenStore()}
+	 * 根据配置使用,见{@link CustomizerOAuth2JdbcConfig#tokenStore()},
+	 * {@link CustomizerOAuth2JdbcConfig#redisTokenStore()},{@link CustomizerOAuth2JdbcConfig#jdbcTokenStore()}
 	 */
 	private TokenStore tokenStore;
 
 	/**
-	 * {@link JdbcOAuth2Config#jdbcClientDetailsService()}
+	 * {@link CustomizerOAuth2JdbcConfig#jdbcClientDetailsService()}
 	 */
-	private JdbcClientDetailsService jdbcClientDetailsService;
+	private CustomizerJdbcClientDetailsService customizerJdbcClientDetailsService;
 
 	/**
-	 * {@link JdbcOAuth2Config#authorizationCodeServices()}
+	 * {@link CustomizerOAuth2JdbcConfig#authorizationCodeServices()}
 	 */
 	private AuthorizationCodeServices jdbcAuthorizationCodeServices;
 
 	/**
-	 * {@link JdbcOAuth2Config#authorizationServerTokenServices()}
+	 * {@link CustomizerOAuth2JdbcConfig#authorizationServerTokenServices()}
 	 */
 	private AuthorizationServerTokenServices jdbcAuthorizationServerTokenServices;
 
 	/**
-	 * {@link JdbcOAuth2Config#jwtAccessTokenConverter()}
+	 * {@link CustomizerOAuth2JdbcConfig#jwtAccessTokenConverter()}
 	 */
 	private JwtAccessTokenConverter jwtAccessTokenConverter;
 
 	/**
-	 * {@link JdbcOAuth2Config#jwtTokenEnhancer()}
+	 * {@link CustomizerOAuth2JdbcConfig#jwtTokenEnhancer()}
 	 */
-	private final TokenEnhancer jwtTokenEnhancer;
+	private TokenEnhancer jwtTokenEnhancer;
 
 	/**
 	 * 用户认证业务
@@ -101,9 +101,9 @@ public class JdbcAuthorizationServer extends AuthorizationServerConfigurerAdapte
 	/**
 	 * 客户端管理令牌:令牌生成和存储
 	 * 
-	 * 重写该方法后,如果使用内存方式存储客户端信息,则在配置文件中的security.oauth2.client.client-id和client-secret都将无效
-	 * 
 	 * 将ClientDetailsServiceConfigurer(从回调AuthorizationServerConfigurer)可以用来在内存或JDBC实现客户的细节服务来定义的
+	 * 
+	 * 重写该方法后,如果使用内存方式存储客户端信息,则在配置文件中的security.oauth2.client.client-id和client-secret都将无效
 	 * 
 	 * <pre>
 	 * 客户端的重要属性是:
@@ -117,7 +117,7 @@ public class JdbcAuthorizationServer extends AuthorizationServerConfigurerAdapte
 	 */
 	@Override
 	public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-		clients.withClientDetails(jdbcClientDetailsService);
+		clients.withClientDetails(customizerJdbcClientDetailsService);
 	}
 
 	/**
@@ -152,12 +152,10 @@ public class JdbcAuthorizationServer extends AuthorizationServerConfigurerAdapte
 				.tokenEnhancer(jwtTokenEnhancer)
 				// 授权码存储,若无refresh_token会有UserDetailsService is required错误
 				.authorizationCodeServices(jdbcAuthorizationCodeServices)
-
 				// 使用默认的tokenService,默认实现 DefaultTokenServices
 				// .tokenServices(new DefaultTokenServices())
 				// 使用自定义的tokenService,改造后的 DefaultTokenServices
 				.tokenServices(jdbcAuthorizationServerTokenServices)
-
 				// 使用jdbc存储第三方客户端相关信息
 				.tokenStore(tokenStore)
 				// 支持的请求类型

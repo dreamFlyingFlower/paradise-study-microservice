@@ -52,7 +52,11 @@ public class MemoryAuthorizationServer extends AuthorizationServerConfigurerAdap
 	// private final PasswordEncoder passwordEncoder;
 
 	/**
+	 * 客户端管理令牌:令牌生成和存储
+	 * 
 	 * 实际生产应该从数据库查询加载到内存中,内存中没有再从数据库查询,数据据没有则说明没有注册
+	 * 
+	 * 重写该方法后,如果使用内存方式存储客户端信息,则在配置文件中的security.oauth2.client.client-id和client-secret都将无效
 	 * 
 	 * guest:Bcrpt加密->$2a$10$ahYHTCNIo7RxlMObpPspHOboa1EKKCNreHhBSyGx71.003149BPey
 	 * 123456:Bcrpt加密->$2a$10$dEwuUZzYSIJOx7.Lg6VuSuCNF2DGDOg30BV9bHqtHGIRuRZ38XoTi
@@ -79,11 +83,14 @@ public class MemoryAuthorizationServer extends AuthorizationServerConfigurerAdap
 				// 执行认证操作的时候会跳转到一个授权页面
 				.autoApprove(true)
 				// 重定向地址
-				.redirectUris("http://");
+				.redirectUris("http://")
+		// 该方法可以添加多个客户端信息
+		// .and().withClient("test1")
+		;
 	}
 
 	/**
-	 * 配置客户端详细信息,客户端标识,客户端秘钥,资源列表等等
+	 * 配置客户端详细信息,客户端标识,客户端秘钥,资源列表等,TokenEndpoint等入口点参数配置
 	 * 
 	 * <pre>
 	 * {@link AuthorizationEndpoint}:可以通过以下方式配置支持的授权类型AuthorizationServerEndpointsConfigurer.
@@ -106,14 +113,18 @@ public class MemoryAuthorizationServer extends AuthorizationServerConfigurerAdap
 		endpoints
 				// 认证管理器
 				.authenticationManager(authenticationManager)
-				// 授权码存储
+				// 授权码存储,若无refresh_token会有UserDetailsService is required错误
 				.authorizationCodeServices(memoryAuthorizationCodeServices)
 				// token服务
 				.tokenServices(memoryAuthorizationServerTokenServices)
 				// 以内存的方式存储token
 				.tokenStore(tokenStore)
 				// 允许获得token的请求方式
-				.allowedTokenEndpointRequestMethods(HttpMethod.POST, HttpMethod.GET);
+				.allowedTokenEndpointRequestMethods(HttpMethod.POST, HttpMethod.GET)
+		// 调整相关固定API重定向地址:第一个参数为固定API地址,第二个参数为重定向地址,当前只有/oauth/confirm_access和/oauth/error可配置
+		// .pathMapping("/oauth/confirm_access", "/confirm_access")
+		// .pathMapping("/oauth/error", "/oauth_error")
+		;
 	}
 
 	/**
@@ -133,6 +144,10 @@ public class MemoryAuthorizationServer extends AuthorizationServerConfigurerAdap
 		oauthServer
 				// 开启端口/oauth/token_key的访问权限(允许所有),可获得公钥signKey,默认是denyAll(),是SpringSecurity的权限表达式
 				.tokenKeyAccess("permitAll()")
+				// 允许已经认证了的用户访问
+				// .tokenKeyAccess("isAuthenticated()")
+				// 拒绝所有
+				// .tokenKeyAccess("denyAll()")
 				// 开启端口/oauth/check_token的访问权限(允许所有)
 				.checkTokenAccess("permitAll()")
 				// 值允许已经认证了的用户访问

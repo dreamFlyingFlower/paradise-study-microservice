@@ -5,9 +5,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.provider.token.TokenEnhancer;
-
-import com.wy.oauth.CustomizeTokenEnhancer;
 
 /**
  * 密码加解密方式
@@ -29,16 +26,5 @@ public class OAuthConfig {
 	@ConditionalOnMissingBean
 	PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
-	}
-
-	/**
-	 * 设置默认的token生成方式
-	 * 
-	 * @return TokenEnhancer
-	 */
-	@Bean
-	@ConditionalOnMissingBean
-	TokenEnhancer tokenEnhancer() {
-		return new CustomizeTokenEnhancer();
 	}
 }

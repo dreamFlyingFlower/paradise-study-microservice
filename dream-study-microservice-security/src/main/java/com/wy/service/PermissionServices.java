@@ -1,4 +1,4 @@
-package com.wy.services;
+package com.wy.service;
 
 import java.util.List;
 import java.util.Objects;

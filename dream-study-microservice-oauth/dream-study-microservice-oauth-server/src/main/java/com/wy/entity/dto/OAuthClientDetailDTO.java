@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import com.wy.entity.OauthClientDetails;
+import com.wy.entity.OAuthClientDetail;
 import com.wy.util.GuidGenerator;
 
 import dream.flying.flower.helper.DateTimeHelper;
@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class OauthClientDetailsDTO implements Serializable {
+public class OAuthClientDetailDTO implements Serializable {
 
 	private static final long serialVersionUID = -6650829879035029696L;
 
@@ -52,7 +52,7 @@ public class OauthClientDetailsDTO implements Serializable {
 
 	private boolean trusted;
 
-	public OauthClientDetailsDTO(OauthClientDetails clientDetails) {
+	public OAuthClientDetailDTO(OAuthClientDetail clientDetails) {
 		this.clientId = clientDetails.clientId();
 		this.clientSecret = clientDetails.clientSecret();
 		this.scope = clientDetails.scope();
@@ -75,10 +75,10 @@ public class OauthClientDetailsDTO implements Serializable {
 		return scope;
 	}
 
-	public static List<OauthClientDetailsDTO> toDtos(List<OauthClientDetails> clientDetailses) {
-		List<OauthClientDetailsDTO> dtos = new ArrayList<>(clientDetailses.size());
-		for (OauthClientDetails clientDetailse : clientDetailses) {
-			dtos.add(new OauthClientDetailsDTO(clientDetailse));
+	public static List<OAuthClientDetailDTO> toDtos(List<OAuthClientDetail> clientDetailses) {
+		List<OAuthClientDetailDTO> dtos = new ArrayList<>(clientDetailses.size());
+		for (OAuthClientDetail clientDetailse : clientDetailses) {
+			dtos.add(new OAuthClientDetailDTO(clientDetailse));
 		}
 		return dtos;
 	}
@@ -103,8 +103,8 @@ public class OauthClientDetailsDTO implements Serializable {
 		return this.authorizedGrantTypes.contains("refresh_token");
 	}
 
-	public OauthClientDetails createDomain() {
-		OauthClientDetails clientDetails = new OauthClientDetails().clientId(clientId)
+	public OAuthClientDetail createDomain() {
+		OAuthClientDetail clientDetails = new OAuthClientDetail().clientId(clientId)
 		        // encrypted client secret
 		        .clientSecret(new BCryptPasswordEncoder().encode(clientSecret)).resourceIds(resourceIds)
 		        .authorizedGrantTypes(authorizedGrantTypes).scope(scope);

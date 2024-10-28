@@ -1,4 +1,4 @@
-package com.wy.authentication.sms;
+package com.wy.provider.sms;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

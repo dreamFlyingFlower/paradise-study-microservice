@@ -38,12 +38,13 @@ import org.springframework.web.accept.HeaderContentNegotiationStrategy;
 
 import com.wy.filters.VerifyFilter;
 import com.wy.properties.UserProperties;
-import com.wy.security.LoginAuthEntryPoint;
-import com.wy.security.LoginFailureHandler;
-import com.wy.security.LoginSuccessHandler;
-import com.wy.security.LogoutSuccessHandler;
 import com.wy.security.UserAuthenticationProvider;
 import com.wy.service.UserService;
+
+import dream.flying.flower.framework.security.entrypoint.LoginAuthenticationEntryPoint;
+import dream.flying.flower.framework.security.handler.LoginFailureHandler;
+import dream.flying.flower.framework.security.handler.LoginSuccessHandler;
+import dream.flying.flower.framework.security.handler.LogoutSuccessHandler;
 
 /**
  * 重写security的configure方法,见官网
@@ -67,12 +68,6 @@ public class SecurityConfig {
 	private UserAuthenticationProvider provider;
 
 	@Autowired
-	private LoginSuccessHandler loginSuccessHandler;
-
-	@Autowired
-	private LoginFailureHandler loginFailHandler;
-
-	@Autowired
 	private UserService userService;
 
 	@Autowired
@@ -94,8 +89,6 @@ public class SecurityConfig {
 	// private SessionExpiredStrategy sessionExpiredStrategy;
 
 	@Autowired
-	private LogoutSuccessHandler logoutSuccessHandler;
-
 	// @Autowired
 	// private QqSocialConfigurer qqSocialConfigurer;
 
@@ -223,9 +216,9 @@ public class SecurityConfig {
 				.formLogin(form -> form.loginProcessingUrl("/user/login")
 						.usernameParameter("username")
 						.passwordParameter("password")
-						.successHandler(loginSuccessHandler)
+						.successHandler(new LoginSuccessHandler())
 						// 失败的自定义处理
-						.failureHandler(loginFailHandler))
+						.failureHandler(new LoginFailureHandler()))
 				// 使用记住密码功能需要使用数据库,只是服务端记住,而非浏览器,浏览器关掉之后仍然需要重新登录
 				.rememberMe(remember -> remember.tokenRepository(persistentTokenRepository())
 						// .requestCache().requestCache(getRequestCache(http))
@@ -242,9 +235,10 @@ public class SecurityConfig {
 						// 自定义退出成功的页面,默认退出到登录页
 						// .logoutSuccessUrl("/logoutsuccess.html")
 						// 自定义登出登录返回json字符串,若不定义则跳到默认地址,url和handler只能有一个生效
-						.logoutSuccessHandler(logoutSuccessHandler))
+						.logoutSuccessHandler(new LogoutSuccessHandler()))
 				// 自定义拦截未登录请求,若不定义则跳转到loginForm自定义地址或默认的/login
-				.exceptionHandling(exception -> exception.authenticationEntryPoint(new LoginAuthEntryPoint(null)))
+				.exceptionHandling(
+						exception -> exception.authenticationEntryPoint(new LoginAuthenticationEntryPoint(null)))
 				.csrf(csrf -> csrf.disable());
 
 		// 自定义oauth2

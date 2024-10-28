@@ -1,4 +1,4 @@
-package com.wy.oauth2;
+package com.wy.oauth;
 
 import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
 

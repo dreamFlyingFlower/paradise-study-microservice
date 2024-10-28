@@ -1,11 +1,17 @@
-package com.wy.oauth.jdbc.config;
+package com.wy.oauth.customizer.config;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.security.jwt.crypto.sign.MacSigner;
 import org.springframework.security.oauth2.provider.approval.ApprovalStore;
 import org.springframework.security.oauth2.provider.approval.ApprovalStoreUserApprovalHandler;
@@ -17,19 +23,25 @@ import org.springframework.security.oauth2.provider.code.JdbcAuthorizationCodeSe
 import org.springframework.security.oauth2.provider.request.DefaultOAuth2RequestFactory;
 import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
+import org.springframework.security.oauth2.provider.token.TokenEnhancer;
+import org.springframework.security.oauth2.provider.token.TokenEnhancerChain;
 import org.springframework.security.oauth2.provider.token.TokenStore;
+import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
+import org.springframework.security.oauth2.provider.token.store.redis.RedisTokenStore;
 
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.KeyUse;
 import com.nimbusds.jose.jwk.RSAKey;
+import com.wy.oauth.CustomizeTokenEnhancer;
+import com.wy.oauth.customizer.CustomizerJdbcClientDetailsService;
 import com.wy.oauth.jdbc.JdbcAccessTokenConverter;
 import com.wy.util.JwtUtil;
 
 /**
- * OAuth2使用数据库相关配置
+ * OAuth2使用数据库自定义相关配置
  *
  * @author 飞花梦影
  * @date 2021-07-02 16:51:40
@@ -37,36 +49,13 @@ import com.wy.util.JwtUtil;
  */
 @Deprecated
 @Configuration
-public class OAuth2JdbcConfig {
+public class CustomizerOAuth2JdbcConfig {
 
 	@Autowired
 	private DataSource dataSource;
 
 	@Autowired
 	private JdbcAccessTokenConverter jdbcAccessTokenConverter;
-
-	/**
-	 * 使用redis存储令牌,无需建表
-	 * 
-	 * @return TokenStore
-	 */
-	// @Bean
-	// @ConditionalOnProperty(prefix = "config.oauth2", name = "storeType",
-	// havingValue = "redis")
-	// public TokenStore redisTokenStore(RedisConnectionFactory
-	// redisConnectionFactory) {
-	// return new RedisTokenStore(redisConnectionFactory);
-	// }
-
-	// /**
-	// * 使用数据库存储令牌,需要建表oauth_acccess_token和oauth_refresh_token,该表结构见 JdbcTokenStore
-	// *
-	// * @return TokenStore
-	// */
-	// @Bean
-	// public TokenStore tokenStore() {
-	// return new JdbcTokenStore(dataSource);
-	// }
 
 	/**
 	 * 授权码模式数据来源,将授权码存储在数据库
@@ -90,13 +79,35 @@ public class OAuth2JdbcConfig {
 	}
 
 	/**
+	 * 使用数据库存储令牌,需要建表oauth_acccess_token和oauth_refresh_token,该表结构见 JdbcTokenStore
+	 *
+	 * @return TokenStore
+	 */
+	@Bean
+	@ConditionalOnProperty(prefix = "config.oauth2", name = "storeType", havingValue = "jdbc")
+	public TokenStore jdbcTokenStore() {
+		return new JdbcTokenStore(dataSource);
+	}
+
+	/**
+	 * 使用redis存储令牌,无需建表
+	 * 
+	 * @return TokenStore
+	 */
+	@Bean
+	@ConditionalOnProperty(prefix = "config.oauth2", name = "storeType", havingValue = "redis")
+	public TokenStore redisTokenStore(RedisConnectionFactory redisConnectionFactory) {
+		return new RedisTokenStore(redisConnectionFactory);
+	}
+
+	/**
 	 * 注入数据库资源,需要新建oauth_client_details表,该表结构见 JdbcClientDetailsService
 	 * 
 	 * @return JdbcClientDetailsService
 	 */
 	@Bean
 	JdbcClientDetailsService jdbcClientDetailsService() {
-		return new JdbcClientDetailsService(dataSource);
+		return new CustomizerJdbcClientDetailsService(dataSource);
 	}
 
 	/**
@@ -105,24 +116,35 @@ public class OAuth2JdbcConfig {
 	@Bean
 	@Primary
 	AuthorizationServerTokenServices authorizationServerTokenServices() {
-		DefaultTokenServices service = new DefaultTokenServices();
+		DefaultTokenServices defaultTokenServices = new DefaultTokenServices();
 		// 客户端信息服务
-		service.setClientDetailsService(jdbcClientDetailsService());
+		defaultTokenServices.setClientDetailsService(jdbcClientDetailsService());
 		// 令牌存储策略
-		service.setTokenStore(tokenStore());
-		// 针对JWT令牌的添加
-		service.setTokenEnhancer(jwtAccessTokenConverter());
-		// 令牌默认有效期2小时
-		service.setAccessTokenValiditySeconds(60 * 60 * 2);
+		defaultTokenServices.setTokenStore(tokenStore());
 		// 是否支持刷新令牌
-		service.setSupportRefreshToken(true);
+		defaultTokenServices.setSupportRefreshToken(true);
+		// 令牌默认有效期2小时
+		defaultTokenServices.setAccessTokenValiditySeconds(60 * 60 * 2);
 		// 刷新令牌默认有效期30天
-		service.setRefreshTokenValiditySeconds(60 * 60 * 24 * 30);
+		defaultTokenServices.setRefreshTokenValiditySeconds(60 * 60 * 24 * 30);
+		// 针对JWT令牌的添加
+		defaultTokenServices.setTokenEnhancer(jwtAccessTokenConverter());
 
 		// 加入JWT配置
 		// TokenEnhancerChain tokenEnhancerChain = new TokenEnhancerChain();
 		// tokenEnhancerChain.setTokenEnhancers(Arrays.asList(jwtAccessTokenConverter));
 		// service.setTokenEnhancer(tokenEnhancerChain);
+
+		TokenEnhancerChain tokenEnhancerChain = new TokenEnhancerChain();
+		if (null != jwtAccessTokenConverter() && null != jwtTokenEnhancer()) {
+			ArrayList<TokenEnhancer> enhancers = new ArrayList<>();
+			enhancers.add(jwtAccessTokenConverter());
+			enhancers.add(jwtTokenEnhancer());
+			tokenEnhancerChain.setTokenEnhancers(enhancers);
+		} else {
+			tokenEnhancerChain.setTokenEnhancers(Arrays.asList(tokenEnhancer(), jwtAccessTokenConverter));
+			defaultTokenServices.setTokenEnhancer(tokenEnhancerChain);
+		}
 		return service;
 	}
 
@@ -132,8 +154,7 @@ public class OAuth2JdbcConfig {
 	 * @return JwtAccessTokenConverter
 	 */
 	@Bean
-	// @ConditionalOnProperty(prefix = "config.oauth2", name = "storeType",
-	// havingValue = "jwt", matchIfMissing = true)
+	@ConditionalOnProperty(prefix = "config.oauth2", name = "storeType", havingValue = "jwt", matchIfMissing = true)
 	JwtAccessTokenConverter jwtAccessTokenConverter() {
 		// 生成JWT令牌
 		// 第一种方式
@@ -197,6 +218,17 @@ public class OAuth2JdbcConfig {
 		// 设置自定义JWT数据
 		jwtAccessTokenConverter.setAccessTokenConverter(jdbcAccessTokenConverter);
 		return jwtAccessTokenConverter;
+	}
+
+	/**
+	 * 设置默认的token生成方式
+	 * 
+	 * @return TokenEnhancer
+	 */
+	@Bean
+	@ConditionalOnMissingBean(name = "jwtTokenEnhancer")
+	TokenEnhancer jwtTokenEnhancer() {
+		return new CustomizeTokenEnhancer();
 	}
 
 	/**

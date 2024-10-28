@@ -1,4 +1,4 @@
-package com.wy.oauth2;
+package com.wy.oauth;
 
 import java.io.IOException;
 import java.util.Map;

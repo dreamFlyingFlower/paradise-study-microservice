@@ -69,40 +69,6 @@ public class OAuth2Config {
 	// private OauthService oauthService;
 
 	@Bean
-	PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
-
-	@Bean
-	ClientDetailsService clientDetailsService(DataSource dataSource) {
-		// 使用默认的数据库处理数据
-		JdbcClientDetailsService clientDetailsService = new JdbcClientDetailsService(dataSource);
-		clientDetailsService.setPasswordEncoder(passwordEncoder);
-
-		// 使用默认的内存处理数据
-		// InMemoryClientDetailsService memoryClientDetailsService = new
-		// InMemoryClientDetailsService();
-
-		// 使用自定义的ClientDetailsService
-		// SelfJdbcClientDetailsService clientDetailsService = new
-		// SelfJdbcClientDetailsService(dataSource);
-		// clientDetailsService.setPasswordEncoder(passwordEncoder());
-		return clientDetailsService;
-	}
-
-	/**
-	 * 使用内存或数据库处理验证码
-	 * 
-	 * @param dataSource 数据库配置
-	 * @return AuthorizationCodeServices
-	 */
-	@Bean
-	AuthorizationCodeServices authorizationCodeServices(DataSource dataSource) {
-		// return new InMemoryAuthorizationCodeServices();
-		return new JdbcAuthorizationCodeServices(dataSource);
-	}
-
-	@Bean
 	UserApprovalHandler userApprovalHandler(DataSource dataSource) {
 		ApprovalStoreUserApprovalHandler userApprovalHandler = new ApprovalStoreUserApprovalHandler();
 		userApprovalHandler.setApprovalStore(new JdbcApprovalStore(dataSource));

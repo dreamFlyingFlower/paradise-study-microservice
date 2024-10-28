@@ -1,4 +1,4 @@
-package com.wy.authentication.sms;
+package com.wy.provider.sms;
 
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;

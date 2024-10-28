@@ -18,7 +18,7 @@ import org.springframework.security.oauth2.provider.token.store.InMemoryTokenSto
  */
 @Deprecated
 @Configuration
-public class OAuth2MemoryConfig {
+public class MemoryOAuth2Config {
 
 	/**
 	 * 将授权码存储在内存

@@ -1,11 +1,11 @@
-package com.wy.oauth2;
+package com.wy.oauth.customizer;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.provider.AuthorizationRequest;
 import org.springframework.security.oauth2.provider.approval.TokenStoreUserApprovalHandler;
 
-import com.wy.entity.OauthClientDetails;
-import com.wy.service.OauthService;
+import com.wy.entity.OAuthClientDetail;
+import com.wy.service.OAuthService;
 
 /**
  * 自定义tokenstore处理器
@@ -15,11 +15,11 @@ import com.wy.service.OauthService;
  * @git {@link https://github.com/dreamFlyingFlower }
  */
 @SuppressWarnings("deprecation")
-public class SelfUserApprovalHandler extends TokenStoreUserApprovalHandler {
+public class CustomizerUserApprovalHandler extends TokenStoreUserApprovalHandler {
 
-	private OauthService oauthService;
+	private OAuthService oauthService;
 
-	public SelfUserApprovalHandler() {
+	public CustomizerUserApprovalHandler() {
 	}
 
 	@Override
@@ -31,12 +31,12 @@ public class SelfUserApprovalHandler extends TokenStoreUserApprovalHandler {
 			return false;
 		}
 
-		OauthClientDetails clientDetails = oauthService.loadOauthClientDetails(authorizationRequest.getClientId());
+		OAuthClientDetail clientDetails = oauthService.loadOauthClientDetails(authorizationRequest.getClientId());
 		return clientDetails != null && clientDetails.trusted();
 
 	}
 
-	public void setOauthService(OauthService oauthService) {
+	public void setOauthService(OAuthService oauthService) {
 		this.oauthService = oauthService;
 	}
 }

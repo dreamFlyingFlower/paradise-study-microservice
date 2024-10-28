@@ -3,7 +3,7 @@ package com.wy.entity;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public class OauthClientDetails implements Serializable {
+public class OAuthClientDetail implements Serializable {
 
 	private static final long serialVersionUID = -6947822646185526939L;
 
@@ -68,13 +68,13 @@ public class OauthClientDetails implements Serializable {
 	 */
 	private String autoApprove;
 
-	public OauthClientDetails() {}
+	public OAuthClientDetail() {}
 
 	public String autoApprove() {
 		return autoApprove;
 	}
 
-	public OauthClientDetails autoApprove(String autoApprove) {
+	public OAuthClientDetail autoApprove(String autoApprove) {
 		this.autoApprove = autoApprove;
 		return this;
 	}
@@ -87,7 +87,7 @@ public class OauthClientDetails implements Serializable {
 		return createTime;
 	}
 
-	public OauthClientDetails createTime(LocalDateTime createTime) {
+	public OAuthClientDetail createTime(LocalDateTime createTime) {
 		this.createTime = createTime;
 		return this;
 	}
@@ -157,62 +157,62 @@ public class OauthClientDetails implements Serializable {
 		return sb.toString();
 	}
 
-	public OauthClientDetails clientId(String clientId) {
+	public OAuthClientDetail clientId(String clientId) {
 		this.clientId = clientId;
 		return this;
 	}
 
-	public OauthClientDetails clientSecret(String clientSecret) {
+	public OAuthClientDetail clientSecret(String clientSecret) {
 		this.clientSecret = clientSecret;
 		return this;
 	}
 
-	public OauthClientDetails resourceIds(String resourceIds) {
+	public OAuthClientDetail resourceIds(String resourceIds) {
 		this.resourceIds = resourceIds;
 		return this;
 	}
 
-	public OauthClientDetails authorizedGrantTypes(String authorizedGrantTypes) {
+	public OAuthClientDetail authorizedGrantTypes(String authorizedGrantTypes) {
 		this.authorizedGrantTypes = authorizedGrantTypes;
 		return this;
 	}
 
-	public OauthClientDetails scope(String scope) {
+	public OAuthClientDetail scope(String scope) {
 		this.scope = scope;
 		return this;
 	}
 
-	public OauthClientDetails webServerRedirectUri(String webServerRedirectUri) {
+	public OAuthClientDetail webServerRedirectUri(String webServerRedirectUri) {
 		this.webServerRedirectUri = webServerRedirectUri;
 		return this;
 	}
 
-	public OauthClientDetails authorities(String authorities) {
+	public OAuthClientDetail authorities(String authorities) {
 		this.authorities = authorities;
 		return this;
 	}
 
-	public OauthClientDetails accessTokenValidity(Integer accessTokenValidity) {
+	public OAuthClientDetail accessTokenValidity(Integer accessTokenValidity) {
 		this.accessTokenValidity = accessTokenValidity;
 		return this;
 	}
 
-	public OauthClientDetails refreshTokenValidity(Integer refreshTokenValidity) {
+	public OAuthClientDetail refreshTokenValidity(Integer refreshTokenValidity) {
 		this.refreshTokenValidity = refreshTokenValidity;
 		return this;
 	}
 
-	public OauthClientDetails trusted(boolean trusted) {
+	public OAuthClientDetail trusted(boolean trusted) {
 		this.trusted = trusted;
 		return this;
 	}
 
-	public OauthClientDetails additionalInformation(String additionalInformation) {
+	public OAuthClientDetail additionalInformation(String additionalInformation) {
 		this.additionalInformation = additionalInformation;
 		return this;
 	}
 
-	public OauthClientDetails archived(boolean archived) {
+	public OAuthClientDetail archived(boolean archived) {
 		this.archived = archived;
 		return this;
 	}
