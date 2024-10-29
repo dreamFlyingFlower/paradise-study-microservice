@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
+import org.springframework.context.ApplicationContext;
 import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.access.AccessDecisionVoter;
 import org.springframework.security.access.ConfigAttribute;
@@ -35,12 +36,24 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.AbstractConfiguredSecurityBuilder;
 import org.springframework.security.config.annotation.AbstractSecurityBuilder;
 import org.springframework.security.config.annotation.SecurityConfigurer;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configurers.AnonymousConfigurer;
+import org.springframework.security.config.annotation.web.configurers.CorsConfigurer;
+import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
+import org.springframework.security.config.annotation.web.configurers.DefaultLoginPageConfigurer;
+import org.springframework.security.config.annotation.web.configurers.ExceptionHandlingConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
+import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
+import org.springframework.security.config.annotation.web.configurers.RequestCacheConfigurer;
+import org.springframework.security.config.annotation.web.configurers.SecurityContextConfigurer;
+import org.springframework.security.config.annotation.web.configurers.ServletApiConfigurer;
+import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer;
 import org.springframework.security.config.oauth2.client.CommonOAuth2Provider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -84,6 +97,7 @@ import org.springframework.security.web.servletapi.SecurityContextHolderAwareReq
 import org.springframework.security.web.session.SessionManagementFilter;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 import org.springframework.social.security.SocialAuthenticationFilter;
+import org.springframework.web.accept.ContentNegotiationStrategy;
 import org.springframework.web.filter.DelegatingFilterProxy;
 
 import com.wy.config.CustomizerMethodSecurityExpressionHandler;
@@ -358,6 +372,36 @@ import com.wy.controller.UserController;
  * </pre>
  * 
  * {@link CommonOAuth2Provider}:枚举类,里面事先定义好了几种常用的三方登录授权服务器的各种参数
+ * 
+ * 相关类
+ * 
+ * <pre>
+ * {@link SecurityFilterChain}:入口
+ * ->{@link DefaultSecurityFilterChain}:默认实现类
+ * {@link AbstractConfiguredSecurityBuilder}:SpringSecurity各种配置适配器建造类抽象实现
+ * ->{@link HttpSecurity}:SpringSecurity API主要配置,继承AbstractConfiguredSecurityBuilder.泛型O为DefaultSecurityFilterChain,B为HttpSecurity
+ * ->{@link WebSecurity}:SpringSecurity Web页面主要配置,继承AbstractConfiguredSecurityBuilder.泛型O为Filter,B为WebSecurity
+ * {@link AbstractConfiguredSecurityBuilder.configurers}:SecurityConfigurer各种配置集合
+ * ->{@link SecurityConfigurer}:各种配置的适配器,如果需要自定义,实现该接口.泛型O为DefaultSecurityFilterChain,B为HttpSecurity
+ * -->{@link CsrfConfigurer}:CSRF配置类
+ * -->{@link ExceptionHandlingConfigurer}:异常处理配置 
+ * -->{@link HeadersConfigurer}:请求头配置 
+ * -->{@link SessionManagementConfigurer}:Session配置
+ * -->{@link SecurityContextConfigurer}:SecurityContext上下文配置
+ * -->{@link RequestCacheConfigurer}:请求缓存配置
+ * -->{@link AnonymousConfigurer}:匿名请求配置
+ * -->{@link ServletApiConfigurer}:Web请求配置
+ * -->{@link DefaultLoginPageConfigurer}:登录相关配置
+ * -->{@link LogoutConfigurer}:登出相关配置
+ * -->{@link CorsConfigurer}:跨域请求配置
+ * -->#OAuth2AuthorizationServerConfigurer:OAuth2.1认证服务配置
+ * -->#OAuth2ResourceServerConfigurer:OAuth2.1资源服务配置
+ * -->#OAuth2ClientAuthenticationConfigurer:OAuth2.1客户端配置
+ * {@link AbstractConfiguredSecurityBuilder.sharedObjects}:可重用的对象实例
+ * ->{@link ApplicationContext}:Spring上下文
+ * ->{@link ContentNegotiationStrategy}:
+ * ->{@link AuthenticationManagerBuilder}:认证管理器构造器
+ * </pre>
  * 
  * @author 飞花梦影
  * @date 2019-01-31 00:09:33

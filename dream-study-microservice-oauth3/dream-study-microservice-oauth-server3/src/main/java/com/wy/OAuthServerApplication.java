@@ -3,9 +3,27 @@ package com.wy;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.config.annotation.AbstractConfiguredSecurityBuilder;
+import org.springframework.security.config.annotation.SecurityConfigurer;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AnonymousConfigurer;
+import org.springframework.security.config.annotation.web.configurers.CorsConfigurer;
+import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
+import org.springframework.security.config.annotation.web.configurers.DefaultLoginPageConfigurer;
+import org.springframework.security.config.annotation.web.configurers.ExceptionHandlingConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
+import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
+import org.springframework.security.config.annotation.web.configurers.RequestCacheConfigurer;
+import org.springframework.security.config.annotation.web.configurers.SecurityContextConfigurer;
+import org.springframework.security.config.annotation.web.configurers.ServletApiConfigurer;
+import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer;
+import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContext;
@@ -33,6 +51,15 @@ import org.springframework.security.oauth2.server.authorization.client.InMemoryR
 import org.springframework.security.oauth2.server.authorization.client.JdbcRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
+import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationEndpointConfigurer;
+import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
+import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerMetadataEndpointConfigurer;
+import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2ClientAuthenticationConfigurer;
+import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2DeviceAuthorizationEndpointConfigurer;
+import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2DeviceVerificationEndpointConfigurer;
+import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2TokenEndpointConfigurer;
+import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2TokenIntrospectionEndpointConfigurer;
+import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2TokenRevocationEndpointConfigurer;
 import org.springframework.security.oauth2.server.authorization.oidc.web.OidcProviderConfigurationEndpointFilter;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.oauth2.server.authorization.settings.OAuth2TokenFormat;
@@ -54,7 +81,9 @@ import org.springframework.security.oauth2.server.authorization.web.authenticati
 import org.springframework.security.oauth2.server.authorization.web.authentication.OAuth2ClientCredentialsAuthenticationConverter;
 import org.springframework.security.oauth2.server.authorization.web.authentication.OAuth2DeviceCodeAuthenticationConverter;
 import org.springframework.security.oauth2.server.authorization.web.authentication.OAuth2RefreshTokenAuthenticationConverter;
+import org.springframework.security.oauth2.server.authorization.web.authentication.OAuth2TokenExchangeAuthenticationConverter;
 import org.springframework.security.oauth2.server.authorization.web.authentication.PublicClientAuthenticationConverter;
+import org.springframework.security.oauth2.server.authorization.web.authentication.X509ClientCertificateAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.SecurityFilterChain;
@@ -69,6 +98,7 @@ import org.springframework.security.web.header.HeaderWriterFilter;
 import org.springframework.security.web.savedrequest.RequestCacheAwareFilter;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter;
 import org.springframework.security.web.session.SessionManagementFilter;
+import org.springframework.web.accept.ContentNegotiationStrategy;
 import org.springframework.web.filter.CorsFilter;
 
 import com.nimbusds.jose.jwk.source.JWKSource;
@@ -224,6 +254,67 @@ import com.wy.config.AuthorizationServerConfig;
  * 		eg:http://ip:port/oauth2/revoke?token=AccessTokenUUID
  * 
  * {@link OAuth2LoginAuthenticationFilter}:拦截/login/oauth2/code/*
+ * </pre>
+ * 
+ * 相关类-{@link AbstractConfiguredSecurityBuilder}
+ * 
+ * <pre>
+ * {@link SecurityFilterChain}:入口
+ * ->{@link DefaultSecurityFilterChain}:默认实现类
+ * {@link AbstractConfiguredSecurityBuilder}:SpringSecurity各种配置适配器建造类抽象实现
+ * ->{@link HttpSecurity#doBuild}:SpringSecurity API主要配置,继承AbstractConfiguredSecurityBuilder.泛型O为DefaultSecurityFilterChain,B为HttpSecurity
+ * ->{@link WebSecurity}:SpringSecurity Web页面主要配置,继承AbstractConfiguredSecurityBuilder.泛型O为Filter,B为WebSecurity
+ * {@link AbstractConfiguredSecurityBuilder.configurers}:SecurityConfigurer各种配置集合
+ * ->{@link SecurityConfigurer}:各种配置的适配器,如果需要自定义,实现该接口.泛型O为DefaultSecurityFilterChain,B为HttpSecurity
+ * -->{@link CsrfConfigurer}:CSRF配置类
+ * -->{@link ExceptionHandlingConfigurer}:异常处理配置 
+ * -->{@link HeadersConfigurer}:请求头配置 
+ * -->{@link SessionManagementConfigurer}:Session配置
+ * -->{@link SecurityContextConfigurer}:SecurityContext上下文配置
+ * -->{@link RequestCacheConfigurer}:请求缓存配置
+ * -->{@link AnonymousConfigurer}:匿名请求配置
+ * -->{@link ServletApiConfigurer}:Web请求配置
+ * -->{@link DefaultLoginPageConfigurer}:登录相关配置
+ * -->{@link LogoutConfigurer}:登出相关配置
+ * -->{@link CorsConfigurer}:跨域请求配置
+ * -->{@link OAuth2AuthorizationServerConfigurer#createConfigurers}:OAuth2.1认证服务配置,额外添加OAuth2.1相关配置类以及其后置类
+ * 
+ * --->{@link OAuth2ClientAuthenticationConfigurer#init}:OAuth2.1客户端配置,添加各种内置API
+ * ---->{@link OAuth2ClientAuthenticationConfigurer#createDefaultAuthenticationProviders}:添加各种客户端鉴权的Provider
+ * --->{@link OAuth2ClientAuthenticationConfigurer#configure}:配置各种AuthenticationConverter
+ * ---->{@link OAuth2ClientAuthenticationConfigurer#createDefaultAuthenticationConverters}:添加各种客户端认证转换器,不同版本不一样
+ * ----->{@link JwtClientAssertionAuthenticationConverter}
+ * ----->{@link ClientSecretBasicAuthenticationConverter}
+ * ----->{@link ClientSecretPostAuthenticationConverter}
+ * ----->{@link PublicClientAuthenticationConverter}
+ * ----->{@link X509ClientCertificateAuthenticationConverter}
+ * 
+ * --->{@link OAuth2AuthorizationServerMetadataEndpointConfigurer}
+ * --->{@link OAuth2AuthorizationEndpointConfigurer}
+ * --->{@link OAuth2TokenEndpointConfigurer#init}:初始化各种Token操作
+ * ---->{@link OAuth2TokenEndpointConfigurer#createDefaultAuthenticationProviders}:添加各种Token Provider
+ * --->{@link OAuth2TokenEndpointConfigurer#configure}:配置各种AuthenticationConverter
+ * ---->{@link OAuth2TokenEndpointConfigurer#createDefaultAuthenticationConverters}:添加各种客户端认证转换器,不同版本不一样
+ * ----->{@link OAuth2AuthorizationCodeAuthenticationConverter}:
+ * ----->{@link OAuth2RefreshTokenAuthenticationConverter}:
+ * ----->{@link OAuth2ClientCredentialsAuthenticationConverter}:
+ * ----->{@link OAuth2DeviceCodeAuthenticationConverter}:
+ * ----->{@link OAuth2TokenExchangeAuthenticationConverter}:
+ * 
+ * --->{@link OAuth2TokenIntrospectionEndpointConfigurer}
+ * --->{@link OAuth2TokenRevocationEndpointConfigurer}
+ * --->{@link OAuth2DeviceAuthorizationEndpointConfigurer}
+ * --->{@link OAuth2DeviceVerificationEndpointConfigurer}
+ * 
+ * -->{@link OAuth2AuthorizationServerConfigurer#configure}:添加一些Filter和JWKSource
+ * 
+ * -->{@link OAuth2ResourceServerConfigurer}:OAuth2.1资源服务配置
+ * -->{@link OAuth2ResourceServerConfigurer#configure}:加入BearerTokenAuthenticationFilter,校验header中的token
+ * 
+ * {@link AbstractConfiguredSecurityBuilder.sharedObjects}:可重用的对象实例
+ * ->{@link ApplicationContext}:Spring上下文
+ * ->{@link ContentNegotiationStrategy}:
+ * ->{@link AuthenticationManagerBuilder}:认证管理器构造器
  * </pre>
  * 
  * 授权码模式

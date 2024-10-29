@@ -84,6 +84,7 @@ public class AuthorizationServerConfig {
 			RegisteredClientRepository registeredClientRepository,
 			AuthorizationServerSettings authorizationServerSettings) throws Exception {
 		// 默认配置,忽略认证端点的csrf校验.如果要整合OAuth2,则需要当前方式注入相关对象
+		// 将OAuth2AuthorizationServerConfigurer配置应用到HttpSecurity中
 		OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
 
 		// 新建设备码converter和provider
@@ -96,6 +97,7 @@ public class AuthorizationServerConfig {
 		// 使用redis存储、读取登录的认证信息
 		http.securityContext(context -> context.securityContextRepository(redisSecurityContextRepository));
 
+		// 获得第一步应用的OAuth2AuthorizationServerConfigurer
 		http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
 				// 开启OpenID Connect 1.0协议相关端点
 				.oidc(Customizer.withDefaults())
