@@ -14,10 +14,12 @@
 	<description>study for spring cloud microservice</description>
 
 	<properties>
-		<!-- 因为日志框架漏洞的关系,log4j-api和log4j-core要升级到2.17.1以上,springboot2.7以上已升级,以下不需要重写版本号 -->
+		<!--
+		因为日志框架漏洞的关系,log4j-api和log4j-core要升级到2.17.1以上,springboot2.7以上已升级,以下不需要重写版本号 -->
 		<java.version>1.8</java.version>
 		<!-- 若要升级到2020.0.1,Netflix的很多Jar被移除或替换 -->
-		<!-- hystrix被移除,替换为resilience4j;zuul被移除,替换为gateway;ribbon被移除,替换为loadbalancer -->
+		<!--
+		hystrix被移除,替换为resilience4j;zuul被移除,替换为gateway;ribbon被移除,替换为loadbalancer -->
 		<!-- turbine被移除,暂无替代,springboot要使用2.4.2版本 -->
 		<!-- <alibaba.cloud.version>2021.1</alibaba.cloud.version> -->
 		<!-- <spring.cloud-version>2020.0.1</spring.cloud-version> -->
@@ -28,16 +30,13 @@
 		<module>dream-study-microservice-cache</module>
 		<module>dream-study-microservice-config</module>
 		<module>dream-study-microservice-gateway</module>
-		<module>dream-study-microservice-gateway3</module>
 		<module>dream-study-microservice-invocation</module>
 		<module>dream-study-microservice-mq</module>
 		<module>dream-study-microservice-oauth</module>
 		<module>dream-study-microservice-oauth2</module>
 		<module>dream-study-microservice-oauth3</module>
 		<module>dream-study-microservice-security</module>
-		<module>dream-study-microservice-security3</module>
 		<module>dream-study-microservice-server</module>
-		<module>dream-study-microservice-service</module>
 		<module>dream-study-microservice-sleuth</module>
 		<module>dream-study-microservice-stream</module>
 		<module>dream-study-microservice-zuul</module>

@@ -4,14 +4,19 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.oauth2.client.servlet.OAuth2ClientAutoConfiguration;
 import org.springframework.security.config.oauth2.client.CommonOAuth2Provider;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthorizationCodeAuthenticationProvider;
 import org.springframework.security.oauth2.client.authentication.OAuth2LoginAuthenticationProvider;
 import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
+import org.springframework.security.oauth2.client.registration.ClientRegistration;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.web.AuthenticatedPrincipalOAuth2AuthorizedClientRepository;
 import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizationRequestResolver;
 import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizationCodeGrantFilter;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
 import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.DefaultSecurityFilterChain;
@@ -57,6 +62,19 @@ import org.springframework.security.web.authentication.AbstractAuthenticationPro
  * </pre>
  * 
  * SpringSocial和SpringSecurityOAuth都已经不维护了,只能直接使用SpringSecurity进行相关操作,详见SpringSecurity官网(spring.io)
+ * 
+ * 
+ * 相关组件:
+ * 
+ * <pre>
+ * {@link ClientRegistration}:注册的客户端
+ * {@link ClientRegistrationRepository}:ClientRegistration的存储仓库
+ * {@link OAuth2AuthorizedClient}:已授权过的客户端
+ * {@link OAuth2AuthorizedClientRepository}:已授权过的客户端存储库持久化
+ * {@link OAuth2AuthorizationRequestRedirectFilter}:该过滤器处理/oauth2/authorize 路径,转发给认证中心对应的路径 /oauth2/authorize
+ * {@link OAuth2AuthorizationCodeGrantFilter}:负责处理认证中心的授权码回调请求,如地址重定向
+ * {@link OAuth2LoginAuthenticationFilter}:处理第三方认证的回调(该回调有授权码),拿着授权码到第三方认证服务器获取 access_token 和 refresh_token
+ * </pre>
  * 
  * @author 飞花梦影
  * @date 2021-04-09 11:04:34

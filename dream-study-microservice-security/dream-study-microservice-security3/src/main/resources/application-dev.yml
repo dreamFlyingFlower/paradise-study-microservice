@@ -1,0 +1,79 @@
+user:
+  security: 
+    permit-sources: 
+    - /images/**
+    - /user/save
+    - /user/hasSame
+    - /user/getCode/**
+    - /html/**
+    - /plugins/**
+    - /actuator/**
+    - /oauth/authorize**
+    - /*.html
+    - /favicon.ico
+    - /**/*.html
+    - /**/*.css
+    - /**/*.js
+    - /**/*.png
+    - /**/*.jpg
+    - /**/*.ttf
+    - /**/*.woff
+    - /**/*.wav
+    - /**/*.gif
+    - swagger-ui.html
+    - /swagger-resources
+    - /v2/api-docs
+    - /v3/api-docs
+    - /api/v1/sys/auth/login
+    code: 
+      image:
+        width: 100
+  verify: 
+    enabled: true
+  social:
+    qq:
+      app-id: test
+    
+server:
+  servlet:
+    session:
+      # session超时时间,单位为妙,但是默认程序的最小超时时间是1min
+      timeout: 
+        600
+    
+security:
+  oauth2: 
+    
+    client:
+      client-id: test
+      client-secret: test
+      # 认证服务器校验用户的接口地址
+      user-authorization-uri: http://127.0.0.1:12345/oauth/authorize
+      # 认证服务器获取令牌的接口地址
+      access-token-uri: http://127.0.0.1:12345/oauth/token
+      registered-redirect-uri: 
+      - http://example.com
+    resource:
+      jwt:
+        # 认证服务器上获取JWT加密密钥的接口
+        key-uri: http://127.0.0.1:12345/oauth/token_key
+      
+management: 
+  endpoints: 
+    web:
+      exposure: 
+        include: "*"
+        
+logging:
+  level:
+    org.springframework.boot.actuate: trace
+    org.springframework.security.oauth2: trace
+    
+spring:
+  main:
+    allow-bean-definition-overriding: false
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${mockwebserver.url}/.well-known/jwks.json

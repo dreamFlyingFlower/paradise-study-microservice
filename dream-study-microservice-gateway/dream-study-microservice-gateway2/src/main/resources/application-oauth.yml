@@ -1,0 +1,47 @@
+# SpringGateway添加对认证服务器的支持
+spring:
+  security:
+    oauth2:
+      # 资源服务器配置
+      resourceserver:
+        jwt:
+          # Jwt中claims的iss属性，也就是jwt的签发地址，即认证服务器的根路径
+          # 资源服务器会进一步的配置，通过该地址获取公钥以解析jwt
+          issuer-uri: http://spring-oauth-server:9000
+      client:
+        provider:
+          #认证服务器信息
+          oauth-server:
+            #授权地址
+            issuer-uri: http://spring-oauth-server:9000
+            # 获取用户信息的地址，默认的/userinfo端点需要IdToken获取，为避免麻烦自定一个用户信息接口
+            #user-info-uri: ${spring.security.oauth2.client.provider.oauth-server.issuer-uri}/user
+            #user-name-attribute: name
+            authorizationUri: ${spring.security.oauth2.client.provider.oauth-server.issuer-uri}/oauth2/authorize
+            #令牌获取地址
+            tokenUri: ${spring.security.oauth2.client.provider.oauth-server.issuer-uri}/oauth2/token
+        registration:
+          messaging-client-oidc:
+            #认证提供者，标识由哪个认证服务器进行认证，和上面的oauth-server进行关联
+            provider: oauth-server
+            #客户端名称
+            client-name: 网关服务
+            #客户端id，从认证平台申请的客户端id
+            client-id: mall-gateway-id
+            #客户端秘钥
+            client-secret: secret
+            #客户端认证方式
+            client-authentication-method: client_secret_basic
+            #使用授权码模式获取令牌（token）
+            authorization-grant-type: authorization_code
+            #回调地址，接收认证服务器回传code的接口地址，之前我们是使用http://www.baidu.com代替
+            redirect-uri: http://mall-gateway:8888/login/oauth2/code/messaging-client-oidc
+            scope:
+            - profile
+            - openid
+
+  cloud:
+    gateway:
+      default-filters:
+      # 令牌中继,会在请求头中添加token向下游传递
+      - TokenRelay=

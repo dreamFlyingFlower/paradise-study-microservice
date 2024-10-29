@@ -1,0 +1,73 @@
+spring:
+  thymeleaf:
+    cache: false
+
+  security:
+    # 进行登录验证的用户名和密码,由用户自行输入
+    user:
+      name: admin
+      # 123456
+      password: $2a$10$vN5dYR542V03tOvLs4ep6.W8MAMBUqm2feSGxxOLZKoGKPumM.w0y
+    oauth2:
+      resourceserver:
+        jwt:
+          # 认证服务器解析token令牌的密钥地址
+          jwk-set-uri: http://127.0.0.1:55100/oauthServer/oauth/token_key
+      client:
+        # 认证服务器信息,可写多个
+        provider:
+          # 认证服务器ID,可自定义,不可重复
+          oauth-server: 
+            # 认证服务器授权地址
+            authorization-uri: http://127.0.0.1:55100/oauthServer/oauth/oauthrize
+            # 认证服务器获取token地址
+            token-uri: http://127.0.0.1:55100/oauthServer/oauth/token
+            # 令牌发布地址
+            issuer-uri: http://127.0.0.1:55100/oauthServer/issuer
+        # 当前客户端注册到不同认证服务器的信息,由认证服务器颁发
+        registration:
+          # 本应用注册在facebook的参数,系统已经内置,其他参数可不写
+#          facebook: 
+#            client-id: facebook_client_id
+#            client-secret: facebook_client_secret
+          # 本应用注册在github上的参数,系统已经内置,其他参数可不写
+#          github:
+#            client-id: github_client_id
+#            client-secret: github_client_secret
+          oauth-server-client-code: 
+            # 认证服务器ID,需要和spring.security.oauth2.client.provider下的key对应
+            provider: oauth-server
+            # 客户端名称
+            client-name: guest
+            # 认证服务器发放的客户端ID和客户端密钥
+            client-id: guest
+            client-secret: guest
+            # 客户端认证方式,详见org.springframework.security.oauth2.core.ClientAuthenticationMethod
+            client-authentication-method: client_secret_basic
+            # 获取令牌的授权模式
+            authorization-grant-type: authorization_code
+            # 客户端接收授权码的回调地址
+            redirect-uri: http://localhost:55300/oauthClient/authorized
+            scope: message.read, message.write
+          oauth-server-client-credentials:
+            provider: oauth-server
+            client-name: guest
+            client-id: guest
+            client-secret: guest
+            authorization-grant-type: client_credentials
+            scope: message.read, message.write
+          oauth-server-client-password:
+            provider: oauth-server
+            client-name: guest
+            client-id: guest
+            client-secret: guest
+            authorization-grant-type: password
+            scope: message.read, message.write
+          oauth2-client-implicit:
+            provider: oauth-server
+            client-name: guest
+            client-id: guest
+            client-secret: guest
+            authorization-grant-type: implicit
+            redirect-uri: http://localhost:55300/oauthClient/authorized
+            scope: message.read, message.write

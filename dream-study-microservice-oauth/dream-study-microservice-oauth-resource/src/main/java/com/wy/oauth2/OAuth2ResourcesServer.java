@@ -98,6 +98,10 @@ public class OAuth2ResourcesServer extends ResourceServerConfigurerAdapter {
 				// 其他请求都需要进行认证
 				.anyRequest()
 				.authenticated())
+				// .formLogin(formLogin -> formLogin.loginProcessingUrl("/user/login")
+				// .permitAll()
+				// .successHandler(new ClientLoginSuccessHandler())
+				// .failureHandler(new LoginFailureHandler()))
 				// 禁用session
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				// 指定请求头参数

@@ -2,11 +2,14 @@ package com.wy.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
+import org.springframework.security.oauth2.client.annotation.RegisteredOAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.web.reactive.function.client.ServletOAuth2AuthorizedClientExchangeFilterFunction;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -95,5 +98,13 @@ public class AuthController {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	@GetMapping("/token")
+	@ResponseBody
+	public OAuth2AuthorizedClient
+			token(@RegisteredOAuth2AuthorizedClient OAuth2AuthorizedClient oAuth2AuthorizedClient) {
+		// 通过OAuth2AuthorizedClient对象获取到客户端和令牌相关的信息,然后直接返回给前端页面
+		return oAuth2AuthorizedClient;
 	}
 }

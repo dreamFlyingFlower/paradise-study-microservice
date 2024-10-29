@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: cloud-security
+  devtools:
+    restart:
+      enabled: true
+  datasource:
+    url: jdbc:mysql://localhost:3306/simpleoa?autoReconnect=true&useUnicode=true&useSSL=false&characterEncoding=UTF8&serverTimezone=GMT%2B8
+    password: 52LDforever
+    username: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  redis:
+    host: localhost
+    port: 6379
+  profiles: 
+    active: dev
+server: 
+  port: 5550

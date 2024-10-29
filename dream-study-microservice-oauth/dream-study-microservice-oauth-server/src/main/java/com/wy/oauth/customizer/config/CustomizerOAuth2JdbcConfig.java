@@ -2,6 +2,8 @@ package com.wy.oauth.customizer.config;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -12,7 +14,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.security.jwt.crypto.sign.MacSigner;
+import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
+import org.springframework.security.oauth2.common.OAuth2AccessToken;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.approval.ApprovalStore;
 import org.springframework.security.oauth2.provider.approval.ApprovalStoreUserApprovalHandler;
 import org.springframework.security.oauth2.provider.approval.JdbcApprovalStore;
@@ -37,7 +41,6 @@ import com.nimbusds.jose.jwk.KeyUse;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.wy.oauth.CustomizeTokenEnhancer;
 import com.wy.oauth.customizer.CustomizerJdbcClientDetailsService;
-import com.wy.oauth.jdbc.JdbcAccessTokenConverter;
 import com.wy.util.JwtUtil;
 
 /**
@@ -54,8 +57,8 @@ public class CustomizerOAuth2JdbcConfig {
 	@Autowired
 	private DataSource dataSource;
 
-	@Autowired
-	private JdbcAccessTokenConverter jdbcAccessTokenConverter;
+	// @Autowired
+	// private JdbcAccessTokenConverter jdbcAccessTokenConverter;
 
 	/**
 	 * 授权码模式数据来源,将授权码存储在数据库
@@ -73,6 +76,7 @@ public class CustomizerOAuth2JdbcConfig {
 	 * 
 	 * @return TokenStore
 	 */
+	@ConditionalOnProperty(prefix = "config.oauth2", name = "storeType", havingValue = "jwt", matchIfMissing = true)
 	@Bean
 	TokenStore tokenStore() {
 		return new JwtTokenStore(jwtAccessTokenConverter());
@@ -142,10 +146,10 @@ public class CustomizerOAuth2JdbcConfig {
 			enhancers.add(jwtTokenEnhancer());
 			tokenEnhancerChain.setTokenEnhancers(enhancers);
 		} else {
-			tokenEnhancerChain.setTokenEnhancers(Arrays.asList(tokenEnhancer(), jwtAccessTokenConverter));
+			tokenEnhancerChain.setTokenEnhancers(Arrays.asList(tokenEnhancer(), jwtAccessTokenConverter()));
 			defaultTokenServices.setTokenEnhancer(tokenEnhancerChain);
 		}
-		return service;
+		return defaultTokenServices;
 	}
 
 	/**
@@ -210,14 +214,40 @@ public class CustomizerOAuth2JdbcConfig {
 		// RsaVerifier(JwtUtil.getVerifierKey()));
 
 		// 第三种方式
-		JwtAccessTokenConverter jwtAccessTokenConverter = new JwtAccessTokenConverter();
+		// JwtAccessTokenConverter jwtAccessTokenConverter = new
+		// JwtAccessTokenConverter();
 		// 设置签名密钥
-		jwtAccessTokenConverter.setSigningKey("test");
+		// jwtAccessTokenConverter.setSigningKey("test");
 		// 设置验证时使用的密钥,和签名密钥保持一致
-		jwtAccessTokenConverter.setVerifier(new MacSigner("test"));
+		// jwtAccessTokenConverter.setVerifier(new MacSigner("test"));
 		// 设置自定义JWT数据
-		jwtAccessTokenConverter.setAccessTokenConverter(jdbcAccessTokenConverter);
+		// jwtAccessTokenConverter.setAccessTokenConverter(jdbcAccessTokenConverter);
+
+		// 第四种方式
+		JwtAccessTokenConverter jwtAccessTokenConverter = new JwtAccessTokenConverter();
+		jwtAccessTokenConverter.setSigningKey("test");
 		return jwtAccessTokenConverter;
+	}
+
+	/**
+	 * 设置默认的Token生成方式
+	 * 
+	 * @return TokenEnhancer
+	 */
+	@Bean
+	TokenEnhancer tokenEnhancer() {
+		return new TokenEnhancer() {
+
+			@Override
+			public OAuth2AccessToken enhance(OAuth2AccessToken accessToken, OAuth2Authentication authentication) {
+				DefaultOAuth2AccessToken token = (DefaultOAuth2AccessToken) accessToken;
+				Map<String, Object> additionalInformation = new LinkedHashMap<String, Object>();
+				additionalInformation.put("code", 0);
+				additionalInformation.put("msg", "success");
+				token.setAdditionalInformation(additionalInformation);
+				return accessToken;
+			}
+		};
 	}
 
 	/**
@@ -229,16 +259,6 @@ public class CustomizerOAuth2JdbcConfig {
 	@ConditionalOnMissingBean(name = "jwtTokenEnhancer")
 	TokenEnhancer jwtTokenEnhancer() {
 		return new CustomizeTokenEnhancer();
-	}
-
-	/**
-	 * 授权信息保存策略
-	 * 
-	 * @return ApprovalStore
-	 */
-	@Bean
-	ApprovalStore jdbcApprovalStore() {
-		return new JdbcApprovalStore(dataSource);
 	}
 
 	/**
@@ -254,12 +274,34 @@ public class CustomizerOAuth2JdbcConfig {
 		return new JWKSet(builder.build());
 	}
 
+	/**
+	 * 授权信息保存策略
+	 * 
+	 * @return ApprovalStore
+	 */
+	@Bean
+	ApprovalStore jdbcApprovalStore() {
+		return new JdbcApprovalStore(dataSource);
+	}
+
 	@Bean
 	UserApprovalHandler userApprovalHandler() {
 		ApprovalStoreUserApprovalHandler userApprovalHandler = new ApprovalStoreUserApprovalHandler();
 		userApprovalHandler.setApprovalStore(jdbcApprovalStore());
 		userApprovalHandler.setClientDetailsService(jdbcClientDetailsService());
 		userApprovalHandler.setRequestFactory(new DefaultOAuth2RequestFactory(jdbcClientDetailsService()));
+
+		// 通过token统计结果
+		// TokenStoreUserApprovalHandler userApprovalHandler = new
+		// TokenStoreUserApprovalHandler();
+		// userApprovalHandler.setTokenStore(tokenStore);
+
+		// 通过自定义处理方法处理token
+		// CustomizerUserApprovalHandler customizerUserApprovalHandler = new
+		// CustomizerUserApprovalHandler();
+		// customizerUserApprovalHandler.setOauthService(oauthService);
+		// customizerUserApprovalHandler.setTokenStore(tokenStore);
+
 		return userApprovalHandler;
 	}
 }

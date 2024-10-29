@@ -7,6 +7,9 @@ import org.springframework.security.oauth2.provider.approval.TokenStoreUserAppro
 import com.wy.entity.OAuthClientDetail;
 import com.wy.service.OAuthService;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * 自定义tokenstore处理器
  * 
@@ -15,6 +18,8 @@ import com.wy.service.OAuthService;
  * @git {@link https://github.com/dreamFlyingFlower }
  */
 @SuppressWarnings("deprecation")
+@Setter
+@Getter
 public class CustomizerUserApprovalHandler extends TokenStoreUserApprovalHandler {
 
 	private OAuthService oauthService;
@@ -34,9 +39,5 @@ public class CustomizerUserApprovalHandler extends TokenStoreUserApprovalHandler
 		OAuthClientDetail clientDetails = oauthService.loadOauthClientDetails(authorizationRequest.getClientId());
 		return clientDetails != null && clientDetails.trusted();
 
-	}
-
-	public void setOauthService(OAuthService oauthService) {
-		this.oauthService = oauthService;
 	}
 }

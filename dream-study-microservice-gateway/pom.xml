@@ -3,82 +3,22 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+
 	<parent>
 		<groupId>dream.flying.flower</groupId>
-		<artifactId>dream-study-microservice</artifactId>
+		<artifactId>dream-parent2</artifactId>
 		<version>0.0.1</version>
+		<relativePath />
 	</parent>
+
 	<artifactId>dream-study-microservice-gateway</artifactId>
+	<packaging>pom</packaging>
 	<name>dream-study-microservice-gateway</name>
-	<description>spring cloud study for gateway</description>
+	<description>Spring Cloud Gateway</description>
 
-	<dependencies>
-		<dependency>
-			<groupId>com.alibaba.csp</groupId>
-			<artifactId>sentinel-spring-cloud-gateway-adapter</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-gateway</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
-			<version>2.2.10.RELEASE</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-webflux</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-redis-reactive</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-security</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.isomorphism</groupId>
-			<artifactId>token-bucket</artifactId>
-			<version>1.7</version>
-		</dependency>
-		<dependency>
-			<groupId>com.alibaba.cloud</groupId>
-			<artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>org.springframework.cloud</groupId>
-					<artifactId>spring-cloud-starter-netflix-ribbon</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-loadbalancer</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>dream.flying.flower</groupId>
-			<artifactId>dream-tool-core</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>org.junit.vintage</groupId>
-					<artifactId>junit-vintage-engine</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-	</dependencies>
+	<modules>
+		<module>dream-study-microservice-gateway1</module>
+		<module>dream-study-microservice-gateway2</module>
+		<module>dream-study-microservice-gateway3</module>
+	</modules>
 </project>

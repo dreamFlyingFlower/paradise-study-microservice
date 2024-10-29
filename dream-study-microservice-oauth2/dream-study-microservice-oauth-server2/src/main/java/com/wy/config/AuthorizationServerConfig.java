@@ -1,17 +1,15 @@
 package com.wy.config;
 
-import java.security.KeyPair;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,15 +18,9 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationConsentService;
 import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationConsentService;
@@ -42,32 +34,16 @@ import org.springframework.security.oauth2.server.authorization.token.OAuth2Toke
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenGenerator;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.util.UrlUtils;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
 
-import com.nimbusds.jose.jwk.JWKSet;
-import com.nimbusds.jose.jwk.RSAKey;
-import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
-import com.nimbusds.jose.jwk.source.JWKSource;
-import com.nimbusds.jose.proc.SecurityContext;
 import com.wy.context.RedisSecurityContextRepository;
-import com.wy.helpers.SecurityContextOAuth2Helpers;
-import com.wy.properties.OAuthServerSecurityProperties;
 import com.wy.provider.sms.SmsGrantAuthenticationConverter;
 import com.wy.provider.sms.SmsGrantAuthenticationProvider;
 
-import dream.flying.flower.ConstDigest;
-import dream.flying.flower.digest.RsaHelper;
 import dream.flying.flower.framework.security.constant.ConstAuthorization;
 import dream.flying.flower.framework.security.entrypoint.LoginRedirectAuthenticationEntryPoint;
-import dream.flying.flower.framework.security.handler.LoginFailureHandler;
-import dream.flying.flower.framework.security.handler.LoginSuccessHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
@@ -93,10 +69,6 @@ public class AuthorizationServerConfig {
 
 	private final RedisSecurityContextRepository redisSecurityContextRepository;
 
-	private final OAuthServerSecurityProperties oauthServerSecurityProperties;
-
-	private final LoginSuccessHandler loginSuccessHandler;
-
 	/**
 	 * 配置认证相关的端点过滤器链,用于处理与协议端点相关的请求和响应.
 	 * 
@@ -107,6 +79,7 @@ public class AuthorizationServerConfig {
 	 * @throws Exception
 	 */
 	@Bean
+	@Order(Ordered.HIGHEST_PRECEDENCE)
 	SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http,
 			RegisteredClientRepository registeredClientRepository,
 			AuthorizationServerSettings authorizationServerSettings) throws Exception {
@@ -151,7 +124,7 @@ public class AuthorizationServerConfig {
 						new LoginRedirectAuthenticationEntryPoint(LOGIN_URL),
 						new MediaTypeRequestMatcher(MediaType.TEXT_HTML)));
 
-		// 接受访问令牌用于用户信息和/或客户端注册
+		// 使用JWT处理令牌用于用户信息和/或客户端注册
 		http.oauth2ResourceServer(resourceServer -> resourceServer.jwt(Customizer.withDefaults()));
 
 		// 自定义短信认证登录转换器
@@ -181,94 +154,6 @@ public class AuthorizationServerConfig {
 		provider.setAuthenticationManager(authenticationManager);
 
 		return build;
-	}
-
-	/**
-	 * 配置资源相关的过滤器链,不能和上面的{@link #authorizationServerSecurityFilterChain()}放一起,会有冲突
-	 * 
-	 * 用于身份验证的SpringSecurity过滤器链,用于处理身份验证相关的请求和响应.负责验证用户的身份,并生成相应的凭据,以便后续的授权和访问控制
-	 *
-	 * @param http security核心配置类
-	 * @return 过滤器链
-	 * @throws Exception 抛出
-	 */
-	@Bean
-	SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-		// 添加跨域过滤器
-		http.addFilter(corsFilter());
-		// 禁用 csrf 与 cors
-		http.csrf(AbstractHttpConfigurer::disable);
-		http.cors(AbstractHttpConfigurer::disable);
-		http.authorizeHttpRequests((authorize) -> authorize
-				// 放行静态资源
-				.requestMatchers("/assets/**", "/webjars/**", "/login", "/getCaptcha", "/getSmsCaptcha")
-				.permitAll()
-				// 放行swagger相关资源
-				.requestMatchers("/authenticate", "/oauth/authorize", "/swagger-resources/**", "/swagger-ui/**",
-						"/v3/api-docs", "/webjars/**")
-				.permitAll()
-				.requestMatchers(oauthServerSecurityProperties.getPermitAllSources())
-				.permitAll()
-				.anyRequest()
-				.authenticated())
-				// 指定登录页面
-				.formLogin(formLogin -> {
-					formLogin.loginPage("/login");
-					if (UrlUtils.isAbsoluteUrl(LOGIN_URL)) {
-						// 绝对路径代表是前后端分离,登录成功和失败改为写回json,不重定向了
-						formLogin.successHandler(loginSuccessHandler);
-						formLogin.failureHandler(new LoginFailureHandler());
-					}
-				});
-
-		// 添加BearerTokenAuthenticationFilter,将认证服务当做一个资源服务,解析请求头中的token
-		// 资源服务器配置,处理使用access_token访问用户信息端点和客户端注册端点
-		http.oauth2ResourceServer((resourceServer) -> resourceServer
-				// 可自定义JWT设置
-				.jwt(Customizer.withDefaults())
-				// 权限不足时的异常处理
-				.accessDeniedHandler(SecurityContextOAuth2Helpers::exceptionHandler)
-				// 未携带token的异常处理
-				.authenticationEntryPoint(SecurityContextOAuth2Helpers::exceptionHandler));
-
-		http
-				// 当未登录时访问认证端点时重定向至login页面
-				.exceptionHandling((exceptions) -> exceptions.defaultAuthenticationEntryPointFor(
-						new LoginRedirectAuthenticationEntryPoint(LOGIN_URL),
-						new MediaTypeRequestMatcher(MediaType.TEXT_HTML)));
-
-		// 使用redis存储、读取登录的认证信息
-		http.securityContext(context -> context.securityContextRepository(redisSecurityContextRepository));
-
-		return http.build();
-	}
-
-	/**
-	 * 跨域过滤器配置
-	 *
-	 * @return CorsFilter
-	 */
-	@Bean
-	CorsFilter corsFilter() {
-		// 初始化cors配置对象
-		CorsConfiguration configuration = new CorsConfiguration();
-		// 设置跨域访问可以携带cookie
-		configuration.setAllowCredentials(true);
-		// 设置允许跨域的域名,如果允许携带cookie的话,路径就不能写*号, *表示所有的域名都可以跨域访问
-		configuration.addAllowedOrigin("http://127.0.0.1:8080");
-		// configuration.setAllowedOriginPatterns(Collections.singletonList(CorsConfiguration.ALL));
-		// 允许所有的请求方法 ==> GET POST PUT Delete
-		configuration.addAllowedMethod(CorsConfiguration.ALL);
-		// 允许携带任何头信息
-		configuration.addAllowedHeader(CorsConfiguration.ALL);
-		// 初始化cors配置源对象
-		UrlBasedCorsConfigurationSource configurationSource = new UrlBasedCorsConfigurationSource();
-		// 给配置源对象设置过滤的参数
-		// 参数一: 过滤的路径 == > 所有的路径都要求校验是否跨域
-		// 参数二: 配置类
-		configurationSource.registerCorsConfiguration("/**", configuration);
-		// 返回配置好的过滤器
-		return new CorsFilter(configurationSource);
 	}
 
 	/**
@@ -338,36 +223,7 @@ public class AuthorizationServerConfig {
 	}
 
 	/**
-	 * 配置密码解析器,注意重复注入
-	 *
-	 * @return BCryptPasswordEncoder
-	 */
-	@Bean
-	PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
-
-	/**
-	 * 内存中注入UserDetailsService,注意重复注入
-	 * 
-	 * UserDetailsService的实例,用于获取需要进行身份验证的用户信息,提供了与用户相关的数据,以便进行身份验证和授权的决策
-	 * 
-	 * @return UserDetailsService
-	 */
-	@Bean
-	UserDetailsService userDetailsService() {
-		UserDetails userDetails = User.builder()
-				.passwordEncoder(passwordEncoder()::encode)
-				.username("username")
-				.password("123456")
-				.roles("USRE")
-				.build();
-
-		return new InMemoryUserDetailsManager(userDetails);
-	}
-
-	/**
-	 * 配置基于db的oauth2的授权管理服务
+	 * 配置基于db的oauth2的授权管理服务,对应表oauth2_authorization
 	 *
 	 * @param jdbcTemplate db数据源信息
 	 * @param registeredClientRepository 上边注入的客户端repository
@@ -381,7 +237,7 @@ public class AuthorizationServerConfig {
 	}
 
 	/**
-	 * 配置基于db的授权确认管理服务
+	 * 配置基于db的授权确认管理服务,对应表oauth2_authorization_consent
 	 *
 	 * @param jdbcTemplate db数据源信息
 	 * @param registeredClientRepository 客户端repository
@@ -392,37 +248,6 @@ public class AuthorizationServerConfig {
 			RegisteredClientRepository registeredClientRepository) {
 		// 基于db的授权确认管理服务,基于内存的服务实现InMemoryOAuth2AuthorizationConsentService
 		return new JdbcOAuth2AuthorizationConsentService(jdbcTemplate, registeredClientRepository);
-	}
-
-	/**
-	 * 配置jwk源,使用非对称加密,公开用于检索匹配指定选择器的JWK的方法
-	 * 
-	 * 用于生成和管理用于对访问令牌进行签名的JSON Web Key(JWK),提供了加密算法和密钥,以确保访问令牌的完整性和安全性
-	 *
-	 * @return JWKSource
-	 */
-	@Bean
-	JWKSource<SecurityContext> jwkSource() {
-		KeyPair keyPair = RsaHelper.generateKeyPair(ConstDigest.KEY_SIZE_2048);
-		RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
-		RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
-		RSAKey rsaKey =
-				new RSAKey.Builder(publicKey).privateKey(privateKey).keyID(UUID.randomUUID().toString()).build();
-		JWKSet jwkSet = new JWKSet(rsaKey);
-		return new ImmutableJWKSet<>(jwkSet);
-	}
-
-	/**
-	 * 配置jwt解析器
-	 * 
-	 * 用于验证和解码已签名的访问令牌,以获取其中包含的授权信息和用户身份,负责验证访问令牌的有效性和真实性
-	 *
-	 * @param jwkSource jwk源
-	 * @return JwtDecoder
-	 */
-	@Bean
-	JwtDecoder jwtDecoder(JWKSource<SecurityContext> jwkSource) {
-		return OAuth2AuthorizationServerConfiguration.jwtDecoder(jwkSource);
 	}
 
 	/**

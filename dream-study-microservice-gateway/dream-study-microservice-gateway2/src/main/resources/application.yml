@@ -1,0 +1,26 @@
+server: 
+  port: 5530
+
+spring:
+  application:
+    name: dream-study-microservice-gateway
+    
+eureka: 
+  instance:
+    hostname: localhost
+    prefer-ip-address: true
+    instance-id: gateway-5530.com
+  client: 
+    service-url: 
+      defaultZone: http://localhost:5500/eureka
+      
+management: 
+  endpoints:
+    web:
+      exposure:
+        #*表示暴露info,health所有端点
+        include: "*"
+  endpoint:
+    health:
+      #默认是never
+      show-details: always

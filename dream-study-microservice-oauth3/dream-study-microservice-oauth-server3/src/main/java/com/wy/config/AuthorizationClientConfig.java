@@ -1,5 +1,8 @@
 package com.wy.config;
 
+import java.security.KeyPair;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
 import java.time.Duration;
 import java.util.UUID;
 
@@ -12,13 +15,25 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
+import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.JdbcRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
+import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
+import org.springframework.security.oauth2.server.authorization.settings.OAuth2TokenFormat;
 import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
 
+import com.nimbusds.jose.jwk.JWKSet;
+import com.nimbusds.jose.jwk.RSAKey;
+import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
+import com.nimbusds.jose.jwk.source.JWKSource;
+import com.nimbusds.jose.proc.SecurityContext;
+
+import dream.flying.flower.ConstDigest;
+import dream.flying.flower.digest.RsaHelper;
 import dream.flying.flower.framework.security.constant.ConstAuthorization;
 import lombok.RequiredArgsConstructor;
 
@@ -28,6 +43,8 @@ import lombok.RequiredArgsConstructor;
  * {@link RegisteredClientRepository}:认证的客户端数据操作,自定义操作需实现该接口
  * {@link JdbcRegisteredClientRepository}:数据库认证客户端实现
  * {@link InMemoryRegisteredClientRepository}:内存认证客户端实现,可直接从配置文件中读取
+ * 
+ * 项目启动时,会将不存在于oauth2_registered_client表中的客户端数据写入到该表中
  * 
  * @author 飞花梦影
  * @date 2024-09-18 22:02:11
@@ -40,10 +57,14 @@ import lombok.RequiredArgsConstructor;
 public class AuthorizationClientConfig {
 
 	/**
-	 * 配置已经注册的客户端认证Repository,也可以直接使用配置文件
+	 * 配置已经注册的客户端认证Repository,也可以直接使用配置文件,数据库对应表oauth2_registered_client
 	 * 
 	 * 用于管理OAuth2和OpenID Connect客户端的注册信息,包括客户端ID、密钥、授权类型和重定向URI等,负责验证客户端的身份并维护客户端的配置
-	 *
+	 * 
+	 * 如果认证服务器开启了oidc,可调用该URL查询认证服务器信息:http://127.0.0.1:17127/.well-known/openid-configuration
+	 * 
+	 * 获取授权码:http://localhost:17127/oauth2/authorize?response_type=code&client_id=oidc-client&scope=profile&redirect_uri=http://www.baidu.com
+	 * 
 	 * @param jdbcTemplate db 数据源信息
 	 * @param passwordEncoder 密码解析器
 	 * @return 基于数据库的repository
@@ -55,8 +76,11 @@ public class AuthorizationClientConfig {
 				.clientId("test-client")
 				// 客户端秘钥,使用密码解析器加密
 				.clientSecret(passwordEncoder.encode("123456"))
-				// 客户端认证方式,基于请求头的认证
+				// {noop}开头,表示密码以明文存储
+				.clientSecret("{noop}123456")
+				// 客户端认证方式:基于POST请求,从请求头获取参数的认证方式,处理类为 ClientSecretBasicAuthenticationConverter
 				.clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+				// 客户端认证方式:基于POST请求,从请求参数中获取相关参数,处理类为 ClientSecretPostAuthenticationConverter
 				.clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_POST)
 				// 配置资源服务器使用该客户端获取授权时支持的方式
 				.authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
@@ -73,17 +97,26 @@ public class AuthorizationClientConfig {
 				// 自定scope
 				.scope("message.read")
 				.scope("message.write")
-				// 客户端设置,设置用户需要确认授权
-				.clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
+				// 客户端设置
+				.clientSettings(ClientSettings.builder()
+						// 设置用户需要确认授权,若无感授权,改为false
+						.requireAuthorizationConsent(true)
+						.build())
 				// token配置
 				.tokenSettings(TokenSettings.builder()
 						// access token 有效期
 						.accessTokenTimeToLive(Duration.ofMinutes(60))
+						// access_token格式
+						.accessTokenFormat(OAuth2TokenFormat.REFERENCE)
+						// 指定加密算法
+						.idTokenSignatureAlgorithm(SignatureAlgorithm.RS256)
+						// refresh_token是否可以重用:true->可重用
+						.reuseRefreshTokens(true)
 						.build())
 				.build();
 
 		// 基于内存的InMemoryRegisteredClientRepository
-		// new InMemoryRegisteredClientRepository(registeredClient);
+		new InMemoryRegisteredClientRepository(registeredClient);
 
 		// 基于db存储客户端
 		JdbcRegisteredClientRepository registeredClientRepository = new JdbcRegisteredClientRepository(jdbcTemplate);
@@ -95,7 +128,7 @@ public class AuthorizationClientConfig {
 			registeredClientRepository.save(registeredClient);
 		}
 
-		// 设备码授权客户端,公共客户端
+		// 设置多个客户端认证.设备码授权客户端,公共客户端
 		RegisteredClient deviceClient = RegisteredClient.withId(UUID.randomUUID().toString())
 				.clientId("device-message-client")
 				// 公共客户端
@@ -132,5 +165,36 @@ public class AuthorizationClientConfig {
 			registeredClientRepository.save(pkceClient);
 		}
 		return registeredClientRepository;
+	}
+
+	/**
+	 * 配置JWK源,使用非对称加密,为JWT(id_token)提供加密密钥,用于加密/解密或签名/验签.公开用于检索匹配指定选择器的JWK的方法,用于签名访问令牌
+	 * 
+	 * 用于生成和管理用于对访问令牌进行签名的JSON Web Key(JWK),提供了加密算法和密钥,以确保访问令牌的完整性和安全性
+	 *
+	 * @return JWKSource
+	 */
+	@Bean
+	JWKSource<SecurityContext> jwkSource() {
+		KeyPair keyPair = RsaHelper.generateKeyPair(ConstDigest.KEY_SIZE_2048);
+		RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
+		RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
+		RSAKey rsaKey =
+				new RSAKey.Builder(publicKey).privateKey(privateKey).keyID(UUID.randomUUID().toString()).build();
+		JWKSet jwkSet = new JWKSet(rsaKey);
+		return new ImmutableJWKSet<>(jwkSet);
+	}
+
+	/**
+	 * 用于解码已签名的访问令牌
+	 * 
+	 * 用于验证和解码已签名的访问令牌,以获取其中包含的授权信息和用户身份,负责验证访问令牌的有效性和真实性
+	 *
+	 * @param jwkSource jwk源
+	 * @return JwtDecoder
+	 */
+	@Bean
+	JwtDecoder jwtDecoder(JWKSource<SecurityContext> jwkSource) {
+		return OAuth2AuthorizationServerConfiguration.jwtDecoder(jwkSource);
 	}
 }
