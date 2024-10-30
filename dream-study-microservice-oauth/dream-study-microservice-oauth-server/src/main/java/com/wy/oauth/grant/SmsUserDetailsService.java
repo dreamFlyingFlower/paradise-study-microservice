@@ -11,7 +11,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
  * @date 2024-10-24 15:08:46
  * @git {@link https://github.com/dreamFlyingFlower}
  */
-public class PhoneUserDetailsService implements UserDetailsService {
+public class SmsUserDetailsService implements UserDetailsService {
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

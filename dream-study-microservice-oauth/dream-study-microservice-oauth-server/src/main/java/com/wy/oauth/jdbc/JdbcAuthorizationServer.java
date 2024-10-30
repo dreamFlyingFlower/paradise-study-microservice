@@ -1,6 +1,8 @@
 package com.wy.oauth.jdbc;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -12,6 +14,7 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.A
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
+import org.springframework.security.oauth2.provider.CompositeTokenGranter;
 import org.springframework.security.oauth2.provider.TokenGranter;
 import org.springframework.security.oauth2.provider.approval.UserApprovalHandler;
 import org.springframework.security.oauth2.provider.client.JdbcClientDetailsService;
@@ -19,6 +22,7 @@ import org.springframework.security.oauth2.provider.code.AuthorizationCodeServic
 import org.springframework.security.oauth2.provider.code.JdbcAuthorizationCodeServices;
 import org.springframework.security.oauth2.provider.endpoint.AuthorizationEndpoint;
 import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
+import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenEnhancer;
 import org.springframework.security.oauth2.provider.token.TokenEnhancerChain;
 import org.springframework.security.oauth2.provider.token.TokenStore;
@@ -182,8 +186,34 @@ public class JdbcAuthorizationServer extends AuthorizationServerConfigurerAdapte
 			enhancers.add(jwtTokenEnhancer);
 			enhancers.add(jwtAccessTokenConverter);
 			tokenEnhancerChain.setTokenEnhancers(enhancers);
+
+			// 获取原有默认授权模式(授权码模式、密码模式、客户端模式、简化模式)的授权者
+			List<TokenGranter> granterList = new ArrayList<>(Arrays.asList(endpoints.getTokenGranter()));
+
+			CompositeTokenGranter compositeTokenGranter = new CompositeTokenGranter(granterList);
+			endpoints.authenticationManager(authenticationManager)
+					.accessTokenConverter(jwtAccessTokenConverter)
+					.tokenEnhancer(tokenEnhancerChain)
+					.tokenGranter(compositeTokenGranter)
+					.reuseRefreshTokens(true)
+					.tokenServices(tokenServices(endpoints));
 			endpoints.tokenEnhancer(tokenEnhancerChain).accessTokenConverter(jwtAccessTokenConverter);
 		}
+	}
+
+	public DefaultTokenServices tokenServices(AuthorizationServerEndpointsConfigurer endpoints) {
+		TokenEnhancerChain tokenEnhancerChain = new TokenEnhancerChain();
+		List<TokenEnhancer> tokenEnhancers = new ArrayList<>();
+		tokenEnhancers.add(jwtTokenEnhancer);
+		tokenEnhancers.add(jwtAccessTokenConverter);
+		tokenEnhancerChain.setTokenEnhancers(tokenEnhancers);
+
+		DefaultTokenServices tokenServices = new DefaultTokenServices();
+		tokenServices.setTokenStore(endpoints.getTokenStore());
+		tokenServices.setSupportRefreshToken(true);
+		tokenServices.setClientDetailsService(jdbcClientDetailsService);
+		tokenServices.setTokenEnhancer(tokenEnhancerChain);
+		return tokenServices;
 	}
 
 	/**

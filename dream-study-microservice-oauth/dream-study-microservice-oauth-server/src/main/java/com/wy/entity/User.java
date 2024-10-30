@@ -8,7 +8,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.wy.entity.vo.PermissionVo;
+import com.wy.vo.PermissionVo;
 
 import io.swagger.annotations.ApiModel;
 import lombok.AllArgsConstructor;

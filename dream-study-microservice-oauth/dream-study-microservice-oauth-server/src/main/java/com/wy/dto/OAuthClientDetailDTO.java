@@ -1,4 +1,4 @@
-package com.wy.entity.dto;
+package com.wy.dto;
 
 import java.io.Serializable;
 import java.util.ArrayList;

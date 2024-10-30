@@ -93,24 +93,32 @@ public class AuthorizationClientConfig {
 				// 该客户端的授权范围,OPENID与PROFILE是IdToken的scope,获取授权时请求OPENID的scope时认证服务会返回IdToken
 				.scope(OidcScopes.OPENID)
 				.scope(OidcScopes.PROFILE)
-				// 自定scope
+				// 自定scope,客户端如果带了scope必须带上SCOPE_前缀,可以去掉,见AuthorizationServerConfig#jwtAuthenticationConverter()
 				.scope("message.read")
 				.scope("message.write")
 				// 客户端设置
 				.clientSettings(ClientSettings.builder()
 						// 设置用户需要确认授权,若无感授权,改为false
 						.requireAuthorizationConsent(true)
+						// 当使用该客户端发起PKCE流程时必须设置为true
+						.requireProofKey(false)
+						// 设置客户端JWKS的URL
+						.jwkSetUrl(null)
+						// 设置token端点对验证方法为CLIENT_SECRET_JWT,PRIVATE_KEY_JWT的客户端进行身份验证使用的签名算法
+						.tokenEndpointAuthenticationSigningAlgorithm(null)
 						.build())
 				// token配置
 				.tokenSettings(TokenSettings.builder()
 						// access_token有效期
 						.accessTokenTimeToLive(Duration.ofMinutes(60))
-						// access_token格式
+						// access_token格式,SELF_CONTAINED是token(jwt格式),REFERENCE是不透明token,相相当于是token元数据的一个id,通过id找到对应数据(自省令牌时)
 						.accessTokenFormat(OAuth2TokenFormat.REFERENCE)
 						// 指定加密算法
 						.idTokenSignatureAlgorithm(SignatureAlgorithm.RS256)
 						// refresh_token是否可以重用:true->可重用
 						.reuseRefreshTokens(true)
+						// 授权码有效时长
+						.authorizationCodeTimeToLive(Duration.ofSeconds(60))
 						.build())
 				.build();
 

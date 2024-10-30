@@ -18,4 +18,7 @@ import dream.flying.flower.framework.mybatis.plus.mapper.BaseMappers;
 @Mapper
 public interface UserMapper extends BaseMappers<UserEntity, UserVO, UserQuery> {
 
+	UserVO getUserByPhone(String phone);
+
+	UserVO getUserByUserName(String username);
 }

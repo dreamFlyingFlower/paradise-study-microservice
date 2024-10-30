@@ -1,21 +1,24 @@
 package com.wy.mapper;
 
-import com.wy.entity.User;
+import org.apache.ibatis.annotations.Mapper;
+
+import com.wy.entity.UserEntity;
+import com.wy.query.UserQuery;
+import com.wy.vo.UserVO;
+
+import dream.flying.flower.framework.mybatis.plus.mapper.BaseMappers;
 
 /**
- * 用户数据层
- * 
- * @auther 飞花梦影
- * @date 2021-07-05 20:19:36
+ * 用户信息
+ *
+ * @author 飞花梦影
+ * @date 2024-08-01
  * @git {@link https://github.com/dreamFlyingFlower}
  */
-public interface UserMapper {
+@Mapper
+public interface UserMapper extends BaseMappers<UserEntity, UserVO, UserQuery> {
 
-	/**
-	 * 根据用户民查询用户数据
-	 * 
-	 * @param username 用户名
-	 * @return 用户
-	 */
-	User selectByUsername(String username);
+	UserVO getUserByPhone(String phone);
+
+	UserVO getUserByUserName(String username);
 }

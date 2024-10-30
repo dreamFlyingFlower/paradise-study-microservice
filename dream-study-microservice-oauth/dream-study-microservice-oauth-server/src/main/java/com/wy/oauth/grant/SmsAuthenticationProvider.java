@@ -22,17 +22,17 @@ import lombok.Data;
  * @git {@link https://github.com/dreamFlyingFlower}
  */
 @Data
-public class PhoneAuthenticationProvider implements AuthenticationProvider {
+public class SmsAuthenticationProvider implements AuthenticationProvider {
 
 	private RedisTemplate<String, Object> redisTemplate;
 
-	private PhoneUserDetailsService phoneUserDetailsService;
+	private SmsUserDetailsService phoneUserDetailsService;
 
 	public static final String PHONE_CODE_SUFFIX = "phone:code:";
 
 	@Override
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-		PhoneAuthenticationToken authenticationToken = (PhoneAuthenticationToken) authentication;
+		SmsAuthenticationToken authenticationToken = (SmsAuthenticationToken) authentication;
 		// 手机号
 		Object principal = authenticationToken.getPrincipal();
 		// 验证码
@@ -59,19 +59,19 @@ public class PhoneAuthenticationProvider implements AuthenticationProvider {
 			throw new InternalAuthenticationServiceException("验证码错误！");
 		}
 		// 返回认证成功的对象
-		PhoneAuthenticationToken phoneAuthenticationToken =
-				new PhoneAuthenticationToken(userDetails.getAuthorities(), phone, phoneCode);
+		SmsAuthenticationToken phoneAuthenticationToken =
+				new SmsAuthenticationToken(userDetails.getAuthorities(), phone, phoneCode);
 		phoneAuthenticationToken.setPhone(phone);
 		phoneAuthenticationToken.setDetails(userDetails);
 		return phoneAuthenticationToken;
 	}
 
 	/**
-	 * ProviderManager选择具体Provider时根据此方法判断authentication是不是PhoneAuthenticationToken的子类或子接口
+	 * ProviderManager选择具体Provider时根据此方法判断authentication是不是SmsAuthenticationToken的子类或子接口
 	 */
 	@Override
 	public boolean supports(Class<?> authentication) {
 		// isAssignableFrom方法如果比较类authentication和被比较类类型相同,或者是其子类、实现类,返回true
-		return PhoneAuthenticationToken.class.isAssignableFrom(authentication);
+		return SmsAuthenticationToken.class.isAssignableFrom(authentication);
 	}
 }

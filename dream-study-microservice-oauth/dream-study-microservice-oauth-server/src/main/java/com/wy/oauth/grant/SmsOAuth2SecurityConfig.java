@@ -25,7 +25,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 @EnableWebSecurity
 @Deprecated
-public class PhoneOAuth2SecurityConfig extends WebSecurityConfigurerAdapter {
+public class SmsOAuth2SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
@@ -34,7 +34,7 @@ public class PhoneOAuth2SecurityConfig extends WebSecurityConfigurerAdapter {
 	private RedisTemplate<String, Object> redisTemplate;
 
 	@Autowired
-	private PhoneUserDetailsService phoneUserDetailsService;
+	private SmsUserDetailsService phoneUserDetailsService;
 
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -55,7 +55,7 @@ public class PhoneOAuth2SecurityConfig extends WebSecurityConfigurerAdapter {
 	public AuthenticationManager authenticationManager() throws Exception {
 		List<AuthenticationProvider> authenticationProviders = new ArrayList<>();
 
-		PhoneAuthenticationProvider phoneAuthenticationProvider = new PhoneAuthenticationProvider();
+		SmsAuthenticationProvider phoneAuthenticationProvider = new SmsAuthenticationProvider();
 		phoneAuthenticationProvider.setRedisTemplate(redisTemplate);
 		phoneAuthenticationProvider.setPhoneUserDetailsService(phoneUserDetailsService);
 

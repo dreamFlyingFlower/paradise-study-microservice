@@ -71,7 +71,6 @@ import org.springframework.security.web.session.SessionManagementFilter;
 import org.springframework.web.filter.CorsFilter;
 
 import com.nimbusds.jose.jwk.source.JWKSource;
-import com.wy.config.AuthorizationServerConfig;
 
 /**
  * SpringSecurity认证服务器,5.7以上版本已经抛弃了EnableAuthorizationServer等相关注解,直接使用拦截器SecurityFilterChain
@@ -82,30 +81,8 @@ import com.wy.config.AuthorizationServerConfig;
  * 是Spring Security OAuth的进化版本,引入了对OAuth 2.1和OpenID Connect 1.0规范的支持.
  * 基于Spring Security,为构建OpenID Connect 1.0身份提供者和OAuth2授权服务器产品提供了安全、轻量级和可定制的基础.
  * OAuth 2.1和OpenID Connect 1.0是用于身份验证和授权的行业标准协议,被广泛应用于各种应用程序和系统,以实现安全的用户身份验证和授权流程.
- * </pre>
  * 
- * 相关类,eg:{@link AuthorizationServerConfig}
- * 
- * <pre>
- * {@link AbstractAuthenticationProcessingFilter#doFilter}:与认证相关的拦截器从此处触发
- * 
- * {@link RegisteredClientRepository}:认证的客户端数据操作,自定义操作需实现该接口
- * {@link JdbcRegisteredClientRepository}:数据库认证客户端操作
- * {@link InMemoryRegisteredClientRepository}:内存认证客户端操作,可直接在配置文件中编写
- * 
- * {@link AuthorizationServerSettings}:认证服务器相关设置
- * 
- * {@link BearerTokenAuthenticationFilter}:Bearer Token拦截器
- * 
- * {@link OAuth2AuthorizationService}:OAuth2认证服务接口,自定义操作需实现该接口
- * {@link JdbcOAuth2AuthorizationService}:基于数据库的OAuth2认证服务
- * {@link InMemoryOAuth2AuthorizationService}:基于内存的OAuth2认证服务
- * 
- * {@link OAuth2AuthorizationConsentService}:授权确认管理服务,自定义操作需实现该接口
- * {@link JdbcOAuth2AuthorizationConsentService}:基于数据库的授权确认管理服务
- * {@link InMemoryOAuth2AuthorizationConsentService}:基于内存的授权确认管理服务
- * 
- * {@link JWKSource}:JWK是一种JSON格式的密钥表示,用于描述加密算法使用的密钥.JWT使用JWK签名和验签,确保令牌的真实和完整性
+ * JWT和Opaque:Jwt是公开的,直接在线就可以解析看到里面的数据,但不能修改.Opaque一个不透明的token,在看起来就是一个字符串
  * </pre>
  * 
  * 程序启动后,有以下几个固定访问端点:
@@ -146,14 +123,32 @@ import com.wy.config.AuthorizationServerConfig;
  * 相关类
  * 
  * <pre>
- * {@link AuthorizationServerSettings#builder()}:固定访问端点设置,每个URL都有拦截器进行拦截.
- * 		包括/oauth2/authorize,/oauth2/token,/oauth2/jwks,/oauth2/revoke,/oauth2/introspect,/connect/register,/userinfo
+ * {@link AuthorizationServerSettings#builder()}:认证服务器相关设置,例如访问令牌的有效期,刷新令牌的策略和认证页面的URL等.提供了对授权服务器行为的细粒度控制.
+ * 		设置固定访问端点,每个端点都有拦截器进行拦截.	包括/oauth2/authorize,/oauth2/token,/oauth2/jwks,/oauth2/revoke,/oauth2/introspect,/connect/register,/userinfo
  * {@link AuthorizationGrantType}:支持的授权模式
  * {@link SecurityContext}:SpringSecurity上下文,保存登录相关信息
  * ->{@link SecurityContextImpl}:SecurityContext默认实现类
  * {@link ExceptionTranslationFilter}:在认证或授权过程中,捕获出现的{@link AuthenticationException}(认证异常)和{@link AccessDeniedException}(授权异常)异常.
  * 		自定义对AuthenticationException,AccessDeniedException异常的处理,需要自定义AuthenticationEntryPoint,AccessDeniedException的实现类,然后将自定义的异常实现类设置到配置中去.
  * 		通过accessDeniedHandler(AccessDeniedHandler),authenticationEntryPoint(AuthenticationEntryPoint),将自定义的异常设置到配置中去
+ * 
+ * {@link AbstractAuthenticationProcessingFilter#doFilter}:与认证相关的拦截器从此处触发
+ * 
+ * {@link RegisteredClientRepository}:认证的客户端数据操作,自定义操作需实现该接口
+ * {@link JdbcRegisteredClientRepository}:数据库认证客户端操作
+ * {@link InMemoryRegisteredClientRepository}:内存认证客户端操作,可直接在配置文件中编写
+ * 
+ * {@link BearerTokenAuthenticationFilter}:Bearer Token拦截器
+ * 
+ * {@link OAuth2AuthorizationService}:OAuth2认证服务接口,自定义操作需实现该接口
+ * {@link JdbcOAuth2AuthorizationService}:基于数据库的OAuth2认证服务
+ * {@link InMemoryOAuth2AuthorizationService}:基于内存的OAuth2认证服务
+ * 
+ * {@link OAuth2AuthorizationConsentService}:授权确认管理服务,自定义操作需实现该接口
+ * {@link JdbcOAuth2AuthorizationConsentService}:基于数据库的授权确认管理服务
+ * {@link InMemoryOAuth2AuthorizationConsentService}:基于内存的授权确认管理服务
+ * 
+ * {@link JWKSource}:JWK是一种JSON格式的密钥表示,用于描述加密算法使用的密钥.JWT使用JWK签名和验签,确保令牌的真实和完整性
  * </pre>
  * 
  * 相关拦截器

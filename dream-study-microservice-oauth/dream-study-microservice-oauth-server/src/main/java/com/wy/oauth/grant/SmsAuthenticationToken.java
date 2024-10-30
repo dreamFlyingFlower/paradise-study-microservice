@@ -32,7 +32,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class PhoneAuthenticationToken extends AbstractAuthenticationToken {
+public class SmsAuthenticationToken extends AbstractAuthenticationToken {
 
 	private static final long serialVersionUID = 2530206941077115912L;
 
@@ -51,7 +51,7 @@ public class PhoneAuthenticationToken extends AbstractAuthenticationToken {
 	 * @param principal
 	 * @param credentials
 	 */
-	public PhoneAuthenticationToken(Object principal, Object credentials) {
+	public SmsAuthenticationToken(Object principal, Object credentials) {
 		super(null);
 		this.principal = principal;
 		this.credentials = credentials;
@@ -65,7 +65,7 @@ public class PhoneAuthenticationToken extends AbstractAuthenticationToken {
 	 * @param principal
 	 * @param credentials
 	 */
-	public PhoneAuthenticationToken(Collection<? extends GrantedAuthority> authorities, Object principal,
+	public SmsAuthenticationToken(Collection<? extends GrantedAuthority> authorities, Object principal,
 			Object credentials) {
 		super(authorities);
 		this.principal = principal;

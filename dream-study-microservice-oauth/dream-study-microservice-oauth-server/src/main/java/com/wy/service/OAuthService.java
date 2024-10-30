@@ -2,8 +2,8 @@ package com.wy.service;
 
 import java.util.List;
 
+import com.wy.dto.OAuthClientDetailDTO;
 import com.wy.entity.OAuthClientDetail;
-import com.wy.entity.dto.OAuthClientDetailDTO;
 
 public interface OAuthService {
 

@@ -7,8 +7,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.wy.dto.OAuthClientDetailDTO;
 import com.wy.entity.OAuthClientDetail;
-import com.wy.entity.dto.OAuthClientDetailDTO;
 import com.wy.repository.OAuthRepository;
 import com.wy.service.OAuthService;
 

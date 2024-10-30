@@ -35,7 +35,7 @@ import org.springframework.security.oauth2.provider.token.AuthorizationServerTok
  * @git {@link https://github.com/dreamFlyingFlower}
  */
 @Deprecated
-public class PhoneTokenGranter extends AbstractTokenGranter {
+public class SmsTokenGranter extends AbstractTokenGranter {
 
 	/** 授权类型名称 */
 	public static final String GRANT_TYPE = "phonecode";
@@ -50,13 +50,13 @@ public class PhoneTokenGranter extends AbstractTokenGranter {
 	 * @param requestFactory
 	 * @param authenticationManager
 	 */
-	public PhoneTokenGranter(AuthorizationServerTokenServices tokenServices, ClientDetailsService clientDetailsService,
+	public SmsTokenGranter(AuthorizationServerTokenServices tokenServices, ClientDetailsService clientDetailsService,
 			OAuth2RequestFactory requestFactory, AuthenticationManager authenticationManager) {
-		this(tokenServices, clientDetailsService, requestFactory, GRANT_TYPE, authenticationManager);
+		this(tokenServices, clientDetailsService, requestFactory, authenticationManager, GRANT_TYPE);
 	}
 
-	public PhoneTokenGranter(AuthorizationServerTokenServices tokenServices, ClientDetailsService clientDetailsService,
-			OAuth2RequestFactory requestFactory, String grantType, AuthenticationManager authenticationManager) {
+	public SmsTokenGranter(AuthorizationServerTokenServices tokenServices, ClientDetailsService clientDetailsService,
+			OAuth2RequestFactory requestFactory, AuthenticationManager authenticationManager, String grantType) {
 		super(tokenServices, clientDetailsService, requestFactory, grantType);
 		this.authenticationManager = authenticationManager;
 	}
@@ -68,7 +68,7 @@ public class PhoneTokenGranter extends AbstractTokenGranter {
 		String phone = parameters.get("phone");
 		String phonecode = parameters.get("phoneCode");
 		// 创建未认证对象
-		Authentication authentication = new PhoneAuthenticationToken(phone, phonecode);
+		Authentication authentication = new SmsAuthenticationToken(phone, phonecode);
 		((AbstractAuthenticationToken) authentication).setDetails(parameters);
 		try {
 			// 进行身份认证

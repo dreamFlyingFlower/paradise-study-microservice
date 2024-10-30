@@ -94,7 +94,7 @@ public class AuthorizationClientConfig {
 				// 该客户端的授权范围,OPENID与PROFILE是IdToken的scope,获取授权时请求OPENID的scope时认证服务会返回IdToken
 				.scope(OidcScopes.OPENID)
 				.scope(OidcScopes.PROFILE)
-				// 自定scope
+				// 自定scope,客户端如果带了scope必须带上SCOPE_前缀,可以去掉,见AuthorizationServerConfig#jwtAuthenticationConverter()
 				.scope("message.read")
 				.scope("message.write")
 				// 客户端设置

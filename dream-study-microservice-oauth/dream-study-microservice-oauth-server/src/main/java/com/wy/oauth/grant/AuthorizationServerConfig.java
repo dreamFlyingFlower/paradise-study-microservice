@@ -69,7 +69,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 		// 获取原有默认授权模式(授权码模式、密码模式、客户端模式、简化模式)的授权者,用于支持原有授权模式
 		List<TokenGranter> tokenGranters = new ArrayList<>(Collections.singletonList(endpoints.getTokenGranter()));
 		// 添加自定义TokenGranter到集合
-		tokenGranters.add(new PhoneTokenGranter(endpoints.getTokenServices(), endpoints.getClientDetailsService(),
+		tokenGranters.add(new SmsTokenGranter(endpoints.getTokenServices(), endpoints.getClientDetailsService(),
 				endpoints.getOAuth2RequestFactory(), authenticationManager));
 		// CompositeTokenGranter是一个TokenGranter组合类
 		CompositeTokenGranter compositeTokenGranter = new CompositeTokenGranter(tokenGranters);
@@ -92,6 +92,6 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 		clients.inMemory()
 				.withClient("admin")
 				.authorizedGrantTypes("authorization_code", "password", "implicit", "client_credentials",
-						"refresh_token", PhoneTokenGranter.GRANT_TYPE);
+						"refresh_token", SmsTokenGranter.GRANT_TYPE);
 	}
 }
