@@ -7,7 +7,6 @@ import java.time.Duration;
 import java.util.UUID;
 
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -45,11 +44,12 @@ import lombok.RequiredArgsConstructor;
  * {@link JdbcRegisteredClientRepository}:数据库认证客户端实现
  * {@link InMemoryRegisteredClientRepository}:内存认证客户端实现,可直接从配置文件中读取
  * 
+ * 项目启动时,会将不存在于oauth2_registered_client表中的客户端数据写入到该表中
+ * 
  * @author 飞花梦影
  * @date 2024-09-18 22:02:11
  * @git {@link https://github.com/dreamFlyingFlower}
  */
-@Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 @EnableMethodSecurity(jsr250Enabled = true, securedEnabled = true)
@@ -109,16 +109,18 @@ public class AuthorizationClientConfig {
 						.build())
 				// token配置
 				.tokenSettings(TokenSettings.builder()
-						// access_token有效期
-						.accessTokenTimeToLive(Duration.ofMinutes(60))
-						// access_token格式,SELF_CONTAINED是token(jwt格式),REFERENCE是不透明token,相相当于是token元数据的一个id,通过id找到对应数据(自省令牌时)
-						.accessTokenFormat(OAuth2TokenFormat.REFERENCE)
-						// 指定加密算法
-						.idTokenSignatureAlgorithm(SignatureAlgorithm.RS256)
-						// refresh_token是否可以重用:true->可重用
-						.reuseRefreshTokens(true)
 						// 授权码有效时长
 						.authorizationCodeTimeToLive(Duration.ofSeconds(60))
+						// access_token有效期
+						.accessTokenTimeToLive(Duration.ofMinutes(60))
+						// access_token格式,SELF_CONTAINED是token(jwt格式),REFERENCE是不透明token,相当于token元数据的一个id,通过id找到对应数据(自省令牌时)
+						.accessTokenFormat(OAuth2TokenFormat.REFERENCE)
+						// refresh_token是否可以重用:true->可重用,refresh_token不变,可一直使用
+						.reuseRefreshTokens(true)
+						// refresh_token有效时长
+						.refreshTokenTimeToLive(null)
+						// 指定加密算法
+						.idTokenSignatureAlgorithm(SignatureAlgorithm.RS256)
 						.build())
 				.build();
 

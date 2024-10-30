@@ -101,17 +101,29 @@ public class AuthorizationClientConfig {
 				.clientSettings(ClientSettings.builder()
 						// 设置用户需要确认授权,若无感授权,改为false
 						.requireAuthorizationConsent(true)
+						// 当使用该客户端发起PKCE流程时必须设置为true
+						.requireProofKey(false)
+						// 设置客户端JWKS的URL
+						.jwkSetUrl(null)
+						// 设置token端点对验证方法为CLIENT_SECRET_JWT,PRIVATE_KEY_JWT的客户端进行身份验证使用的签名算法
+						.tokenEndpointAuthenticationSigningAlgorithm(null)
 						.build())
 				// token配置
 				.tokenSettings(TokenSettings.builder()
+						// 授权码有效时长
+						.authorizationCodeTimeToLive(Duration.ofSeconds(60))
 						// access token 有效期
 						.accessTokenTimeToLive(Duration.ofMinutes(60))
-						// access_token格式
+						// access_token格式,SELF_CONTAINED是token(jwt格式),REFERENCE是不透明token,相当于token元数据的一个id,通过id找到对应数据(自省令牌时)
 						.accessTokenFormat(OAuth2TokenFormat.REFERENCE)
-						// 指定加密算法
-						.idTokenSignatureAlgorithm(SignatureAlgorithm.RS256)
-						// refresh_token是否可以重用:true->可重用
+						// refresh_token是否可以重用:true->可重用,refresh_token不变,可一直使用
 						.reuseRefreshTokens(true)
+						// refresh_token有效时长
+						.refreshTokenTimeToLive(null)
+						// id_token的加密算法
+						.idTokenSignatureAlgorithm(SignatureAlgorithm.RS256)
+						// 设备码有效时长
+						.deviceCodeTimeToLive(null)
 						.build())
 				.build();
 

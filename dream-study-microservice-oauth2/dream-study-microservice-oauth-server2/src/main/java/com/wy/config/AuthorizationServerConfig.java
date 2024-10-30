@@ -7,11 +7,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -54,11 +54,15 @@ import lombok.SneakyThrows;
 /**
  * SpringSecurity5.8.14认证服务器配置
  * 
+ * <pre>
+ * {@link EnableWebSecurity}:加载WebSecurityConfiguration,配置安全认证策略,加载AuthenticationConfiguration, 配置了认证信息
+ * {@link EnableMethodSecurity}:开启全局方法认证,启用JSR250注解支持,启用注解 {@link Secured}支持
+ * </pre>
+ * 
  * @author 飞花梦影
  * @date 2024-09-18 22:02:11
  * @git {@link https://github.com/dreamFlyingFlower}
  */
-@Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 @EnableMethodSecurity(jsr250Enabled = true, securedEnabled = true)

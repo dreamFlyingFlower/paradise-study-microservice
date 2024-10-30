@@ -12,9 +12,11 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.authentication.configuration.EnableGlobalAuthentication;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -51,7 +53,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
 /**
- * SpringSecurity5.8.14认证服务器配置
+ * SpringSecurity6认证服务器配置
+ * 
+ * <pre>
+ * {@link EnableWebSecurity}:加载WebSecurityConfiguration,配置安全认证策略,加载AuthenticationConfiguration, 配置了认证信息
+ * {@link EnableMethodSecurity}:开启全局方法认证,启用JSR250注解支持,启用注解 {@link Secured}支持,高版本移除了{@link Configuration}
+ * {@link EnableGlobalAuthentication}:
+ *  </pre>
  * 
  * @author 飞花梦影
  * @date 2024-09-18 22:02:11
