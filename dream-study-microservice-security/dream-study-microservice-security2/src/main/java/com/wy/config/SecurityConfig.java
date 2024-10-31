@@ -15,10 +15,9 @@ import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -56,16 +55,13 @@ import dream.flying.flower.framework.security.handler.LogoutSuccessHandler;
  * 
  * {@link ExceptionTranslationFilter}:认证异常处理类
  * 
- * {@link Deprecated}:{@link WebSecurityConfigurerAdapter}在5.7以上废弃,使用见{@link SecurityHighConfig}
- * 
  * @author 飞花梦影
  * @date 2020-12-08 10:23:47
  * @git {@link https://github.com/dreamFlyingFlower}
  */
-@SuppressWarnings("deprecation")
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
+@EnableMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class SecurityConfig {
 
 	@Autowired
@@ -270,8 +266,24 @@ public class SecurityConfig {
 
 	@Bean
 	WebSecurityCustomizer webSecurityCustomizer() {
-		// 配置需要忽略检查的web url
-		return web -> web.ignoring().antMatchers("/js/**", "/css/**", "/images/**");
+		// 配置不走SpringSecurity过滤器链的url,被忽略的请求不会被SecurityContextPersistenceFilter拦截,也不会存入Session,特别是登录,不能放这
+		return web -> web.ignoring()
+				// 忽略OPTIONS请求
+				.requestMatchers(HttpMethod.OPTIONS)
+				// 忽略指定URL请求
+				.requestMatchers(
+						// 过滤静态资源
+						"/public/**", "/static/**", "/resources/**", "/js/**", "/css/**", "/images/**",
+						// swagger api json
+						"/swagger**", "/swagger-ui.html", "/v2/api-docs",
+						// 用来获取支持的动作
+						"/swagger-resources/configuration/ui",
+						// 用来获取api-docs的URI
+						"/swagger-resources",
+						// 安全选项
+						"/swagger-resources/configuration/security", "/swagger-resources/**",
+						// 在搭建swagger接口文档时,通过浏览器控制台发现该/webjars路径下的文件被拦截,故加上此过滤条件
+						"/webjars/**");
 	}
 
 	protected RequestCache getRequestCache(HttpSecurity http) {

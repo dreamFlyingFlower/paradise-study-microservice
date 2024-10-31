@@ -106,7 +106,7 @@ import com.wy.config.SecurityConfig;
 import com.wy.controller.UserController;
 
 /**
- * SpringSecurity默认的登录请求是/login,而且必须是post请求<br>
+ * SpringSecurity5.7以上,废弃原先的方式,直接使用SecurityFilterChain过滤链
  * https://blog.csdn.net/abcwanglinyong/article/details/80981389<br>
  * https://blog.csdn.net/qq_29580525/article/details/79317969<br>
  * https://blog.csdn.net/XlxfyzsFdblj/article/details/82083443 实现动态权限控制<br>

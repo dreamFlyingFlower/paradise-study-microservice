@@ -12,7 +12,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -94,30 +93,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.successHandler(loginSuccessHandler);
 	}
 
-	@Bean
-	WebSecurityCustomizer webSecurityCustomizer() {
-		return web -> web.ignoring()
-				// 忽略OPTIONS请求
-				.antMatchers(HttpMethod.OPTIONS)
-				// 忽略指定URL请求
-				.antMatchers(
-						// 过滤静态资源
-						"/public/**", "/static/**", "/resources/**", "/js/**", "/css/**", "/images/**",
-						// swagger api json
-						"/swagger**", "/swagger-ui.html", "/v2/api-docs",
-						// 用来获取支持的动作
-						"/swagger-resources/configuration/ui",
-						// 用来获取api-docs的URI
-						"/swagger-resources",
-						// 安全选项
-						"/swagger-resources/configuration/security", "/swagger-resources/**",
-						// 在搭建swagger接口文档时,通过浏览器控制台发现该/webjars路径下的文件被拦截,故加上此过滤条件
-						"/webjars/**");
-	}
-
 	@Override
 	public void configure(WebSecurity web) throws Exception {
-		// 配置需要忽略检查的web url
+		// 配置不走SpringSecurity过滤器链的url,被忽略的请求不会被SecurityContextPersistenceFilter拦截,也不会存入Session,特别是登录,不能放这
 		web.ignoring()
 				// 忽略OPTIONS请求
 				.antMatchers(HttpMethod.OPTIONS)

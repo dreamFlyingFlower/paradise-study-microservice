@@ -9,6 +9,8 @@ import org.springframework.security.oauth2.client.token.grant.code.Authorization
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.common.util.OAuth2Utils;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
+import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerEndpointsConfiguration;
+import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerSecurityConfiguration;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.provider.ClientDetails;
@@ -124,9 +126,13 @@ import org.springframework.web.bind.annotation.RestController;
  * 
  * <pre>
  * {@link EnableAuthorizationServer}:在SpringSecurity5.7以上版本中,该方式被废弃.
- * 		类上添加该注解并继承{@link AuthorizationServerConfigurerAdapter}即可注册为认证服务器,
+ * 		类上添加该注解并继承{@link AuthorizationServerConfigurerAdapter}即可注册为认证服务器
+ * ->{@link AuthorizationServerEndpointsConfiguration}:用来为授权请求提供服务,默认UR 是/oauth/authorize
+ * ->{@link AuthorizationServerSecurityConfiguration}:
  * {@link AuthorizationServerConfigurerAdapter}:继承该类可以对OAuth2登录做些自定义的配置
  * ->{@link AuthorizationServerEndpointsConfigurer}:SpringOAuth其他入口点配置,如TokenEndpoint
+ * {@link AuthorizationEndpoint}:用来为授权请求提供服务,默认URL是/oauth/authorize
+ * {@link TokenEndpoint}:用来为访问令牌请求提供服务,默认URL是/oauth/token
  * </pre>
  * 
  * 搭建自己的认证服务器,表结构如下,具体表字段参照{@link JdbcClientDetailsService}:
