@@ -46,8 +46,8 @@ import com.wy.provider.user.UserAuthenticationProvider;
 import com.wy.service.UserService;
 
 import dream.flying.flower.framework.security.entrypoint.LoginAuthenticationEntryPoint;
-import dream.flying.flower.framework.security.handler.LoginFailureHandler;
-import dream.flying.flower.framework.security.handler.LoginSuccessHandler;
+import dream.flying.flower.framework.security.handler.CustomizerAuthenticationFailureHandler;
+import dream.flying.flower.framework.security.handler.CustomizerAuthenticationSuccessHandler;
 import dream.flying.flower.framework.security.handler.LogoutSuccessHandler;
 
 /**
@@ -218,9 +218,9 @@ public class SecurityConfig {
 				.formLogin(form -> form.loginProcessingUrl("/user/login")
 						.usernameParameter("username")
 						.passwordParameter("password")
-						.successHandler(new LoginSuccessHandler())
+						.successHandler(new CustomizerAuthenticationSuccessHandler())
 						// 失败的自定义处理
-						.failureHandler(new LoginFailureHandler()))
+						.failureHandler(new CustomizerAuthenticationFailureHandler()))
 
 				// 使用记住密码功能需要使用数据库,只是服务端记住,而非浏览器,浏览器关掉之后仍然需要重新登录
 				.rememberMe(remember -> remember.tokenRepository(persistentTokenRepository())

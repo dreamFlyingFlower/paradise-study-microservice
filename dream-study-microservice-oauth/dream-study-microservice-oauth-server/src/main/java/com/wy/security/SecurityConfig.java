@@ -18,7 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.wy.properties.OAuthServerSecurityProperties;
 
-import dream.flying.flower.framework.security.handler.LoginSuccessHandler;
+import dream.flying.flower.framework.security.handler.CustomizerAuthenticationSuccessHandler;
 import lombok.AllArgsConstructor;
 
 /**
@@ -37,7 +37,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	private final OAuthServerSecurityProperties oauthServerSecurityProperties;
 
-	private final LoginSuccessHandler loginSuccessHandler;
+	private final CustomizerAuthenticationSuccessHandler loginSuccessHandler;
 
 	private final UserAuthenticationProvider userAuthenticationProvider;
 

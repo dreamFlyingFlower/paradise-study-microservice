@@ -45,6 +45,8 @@ public class SecurtiyConfig {
 	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http.authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
 				.formLogin(form -> form.loginPage("/login").failureUrl("/login-error").permitAll())
+				// 配置登录URL
+				.oauth2Login(oauth2Login -> oauth2Login.loginPage("/oauth2/authorization/login"))
 				// 配置OAuth2 Client和OAuth2 Server交互,启用SSO
 				.oauth2Client(Customizer.withDefaults());
 		return http.build();

@@ -50,6 +50,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
+import springfox.documentation.service.TokenEndpoint;
 
 /**
  * SpringSecurity6整合OAuth2

@@ -46,8 +46,8 @@ import com.wy.service.UserService;
 import com.wy.social.qq.QqSocialConfigurer;
 
 import dream.flying.flower.framework.security.entrypoint.LoginAuthenticationEntryPoint;
-import dream.flying.flower.framework.security.handler.LoginFailureHandler;
-import dream.flying.flower.framework.security.handler.LoginSuccessHandler;
+import dream.flying.flower.framework.security.handler.CustomizerAuthenticationFailureHandler;
+import dream.flying.flower.framework.security.handler.CustomizerAuthenticationSuccessHandler;
 import dream.flying.flower.framework.security.handler.LogoutSuccessHandler;
 
 /**
@@ -234,8 +234,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.loginProcessingUrl("/user/login")
 				.usernameParameter("username")
 				.passwordParameter("password")
-				.successHandler(new LoginSuccessHandler())
-				.failureHandler(new LoginFailureHandler())
+				.successHandler(new CustomizerAuthenticationSuccessHandler())
+				.failureHandler(new CustomizerAuthenticationFailureHandler())
 
 				.and()
 

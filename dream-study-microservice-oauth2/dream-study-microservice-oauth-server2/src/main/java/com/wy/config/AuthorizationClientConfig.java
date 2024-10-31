@@ -40,10 +40,6 @@ import lombok.RequiredArgsConstructor;
 /**
  * SpringSecurity5.8.14客户端认证配置
  * 
- * {@link RegisteredClientRepository}:认证的客户端数据操作,自定义操作需实现该接口
- * {@link JdbcRegisteredClientRepository}:数据库认证客户端实现
- * {@link InMemoryRegisteredClientRepository}:内存认证客户端实现,可直接从配置文件中读取
- * 
  * 项目启动时,会将不存在于oauth2_registered_client表中的客户端数据写入到该表中
  * 
  * @author 飞花梦影
@@ -154,7 +150,7 @@ public class AuthorizationClientConfig {
 			registeredClientRepository.save(deviceClient);
 		}
 
-		// PKCE客户端
+		// PKCE客户端(授权码扩展模式)
 		RegisteredClient pkceClient = RegisteredClient.withId(UUID.randomUUID().toString())
 				.clientId("pkce-message-client")
 				// 公共客户端
@@ -164,6 +160,7 @@ public class AuthorizationClientConfig {
 				.authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
 				// 授权码模式回调地址,oauth2.1已改为精准匹配,不能只设置域名,并且屏蔽了localhost,本机使用127.0.0.1访问
 				.redirectUri("http://127.0.0.1:8080/login/oauth2/code/messaging-client-oidc")
+				// 开启PKCE
 				.clientSettings(ClientSettings.builder().requireProofKey(Boolean.TRUE).build())
 				// 自定scope
 				.scope("message.read")

@@ -9,7 +9,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import dream.flying.flower.framework.security.handler.LoginSuccessHandler;
+import dream.flying.flower.framework.security.handler.CustomizerAuthenticationSuccessHandler;
 
 /**
  * 注入SpringSecurity中
@@ -89,7 +89,7 @@ public class QrcodeSecurityConfig extends WebSecurityConfigurerAdapter {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		filter.setAuthenticationSuccessHandler(new LoginSuccessHandler());
+		filter.setAuthenticationSuccessHandler(new CustomizerAuthenticationSuccessHandler());
 		filter.setAuthenticationFailureHandler(new SimpleUrlAuthenticationFailureHandler("/login?error"));
 		return filter;
 	}

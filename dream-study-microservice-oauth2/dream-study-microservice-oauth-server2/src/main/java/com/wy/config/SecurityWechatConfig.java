@@ -146,19 +146,6 @@ public class SecurityWechatConfig {
 		}
 	}
 
-	private OAuth2UserService<OAuth2UserRequest, OAuth2User> userService() {
-		DefaultOAuth2UserService userService = new DefaultOAuth2UserService();
-		// 注入自定义的requestEntityConverter
-		userService.setRequestEntityConverter(new WechatOAuth2UserRequestEntityConverter());
-		// 创建一个MappingJackson2HttpMessageConverter对象,同样设置支持的MediaType为text/plain
-		MappingJackson2HttpMessageConverter messageConverter = new MappingJackson2HttpMessageConverter();
-		messageConverter.setSupportedMediaTypes(Arrays.asList(MediaType.TEXT_PLAIN));
-		RestTemplate restTemplate = new RestTemplate(Arrays.asList(messageConverter));
-		restTemplate.setErrorHandler(new OAuth2ErrorResponseErrorHandler());
-		userService.setRestOperations(restTemplate);
-		return userService;
-	}
-
 	private static class WechatOAuth2UserRequestEntityConverter
 			implements Converter<OAuth2UserRequest, RequestEntity<?>> {
 
@@ -186,5 +173,18 @@ public class SecurityWechatConfig {
 		DefaultSecurityFilterChain filterChain = http.build();
 		filterChain.getFilters().stream().map(Object::toString).forEach(log::info);
 		return filterChain;
+	}
+
+	private OAuth2UserService<OAuth2UserRequest, OAuth2User> userService() {
+		DefaultOAuth2UserService userService = new DefaultOAuth2UserService();
+		// 注入自定义的requestEntityConverter
+		userService.setRequestEntityConverter(new WechatOAuth2UserRequestEntityConverter());
+		// 创建一个MappingJackson2HttpMessageConverter对象,同样设置支持的MediaType为text/plain
+		MappingJackson2HttpMessageConverter messageConverter = new MappingJackson2HttpMessageConverter();
+		messageConverter.setSupportedMediaTypes(Arrays.asList(MediaType.TEXT_PLAIN));
+		RestTemplate restTemplate = new RestTemplate(Arrays.asList(messageConverter));
+		restTemplate.setErrorHandler(new OAuth2ErrorResponseErrorHandler());
+		userService.setRestOperations(restTemplate);
+		return userService;
 	}
 }

@@ -4,7 +4,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import javax.annotation.security.DenyAll;
+import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.Ordered;
@@ -18,18 +23,23 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationConsentService;
 import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationConsentService;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
+import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
+import org.springframework.security.oauth2.server.authorization.oidc.authentication.OidcUserInfoAuthenticationContext;
+import org.springframework.security.oauth2.server.authorization.oidc.authentication.OidcUserInfoAuthenticationToken;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenClaimsContext;
@@ -37,6 +47,7 @@ import org.springframework.security.oauth2.server.authorization.token.OAuth2Toke
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenGenerator;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.SecurityFilterChain;
@@ -45,9 +56,13 @@ import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
 import com.wy.context.RedisSecurityContextRepository;
 import com.wy.provider.sms.SmsGrantAuthenticationConverter;
 import com.wy.provider.sms.SmsGrantAuthenticationProvider;
+import com.wy.service.UserService;
 
+import dream.flying.flower.framework.core.json.JsonHelpers;
 import dream.flying.flower.framework.security.constant.ConstAuthorization;
 import dream.flying.flower.framework.security.entrypoint.LoginRedirectAuthenticationEntryPoint;
+import dream.flying.flower.framework.security.handler.CustomizerAuthenticationFailureHandler;
+import dream.flying.flower.framework.security.handler.CustomizerAuthenticationSuccessHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
@@ -55,8 +70,10 @@ import lombok.SneakyThrows;
  * SpringSecurity5.8.14认证服务器配置
  * 
  * <pre>
- * {@link EnableWebSecurity}:加载WebSecurityConfiguration,配置安全认证策略,加载AuthenticationConfiguration, 配置了认证信息
- * {@link EnableMethodSecurity}:开启全局方法认证,启用JSR250注解支持,启用注解 {@link Secured}支持
+ * {@link EnableWebSecurity}:加载{@link WebSecurityConfiguration},配置安全认证策略,加载{@link AuthenticationConfiguration},配置认证信息
+ * {@link EnableMethodSecurity}:开启全局方法校验
+ * ->{@link EnableMethodSecurity#jsr250Enabled()}:为true启用JSR250注解支持,如{@link RolesAllowed},{@link PermitAll}和{@link DenyAll}等注解
+ * ->{@link EnableMethodSecurity#securedEnabled()}:为true启用{@link Secured}注解支持
  * </pre>
  * 
  * @author 飞花梦影
@@ -76,6 +93,8 @@ public class AuthorizationServerConfig {
 	private static final String CUSTOM_CONSENT_PAGE_URI = "/oauth2/consent";
 
 	private final RedisSecurityContextRepository redisSecurityContextRepository;
+
+	private final UserService userService;
 
 	/**
 	 * 配置认证相关的端点过滤器链,用于处理与协议端点相关的请求和响应.
@@ -105,13 +124,32 @@ public class AuthorizationServerConfig {
 		// 使用redis存储、读取登录的认证信息
 		http.securityContext(context -> context.securityContextRepository(redisSecurityContextRepository));
 
+		// 自定义用户映射器,该方式会改变客户端调用/userinfo接口的数据
+		Function<OidcUserInfoAuthenticationContext, OidcUserInfo> userInfoMapper = (context) -> {
+			OidcUserInfoAuthenticationToken authentication = context.getAuthentication();
+			JwtAuthenticationToken principal = (JwtAuthenticationToken) authentication.getPrincipal();
+			return new OidcUserInfo(JsonHelpers.parseMap(userService.loadUserByUsername(principal.getName())));
+		};
+
 		// 获得第一步应用的OAuth2AuthorizationServerConfigurer
 		http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
 				// 开启OpenID Connect 1.0协议相关端点
 				.oidc(Customizer.withDefaults())
-				// 设置自定义用户确认授权页
-				.authorizationEndpoint(
-						authorizationEndpoint -> authorizationEndpoint.consentPage(CUSTOM_CONSENT_PAGE_URI))
+				// 开启OpenID Connect 1.0协议相关端点,并使用自定义的UserInfo映射器
+				.oidc((oidc) -> {
+					oidc.userInfoEndpoint((userInfo) -> {
+						userInfo.userInfoMapper(userInfoMapper);
+						userInfo.userInfoResponseHandler(new CustomizerAuthenticationSuccessHandler());
+					});
+				})
+				.authorizationEndpoint(authorizationEndpoint -> authorizationEndpoint
+						// 设置自定义用户确认授权页
+						.consentPage(CUSTOM_CONSENT_PAGE_URI))
+				// 设置客户端授权中失败的handler处理
+				.clientAuthentication(auth -> auth.errorResponseHandler(new CustomizerAuthenticationFailureHandler()))
+				// token 相关配置,如/oauth2/token接口
+				.tokenEndpoint(token -> token.errorResponseHandler(new CustomizerAuthenticationFailureHandler()))
+
 		// 设置设备码用户验证url(自定义用户验证页)
 		// .deviceAuthorizationEndpoint(
 		// deviceAuthorizationEndpoint ->
@@ -134,7 +172,7 @@ public class AuthorizationServerConfig {
 						new LoginRedirectAuthenticationEntryPoint(LOGIN_URL),
 						new MediaTypeRequestMatcher(MediaType.TEXT_HTML)));
 
-		// 使用JWT处理令牌用于用户信息和/或客户端注册
+		// 使用JWT处理令牌用于用户信息和/或客户端注册,同时将认证服务器做为一个资源服务器
 		http.oauth2ResourceServer(resourceServer -> resourceServer.jwt(Customizer.withDefaults()));
 
 		// 自定义短信认证登录转换器
@@ -270,6 +308,22 @@ public class AuthorizationServerConfig {
 	@Bean
 	OAuth2TokenCustomizer<JwtEncodingContext> oauth2TokenCustomizer() {
 		return context -> {
+			// 根据token类型添加信息
+			OAuth2TokenType tokenType = context.getTokenType();
+			System.out.println(context.getTokenType());
+			if (tokenType.getValue().equals("id_token")) {
+				context.getClaims().claim("Test", "Test Id Token");
+			}
+			if (tokenType.getValue().equals("access_token")) {
+				context.getClaims().claim("Test", "Test Access Token");
+				Set<String> authorities = context.getPrincipal()
+						.getAuthorities()
+						.stream()
+						.map(GrantedAuthority::getAuthority)
+						.collect(Collectors.toSet());
+				context.getClaims().claim("authorities", authorities).claim("user", context.getPrincipal().getName());
+			}
+
 			// 检查登录用户信息是不是UserDetails,排除掉没有用户参与的流程
 			if (context.getPrincipal().getPrincipal() instanceof UserDetails) {
 				UserDetails user = (UserDetails) context.getPrincipal().getPrincipal();
@@ -292,8 +346,7 @@ public class AuthorizationServerConfig {
 				JwtClaimsSet.Builder claims = context.getClaims();
 				// 将权限信息放入jwt的claims中,也可以生成一个以指定字符分割的字符串放入
 				claims.claim(ConstAuthorization.AUTHORITIES_KEY, authoritySet);
-				// 放入其它自定内容
-				// 角色、头像...
+				// 放入其它自定内容.如角色、头像...
 			}
 		};
 	}

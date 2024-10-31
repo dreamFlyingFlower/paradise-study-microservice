@@ -26,8 +26,8 @@ import com.wy.helpers.SecurityContextOAuth2Helpers;
 import com.wy.properties.OAuthServerSecurityProperties;
 
 import dream.flying.flower.framework.security.entrypoint.LoginRedirectAuthenticationEntryPoint;
-import dream.flying.flower.framework.security.handler.LoginFailureHandler;
-import dream.flying.flower.framework.security.handler.LoginSuccessHandler;
+import dream.flying.flower.framework.security.handler.CustomizerAuthenticationFailureHandler;
+import dream.flying.flower.framework.security.handler.CustomizerAuthenticationSuccessHandler;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -52,7 +52,7 @@ public class SecurityConfig {
 
 	private final OAuthServerSecurityProperties oauthServerSecurityProperties;
 
-	private final LoginSuccessHandler loginSuccessHandler;
+	private final CustomizerAuthenticationSuccessHandler loginSuccessHandler;
 
 	/**
 	 * 配置密码解析器,注意重复注入
@@ -105,7 +105,7 @@ public class SecurityConfig {
 					if (UrlUtils.isAbsoluteUrl(LOGIN_URL)) {
 						// 绝对路径代表是前后端分离,登录成功和失败改为写回json,不重定向了
 						formLogin.successHandler(loginSuccessHandler);
-						formLogin.failureHandler(new LoginFailureHandler());
+						formLogin.failureHandler(new CustomizerAuthenticationFailureHandler());
 					}
 				});
 

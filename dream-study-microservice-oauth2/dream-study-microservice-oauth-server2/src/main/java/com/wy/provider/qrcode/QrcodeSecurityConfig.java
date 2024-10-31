@@ -11,7 +11,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import dream.flying.flower.framework.security.handler.LoginSuccessHandler;
+import dream.flying.flower.framework.security.handler.CustomizerAuthenticationSuccessHandler;
 
 /**
  * 注入SpringSecurity中
@@ -78,7 +78,7 @@ public class QrcodeSecurityConfig {
 	@Bean
 	QrcodeLoginAuthenticationFilter qrcodeLoginAuthenticationFilter() {
 		QrcodeLoginAuthenticationFilter filter = new QrcodeLoginAuthenticationFilter();
-		filter.setAuthenticationSuccessHandler(new LoginSuccessHandler());
+		filter.setAuthenticationSuccessHandler(new CustomizerAuthenticationSuccessHandler());
 		filter.setAuthenticationFailureHandler(new SimpleUrlAuthenticationFailureHandler("/login?error"));
 		return filter;
 	}
