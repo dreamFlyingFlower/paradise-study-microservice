@@ -129,14 +129,13 @@ public class AuthorizationServerConfig {
 				// 客户端认证添加设备码的converter和provider
 				clientAuthentication.authenticationConverter(deviceClientAuthenticationConverter)
 						.authenticationProvider(deviceClientAuthenticationProvider));
-		http
 
-				.exceptionHandling((exceptions) -> exceptions
-						// 当未登录时访问认证端点时重定向至login页面
-						.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"))
-						// 当未登录时访问认证端点时重定向至login页面,同时指定请求类型
-						.defaultAuthenticationEntryPointFor(new LoginRedirectAuthenticationEntryPoint(LOGIN_URL),
-								new MediaTypeRequestMatcher(MediaType.TEXT_HTML)));
+		http.exceptionHandling((exceptions) -> exceptions
+				// 当未登录时访问认证端点时重定向至login页面,适合前后端不分离
+				.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"))
+				// 当未登录时访问认证端点时重定向至login页面,同时指定请求类型,适合前后端分离
+				.defaultAuthenticationEntryPointFor(new LoginRedirectAuthenticationEntryPoint(LOGIN_URL),
+						new MediaTypeRequestMatcher(MediaType.TEXT_HTML)));
 
 		// 使用JWT处理令牌用于用户信息和/或客户端注册
 		http.oauth2ResourceServer(resourceServer -> resourceServer.jwt(Customizer.withDefaults()));

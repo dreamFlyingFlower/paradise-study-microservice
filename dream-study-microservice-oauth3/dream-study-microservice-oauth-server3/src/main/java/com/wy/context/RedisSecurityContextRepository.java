@@ -2,11 +2,11 @@ package com.wy.context;
 
 import java.util.function.Supplier;
 
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.context.DeferredSecurityContext;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextHolderStrategy;
-import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.web.context.DelegatingSecurityContextRepository;
 import org.springframework.security.web.context.HttpRequestResponseHolder;
 import org.springframework.security.web.context.SecurityContextRepository;
@@ -74,7 +74,7 @@ public class RedisSecurityContextRepository implements SecurityContextRepository
 			return false;
 		}
 		// 检验当前请求是否有认证信息
-		return redisHelpers.get((ConstAuthorizationServerRedis.SECURITY_CONTEXT_PREFIX_KEY + nonce)) != null;
+		return redisHelpers.get(ConstAuthorizationServerRedis.SECURITY_CONTEXT_PREFIX_KEY + nonce) != null;
 	}
 
 	@Override
@@ -100,12 +100,11 @@ public class RedisSecurityContextRepository implements SecurityContextRepository
 		}
 
 		// 根据缓存id获取认证信息
-		return JsonHelpers.read(redisHelpers.get(ConstAuthorizationServerRedis.SECURITY_CONTEXT_PREFIX_KEY + nonce),
-				SecurityContextImpl.class);
+		return (SecurityContext) redisHelpers.get(ConstAuthorizationServerRedis.SECURITY_CONTEXT_PREFIX_KEY + nonce);
 	}
 
 	/**
-	 * 先从请求头中找,找不到去请求参数中找,找不到获取当前session的id 2023-07-11新增逻辑：获取当前session的sessionId
+	 * 先从请求头中找,找不到去请求参数中找,找不到获取当前session的id
 	 *
 	 * @param request 当前请求
 	 * @return 随机字符串(sessionId),这个字符串本来是前端生成,现在改为后端获取的sessionId
