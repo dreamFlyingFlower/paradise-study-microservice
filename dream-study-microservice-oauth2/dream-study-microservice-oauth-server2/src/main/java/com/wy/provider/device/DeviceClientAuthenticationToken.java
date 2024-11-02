@@ -9,7 +9,7 @@ import org.springframework.security.oauth2.server.authorization.authentication.O
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 
 /**
- * 设备码模式token
+ * 设备码模式token,需配合device-activate.html,device-activated.html页面
  *
  * @author 飞花梦影
  * @date 2024-09-18 22:08:34

@@ -1,4 +1,4 @@
-package com.wy.controller;
+package com.wy.provider.device;
 
 import java.security.Principal;
 import java.util.Collections;
@@ -13,42 +13,48 @@ import org.springframework.security.oauth2.server.authorization.OAuth2Authorizat
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationConsentService;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
 
-import com.nimbusds.jose.jwk.JWKSet;
-import com.wy.core.CustomizerOAuth2ParameterNames;
-
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 
 /**
- * 
- * 
- * @auther 飞花梦影
- * @date 2021-07-04 11:48:11
+ * 设备认证控制层
+ *
+ * @author 飞花梦影
+ * @date 2024-11-02 10:30:37
  * @git {@link https://github.com/dreamFlyingFlower}
  */
-@RequestMapping("oauth")
-@RestController
-@RequiredArgsConstructor
-public class OAuthController {
-
-	private final JWKSet jwkSet;
+@Controller
+@RequestMapping("device")
+@AllArgsConstructor
+public class DeviceController {
 
 	private final RegisteredClientRepository registeredClientRepository;
 
 	private final OAuth2AuthorizationConsentService authorizationConsentService;
 
-	@GetMapping(value = "token_key", produces = "application/json; charset=UTF-8")
-	public String keys() {
-		return this.jwkSet.toString();
+	@GetMapping("/activate")
+	public String activate(@RequestParam(value = "user_code", required = false) String userCode) {
+		if (userCode != null) {
+			return "redirect:/oauth2/device_verification?user_code=" + userCode;
+		}
+		return "device-activate";
+	}
+
+	@GetMapping("/activated")
+	public String activated() {
+		return "device-activated";
+	}
+
+	@GetMapping(value = "/", params = "success")
+	public String success() {
+		return "device-activated";
 	}
 
 	@GetMapping("/login")
@@ -61,7 +67,7 @@ public class OAuthController {
 			@RequestParam(OAuth2ParameterNames.CLIENT_ID) String clientId,
 			@RequestParam(OAuth2ParameterNames.SCOPE) String scope,
 			@RequestParam(OAuth2ParameterNames.STATE) String state,
-			@RequestParam(name = CustomizerOAuth2ParameterNames.USER_CODE, required = false) String userCode) {
+			@RequestParam(name = OAuth2ParameterNames.USER_CODE, required = false) String userCode) {
 
 		// Remove scopes that were already approved
 		Set<String> scopesToApprove = new HashSet<>();
@@ -136,23 +142,6 @@ public class OAuthController {
 		ScopeWithDescription(String scope) {
 			this.scope = scope;
 			this.description = scopeDescriptions.getOrDefault(scope, DEFAULT_DESCRIPTION);
-		}
-	}
-
-	/**
-	 * 自定义的用户信息接口,需要客户端自定配置调用.若认证服务器不配置,则默认调用SpringSecurity的/userInfo接口
-	 * 
-	 * @param principal
-	 * @return
-	 */
-	@ResponseBody
-	@GetMapping("/user")
-	public Map<String, Object> user(Principal principal) {
-		if (!(principal instanceof JwtAuthenticationToken)) {
-			return Collections.emptyMap();
-		} else {
-			JwtAuthenticationToken token = (JwtAuthenticationToken) principal;
-			return token.getToken().getClaims();
 		}
 	}
 }

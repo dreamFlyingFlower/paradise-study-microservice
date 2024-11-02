@@ -1,5 +1,6 @@
-package com.wy.provider.sms;
+package com.wy.grant;
 
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -44,14 +45,14 @@ import dream.flying.flower.framework.security.constant.ConstAuthorization;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 短信验证码登录认证提供者
- *
+ * 自定义OAuth2扩展认证模式-短信验证码登录认证提供者,之后需要添加到授权服务器的配置中
+ * 
  * @author 飞花梦影
  * @date 2024-09-18 22:18:13
  * @git {@link https://github.com/dreamFlyingFlower}
  */
 @Slf4j
-public class SmsGrantAuthenticationProvider implements AuthenticationProvider {
+public class SmsAuthenticationProvider implements AuthenticationProvider {
 
 	private OAuth2TokenGenerator<?> tokenGenerator;
 
@@ -65,7 +66,7 @@ public class SmsGrantAuthenticationProvider implements AuthenticationProvider {
 
 	@Override
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-		SmsGrantAuthenticationToken authenticationToken = (SmsGrantAuthenticationToken) authentication;
+		SmsAuthenticationToken authenticationToken = (SmsAuthenticationToken) authentication;
 
 		// Ensure the client is authenticated
 		OAuth2ClientAuthenticationToken clientPrincipal =
@@ -94,7 +95,12 @@ public class SmsGrantAuthenticationProvider implements AuthenticationProvider {
 
 		// Initialize the OAuth2Authorization
 		OAuth2Authorization.Builder authorizationBuilder = OAuth2Authorization.withRegisteredClient(registeredClient)
+				// 存入授权scope
+				.authorizedScopes(authorizedScopes)
+				// 当前授权用户名称
 				.principalName(clientPrincipal.getName())
+				// 设置当前用户认证信息
+				.attribute(Principal.class.getName(), authenticate)
 				.authorizationGrantType(authenticationToken.getAuthorizationGrantType());
 
 		// ----- Access token -----
@@ -119,6 +125,7 @@ public class SmsGrantAuthenticationProvider implements AuthenticationProvider {
 		} else {
 			authorizationBuilder.accessToken(accessToken);
 		}
+
 		// ----- Refresh token -----
 		OAuth2RefreshToken refreshToken = null;
 		if (registeredClient.getAuthorizationGrantTypes().contains(AuthorizationGrantType.REFRESH_TOKEN) &&
@@ -216,12 +223,11 @@ public class SmsGrantAuthenticationProvider implements AuthenticationProvider {
 	 * @param authenticationToken converter构建的认证信息,这里是包含手机号与验证码的
 	 * @return 认证信息
 	 */
-	public Authentication getAuthenticatedUser(SmsGrantAuthenticationToken authenticationToken) {
+	public Authentication getAuthenticatedUser(SmsAuthenticationToken authenticationToken) {
 		// 获取手机号密码
 		Map<String, Object> additionalParameters = authenticationToken.getAdditionalParameters();
 		String phone = (String) additionalParameters.get(ConstAuthorization.OAUTH_PARAMETER_NAME_PHONE);
-		String smsCaptcha =
-				(String) additionalParameters.get(ConstAuthorization.OAUTH_PARAMETER_NAME_SMS_CAPTCHA);
+		String smsCaptcha = (String) additionalParameters.get(ConstAuthorization.OAUTH_PARAMETER_NAME_SMS_CAPTCHA);
 		// 构建UsernamePasswordAuthenticationToken通过AbstractUserDetailsAuthenticationProvider及其子类对手机号与验证码进行校验
 		// 这里就是我说的短信验证与密码模式区别不大,如果是短信验证模式则在SmsCaptchaLoginAuthenticationProvider中加一个校验,
 		// 使框架支持手机号、验证码校验,反之不加就是账号密码登录
@@ -231,6 +237,8 @@ public class SmsGrantAuthenticationProvider implements AuthenticationProvider {
 		try {
 			authenticate = authenticationManager.authenticate(unauthenticated);
 		} catch (Exception e) {
+			// 这里抛出OAuth2AuthenticationException是为了让/oauth2/token接口可以获取具体异常然后写回json,会被OAuth2TokenEndpointFilter#sendErrorResponse捕获,
+			// 最后是写回了异常信息,如果不手动抛出异常则会被AbstractAuthenticationProcessingFilter处理,最终响应一个登陆页面
 			SecurityContextOAuth2Helpers.throwError(OAuth2ErrorCodes.INVALID_REQUEST, "认证失败：手机号或验证码错误.", ERROR_URI);
 		}
 		return authenticate;
@@ -238,7 +246,7 @@ public class SmsGrantAuthenticationProvider implements AuthenticationProvider {
 
 	@Override
 	public boolean supports(Class<?> authentication) {
-		return SmsGrantAuthenticationToken.class.isAssignableFrom(authentication);
+		return SmsAuthenticationToken.class.isAssignableFrom(authentication);
 	}
 
 	public void setTokenGenerator(OAuth2TokenGenerator<?> tokenGenerator) {

@@ -160,7 +160,10 @@ public class AuthorizationClientConfig {
 				.authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
 				// 授权码模式回调地址,oauth2.1已改为精准匹配,不能只设置域名,并且屏蔽了localhost,本机使用127.0.0.1访问
 				.redirectUri("http://127.0.0.1:8080/login/oauth2/code/messaging-client-oidc")
-				// 开启PKCE
+				// 开启PKCE,需要先在网上生成一对类似密钥的CodeVerifier和CodeChallenge
+				// CodeChallenge用于配置认证服务器的客户端配置,CodeVerifier用户客户端访问认证服务器获取token时携带,以便认证服务器进行校验
+				// 客户端认证:/oauth2/authorize?response_type=code&client_id=pkce-message-client&redirect_uri=&scope=message.read&code_challenge=xxxx&code_challenge_method=S256
+				// 客户端获取token:/oauth2/token?grant_type=&client_id=&redirect_uri=&code=&code_verifier=xxxxxxxx
 				.clientSettings(ClientSettings.builder().requireProofKey(Boolean.TRUE).build())
 				// 自定scope
 				.scope("message.read")

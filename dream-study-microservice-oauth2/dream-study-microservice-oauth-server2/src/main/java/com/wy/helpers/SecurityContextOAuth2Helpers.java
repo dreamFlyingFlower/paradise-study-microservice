@@ -147,6 +147,18 @@ public class SecurityContextOAuth2Helpers {
 	}
 
 	/**
+	 * 抛出 OAuth2AuthenticationException 异常
+	 *
+	 * @param errorCode 错误码
+	 * @param message 错误信息
+	 * @param errorUri 错误对照地址
+	 */
+	public static void throwError(String errorCode, String message, String errorUri) {
+		OAuth2Error error = new OAuth2Error(errorCode, message, errorUri);
+		throw new OAuth2AuthenticationException(error);
+	}
+
+	/**
 	 * 提取请求中的参数并转为一个map返回
 	 *
 	 * @param request 当前请求
@@ -163,17 +175,5 @@ public class SecurityContextOAuth2Helpers {
 			}
 		});
 		return parameters;
-	}
-
-	/**
-	 * 抛出 OAuth2AuthenticationException 异常
-	 *
-	 * @param errorCode 错误码
-	 * @param message 错误信息
-	 * @param errorUri 错误对照地址
-	 */
-	public static void throwError(String errorCode, String message, String errorUri) {
-		OAuth2Error error = new OAuth2Error(errorCode, message, errorUri);
-		throw new OAuth2AuthenticationException(error);
 	}
 }

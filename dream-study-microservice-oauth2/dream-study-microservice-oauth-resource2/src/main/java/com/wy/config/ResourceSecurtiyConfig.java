@@ -18,6 +18,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.oauth2.server.resource.introspection.NimbusOpaqueTokenIntrospector;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -25,6 +27,7 @@ import com.wy.oauth2.CustomizerBearerTokenResolver;
 import com.wy.properties.ConfigProperties;
 
 import dream.flying.flower.collection.CollectionHelper;
+import dream.flying.flower.framework.security.constant.ConstAuthorization;
 import lombok.AllArgsConstructor;
 
 /**
@@ -46,7 +49,7 @@ public class ResourceSecurtiyConfig {
 	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http.authorizeHttpRequests(request -> request
-				// 白名单中的请求直接允许
+				// 白名单中的请求直接允许,被放行的接口上不能有权限注解,否则失效
 				.requestMatchers(configProperties.getSecurity().getPermitAllSources())
 				.permitAll()
 				.requestMatchers("/test/**")
@@ -115,6 +118,24 @@ public class ResourceSecurtiyConfig {
 						.opaqueToken(opaqueToken -> opaqueToken.introspector(opaqueTokenIntrospector())));
 
 		return http.build();
+	}
+
+	/**
+	 * 自定义jwt解析器,设置解析出来的权限信息的前缀与在jwt中的key
+	 *
+	 * @return jwt解析器 JwtAuthenticationConverter
+	 */
+	@Bean
+	JwtAuthenticationConverter jwtAuthenticationConverter() {
+		JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+		// 设置解析权限(scope)信息的前缀,设置为空是去掉前缀,如果不去掉,则scope参数从client传递时需带上SCOPE_
+		grantedAuthoritiesConverter.setAuthorityPrefix("");
+		// 设置权限信息在jwt claims中的key
+		grantedAuthoritiesConverter.setAuthoritiesClaimName(ConstAuthorization.AUTHORITIES_KEY);
+
+		JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+		jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
+		return jwtAuthenticationConverter;
 	}
 
 	public JwtDecoder jwtDecoder() {

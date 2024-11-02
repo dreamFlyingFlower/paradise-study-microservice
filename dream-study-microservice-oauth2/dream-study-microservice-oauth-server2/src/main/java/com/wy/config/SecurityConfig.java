@@ -15,6 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.UrlUtils;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
@@ -24,6 +25,7 @@ import org.springframework.web.filter.CorsFilter;
 import com.wy.context.RedisSecurityContextRepository;
 import com.wy.helpers.SecurityContextOAuth2Helpers;
 import com.wy.properties.OAuthServerSecurityProperties;
+import com.wy.provider.captcha.CaptchaAuthenticationFilter;
 
 import dream.flying.flower.framework.security.entrypoint.LoginRedirectAuthenticationEntryPoint;
 import dream.flying.flower.framework.security.handler.CustomizerAuthenticationFailureHandler;
@@ -75,11 +77,14 @@ public class SecurityConfig {
 	 */
 	@Bean
 	SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-		// 添加跨域过滤器
-		http.addFilter(corsFilter());
 		// 禁用 csrf 与 cors
 		http.csrf(AbstractHttpConfigurer::disable);
 		http.cors(AbstractHttpConfigurer::disable);
+		// 添加跨域过滤器
+		http.addFilter(corsFilter());
+		// 在UsernamePasswordAuthenticationFilter拦截器之前添加验证码校验拦截器，并拦截POST的登录接口
+		http.addFilterBefore(new CaptchaAuthenticationFilter("/login"), UsernamePasswordAuthenticationFilter.class);
+
 		http.authorizeHttpRequests((authorize) -> authorize
 				// 放行静态资源
 				.requestMatchers("/assets/**", "/webjars/**", "/login", "/getCaptcha", "/getSmsCaptcha")

@@ -28,4 +28,9 @@ public interface ConstAuthorizationServerRedis {
 	 * 默认过期时间,默认五分钟
 	 */
 	long DEFAULT_TIMEOUT_SECONDS = 60L * 5;
+
+	/**
+	 * jwk set缓存前缀
+	 */
+	String AUTHORIZATION_JWS_PREFIX_KEY = "authorization_jws";
 }

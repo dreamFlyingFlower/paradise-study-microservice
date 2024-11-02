@@ -16,7 +16,7 @@ import dream.flying.flower.result.Result;
 import lombok.RequiredArgsConstructor;
 
 /**
- * 获取验证码
+ * 获取验证码,需要在SpringSecurity中放行
  *
  * @author 飞花梦影
  * @date 2024-09-20 17:20:53

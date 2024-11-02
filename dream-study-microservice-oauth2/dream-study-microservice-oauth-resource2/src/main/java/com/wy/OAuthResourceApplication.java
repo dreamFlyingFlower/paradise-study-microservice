@@ -1,12 +1,19 @@
 package com.wy;
 
+import javax.mail.AuthenticationFailedException;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
 import org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthentication;
 import org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthenticationToken;
 import org.springframework.security.oauth2.server.resource.authentication.OpaqueTokenAuthenticationProvider;
 import org.springframework.security.oauth2.server.resource.introspection.NimbusOpaqueTokenIntrospector;
+import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationEntryPoint;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
 import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.DefaultSecurityFilterChain;
@@ -27,7 +34,7 @@ import org.springframework.web.filter.AbstractRequestLoggingFilter;
 import org.springframework.web.filter.CorsFilter;
 
 /**
- * 资源服务器
+ * 资源服务器,就是从认证服务获取公钥,然后解析jwt类型的token
  * 
  * 相关拦截器,和授权服务器差不多,但是多了BearerTokenAuthenticationFilter
  * 
@@ -67,6 +74,27 @@ import org.springframework.web.filter.CorsFilter;
  * {@link NimbusOpaqueTokenIntrospector}:获取远程请求的结果TokenIntrospectionResponse,包含tokenClaims认证信息,返回{@link OAuth2AuthenticatedPrincipal}
  * {@link OpaqueTokenAuthenticationProvider}:根据OAuth2AuthenticatedPrincipal,返回{@link BearerTokenAuthentication}
  * {@link BearerTokenAuthenticationFilter}:设置BearerTokenAuthentication到SecurityContext中,以便其他需要API鉴权的Filter进行权限鉴定,通过后,则进入业务Controller
+ * </pre>
+ * 
+ * {@link PreAuthorize}:资源服务器解析access_token时会将用户通过客户端请求的scope当做权限放入authorities中,当使用该注解时的hasAuthority校验用户权限时,
+ * 实际上校验的是access_token中拥有的权限.可以自定义jwt(access_token)中的claims,同时对应的resourceserver也提供了对应的自定义解析配置
+ * 
+ * 请求到达资源服务对token的异常处理,以下两种异常处理默认都是在响应头中添加,响应头是WWW-Authenticate,值就是具体的异常信息
+ * 
+ * <pre>
+ * 没有携带token访问认证信息会抛出AccessDeniedException,并且会调用BearerAuthenticationEntryPoint去处理
+ * ->{@link SecurityFilterChain};
+ * ->{@link AccessDeniedException}
+ * ->{@link ExceptionTranslationFilter}
+ * ->{@link BearerTokenAuthenticationEntryPoint}
+ * 
+ * 请求携带token到达资源服务器后会使用BearerTokenAuthenticationFilter去解析和校验token,成功会将认证信息存入SecurityContextHolder中,失败则调用AuthenticationEntryPoint返回异常信息
+ * ->{@link SecurityFilterChain};
+ * ->{@link BearerTokenAuthenticationFilter}
+ * ->{@link BearerTokenAuthenticationToken}
+ * ->{@link AuthenticationManager}
+ * ->{@link SecurityContextHolder}
+ * ->{@link AuthenticationFailedException}
  * </pre>
  * 
  * @author 飞花梦影

@@ -1,4 +1,4 @@
-package com.wy.provider.sms;
+package com.wy.grant;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -28,7 +28,7 @@ import dream.flying.flower.framework.security.constant.ConstAuthorization;
  * @date 2024-09-18 22:17:41
  * @git {@link https://github.com/dreamFlyingFlower}
  */
-public class SmsGrantAuthenticationConverter implements AuthenticationConverter {
+public class SmsAuthenticationConverter implements AuthenticationConverter {
 
 	static final String ACCESS_TOKEN_REQUEST_ERROR_URI = "https://datatracker.ietf.org/doc/html/rfc6749#section-5.2";
 
@@ -40,7 +40,7 @@ public class SmsGrantAuthenticationConverter implements AuthenticationConverter 
 			return null;
 		}
 
-		// 这里目前是客户端认证信息
+		// 目前是客户端认证信息
 		Authentication clientPrincipal = SecurityContextHolder.getContext().getAuthentication();
 
 		// 获取请求中的参数
@@ -84,7 +84,7 @@ public class SmsGrantAuthenticationConverter implements AuthenticationConverter 
 		});
 
 		// 构建AbstractAuthenticationToken子类实例并返回
-		return new SmsGrantAuthenticationToken(new AuthorizationGrantType(ConstAuthorization.GRANT_TYPE_SMS_CODE),
+		return new SmsAuthenticationToken(new AuthorizationGrantType(ConstAuthorization.GRANT_TYPE_SMS_CODE),
 				clientPrincipal, requestedScopes, additionalParameters);
 	}
 }

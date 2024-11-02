@@ -54,8 +54,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
 
 import com.wy.context.RedisSecurityContextRepository;
-import com.wy.provider.sms.SmsGrantAuthenticationConverter;
-import com.wy.provider.sms.SmsGrantAuthenticationProvider;
+import com.wy.grant.SmsAuthenticationConverter;
+import com.wy.grant.SmsAuthenticationProvider;
 import com.wy.service.UserService;
 
 import dream.flying.flower.framework.core.json.JsonHelpers;
@@ -170,20 +170,21 @@ public class AuthorizationServerConfig {
 				// 当未登录时访问认证端点时重定向至login页面,同时指定请求类型
 				.exceptionHandling((exceptions) -> exceptions.defaultAuthenticationEntryPointFor(
 						new LoginRedirectAuthenticationEntryPoint(LOGIN_URL),
+						// 从浏览器发出的请求肯定会带accept:text/html请求头,根据mediaType,可以用来判断请求是否来自浏览器,只有浏览器请求重定向到登录页面,其他异常返回json
 						new MediaTypeRequestMatcher(MediaType.TEXT_HTML)));
 
 		// 使用JWT处理令牌用于用户信息和/或客户端注册,同时将认证服务器做为一个资源服务器
 		http.oauth2ResourceServer(resourceServer -> resourceServer.jwt(Customizer.withDefaults()));
 
-		// 自定义短信认证登录转换器
-		SmsGrantAuthenticationConverter converter = new SmsGrantAuthenticationConverter();
-		// 自定义短信认证登录认证提供
-		SmsGrantAuthenticationProvider provider = new SmsGrantAuthenticationProvider();
+		// 添加自定义短信认证登录转换器
+		SmsAuthenticationConverter converter = new SmsAuthenticationConverter();
+		// 添加自定义短信认证登录认证提供
+		SmsAuthenticationProvider provider = new SmsAuthenticationProvider();
 		http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
-				// 让认证服务器元数据中有自定义的认证方式
+				// 让认证服务器元数据中有自定义的认证方式,这样访问/.well-known/oauth-authorization-server时返回的元数据中有自定义的grant_type
 				.authorizationServerMetadataEndpoint(metadata -> metadata.authorizationServerMetadataCustomizer(
 						customizer -> customizer.grantType(ConstAuthorization.GRANT_TYPE_SMS_CODE)))
-				// 添加自定义grant_type——短信认证登录
+				// 添加自定义grant_type-短信认证登录
 				.tokenEndpoint(tokenEndpoint -> tokenEndpoint.accessTokenRequestConverter(converter)
 						.authenticationProvider(provider));
 
@@ -202,24 +203,6 @@ public class AuthorizationServerConfig {
 		provider.setAuthenticationManager(authenticationManager);
 
 		return build;
-	}
-
-	/**
-	 * 自定义jwt解析器,设置解析出来的权限信息的前缀与在jwt中的key
-	 *
-	 * @return jwt解析器 JwtAuthenticationConverter
-	 */
-	@Bean
-	JwtAuthenticationConverter jwtAuthenticationConverter() {
-		JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
-		// 设置解析权限(scope)信息的前缀,设置为空是去掉前缀,如果不去掉,则scope参数从client传递时需带上SCOPE_
-		grantedAuthoritiesConverter.setAuthorityPrefix("");
-		// 设置权限信息在jwt claims中的key
-		grantedAuthoritiesConverter.setAuthoritiesClaimName(ConstAuthorization.AUTHORITIES_KEY);
-
-		JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
-		jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
-		return jwtAuthenticationConverter;
 	}
 
 	/**
@@ -266,18 +249,16 @@ public class AuthorizationServerConfig {
 	 * 添加认证服务器配置,设置jwt签发者、默认端点请求地址等
 	 * 
 	 * 配置Authorization Server的一些全局设置,例如令牌的有效期、刷新令牌的策略和认证页面的URL等,提供了对授权服务器行为的细粒度控制
+	 * 
+	 * 若客户端和资源服务器请求认证服务器携带的token中的iss不对,同样会认证失败
 	 *
 	 * @return AuthorizationServerSettings
 	 */
 	@Bean
 	AuthorizationServerSettings authorizationServerSettings() {
 		return AuthorizationServerSettings.builder()
-				/*
-				 * 设置token签发地址(http(s)://{ip}:{port}/context-path,
-				 * http(s)://domain.com/context-path)
-				 * 如果需要通过ip访问这里就是ip,如果是有域名映射就填域名,通过什么方式访问该服务这里就填什么
-				 */
-				// .issuer("http://127.0.0.1:8080")
+				// 设置token签发的完整地址(http(s)://{ip}:{port}/context-path,如果需要通过ip访问就写ip,如果是域名就填域名
+				.issuer("http://127.0.0.1:17127")
 				.build();
 	}
 
@@ -349,5 +330,23 @@ public class AuthorizationServerConfig {
 				// 放入其它自定内容.如角色、头像...
 			}
 		};
+	}
+
+	/**
+	 * 自定义jwt解析器,设置解析出来的权限信息的前缀与在jwt中的key
+	 *
+	 * @return jwt解析器 JwtAuthenticationConverter
+	 */
+	@Bean
+	JwtAuthenticationConverter jwtAuthenticationConverter() {
+		JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+		// 设置解析权限(scope)信息的前缀,设置为空是去掉前缀,如果不去掉,则scope参数从client传递时需带上SCOPE_
+		grantedAuthoritiesConverter.setAuthorityPrefix("");
+		// 设置权限信息在jwt claims中的key
+		grantedAuthoritiesConverter.setAuthoritiesClaimName(ConstAuthorization.AUTHORITIES_KEY);
+
+		JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+		jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
+		return jwtAuthenticationConverter;
 	}
 }

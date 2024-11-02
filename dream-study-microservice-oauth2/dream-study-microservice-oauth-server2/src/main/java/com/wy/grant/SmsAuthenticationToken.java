@@ -1,4 +1,4 @@
-package com.wy.provider.sms;
+package com.wy.grant;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -18,7 +18,7 @@ import org.springframework.security.oauth2.core.AuthorizationGrantType;
  * @date 2024-09-18 22:18:41
  * @git {@link https://github.com/dreamFlyingFlower}
  */
-public class SmsGrantAuthenticationToken extends AbstractAuthenticationToken {
+public class SmsAuthenticationToken extends AbstractAuthenticationToken {
 
 	private static final long serialVersionUID = 8766937495157741790L;
 
@@ -42,7 +42,7 @@ public class SmsGrantAuthenticationToken extends AbstractAuthenticationToken {
 	 */
 	private final AuthorizationGrantType authorizationGrantType;
 
-	public SmsGrantAuthenticationToken(AuthorizationGrantType authorizationGrantType,
+	public SmsAuthenticationToken(AuthorizationGrantType authorizationGrantType,
 			Authentication clientPrincipal, @Nullable Set<String> scopes,
 			@Nullable Map<String, Object> additionalParameters) {
 		super(Collections.emptyList());

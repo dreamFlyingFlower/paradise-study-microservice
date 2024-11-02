@@ -19,11 +19,23 @@ spring:
           # 认证服务器ID,可自定义,不可重复
           oauth-server: 
             # 认证服务器授权地址
-            authorization-uri: http://127.0.0.1:55100/oauthServer/oauth/oauthrize
+            authorization-uri: http://127.0.0.1:17127/oauthServer/oauth2/oauthrize
             # 认证服务器获取token地址
-            token-uri: http://127.0.0.1:55100/oauthServer/oauth/token
-            # 令牌发布地址
-            issuer-uri: http://127.0.0.1:55100/oauthServer/issuer
+            token-uri: http://127.0.0.1:17127/oauthServer/oauth2/token
+            # OIDC或OAuth2令牌发布地址,即认证服务器地址
+            issuer-uri: http://127.0.0.1:17127
+            # 自定义获取用户信息的地址,默认访问认证服务器的/userinfo端点,但是认证服务器需要开启IdToken获取,为避免麻烦自定一个用户信息接口
+            user-info-uri: ${spring.security.oauth2.client.provider.oauth-server.issuer-uri}/user
+            jwk-set-uri: 用于从授权服务器检索JSON Web密钥(JWK)集的URI,其中包含用于验证ID令牌的JSON Web签名(JWS)和可选的UserInfo响应的加密密钥
+            user-info-authentication-method: 
+            user-name-attribute: 
+            # 以下属性高版本才可用
+            #configurationMetadata: OpenID提供者配置信息,仅当属性spring.security.oauth2.client.[providerId].issur-uri可用时,此信息才可用
+            # 用户信息接口
+            #user-info-endpont: 
+              #uri: UserInfo端点URI,用于访问经过身份验证的最终用户的声明和属性
+              #authenticationMethod: 向UserInfo端点发送访问令牌时使用的身份验证方法,支持的值包括标头、窗体和查询,参考AuthenticationMethod
+              #userNameAttributeName: UserInfo响应中返回的属性的名称,该属性引用最终用户的名称或标识符
         # 当前客户端注册到不同认证服务器的信息,由认证服务器颁发
         registration:
           # 本应用注册在facebook的参数,系统已经内置,其他参数可不写
@@ -47,7 +59,9 @@ spring:
             # 获取令牌的授权模式
             authorization-grant-type: authorization_code
             # 客户端接收授权码的回调地址
-            redirect-uri: http://localhost:55300/oauthClient/authorized
+            redirect-uri: http://127.0.0.1:55300/oauthClient/authorized
+            # 客户端接收授权码的回调地址,SpringSecurityClient默认实现使用code换取token的接口
+            #redirect-uri: http://127.0.0.1:55300/login/oauth2/code/messaging-client-oidc
             scope: message.read, message.write
           oauth-server-client-credentials:
             provider: oauth-server

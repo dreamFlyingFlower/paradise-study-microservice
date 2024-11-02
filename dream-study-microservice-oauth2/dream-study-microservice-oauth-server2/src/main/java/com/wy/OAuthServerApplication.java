@@ -6,6 +6,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContext;
@@ -44,7 +47,6 @@ import org.springframework.security.oauth2.server.authorization.client.Registere
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.oidc.web.OidcProviderConfigurationEndpointFilter;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
-import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 import org.springframework.security.oauth2.server.authorization.settings.OAuth2TokenFormat;
 import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
 import org.springframework.security.oauth2.server.authorization.token.JwtGenerator;
@@ -86,6 +88,12 @@ import com.nimbusds.jose.jwk.source.JWKSource;
 
 /**
  * SpringSecurity认证服务器,5.7以上版本已经抛弃了EnableAuthorizationServer等相关注解,直接使用拦截器SecurityFilterChain
+ * 
+ * 自定义授权模式:https://docs.spring.io/spring-authorization-server/reference/guides/how-to-ext-grant-type.html
+ * 
+ * https://juejin.cn/post/7254096495184134181:前后端分离的授权码模式
+ * https://juejin.cn/post/7253331974050299963:添加redis支持统一响应没看
+ * https://juejin.cn/post/7258466145653096504:联合身份验证没看
  * 
  * Spring Authorization Server
  * 
@@ -237,6 +245,8 @@ import com.nimbusds.jose.jwk.source.JWKSource;
  * {@link ExceptionTranslationFilter}:在认证或授权过程中,捕获出现的{@link AuthenticationException}(认证异常)和{@link AccessDeniedException}(授权异常)异常.
  * 		自定义对AuthenticationException,AccessDeniedException异常的处理,需要自定义AuthenticationEntryPoint,AccessDeniedException的实现类,然后将自定义的异常实现类设置到配置中去.
  * 		通过accessDeniedHandler(AccessDeniedHandler),authenticationEntryPoint(AuthenticationEntryPoint),将自定义的异常设置到配置中去
+ * {@link OAuth2ResourceServerConfigurer}:配置资源服务器相关信息
+ * ->{@link OAuth2ResourceServerConfigurer#registerDefaultEntryPoint}:注册默认异常处理类.
  * 
  * {@link AbstractAuthenticationProcessingFilter#doFilter}:与认证相关的拦截器从此处触发
  * 
@@ -270,6 +280,10 @@ import com.nimbusds.jose.jwk.source.JWKSource;
  * {@link JWKSource}:JWK是一种JSON格式的密钥表示,用于描述加密算法使用的密钥.JWT使用JWK签名和验签,确保令牌的真实和完整性
  * {@link BearerTokenAccessDeniedHandler}:权限不足的默认拒绝类,会将错误信息放到请求头中
  * {@link JwtGrantedAuthoritiesConverter}:通过token获取scope权限,会默认添加SCOPE_前缀,可自定义
+ * 
+ * {@link DaoAuthenticationProvider}:默认的用户名密码处理类
+ * ->{@link AbstractUserDetailsAuthenticationProvider}:默认的用户名密码抽象处理类
+ * ->{@link AbstractUserDetailsAuthenticationProvider#additionalAuthenticationChecks}:允许子类使用userDetails做任何附加校验,如果需要实现自定义逻辑需要重写该方法
  * </pre>
  * 
  * 相关拦截器
@@ -545,7 +559,7 @@ import com.nimbusds.jose.jwk.source.JWKSource;
  * </pre>
  * 
  * PKCE:授权码扩展模式.授权服务器需要对客户端开启proofkey:RegisteredClient.clientSettings(ClientSettings.builder().requireProofKey(Boolean.TRUE).build()),
- * 同时需要生成Code Verifier和Code Challenge,可以在网上生成
+ * 同时需要生成CodeVerifier和CodeChallenge,可以在网上生成.随机生成的CodeVerifier和CodeChallenge可以保证流程的安全,无法让他人拆包获取clientId和clientSecret来伪造登录信息
  * 
  * <pre>
  * POST(/oauth2/authorize):http://ip:port/oauth2/authorize?response_type=code&client_id=pkce-message-client&redirect_uri=https://baidu.com&scope=message.read
