@@ -39,13 +39,14 @@ spring:
         # 当前客户端注册到不同认证服务器的信息,由认证服务器颁发
         registration:
           # 本应用注册在facebook的参数,系统已经内置,其他参数可不写
-#          facebook: 
-#            client-id: facebook_client_id
-#            client-secret: facebook_client_secret
+          facebook: 
+            client-id: facebook_client_id
+            client-secret: facebook_client_secret
           # 本应用注册在github上的参数,系统已经内置,其他参数可不写
-#          github:
-#            client-id: github_client_id
-#            client-secret: github_client_secret
+          github:
+            client-id: github_client_id
+            client-secret: github_client_secret
+          # 当前key就是registrationId
           oauth-server-client-code: 
             # 认证服务器ID,需要和spring.security.oauth2.client.provider下的key对应
             provider: oauth-server
@@ -58,10 +59,10 @@ spring:
             client-authentication-method: client_secret_basic
             # 获取令牌的授权模式
             authorization-grant-type: authorization_code
-            # 客户端接收授权码的回调地址
-            redirect-uri: http://127.0.0.1:55300/oauthClient/authorized
-            # 客户端接收授权码的回调地址,SpringSecurityClient默认实现使用code换取token的接口
-            #redirect-uri: http://127.0.0.1:55300/login/oauth2/code/messaging-client-oidc
+            # 自定义客户端接收授权码的回调地址
+            redirect-uri: http://127.0.0.1:55300/oauthClient/oauth-server-client-code
+            # 若不自定义,默认使用ip:port/login/oauth2/code/{registrationId},如下
+            #redirect-uri: http://127.0.0.1:55300/login/oauth2/code/oauth-server-client-code
             scope: message.read, message.write
           oauth-server-client-credentials:
             provider: oauth-server

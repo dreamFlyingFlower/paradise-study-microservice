@@ -186,7 +186,9 @@ public class AuthorizationServerConfig {
 						customizer -> customizer.grantType(ConstAuthorization.GRANT_TYPE_SMS_CODE)))
 				// 添加自定义grant_type-短信认证登录
 				.tokenEndpoint(tokenEndpoint -> tokenEndpoint.accessTokenRequestConverter(converter)
-						.authenticationProvider(provider));
+						.authenticationProvider(provider)
+						// 自定义access_token响应,削减access_token的长度
+						.accessTokenResponseHandler(null));
 
 		DefaultSecurityFilterChain build = http.build();
 

@@ -21,6 +21,7 @@ import org.springframework.security.oauth2.client.web.OAuth2AuthorizationCodeGra
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
 import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
+import org.springframework.security.oauth2.client.web.server.OAuth2AuthorizationCodeGrantWebFilter;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.FilterChainProxy;
@@ -32,7 +33,7 @@ import org.springframework.security.web.authentication.AbstractAuthenticationPro
  * <pre>
  * {@link OAuth2ClientAutoConfiguration}:客户端自动配置类
  * {@link #OAuth2ClientRegistrationRepositoryConfiguration}:将配置文件中注册的client构造成ClientRegistration保存到内存中.
- * 		{@link CommonOAuth2Provider}:枚举类,里面事先定义好了几种常用的三方登录授权服务器的各种参数
+ * ->{@link CommonOAuth2Provider}:事先定义好了几种常用的三方登录授权服务器的各种参数
  * {@link OAuth2WebSecurityConfiguration}:配置web相关的类,如怎么样保存和获取已经授权过的客户端,以及默认的oauth2客户端相关的配置
  * </pre>
  * 
@@ -103,6 +104,10 @@ import org.springframework.security.web.authentication.AbstractAuthenticationPro
  * 		当scope中包含openid时就是openid connect登录,获取token后会响应idToken,里边包含了用户信息,如果要自定义这两个service也需要实现这两个service提高兼容性
  * {@link OAuth2LoginAuthenticationProvider}:调用{@link OAuth2UserService#loadUser},注入的实例是DefaultOAuth2UserService,scope中未包含openid才会去处理
  * </pre>
+ * 
+ * {@link OAuth2AuthorizationCodeGrantFilter}:拦截授权码模式的授权码接口,其中的OAuth2ParameterNames.REGISTRATION_ID参数,
+ * 和配置文件中的spring.security.oauth2.client.registration.[registration_id]对应,故该registration_id不能重复
+ * {@link OAuth2AuthorizationCodeGrantWebFilter}:功能和上述类相同,但是是WebFlux的类
  * 
  * @author 飞花梦影
  * @date 2021-04-09 11:04:34
