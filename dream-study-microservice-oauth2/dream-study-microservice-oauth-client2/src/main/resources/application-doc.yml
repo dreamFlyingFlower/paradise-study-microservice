@@ -1,0 +1,15 @@
+# SpringDoc自定义配置
+custom:
+  info:
+    title: ${spring.application.name}-api
+    version: 0.0.1
+    description: 这是一个使用SpringDoc生成的在线文档.
+    terms-of-service: http://127.0.0.1:8000/test01
+    # 设置当前服务在网关中的代理路径
+    gateway-url: http://127.0.0.1:8080/${spring.application.name}
+  license:
+    name: Apache 2.0
+  security:
+    name: Authenticate
+    token-url: http://kwqqr48rgo.cdhttp.cn/oauth2/token
+    authorization-url: http://kwqqr48rgo.cdhttp.cn/oauth2/authorize

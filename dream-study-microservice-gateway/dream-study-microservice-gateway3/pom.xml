@@ -16,6 +16,11 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>dream.flying.flower</groupId>
+			<artifactId>dream-tool-core</artifactId>
+		</dependency>
+
+		<dependency>
 			<groupId>com.alibaba.csp</groupId>
 			<artifactId>sentinel-spring-cloud-gateway-adapter</artifactId>
 		</dependency>
@@ -37,10 +42,6 @@
 			<artifactId>spring-boot-starter-data-redis-reactive</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-security</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.isomorphism</groupId>
 			<artifactId>token-bucket</artifactId>
 			<version>1.7</version>
@@ -60,10 +61,13 @@
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-loadbalancer</artifactId>
 		</dependency>
-
 		<dependency>
-			<groupId>dream.flying.flower</groupId>
-			<artifactId>dream-tool-core</artifactId>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webflux-ui</artifactId>
 		</dependency>
 
 		<dependency>

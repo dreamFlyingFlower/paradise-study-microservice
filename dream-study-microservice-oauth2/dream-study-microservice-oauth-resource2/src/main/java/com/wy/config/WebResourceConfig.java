@@ -31,7 +31,7 @@ import dream.flying.flower.framework.security.constant.ConstAuthorization;
 import lombok.AllArgsConstructor;
 
 /**
- * 资源服务器Security配置
+ * Web资源服务器Security配置
  * 
  * @auther 飞花梦影
  * @date 2021-07-03 11:00:36
@@ -40,7 +40,7 @@ import lombok.AllArgsConstructor;
 @EnableWebSecurity
 @EnableMethodSecurity(jsr250Enabled = true, securedEnabled = true)
 @AllArgsConstructor
-public class ResourceSecurtiyConfig {
+public class WebResourceConfig {
 
 	private final ConfigProperties configProperties;
 

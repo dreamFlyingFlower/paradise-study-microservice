@@ -27,6 +27,9 @@ import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.FilterChainProxy;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 
+import com.wy.wechat.WechatAuthorizationRequestConsumer;
+import com.wy.wechat.WechatCodeGrantRequestEntityConverter;
+
 /**
  * OAuth2相关类:
  * 
@@ -108,6 +111,11 @@ import org.springframework.security.web.authentication.AbstractAuthenticationPro
  * {@link OAuth2AuthorizationCodeGrantFilter}:拦截授权码模式的授权码接口,其中的OAuth2ParameterNames.REGISTRATION_ID参数,
  * 和配置文件中的spring.security.oauth2.client.registration.[registration_id]对应,故该registration_id不能重复
  * {@link OAuth2AuthorizationCodeGrantWebFilter}:功能和上述类相同,但是是WebFlux的类
+ * 
+ * {@link WechatAuthorizationRequestConsumer}:自定义微信授权获取code,官方文档:
+ * https://docs.spring.io/spring-security/reference/servlet/oauth2/client/authorization-grants.html#_customizing_the_authorization_request
+ * {@link WechatCodeGrantRequestEntityConverter}:自定义code解析,获取token,官方文档:
+ * https://docs.spring.io/spring-security/reference/servlet/oauth2/client/authorization-grants.html#_customizing_the_access_token_request
  * 
  * @author 飞花梦影
  * @date 2021-04-09 11:04:34

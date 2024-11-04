@@ -12,6 +12,7 @@ import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.util.StringUtils;
 
+import com.wy.strategy.OAuth2UserConverterContext;
 import com.wy.vo.OAuth2ClientVO;
 
 import lombok.RequiredArgsConstructor;
@@ -28,14 +29,14 @@ public class CustomizerOidcUserService extends OidcUserService {
 
 	private final OAuth2ClientService oauth2ClientService;
 
-	private final Oauth2UserConverterContext userConverterContext;
+	private final OAuth2UserConverterContext oauth2UserConverterContext;
 
 	@Override
 	public OidcUser loadUser(OidcUserRequest userRequest) throws OAuth2AuthenticationException {
 		// 获取三方用户信息
 		OidcUser oidcUser = super.loadUser(userRequest);
 		// 转为项目中的三方用户信息
-		OAuth2ClientVO oauth2ThirdAccount = userConverterContext.convert(userRequest, oidcUser);
+		OAuth2ClientVO oauth2ThirdAccount = oauth2UserConverterContext.convert(userRequest, oidcUser);
 		// 检查用户信息
 		oauth2ClientService.checkAndSaveUser(oauth2ThirdAccount);
 		OidcIdToken oidcIdToken = oidcUser.getIdToken();

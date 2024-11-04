@@ -1,0 +1,91 @@
+spring:
+  cloud:
+    gateway:
+      # 全局redis限流
+      redis-rate-limiter:
+        # 请求头中标识限流上限的属性
+        burst-capacity-header:
+        # 请求头中标识令牌桶填充速率的属性
+        replenish-rate-header:  
+      globalcors:
+        # 解决options请求被拦截问题.options请求就是一种询问服务器是否浏览器可以跨域的请求
+        # 如果每次跨域都询问服务器是否可以跨域,对性能也是损耗,可以配置本次跨域检测的有效期maxAge
+        # 在maxAge设置的时间范围内,不去询问,统统允许跨域
+        #add-to-simple-url-handler-mapping: true
+        # 全局允许跨域请求
+        cors-configurations:
+          # 需要进行跨域设置的URL请求地址
+          '[/**]':
+            # 允许跨域请求的网站
+            allowedOrigins: "*"
+            # 允许跨域的请求头
+            allowedHeaders: "*"
+            # 允许跨域的请求方式
+            allowedMethods: POST, GET, PUT, OPTIONS, DELETE, PATCH
+            #allowedMethods: "*"
+            # 允许在请求中携带cookie
+            allowCredentials: true
+            # 本次跨域检测的有效期(单位毫秒),在有效期内,跨域请求不会一直发option请求去增大服务器压力
+            #maxAge: 360000
+      default-filters:
+        # 会调用DedupeResponseHeaderGatewayFilterFactory中的dedupe方法
+      - DedupeResponseHeader=Vary Access-Control-Allow-Origin Access-Control-Allow-Credentials
+      filter:
+        remove-hop-by-hop:
+          order: 1          
+      discovery:
+        locator:
+          # true:可以从注册中心获得其他微服务,根据服务名自动转发.若没有特殊转发,可不写下面的routes
+          enabled: true
+          # 微服务名以小写形式呈现,默认false,微服务名为转成大写
+          lower-case-service-id: true
+      # 路由数组
+      routes: 
+        # 当前路由的标识, 要求唯一
+      - id: product_route
+        # 请求要转发到的地址,要注意后面的/,lb表示负载均衡
+        uri: lb://dream-study-microservice-service/
+        # 使用ip地址作为请求转发地址,要注意后面的/
+        # uri: http://localhost:12345/
+        # 路由的优先级,数字越小级别越高
+        order: 1
+        # 断言,相当于匹配规则
+        predicates: 
+          # 当请求路径满足Path指定的规则时,才进行路由转发.此处为所有以product开头的请求
+          - Path=/product/**
+          # 在指定时间之后的请求
+          # - After=2017-01-20T17:42:47.789-07:00[America/Denver]
+          # 指定域名的请求
+          # - Host=dream.com
+          # 权重,负载均衡时有效
+          # - Weight=group1,2
+        # 过滤器,请求在传递过程中可以通过过滤器对其进行一定的修改,参照MyGatewayFilterFactory中的局部过滤器
+        filters:
+        # 转发之前去掉1层路径前缀,如/api/product/**->/prodcut/**,注意等号前后不能有空格
+        - StripPrefix=1
+        # 使用内置的过滤器,修改返回状态
+        - SetStatus=2000
+        # 路径重写,利用正则去掉前面的product,$\为$转义
+        - RewritePath=/product/(?<segment>.*),/$\{segment}
+        - My=true
+        # 使用PrefixPathGatewayFilterFactory过滤器,去掉GatewayFilterFactory就是name或使用PREFIX_KEY的值
+        - name: prefix
+          args:
+            StripPrefix: 1
+        # 使用RetryGatewayFilterFactory过滤器,去掉GatewayFilterFactory就是name
+        - name: retry
+          args: 
+            retries: 3
+            status: 503
+        # 使用RequestRateLimiterGatewayFilterFactory限流过滤器
+        - name: RequestRateLimiter
+          args:
+            # 使用SpEL表达式从容器中获取对象.以下表达式为从spring中获取beanName为pathKeyResolver的对象,参照SelfKeyResolver
+            key-resolver: '#{@pathKeyResolver}'
+            redis-rate-limiter:
+              # 令牌桶每秒填充平局速率,不能设置小数
+              replenish-rate: 1
+              # 令牌桶的上限
+              burst-capacity: 3
+              # 拒绝空key
+              deny-empty-key: true

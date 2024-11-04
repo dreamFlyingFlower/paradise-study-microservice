@@ -1,0 +1,46 @@
+spring:
+  thymeleaf:
+    cache: false
+
+  security:
+    # 进行登录验证的用户名和密码,由用户自行输入
+    user:
+      name: admin
+      # 123456
+      password: $2a$10$vN5dYR542V03tOvLs4ep6.W8MAMBUqm2feSGxxOLZKoGKPumM.w0y
+    oauth2:
+      resourceserver:
+        jwt:
+          # 认证服务器解析token令牌的密钥地址
+          jwk-set-uri: http://127.0.0.1:55100/oauthServer/oauth/token_key
+      client:
+        # 认证服务器信息,可写多个
+        provider:
+          # 微信认证服务器ID,可自定义,不可重复
+          wechat:
+            # 设置用户信息响应体中账号的字段
+            user-name-attribute: nickname
+            # 获取token的地址
+            token-uri: https://api.weixin.qq.com/sns/oauth2/access_token
+            # 获取用户信息的地址
+            user-info-uri: https://api.weixin.qq.com/sns/userinfo
+            # 发起授权申请的地址
+            authorization-uri: https://open.weixin.qq.com/connect/oauth2/authorize
+        # 当前客户端注册到不同认证服务器的信息,由认证服务器颁发
+        registration:
+          # 当前key就是registrationId
+          wechat: 
+            # 微信登录配置
+            provider: wechat
+            # 客户端名字
+            client-name: OAuth2-Client
+            # 认证方式
+            authorization-grant-type: authorization_code
+            # 客户端id,使用自己的微信的appid
+            client-id: 
+            # 客户端秘钥,使用自己的微信的app secret
+            client-secret: 
+            # 回调地址,设置为认证服务的回调地址,由认证服务用code换取token
+            redirect-uri: http://192.168.1.102:8080/login/oauth2/code/wechat
+            # 申请scope列表
+            scope: snsapi_userinfo

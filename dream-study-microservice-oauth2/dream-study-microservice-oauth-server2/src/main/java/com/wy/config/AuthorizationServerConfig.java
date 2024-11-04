@@ -282,6 +282,16 @@ public class AuthorizationServerConfig {
 	}
 
 	/**
+	 * 自定义jwt,将权限信息放至jwt中.联合身份认证自定义token处理,当使用openId Connect登录时将用户信息写入idToken中
+	 * 
+	 * @return OAuth2TokenCustomizer的实例
+	 */
+	@Bean
+	OAuth2TokenCustomizer<JwtEncodingContext> oAuth2TokenCustomizer() {
+		return new FederatedIdentityIdTokenCustomizer();
+	}
+
+	/**
 	 * JWT方式向token中自定义存数据,自定义的数据可以从Authentication中获取
 	 * 
 	 * {@link SecurityContextHolder#getContext()}->{@link SecurityContext#getAuthentication()}

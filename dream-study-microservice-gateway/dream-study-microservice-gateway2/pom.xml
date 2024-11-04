@@ -8,6 +8,7 @@
 		<artifactId>dream-study-microservice-gateway</artifactId>
 		<version>0.0.1</version>
 	</parent>
+
 	<artifactId>dream-study-microservice-gateway2</artifactId>
 	<name>dream-study-microservice-gateway2</name>
 	<description>spring cloud study for gateway</description>
@@ -69,6 +70,11 @@
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-loadbalancer</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-ui</artifactId>
 		</dependency>
 
 		<dependency>

@@ -4,10 +4,10 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
 import org.springframework.security.oauth2.server.resource.introspection.NimbusOpaqueTokenIntrospector;
 import org.springframework.security.oauth2.server.resource.introspection.OpaqueTokenIntrospector;
 
-import com.wy.config.ResourceSecurtiyConfig;
+import com.wy.config.WebResourceConfig;
 
 /**
- * 重写OpaqueTokenIntrospector,获得当前访问资源服务器的客户端client_id和client_secret,让{@link ResourceSecurtiyConfig#opaqueTokenIntrospector()}使用
+ * 重写OpaqueTokenIntrospector,获得当前访问资源服务器的客户端client_id和client_secret,让{@link WebResourceConfig#opaqueTokenIntrospector()}使用
  * 
  * 参照{@link NimbusOpaqueTokenIntrospector}
  *

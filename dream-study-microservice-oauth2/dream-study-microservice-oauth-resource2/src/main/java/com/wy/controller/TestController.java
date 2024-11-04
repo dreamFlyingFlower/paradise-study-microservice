@@ -2,6 +2,7 @@ package com.wy.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,4 +45,21 @@ public class TestController {
 		return null;
 	}
 
+	@GetMapping("/test01")
+	@PreAuthorize("hasAnyAuthority('message.write')")
+	public String test01() {
+		return "test01";
+	}
+
+	@GetMapping("/test02")
+	@PreAuthorize("hasAnyAuthority('test02')")
+	public String test02() {
+		return "test02";
+	}
+
+	@GetMapping("/app")
+	@PreAuthorize("hasAnyAuthority('app')")
+	public String app() {
+		return "app";
+	}
 }

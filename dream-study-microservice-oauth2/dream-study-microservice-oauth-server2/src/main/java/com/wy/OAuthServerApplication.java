@@ -91,9 +91,8 @@ import com.nimbusds.jose.jwk.source.JWKSource;
  * 
  * 自定义授权模式:https://docs.spring.io/spring-authorization-server/reference/guides/how-to-ext-grant-type.html
  * 
- * https://juejin.cn/post/7254096495184134181:前后端分离的授权码模式
- * https://juejin.cn/post/7253331974050299963:添加redis支持统一响应没看
- * https://juejin.cn/post/7258466145653096504:联合身份验证没看
+ * https://juejin.cn/post/7258466145653096504 :15,17,18,19
+ * https://juejin.cn/post/7430748937147432970:基于Session的前后端分离
  * 
  * Spring Authorization Server
  * 

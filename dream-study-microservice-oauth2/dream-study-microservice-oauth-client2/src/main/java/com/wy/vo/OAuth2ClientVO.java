@@ -80,6 +80,14 @@ public class OAuth2ClientVO implements Serializable, TransPojo, OAuth2User {
 	@Size(max = 256, message = "地址最大长度不能超过256", groups = { ValidAdd.class, ValidEdit.class })
 	private String location;
 
+	@Schema(description = "名称")
+	@Size(max = 64, message = "名称最大长度不能超过64", groups = { ValidAdd.class, ValidEdit.class })
+	private String name;
+
+	@Schema(description = "头像")
+	@Size(max = 256, message = "地址最大长度不能超过256", groups = { ValidAdd.class, ValidEdit.class })
+	private String avatarUrl;
+
 	@Override
 	public Map<String, Object> getAttributes() {
 		return null;
