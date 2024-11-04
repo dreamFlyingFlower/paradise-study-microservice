@@ -97,7 +97,7 @@ public class AuthorizationServerConfig {
 	private final UserService userService;
 
 	/**
-	 * 配置认证相关的端点过滤器链,用于处理与协议端点相关的请求和响应.
+	 * 配置认证相关的端点过滤器链,用于处理与协议端点相关的请求和响应
 	 * 
 	 * 负责处理OAuth2和OpenID Connect的协议细节,例如授权请求、令牌颁发和验证等
 	 *
