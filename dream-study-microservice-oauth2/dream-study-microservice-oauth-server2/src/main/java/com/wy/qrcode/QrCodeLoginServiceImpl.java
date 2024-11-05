@@ -22,6 +22,7 @@ import org.springframework.security.oauth2.server.authorization.OAuth2Authorizat
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.savedrequest.DefaultSavedRequest;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.security.web.savedrequest.RequestCache;
@@ -34,6 +35,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
+import com.wy.entity.OAuth2BaseUser;
 
 import cn.hutool.extra.qrcode.QrCodeUtil;
 import cn.hutool.extra.qrcode.QrConfig;
@@ -156,8 +158,8 @@ public class QrCodeLoginServiceImpl implements IQrCodeLoginService {
 		// app端使用密码模式、手机认证登录,不使用三方登录的情况
 		UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
 				oAuth2Authorization.getAttribute(Principal.class.getName());
-		if (usernamePasswordAuthenticationToken.getPrincipal() instanceof Oauth2BasicUser) {
-			Oauth2BasicUser basicUser = (Oauth2BasicUser) usernamePasswordAuthenticationToken.getPrincipal();
+		if (usernamePasswordAuthenticationToken.getPrincipal() instanceof OAuth2BaseUser) {
+			OAuth2BaseUser basicUser = (OAuth2BaseUser) usernamePasswordAuthenticationToken.getPrincipal();
 			// 生成临时票据
 			String qrCodeTicket = IdWorker.getIdStr();
 			// 根据二维码id和临时票据存储,确认时根据临时票据认证
@@ -263,7 +265,8 @@ public class QrCodeLoginServiceImpl implements IQrCodeLoginService {
 				HttpSession session = request.getSession(Boolean.FALSE);
 				if (session != null) {
 					// 获取到认证信息后将之前扫码确认的用户信息放入当前session中。
-					session.setAttribute(SPRING_SECURITY_CONTEXT_KEY, new SecurityContextImpl(authenticationToken));
+					session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+							new SecurityContextImpl(authenticationToken));
 
 					// 操作成功后移除缓存
 					redisHelpers.delete(QR_CODE_PREV + qrCodeId);

@@ -1,5 +1,6 @@
 package com.wy.config;
 
+import java.text.ParseException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -43,7 +44,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.JWTParser;
-import com.nimbusds.oauth2.sdk.ParseException;
 
 /**
  * OAuth2客户端配置

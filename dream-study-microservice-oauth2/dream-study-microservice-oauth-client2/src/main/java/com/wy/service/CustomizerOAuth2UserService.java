@@ -1,5 +1,7 @@
 package com.wy.service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -44,10 +46,16 @@ public class CustomizerOAuth2UserService extends DefaultOAuth2UserService {
 		// 设置用户信息转换器
 		RestTemplate restTemplate = new RestTemplate();
 		restTemplate.setErrorHandler(new OAuth2ErrorResponseErrorHandler());
-		List<HttpMessageConverter<?>> messageConverters = List.of(new StringHttpMessageConverter(),
-				// 获取微信用户信息时使其支持“text/plain”
-				new WechatUserResponseConverter(), new ResourceHttpMessageConverter(),
-				new ByteArrayHttpMessageConverter(), new AllEncompassingFormHttpMessageConverter());
+		List<HttpMessageConverter<?>> messageConverters =
+				new ArrayList<>(Arrays.asList(new StringHttpMessageConverter(), new WechatUserResponseConverter(),
+						new ResourceHttpMessageConverter(), new ByteArrayHttpMessageConverter(),
+						new AllEncompassingFormHttpMessageConverter()));
+		// List<HttpMessageConverter<?>> messageConverters = List.of(new
+		// StringHttpMessageConverter(),
+		// 获取微信用户信息时使其支持“text/plain”
+		// new WechatUserResponseConverter(), new ResourceHttpMessageConverter(),
+		// new ByteArrayHttpMessageConverter(), new
+		// AllEncompassingFormHttpMessageConverter());
 		restTemplate.setMessageConverters(messageConverters);
 		super.setRestOperations(restTemplate);
 	}

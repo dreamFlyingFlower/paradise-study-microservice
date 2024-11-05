@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -67,7 +69,7 @@ public class OAuth2UserinfoVO implements Serializable {
 	/**
 	 * 权限信息
 	 */
-	private Collection<CustomGrantedAuthority> authorities;
+	private Collection<SimpleGrantedAuthority> authorities;
 
 	/**
 	 * 地址

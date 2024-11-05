@@ -26,6 +26,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
+import com.wy.context.RedisSecurityContextRepository;
+
 import dream.flying.flower.framework.security.entrypoint.LoginAuthenticationEntryPoint;
 import dream.flying.flower.framework.security.entrypoint.LoginRedirectAuthenticationEntryPoint;
 import dream.flying.flower.framework.security.handler.CustomizerAccessDeniedHandler;
@@ -40,6 +42,8 @@ import dream.flying.flower.framework.security.handler.CustomizerAuthenticationSu
  * @git {@link https://github.com/dreamFlyingFlower}
  */
 public class AuthorizationConfig {
+
+	private RedisSecurityContextRepository redisSecurityContextRepository;
 
 	/**
 	 * 登录地址,前后端分离就填写完整的url路径,不分离填写相对路径

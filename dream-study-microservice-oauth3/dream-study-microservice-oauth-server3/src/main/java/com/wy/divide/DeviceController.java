@@ -13,6 +13,7 @@ import org.springframework.security.oauth2.core.oidc.OidcScopes;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationConsent;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationConsentService;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
+import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.RedirectStrategy;
 import org.springframework.security.web.util.UrlUtils;
@@ -31,6 +32,7 @@ import dream.flying.flower.result.Result;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
@@ -43,6 +45,8 @@ import lombok.SneakyThrows;
  */
 @RequiredArgsConstructor
 public class DeviceController {
+
+	private final RegisteredClientRepository registeredClientRepository;
 
 	private RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 
@@ -158,6 +162,42 @@ public class DeviceController {
 			parameters.put("requestURI", "/oauth2/authorize");
 		}
 		return parameters;
+	}
+
+	private static Set<ScopeWithDescription> withDescription(Set<String> scopes) {
+		Set<ScopeWithDescription> scopeWithDescriptions = new HashSet<>();
+		for (String scope : scopes) {
+			scopeWithDescriptions.add(new ScopeWithDescription(scope));
+
+		}
+		return scopeWithDescriptions;
+	}
+
+	@Data
+	public static class ScopeWithDescription {
+
+		private static final String DEFAULT_DESCRIPTION =
+				"UNKNOWN SCOPE - We cannot provide information about this permission, use caution when granting this.";
+
+		private static final Map<String, String> scopeDescriptions = new HashMap<>();
+
+		static {
+			scopeDescriptions.put(OidcScopes.PROFILE,
+					"This application will be able to read your profile information.");
+			scopeDescriptions.put("message.read", "This application will be able to read your message.");
+			scopeDescriptions.put("message.write",
+					"This application will be able to add new messages. It will also be able to edit and delete existing messages.");
+			scopeDescriptions.put("other.scope", "This is another scope example of a scope description.");
+		}
+
+		public final String scope;
+
+		public final String description;
+
+		ScopeWithDescription(String scope) {
+			this.scope = scope;
+			this.description = scopeDescriptions.getOrDefault(scope, DEFAULT_DESCRIPTION);
+		}
 	}
 
 	/**

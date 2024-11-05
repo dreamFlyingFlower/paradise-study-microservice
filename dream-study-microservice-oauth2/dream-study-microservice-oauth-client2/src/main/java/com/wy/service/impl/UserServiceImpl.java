@@ -8,9 +8,11 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
@@ -29,6 +31,8 @@ import com.wy.vo.OAuth2UserinfoVO;
 import com.wy.vo.UserVO;
 
 import dream.flying.flower.framework.mybatis.plus.service.impl.AbstractServiceImpl;
+import dream.flying.flower.framework.security.constant.ConstAuthorization;
+import dream.flying.flower.framework.security.constant.ConstOAuthClient;
 import lombok.AllArgsConstructor;
 
 /**
@@ -90,11 +94,11 @@ public class UserServiceImpl extends AbstractServiceImpl<UserEntity, UserVO, Use
 
 		// 根据菜单ID查出菜单
 		List<SysAuthority> menus = sysAuthorityMapper.selectBatchIds(menusId);
-		Set<CustomGrantedAuthority> authorities = Optional.ofNullable(menus)
+		Set<SimpleGrantedAuthority> authorities = Optional.ofNullable(menus)
 				.orElse(Collections.emptyList())
 				.stream()
 				.map(SysAuthority::getUrl)
-				.map(CustomGrantedAuthority::new)
+				.map(SimpleGrantedAuthority::new)
 				.collect(Collectors.toSet());
 		basicUser.setAuthorities(authorities);
 		return basicUser;
@@ -129,14 +133,14 @@ public class UserServiceImpl extends AbstractServiceImpl<UserEntity, UserVO, Use
 		Jwt token = jwtAuthenticationToken.getToken();
 
 		// 获取当前登录类型
-		String loginType = token.getClaim(OAUTH_LOGIN_TYPE);
+		String loginType = token.getClaim(ConstOAuthClient.OAUTH_LOGIN_TYPE);
 		// 获取用户唯一Id
-		String uniqueId = token.getClaimAsString(TOKEN_UNIQUE_ID);
+		String uniqueId = token.getClaimAsString(ConstOAuthClient.TOKEN_UNIQUE_ID);
 		// 基础用户信息id
 		Long basicUserId = null;
 
 		// 获取Token中的权限列表
-		List<String> claimAsStringList = token.getClaimAsStringList(SecurityConstants.AUTHORITIES_KEY);
+		List<String> claimAsStringList = token.getClaimAsStringList(ConstAuthorization.AUTHORITIES_KEY);
 
 		// 如果登录类型不为空则代表是三方登录,获取三方用户信息
 		if (!org.springframework.util.ObjectUtils.isEmpty(loginType)) {
@@ -169,8 +173,8 @@ public class UserServiceImpl extends AbstractServiceImpl<UserEntity, UserVO, Use
 
 		// 填充权限信息
 		if (!org.springframework.util.ObjectUtils.isEmpty(claimAsStringList)) {
-			Set<CustomGrantedAuthority> authorities =
-					claimAsStringList.stream().map(CustomGrantedAuthority::new).collect(Collectors.toSet());
+			Set<SimpleGrantedAuthority> authorities =
+					claimAsStringList.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toSet());
 			// 否则设置为token中获取的
 			result.setAuthorities(authorities);
 		}

@@ -296,8 +296,9 @@ public class DeviceConfig {
 				new DefaultOAuth2AuthorizationRequestResolver(clientRegistrationRepository,
 						OAuth2AuthorizationRequestRedirectFilter.DEFAULT_AUTHORIZATION_REQUEST_BASE_URI);
 
-		// 兼容微信登录授权申请
-		authorizationRequestResolver.setAuthorizationRequestCustomizer(new WechatAuthorizationRequestConsumer());
+		// 整合oauth2-client客户端,兼容微信登录授权申请
+		// authorizationRequestResolver.setAuthorizationRequestCustomizer(new
+		// WechatAuthorizationRequestConsumer());
 
 		return authorizationRequestResolver;
 	}
@@ -310,14 +311,18 @@ public class DeviceConfig {
 	private OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> accessTokenResponseClient() {
 		DefaultAuthorizationCodeTokenResponseClient tokenResponseClient =
 				new DefaultAuthorizationCodeTokenResponseClient();
-		tokenResponseClient.setRequestEntityConverter(new WechatCodeGrantRequestEntityConverter());
+		// 整合oauth2-client客户端,兼容微信登录授权申请
+		// tokenResponseClient.setRequestEntityConverter(new
+		// WechatCodeGrantRequestEntityConverter());
 		// 自定义 RestTemplate,适配微信登录获取token
 		OAuth2AccessTokenResponseHttpMessageConverter messageConverter =
 				new OAuth2AccessTokenResponseHttpMessageConverter();
 		List<MediaType> mediaTypes = new ArrayList<>(messageConverter.getSupportedMediaTypes());
 		// 微信获取token时响应的类型为“text/plain”,这里特殊处理一下
-		mediaTypes.add(MediaType.TEXT_PLAIN);
-		messageConverter.setAccessTokenResponseConverter(new WechatMapAccessTokenResponseConverter());
+		// 整合oauth2-client客户端,兼容微信登录授权申请
+		// mediaTypes.add(MediaType.TEXT_PLAIN);
+		// messageConverter.setAccessTokenResponseConverter(new
+		// WechatMapAccessTokenResponseConverter());
 		messageConverter.setSupportedMediaTypes(mediaTypes);
 
 		// 初始化RestTemplate
