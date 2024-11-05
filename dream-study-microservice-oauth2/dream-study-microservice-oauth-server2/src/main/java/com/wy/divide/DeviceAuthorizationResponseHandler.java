@@ -7,11 +7,12 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.logging.log4j.core.util.JsonUtils;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
+import dream.flying.flower.framework.core.json.JsonHelpers;
+import dream.flying.flower.framework.security.constant.ConstAuthorization;
 import dream.flying.flower.result.Result;
 
 /**
@@ -27,10 +28,10 @@ public class DeviceAuthorizationResponseHandler implements AuthenticationSuccess
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
 			Authentication authentication) throws IOException, ServletException {
 		// 写回json数据
-		Result<Object> result = Result.success(DEVICE_ACTIVATED_URI);
+		Result<Object> result = Result.ok(ConstAuthorization.DEVICE_ACTIVATED_URI);
 		response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-		response.getWriter().write(JsonUtils.objectCovertToJson(result));
+		response.getWriter().write(JsonHelpers.toString(result));
 		response.getWriter().flush();
 	}
 }

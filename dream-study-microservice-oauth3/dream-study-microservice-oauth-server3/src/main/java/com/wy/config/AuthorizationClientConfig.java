@@ -40,10 +40,6 @@ import lombok.RequiredArgsConstructor;
 /**
  * SpringSecurity6客户端认证配置
  * 
- * {@link RegisteredClientRepository}:认证的客户端数据操作,自定义操作需实现该接口
- * {@link JdbcRegisteredClientRepository}:数据库认证客户端实现
- * {@link InMemoryRegisteredClientRepository}:内存认证客户端实现,可直接从配置文件中读取
- * 
  * 项目启动时,会将不存在于oauth2_registered_client表中的客户端数据写入到该表中
  * 
  * @author 飞花梦影
@@ -157,7 +153,7 @@ public class AuthorizationClientConfig {
 			registeredClientRepository.save(deviceClient);
 		}
 
-		// PKCE客户端
+		// PKCE客户端(授权码扩展模式)
 		RegisteredClient pkceClient = RegisteredClient.withId(UUID.randomUUID().toString())
 				.clientId("pkce-message-client")
 				// 公共客户端
@@ -167,6 +163,10 @@ public class AuthorizationClientConfig {
 				.authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
 				// 授权码模式回调地址,oauth2.1已改为精准匹配,不能只设置域名,并且屏蔽了localhost,本机使用127.0.0.1访问
 				.redirectUri("http://127.0.0.1:8080/login/oauth2/code/messaging-client-oidc")
+				// 开启PKCE,需要先在网上生成一对类似密钥的CodeVerifier和CodeChallenge
+				// CodeChallenge用于配置认证服务器的客户端配置,CodeVerifier用户客户端访问认证服务器获取token时携带,以便认证服务器进行校验
+				// 客户端认证:/oauth2/authorize?response_type=code&client_id=pkce-message-client&redirect_uri=&scope=message.read&code_challenge=xxxx&code_challenge_method=S256
+				// 客户端获取token:/oauth2/token?grant_type=&client_id=&redirect_uri=&code=&code_verifier=xxxxxxxx
 				.clientSettings(ClientSettings.builder().requireProofKey(Boolean.TRUE).build())
 				// 自定scope
 				.scope("message.read")

@@ -163,6 +163,7 @@ public class AuthorizationServerConfig {
 		// clientAuthentication.authenticationConverter(deviceClientAuthenticationConverter)
 		// .authenticationProvider(deviceClientAuthenticationProvider))
 		;
+
 		http
 				// 当未登录时访问认证端点时重定向至login页面
 				// .exceptionHandling((exceptions) -> exceptions

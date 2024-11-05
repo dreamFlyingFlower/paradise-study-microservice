@@ -7,7 +7,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.logging.log4j.core.util.JsonUtils;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -19,6 +18,8 @@ import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.util.UrlUtils;
 
+import dream.flying.flower.framework.core.json.JsonHelpers;
+import dream.flying.flower.framework.security.constant.ConstAuthorization;
 import dream.flying.flower.result.Result;
 
 /**
@@ -43,18 +44,19 @@ public class ConsentAuthenticationFailureHandler implements AuthenticationFailur
 		if (authentication == null) {
 			message = "登录已失效";
 		} else {
-			// 第二次点击“拒绝”会因为之前取消时删除授权申请记录而找不到对应的数据，导致抛出 [invalid_request] OAuth 2.0
+			// 第二次点击“拒绝”会因为之前取消时删除授权申请记录而找不到对应的数据,导致抛出 [invalid_request] OAuth 2.0
 			// Parameter: state
 			message = error.toString();
 		}
 
-		// 授权确认页面提交的请求，因为授权申请与授权确认提交公用一个过滤器，这里判断一下
-		if (request.getMethod().equals(HttpMethod.POST.name()) && UrlUtils.isAbsoluteUrl(CONSENT_PAGE_URI)) {
+		// 授权确认页面提交的请求,因为授权申请与授权确认提交公用一个过滤器,这里判断一下
+		if (request.getMethod().equals(HttpMethod.POST.name())
+				&& UrlUtils.isAbsoluteUrl(ConstAuthorization.CONSENT_PAGE_URI)) {
 			// 写回json异常
 			Result<Object> result = Result.error(HttpStatus.BAD_REQUEST.value(), message);
 			response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 			response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-			response.getWriter().write(JsonUtils.objectCovertToJson(result));
+			response.getWriter().write(JsonHelpers.toString(result));
 			response.getWriter().flush();
 		} else {
 			// 在地址栏输入授权申请地址或设备码流程的验证地址错误(user_code错误)

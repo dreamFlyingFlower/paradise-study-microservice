@@ -21,5 +21,4 @@ import dream.flying.flower.framework.mybatis.plus.mapper.BaseMappers;
 public interface RoleMapper extends BaseMappers<RoleEntity, RoleVO, RoleQuery> {
 
 	List<RoleEntity> queryRolesByUserId(String userId);
-
 }

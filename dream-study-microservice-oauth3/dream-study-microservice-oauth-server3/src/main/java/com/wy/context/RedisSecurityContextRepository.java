@@ -2,11 +2,11 @@ package com.wy.context;
 
 import java.util.function.Supplier;
 
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.context.DeferredSecurityContext;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextHolderStrategy;
+import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.web.context.DelegatingSecurityContextRepository;
 import org.springframework.security.web.context.HttpRequestResponseHolder;
 import org.springframework.security.web.context.SecurityContextRepository;
@@ -100,7 +100,8 @@ public class RedisSecurityContextRepository implements SecurityContextRepository
 		}
 
 		// 根据缓存id获取认证信息
-		return (SecurityContext) redisHelpers.get(ConstAuthorizationServerRedis.SECURITY_CONTEXT_PREFIX_KEY + nonce);
+		return JsonHelpers.read(redisHelpers.get(ConstAuthorizationServerRedis.SECURITY_CONTEXT_PREFIX_KEY + nonce),
+				SecurityContextImpl.class);
 	}
 
 	/**

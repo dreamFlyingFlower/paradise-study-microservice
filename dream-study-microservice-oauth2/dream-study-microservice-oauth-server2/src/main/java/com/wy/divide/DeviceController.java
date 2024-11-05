@@ -12,10 +12,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.springframework.security.config.Customizer;
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationConsent;
+import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationConsentService;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
+import org.springframework.security.web.DefaultRedirectStrategy;
+import org.springframework.security.web.RedirectStrategy;
 import org.springframework.security.web.util.UrlUtils;
 import org.springframework.ui.Model;
 import org.springframework.util.ObjectUtils;
@@ -31,6 +35,7 @@ import com.wy.core.CustomizerOAuth2ParameterNames;
 
 import dream.flying.flower.framework.security.constant.ConstAuthorization;
 import dream.flying.flower.result.Result;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
 /**
@@ -40,7 +45,12 @@ import lombok.SneakyThrows;
  * @date 2024-11-04 17:54:19
  * @git {@link https://github.com/dreamFlyingFlower}
  */
+@RequiredArgsConstructor
 public class DeviceController {
+
+	private RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
+
+	private final OAuth2AuthorizationConsentService oauth2AuthorizationConsentService;
 
 	@SneakyThrows
 	@ResponseBody
@@ -94,7 +104,7 @@ public class DeviceController {
 
 		// 获取consent页面所需的参数
 		Map<String, Object> consentParameters = getConsentParameters(scope, state, clientId, userCode, principal);
-		// 转至model中，让框架渲染页面
+		// 转至model中,让框架渲染页面
 		consentParameters.forEach(model::addAttribute);
 
 		return "consent";
@@ -120,7 +130,7 @@ public class DeviceController {
 			throw new RuntimeException("客户端不存在");
 		}
 		OAuth2AuthorizationConsent currentAuthorizationConsent =
-				this.authorizationConsentService.findById(registeredClient.getId(), principal.getName());
+				this.oauth2AuthorizationConsentService.findById(registeredClient.getId(), principal.getName());
 		Set<String> authorizedScopes;
 		if (currentAuthorizationConsent != null) {
 			authorizedScopes = currentAuthorizationConsent.getScopes();

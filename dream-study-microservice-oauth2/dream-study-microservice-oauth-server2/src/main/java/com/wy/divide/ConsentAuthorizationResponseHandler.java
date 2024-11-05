@@ -7,11 +7,11 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.logging.log4j.core.util.JsonUtils;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.OAuth2Error;
+import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AuthorizationCodeRequestAuthenticationException;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AuthorizationCodeRequestAuthenticationToken;
@@ -24,6 +24,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.springframework.web.util.UriUtils;
 
+import dream.flying.flower.framework.core.json.JsonHelpers;
+import dream.flying.flower.framework.security.constant.ConstAuthorization;
 import dream.flying.flower.result.Result;
 
 /**
@@ -42,12 +44,13 @@ public class ConsentAuthorizationResponseHandler implements AuthenticationSucces
 			Authentication authentication) throws IOException, ServletException {
 		// 获取将要重定向的回调地址
 		String redirectUri = this.getAuthorizationResponseUri(authentication);
-		if (request.getMethod().equals(HttpMethod.POST.name()) && UrlUtils.isAbsoluteUrl(CONSENT_PAGE_URI)) {
-			// 如果是post请求并且CONSENT_PAGE_URI是完整的地址，则响应json
-			Result<String> success = Result.success(redirectUri);
+		if (request.getMethod().equals(HttpMethod.POST.name())
+				&& UrlUtils.isAbsoluteUrl(ConstAuthorization.CONSENT_PAGE_URI)) {
+			// 如果是post请求并且CONSENT_PAGE_URI是完整的地址,则响应json
+			Result<String> success = Result.ok(redirectUri);
 			response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 			response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-			response.getWriter().write(JsonUtils.objectCovertToJson(success));
+			response.getWriter().write(JsonHelpers.toString(success));
 			response.getWriter().flush();
 			return;
 		}
@@ -68,14 +71,15 @@ public class ConsentAuthorizationResponseHandler implements AuthenticationSucces
 		if (ObjectUtils.isEmpty(authorizationCodeRequestAuthentication.getRedirectUri())) {
 			String authorizeUriError = "Redirect uri is not null";
 			throw new OAuth2AuthorizationCodeRequestAuthenticationException(
-					new OAuth2Error(INVALID_REQUEST, authorizeUriError, (null)),
+					new OAuth2Error(OAuth2ErrorCodes.INVALID_REQUEST, authorizeUriError, (null)),
 					authorizationCodeRequestAuthentication);
 		}
 
 		if (authorizationCodeRequestAuthentication.getAuthorizationCode() == null) {
 			String authorizeError = "AuthorizationCode is not null";
 			throw new OAuth2AuthorizationCodeRequestAuthenticationException(
-					new OAuth2Error(INVALID_REQUEST, authorizeError, (null)), authorizationCodeRequestAuthentication);
+					new OAuth2Error(OAuth2ErrorCodes.INVALID_REQUEST, authorizeError, (null)),
+					authorizationCodeRequestAuthentication);
 		}
 
 		UriComponentsBuilder uriBuilder =
@@ -88,6 +92,5 @@ public class ConsentAuthorizationResponseHandler implements AuthenticationSucces
 		}
 		// build(true) -> Components are explicitly encoded
 		return uriBuilder.build(true).toUriString();
-
 	}
 }

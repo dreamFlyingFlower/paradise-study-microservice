@@ -62,7 +62,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
-import com.itextpdf.text.pdf.security.SecurityConstants;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
@@ -71,11 +70,17 @@ import com.nimbusds.jose.proc.SecurityContext;
 import com.wy.config.FederatedIdentityIdTokenCustomizer;
 import com.wy.constant.ConstAuthorizationServerRedis;
 import com.wy.context.RedisSecurityContextRepository;
+import com.wy.core.CustomizerAuthorizationGrantType;
 import com.wy.grant.SmsAuthenticationConverter;
 import com.wy.grant.SmsAuthenticationProvider;
+import com.wy.helpers.SecurityContextOAuth2Helpers;
 import com.wy.provider.device.DeviceClientAuthenticationConverter;
 import com.wy.provider.device.DeviceClientAuthenticationProvider;
 
+import dream.flying.flower.autoconfigure.redis.helper.RedisStrHelpers;
+import dream.flying.flower.framework.security.constant.ConstAuthorization;
+import dream.flying.flower.framework.security.handler.CustomizerAuthenticationFailureHandler;
+import dream.flying.flower.framework.security.handler.CustomizerAuthenticationSuccessHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
@@ -106,7 +111,7 @@ import lombok.SneakyThrows;
 @EnableMethodSecurity(jsr250Enabled = true, securedEnabled = true)
 public class DeviceConfig {
 
-	private final RedisOperator<String> redisOperator;
+	private final RedisStrHelpers redisStrHelpers;
 
 	/**
 	 * 登录地址,前后端分离就填写完整的url路径,不分离填写相对路径
@@ -154,9 +159,10 @@ public class DeviceConfig {
 				// 设置自定义用户确认授权页
 				.authorizationEndpoint(authorizationEndpoint -> {
 					// 校验授权确认页面是否为完整路径；是否是前后端分离的页面
-					boolean absoluteUrl = UrlUtils.isAbsoluteUrl(CONSENT_PAGE_URI);
+					boolean absoluteUrl = UrlUtils.isAbsoluteUrl(ConstAuthorization.CONSENT_PAGE_URI);
 					// 如果是分离页面则重定向,否则转发请求
-					authorizationEndpoint.consentPage(absoluteUrl ? CUSTOM_CONSENT_REDIRECT_URI : CONSENT_PAGE_URI);
+					authorizationEndpoint.consentPage(
+							absoluteUrl ? CUSTOM_CONSENT_REDIRECT_URI : ConstAuthorization.CONSENT_PAGE_URI);
 					if (absoluteUrl) {
 						// 适配前后端分离的授权确认页面,成功/失败响应json
 						authorizationEndpoint.errorResponseHandler(new ConsentAuthenticationFailureHandler());
@@ -203,7 +209,7 @@ public class DeviceConfig {
 		http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
 				// 让认证服务器元数据中有自定义的认证方式
 				.authorizationServerMetadataEndpoint(metadata -> metadata.authorizationServerMetadataCustomizer(
-						customizer -> customizer.grantType(SecurityConstants.GRANT_TYPE_SMS_CODE)))
+						customizer -> customizer.grantType(ConstAuthorization.GRANT_TYPE_SMS_CODE)))
 				// 添加自定义grant_type——短信认证登录
 				.tokenEndpoint(tokenEndpoint -> tokenEndpoint.accessTokenRequestConverter(converter)
 						.authenticationProvider(provider));
@@ -252,14 +258,14 @@ public class DeviceConfig {
 					formLogin.loginPage("/login");
 					if (UrlUtils.isAbsoluteUrl(LOGIN_URL)) {
 						// 绝对路径代表是前后端分离,登录成功和失败改为写回json,不重定向了
-						formLogin.successHandler(new LoginSuccessHandler());
-						formLogin.failureHandler(new LoginFailureHandler());
+						formLogin.successHandler(new CustomizerAuthenticationSuccessHandler());
+						formLogin.failureHandler(new CustomizerAuthenticationFailureHandler());
 					}
 				});
 		// 添加BearerTokenAuthenticationFilter,将认证服务当做一个资源服务,解析请求头中的token
 		http.oauth2ResourceServer((resourceServer) -> resourceServer.jwt(Customizer.withDefaults())
-				.accessDeniedHandler(SecurityUtils::exceptionHandler)
-				.authenticationEntryPoint(SecurityUtils::exceptionHandler));
+				.accessDeniedHandler(SecurityContextOAuth2Helpers::exceptionHandler)
+				.authenticationEntryPoint(SecurityContextOAuth2Helpers::exceptionHandler));
 		// 兼容前后端分离与不分离配置
 		http
 				// 当未登录时访问认证端点时重定向至login页面
@@ -376,7 +382,7 @@ public class DeviceConfig {
 		// 设置解析权限信息的前缀,设置为空是去掉前缀
 		grantedAuthoritiesConverter.setAuthorityPrefix("");
 		// 设置权限信息在jwt claims中的key
-		grantedAuthoritiesConverter.setAuthoritiesClaimName(SecurityConstants.AUTHORITIES_KEY);
+		grantedAuthoritiesConverter.setAuthoritiesClaimName(ConstAuthorization.AUTHORITIES_KEY);
 
 		JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
 		jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
@@ -427,7 +433,7 @@ public class DeviceConfig {
 				.authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
 				.authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
 				// 客户端添加自定义认证
-				.authorizationGrantType(new AuthorizationGrantType(SecurityConstants.GRANT_TYPE_SMS_CODE))
+				.authorizationGrantType(new AuthorizationGrantType(ConstAuthorization.GRANT_TYPE_SMS_CODE))
 				// 授权码模式回调地址,oauth2.1已改为精准匹配,不能只设置域名,并且屏蔽了localhost,本机使用127.0.0.1访问
 				.redirectUri("http://127.0.0.1:8080/login/oauth2/code/messaging-client-oidc")
 				.redirectUri("https://www.baidu.com")
@@ -456,7 +462,7 @@ public class DeviceConfig {
 				// 公共客户端
 				.clientAuthenticationMethod(ClientAuthenticationMethod.NONE)
 				// 设备码授权
-				.authorizationGrantType(AuthorizationGrantType.DEVICE_CODE)
+				.authorizationGrantType(CustomizerAuthorizationGrantType.DEVICE_CODE)
 				.authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
 				// 自定scope
 				.scope("message.read")
@@ -526,7 +532,7 @@ public class DeviceConfig {
 	@SneakyThrows
 	public JWKSource<SecurityContext> jwkSource() {
 		// 先从redis获取
-		String jwkSetCache = redisOperator.get(ConstAuthorizationServerRedis.AUTHORIZATION_JWS_PREFIX_KEY);
+		String jwkSetCache = redisStrHelpers.get(ConstAuthorizationServerRedis.AUTHORIZATION_JWS_PREFIX_KEY);
 		if (ObjectUtils.isEmpty(jwkSetCache)) {
 			KeyPair keyPair = generateRsaKey();
 			RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
@@ -538,7 +544,7 @@ public class DeviceConfig {
 			// 转为json字符串
 			String jwkSetString = jwkSet.toString(Boolean.FALSE);
 			// 存入redis
-			redisOperator.set(ConstAuthorizationServerRedis.AUTHORIZATION_JWS_PREFIX_KEY, jwkSetString);
+			redisStrHelpers.set(ConstAuthorizationServerRedis.AUTHORIZATION_JWS_PREFIX_KEY, jwkSetString);
 			return new ImmutableJWKSet<>(jwkSet);
 		}
 		// 解析存储的jws

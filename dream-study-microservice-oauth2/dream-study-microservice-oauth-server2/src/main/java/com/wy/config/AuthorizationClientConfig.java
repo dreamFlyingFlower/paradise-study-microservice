@@ -58,8 +58,8 @@ public class AuthorizationClientConfig {
 	 * 
 	 * 如果认证服务器开启了oidc,可调用该URL查询认证服务器信息:http://127.0.0.1:17127/.well-known/openid-configuration
 	 * 
-	 * 获取授权码:http://localhost:9000/oauth2/authorize?response_type=code&client_id=oidc-client&scope=profile&redirect_uri=http://www.baidu.com
-	 *
+	 * 获取授权码:http://localhost:17127/oauth2/authorize?response_type=code&client_id=oidc-client&scope=profile&redirect_uri=http://www.baidu.com
+	 * 
 	 * @param jdbcTemplate db 数据源信息
 	 * @param passwordEncoder 密码解析器
 	 * @return 基于数据库的repository
@@ -115,8 +115,10 @@ public class AuthorizationClientConfig {
 						.reuseRefreshTokens(true)
 						// refresh_token有效时长
 						.refreshTokenTimeToLive(null)
-						// 指定加密算法
+						// id_token的加密算法
 						.idTokenSignatureAlgorithm(SignatureAlgorithm.RS256)
+						// 设备码有效时长,SpringSecurity6才有
+						// .deviceCodeTimeToLive(null)
 						.build())
 				.build();
 
@@ -133,7 +135,7 @@ public class AuthorizationClientConfig {
 			registeredClientRepository.save(registeredClient);
 		}
 
-		// 设备码授权客户端,公共客户端
+		// 设置多个客户端认证.设备码授权客户端,公共客户端
 		RegisteredClient deviceClient = RegisteredClient.withId(UUID.randomUUID().toString())
 				.clientId("device-message-client")
 				// 公共客户端

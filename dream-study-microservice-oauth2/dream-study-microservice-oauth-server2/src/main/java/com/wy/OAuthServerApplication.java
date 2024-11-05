@@ -3,11 +3,28 @@ package com.wy;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.AbstractConfiguredSecurityBuilder;
+import org.springframework.security.config.annotation.SecurityConfigurer;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AnonymousConfigurer;
+import org.springframework.security.config.annotation.web.configurers.CorsConfigurer;
+import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
+import org.springframework.security.config.annotation.web.configurers.DefaultLoginPageConfigurer;
+import org.springframework.security.config.annotation.web.configurers.ExceptionHandlingConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
+import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
+import org.springframework.security.config.annotation.web.configurers.RequestCacheConfigurer;
+import org.springframework.security.config.annotation.web.configurers.SecurityContextConfigurer;
+import org.springframework.security.config.annotation.web.configurers.ServletApiConfigurer;
+import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer;
 import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -45,6 +62,13 @@ import org.springframework.security.oauth2.server.authorization.client.InMemoryR
 import org.springframework.security.oauth2.server.authorization.client.JdbcRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
+import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationEndpointConfigurer;
+import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
+import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerMetadataEndpointConfigurer;
+import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2ClientAuthenticationConfigurer;
+import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2TokenEndpointConfigurer;
+import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2TokenIntrospectionEndpointConfigurer;
+import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2TokenRevocationEndpointConfigurer;
 import org.springframework.security.oauth2.server.authorization.oidc.web.OidcProviderConfigurationEndpointFilter;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.oauth2.server.authorization.settings.OAuth2TokenFormat;
@@ -82,6 +106,7 @@ import org.springframework.security.web.header.HeaderWriterFilter;
 import org.springframework.security.web.savedrequest.RequestCacheAwareFilter;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter;
 import org.springframework.security.web.session.SessionManagementFilter;
+import org.springframework.web.accept.ContentNegotiationStrategy;
 import org.springframework.web.filter.CorsFilter;
 
 import com.nimbusds.jose.jwk.source.JWKSource;
@@ -118,22 +143,7 @@ import com.nimbusds.jose.jwk.source.JWKSource;
  * client_credentials: 客户端模式获取
  * </pre>
  * 
- * 程序启动后,有以下几个固定访问端点:
- * 
- * <pre>
- * 如果认证服务器开启了oidc,可调用该URL查询认证服务器相关API信息:http://127.0.0.1:17127/.well-known/openid-configuration
- * 
- * 访问登录页面:GET:http://localhost:17127/oauth2/authorize?client_id=test-client&response_type=code&scope=user&redirect_uri=https://www.baidu.com
- * 登录成功跳转授权页面
- * 授权完成后跳转了认证成功的回调地址,上述地址为https://www.baidu.com
- * 
- * 获取到授权码就可以访问/oauth/token获取JWT token了
- * 请求访问令牌:POST:http://localhost:17127/oauth2/token?grant_type=code&client_id=test-client&client_secret=your_client_secret
- * 
- * 使用访问令牌访问受保护的资源:GET:http://localhost:17127/user?access_token=your_access_token
- * </pre>
- * 
- * 认证服务器API:http://127.0.0.1:17127/.well-known/openid-configuration调用后JSON信息
+ * 如果认证服务器开启了oidc,可调用该URL查询认证服务器相关端点以及配置信息:http://ip:port/{context-path}/.well-known/openid-configuration.
  * 
  * <code>
  * {
@@ -237,7 +247,7 @@ import com.nimbusds.jose.jwk.source.JWKSource;
  * 
  * <pre>
  * {@link AuthorizationServerSettings#builder()}:认证服务器相关设置,例如访问令牌的有效期,刷新令牌的策略和认证页面的URL等.提供了对授权服务器行为的细粒度控制.
- * 		设置固定访问端点,每个端点都有拦截器进行拦截.	包括/oauth2/authorize,/oauth2/token,/oauth2/jwks,/oauth2/revoke,/oauth2/introspect,/connect/register,/userinfo
+ * 		设置固定访问端点,每个端点都有拦截器进行拦截.包括/oauth2/authorize,/oauth2/token,/oauth2/jwks,/oauth2/revoke,/oauth2/introspect,/connect/register,/userinfo
  * {@link AuthorizationGrantType}:支持的授权模式
  * {@link SecurityContext}:SpringSecurity上下文,保存登录相关信息
  * ->{@link SecurityContextImpl}:SecurityContext默认实现类
@@ -285,6 +295,67 @@ import com.nimbusds.jose.jwk.source.JWKSource;
  * ->{@link AbstractUserDetailsAuthenticationProvider#additionalAuthenticationChecks}:允许子类使用userDetails做任何附加校验,如果需要实现自定义逻辑需要重写该方法
  * </pre>
  * 
+ * 相关类-{@link AbstractConfiguredSecurityBuilder}
+ * 
+ * <pre>
+ * {@link SecurityFilterChain}:入口
+ * ->{@link DefaultSecurityFilterChain}:默认实现类
+ * {@link AbstractConfiguredSecurityBuilder}:SpringSecurity各种配置适配器建造类抽象实现
+ * ->{@link HttpSecurity#doBuild}:SpringSecurity API主要配置,继承AbstractConfiguredSecurityBuilder.泛型O为DefaultSecurityFilterChain,B为HttpSecurity
+ * ->{@link WebSecurity}:SpringSecurity Web页面主要配置,继承AbstractConfiguredSecurityBuilder.泛型O为Filter,B为WebSecurity
+ * {@link AbstractConfiguredSecurityBuilder.configurers}:SecurityConfigurer各种配置集合
+ * ->{@link SecurityConfigurer}:各种配置的适配器,如果需要自定义,实现该接口.泛型O为DefaultSecurityFilterChain,B为HttpSecurity
+ * -->{@link CsrfConfigurer}:CSRF配置类
+ * -->{@link ExceptionHandlingConfigurer}:异常处理配置 
+ * -->{@link HeadersConfigurer}:请求头配置 
+ * -->{@link SessionManagementConfigurer}:Session配置
+ * -->{@link SecurityContextConfigurer}:SecurityContext上下文配置
+ * -->{@link RequestCacheConfigurer}:请求缓存配置
+ * -->{@link AnonymousConfigurer}:匿名请求配置
+ * -->{@link ServletApiConfigurer}:Web请求配置
+ * -->{@link DefaultLoginPageConfigurer}:登录相关配置
+ * -->{@link LogoutConfigurer}:登出相关配置
+ * -->{@link CorsConfigurer}:跨域请求配置
+ * -->{@link OAuth2AuthorizationServerConfigurer#createConfigurers}:OAuth2.1认证服务配置,额外添加OAuth2.1相关配置类以及其后置类
+ * 
+ * --->{@link OAuth2ClientAuthenticationConfigurer#init}:OAuth2.1客户端配置,添加各种内置API
+ * ---->{@link OAuth2ClientAuthenticationConfigurer#createDefaultAuthenticationProviders}:添加各种客户端鉴权的Provider
+ * --->{@link OAuth2ClientAuthenticationConfigurer#configure}:配置各种AuthenticationConverter
+ * ---->{@link OAuth2ClientAuthenticationConfigurer#createDefaultAuthenticationConverters}:添加各种客户端认证转换器,不同版本不一样
+ * ----->{@link JwtClientAssertionAuthenticationConverter}
+ * ----->{@link ClientSecretBasicAuthenticationConverter}
+ * ----->{@link ClientSecretPostAuthenticationConverter}
+ * ----->{@link PublicClientAuthenticationConverter}
+ * ----->{@link X509ClientCertificateAuthenticationConverter}:SpringSecurity6
+ * 
+ * --->{@link OAuth2AuthorizationServerMetadataEndpointConfigurer}
+ * --->{@link OAuth2AuthorizationEndpointConfigurer}
+ * --->{@link OAuth2TokenEndpointConfigurer#init}:初始化各种Token操作
+ * ---->{@link OAuth2TokenEndpointConfigurer#createDefaultAuthenticationProviders}:添加各种Token Provider
+ * --->{@link OAuth2TokenEndpointConfigurer#configure}:配置各种AuthenticationConverter
+ * ---->{@link OAuth2TokenEndpointConfigurer#createDefaultAuthenticationConverters}:添加各种客户端认证转换器,不同版本不一样
+ * ----->{@link OAuth2AuthorizationCodeAuthenticationConverter}:
+ * ----->{@link OAuth2RefreshTokenAuthenticationConverter}:
+ * ----->{@link OAuth2ClientCredentialsAuthenticationConverter}:
+ * ----->{@link OAuth2DeviceCodeAuthenticationConverter}:SpringSecurity6
+ * ----->{@link OAuth2TokenExchangeAuthenticationConverter}:SpringSecurity6
+ * 
+ * --->{@link OAuth2TokenIntrospectionEndpointConfigurer}
+ * --->{@link OAuth2TokenRevocationEndpointConfigurer}
+ * --->{@link OAuth2DeviceAuthorizationEndpointConfigurer}
+ * --->{@link OAuth2DeviceVerificationEndpointConfigurer}:SpringSecurity6
+ * 
+ * -->{@link OAuth2AuthorizationServerConfigurer#configure}:添加一些Filter和JWKSource
+ * 
+ * -->{@link OAuth2ResourceServerConfigurer}:OAuth2.1资源服务配置
+ * -->{@link OAuth2ResourceServerConfigurer#configure}:加入BearerTokenAuthenticationFilter,校验header中的token
+ * 
+ * {@link AbstractConfiguredSecurityBuilder.sharedObjects}:可重用的对象实例
+ * ->{@link ApplicationContext}:Spring上下文
+ * ->{@link ContentNegotiationStrategy}:
+ * ->{@link AuthenticationManagerBuilder}:认证管理器构造器
+ * </pre>
+ * 
  * 相关拦截器
  * 
  * <pre>
@@ -330,7 +401,7 @@ import com.nimbusds.jose.jwk.source.JWKSource;
  * -->{@link OAuth2AuthorizationCodeAuthenticationConverter}:授权码转换器
  * -->{@link OAuth2RefreshTokenAuthenticationConverter}:token刷新转换器
  * -->{@link OAuth2ClientCredentialsAuthenticationConverter}:客户端转换器
- * -->OAuth2DeviceCodeAuthenticationConverter:该方式在SpringBoot3版本中存在,当前版本不存在
+ * -->OAuth2DeviceCodeAuthenticationConverter:该方式在SpringSecurity6版本中存在,当前版本不存在
  * ->{@link OAuth2TokenEndpointFilter.authenticationManager#authenticate}:{@link ProviderManager}中筛选{@link AuthenticationProvider#authenticate}返回Authentication,返回token,完成认证
  * 		当前provider为{@link OAuth2ClientCredentialsAuthenticationProvider},token为{@link OAuth2AccessTokenAuthenticationToken}
  * -->{@link OAuth2ClientCredentialsAuthenticationProvider#authenticate}:将OAuth2ClientCredentialsAuthenticationToken处理后转换为OAuth2AccessTokenAuthenticationToken.
@@ -342,7 +413,7 @@ import com.nimbusds.jose.jwk.source.JWKSource;
  * 		{@link OAuth2AccessTokenGenerator}会使用{@link RegisteredClient}中的{@link TokenSettings}进行自定义设置为{@link OAuth2TokenFormat#REFERENCE}格式
  * 		{@link OAuth2TokenFormat#REFERENCE}:不透明的token,经过处理后是一串96长度的字符串
  *
- * {@link OAuth2TokenIntrospectionEndpointFilter}:拦截/oauth2/introspect.该请求从资源服务器请求,用来确认客户端请求资源服务器时传递的token的有效性,有效则返回相关认证授权信息.
+ * {@link OAuth2TokenIntrospectionEndpointFilter}:拦截/oauth2/introspect.该请求从资源服务器请求,用来确认客户端传递的token的有效性,token有效则返回属于这个token的认证授权信息.
  * 		eg:http://ip:port/oauth2/introspect?token=AccessTokenUUID
  * ->{@link OAuth2TokenIntrospectionAuthenticationProvider}:校验token,调用OAuth2AuthorizationService获取OAuth2Authorization.
  * 		返回token对应的tokenClaims认证信息{@link OAuth2TokenIntrospection},被包含在{@link OAuth2TokenIntrospectionAuthenticationToken}中

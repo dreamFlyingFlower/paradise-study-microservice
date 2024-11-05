@@ -8,15 +8,17 @@ import org.springframework.web.context.request.ServletWebRequest;
 import com.wy.common.ConstSecurity;
 
 /**
- * @apiNote 电脑端存储验证码
- * @author ParadiseWY
- * @date 2019年9月29日
+ * 电脑端存储验证码
+ *
+ * @author 飞花梦影
+ * @date 2019-11-05 19:17:10
+ * @git {@link https://github.com/dreamFlyingFlower}
  */
 @Configuration
 public class VerifyStorePc implements VerifyStore {
 
 	SessionStrategy sessionStraegy = new HttpSessionSessionStrategy();
-	
+
 	@Override
 	public String requestSource() {
 		return "pc";

@@ -33,7 +33,7 @@ import dream.flying.flower.ConstDate;
 
 /**
  * Redis配置
- *
+ * 
  * @author 飞花梦影
  * @date 2024-11-01 23:31:35
  * @git {@link https://github.com/dreamFlyingFlower}
@@ -85,6 +85,7 @@ public class RedisConfig {
 
 		Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer =
 				new Jackson2JsonRedisSerializer<>(objectMapper, Object.class);
+
 		return jackson2JsonRedisSerializer;
 	}
 

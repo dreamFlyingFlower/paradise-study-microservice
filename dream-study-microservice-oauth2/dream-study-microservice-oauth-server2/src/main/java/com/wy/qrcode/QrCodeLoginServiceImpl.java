@@ -2,8 +2,9 @@ package com.wy.qrcode;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,6 +19,7 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
 import org.springframework.security.oauth2.server.authorization.OAuth2Authorization;
+import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.security.web.savedrequest.DefaultSavedRequest;
@@ -35,6 +37,9 @@ import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 
 import cn.hutool.extra.qrcode.QrCodeUtil;
 import cn.hutool.extra.qrcode.QrConfig;
+import dream.flying.flower.autoconfigure.redis.helper.RedisHelpers;
+import dream.flying.flower.autoconfigure.redis.helper.RedisStrHelpers;
+import dream.flying.flower.framework.core.json.JsonHelpers;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -50,15 +55,14 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class QrCodeLoginServiceImpl implements IQrCodeLoginService {
 
-	private final RedisOperator<QrCodeInfo> redisOperator;
+	private final RedisHelpers redisHelpers;
 
-	private final RedisOperator<String> stringRedisOperator;
+	private final RedisStrHelpers redisStrHelpers;
 
 	private final CustomSecurityProperties customSecurityProperties;
 
-	private final RedisOAuth2AuthorizationService authorizationService;
-
-	private final RedisOperator<UsernamePasswordAuthenticationToken> authenticationRedisOperator;
+	// private final RedisOAuth2AuthorizationService oauth2AuthorizationService;
+	private final OAuth2AuthorizationService oauth2AuthorizationService;
 
 	/**
 	 * 过期时间
@@ -107,14 +111,14 @@ public class QrCodeLoginServiceImpl implements IQrCodeLoginService {
 				String[] scopes = savedRequest.getParameterValues("scope");
 				if (!ObjectUtils.isEmpty(scopes)) {
 					// 不为空获取第一个并设置进二维码信息中
-					info.setScopes(Set.of(scopes[0].split(" ")));
+					info.setScopes(new HashSet<>(Arrays.asList(scopes[0].split(" "))));
 				}
 				// 前端可以根据scope显示要获取的信息,或固定显示要获取的信息
 			}
 		}
 
 		// 因为上边设置的过期时间是2分钟,这里设置10分钟过期,可根据业务自行调整过期时间
-		redisOperator.set(QR_CODE_PREV + qrCodeId, info, QR_CODE_INFO_TIMEOUT);
+		redisHelpers.setExpire(QR_CODE_PREV + qrCodeId, info, QR_CODE_INFO_TIMEOUT);
 		return new QrCodeGenerateResponse(qrCodeId, pngQrCode);
 	}
 
@@ -124,7 +128,7 @@ public class QrCodeLoginServiceImpl implements IQrCodeLoginService {
 		Assert.hasLength(loginScan.getQrCodeId(), "二维码Id不能为空.");
 
 		// 校验二维码状态
-		QrCodeInfo info = redisOperator.get(QR_CODE_PREV + loginScan.getQrCodeId());
+		QrCodeInfo info = JsonHelpers.parse(redisHelpers.get(QR_CODE_PREV + loginScan.getQrCodeId()), QrCodeInfo.class);
 		if (info == null) {
 
 			throw new RuntimeException("无效二维码.");
@@ -152,18 +156,19 @@ public class QrCodeLoginServiceImpl implements IQrCodeLoginService {
 		// app端使用密码模式、手机认证登录,不使用三方登录的情况
 		UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
 				oAuth2Authorization.getAttribute(Principal.class.getName());
-		if (usernamePasswordAuthenticationToken.getPrincipal() instanceof Oauth2BasicUser basicUser) {
+		if (usernamePasswordAuthenticationToken.getPrincipal() instanceof Oauth2BasicUser) {
+			Oauth2BasicUser basicUser = (Oauth2BasicUser) usernamePasswordAuthenticationToken.getPrincipal();
 			// 生成临时票据
 			String qrCodeTicket = IdWorker.getIdStr();
 			// 根据二维码id和临时票据存储,确认时根据临时票据认证
 			String redisQrCodeTicketKey = String.format("%s%s:%s", QR_CODE_PREV, loginScan.getQrCodeId(), qrCodeTicket);
-			stringRedisOperator.set(redisQrCodeTicketKey, qrCodeTicket, QR_CODE_INFO_TIMEOUT);
+			redisStrHelpers.setExpire(redisQrCodeTicketKey, qrCodeTicket, QR_CODE_INFO_TIMEOUT);
 
 			// 更新二维码信息的状态
 			info.setQrCodeStatus(1);
 			info.setName(basicUser.getName());
 			info.setAvatarUrl(basicUser.getAvatarUrl());
-			redisOperator.set(QR_CODE_PREV + loginScan.getQrCodeId(), info, QR_CODE_INFO_TIMEOUT);
+			redisHelpers.setExpire(QR_CODE_PREV + loginScan.getQrCodeId(), info, QR_CODE_INFO_TIMEOUT);
 
 			// 封装响应
 			loginScanResponse.setQrCodeTicket(qrCodeTicket);
@@ -182,7 +187,8 @@ public class QrCodeLoginServiceImpl implements IQrCodeLoginService {
 		Assert.hasLength(loginConsent.getQrCodeId(), "二维码Id不能为空.");
 
 		// 校验二维码状态
-		QrCodeInfo info = redisOperator.get(QR_CODE_PREV + loginConsent.getQrCodeId());
+		QrCodeInfo info =
+				JsonHelpers.parse(redisHelpers.get(QR_CODE_PREV + loginConsent.getQrCodeId()), QrCodeInfo.class);
 		if (info == null) {
 			throw new RuntimeException("无效二维码或二维码已过期.");
 		}
@@ -190,7 +196,7 @@ public class QrCodeLoginServiceImpl implements IQrCodeLoginService {
 		// 验证临时票据
 		String qrCodeTicketKey =
 				String.format("%s%s:%s", QR_CODE_PREV, loginConsent.getQrCodeId(), loginConsent.getQrCodeTicket());
-		String redisQrCodeTicket = stringRedisOperator.get(qrCodeTicketKey);
+		String redisQrCodeTicket = redisStrHelpers.get(qrCodeTicketKey);
 		if (!Objects.equals(redisQrCodeTicket, loginConsent.getQrCodeTicket())) {
 			// 临时票据有误、临时票据失效(超过redis存活时间后确认)、redis数据有误
 			if (log.isDebugEnabled()) {
@@ -199,7 +205,7 @@ public class QrCodeLoginServiceImpl implements IQrCodeLoginService {
 			throw new RuntimeException("登录确认失败,请重新扫描.");
 		}
 		// 使用后删除
-		stringRedisOperator.delete(qrCodeTicketKey);
+		redisStrHelpers.delete(qrCodeTicketKey);
 
 		// 获取登录用户信息
 		OAuth2Authorization authorization = this.getOAuth2Authorization();
@@ -213,17 +219,17 @@ public class QrCodeLoginServiceImpl implements IQrCodeLoginService {
 		// 根据二维码id存储用户信息
 		String redisUserinfoKey = String.format("%s%s:%s", QR_CODE_PREV, "userinfo", loginConsent.getQrCodeId());
 		// 存储用户信息
-		authenticationRedisOperator.set(redisUserinfoKey, authenticationToken, QR_CODE_INFO_TIMEOUT);
+		redisHelpers.setExpire(redisUserinfoKey, authenticationToken, QR_CODE_INFO_TIMEOUT);
 
 		// 更新二维码信息的状态
 		info.setQrCodeStatus(2);
-		redisOperator.set(QR_CODE_PREV + loginConsent.getQrCodeId(), info, QR_CODE_INFO_TIMEOUT);
+		redisHelpers.setExpire(QR_CODE_PREV + loginConsent.getQrCodeId(), info, QR_CODE_INFO_TIMEOUT);
 	}
 
 	@Override
 	public QrCodeLoginFetchResponse fetch(String qrCodeId) {
 		// 校验二维码状态
-		QrCodeInfo info = redisOperator.get(QR_CODE_PREV + qrCodeId);
+		QrCodeInfo info = JsonHelpers.parse(redisHelpers.get(QR_CODE_PREV + qrCodeId), QrCodeInfo.class);
 		if (info == null) {
 			throw new RuntimeException("无效二维码或二维码已过期.");
 		}
@@ -244,7 +250,8 @@ public class QrCodeLoginServiceImpl implements IQrCodeLoginService {
 
 			// 根据二维码id从redis获取用户信息
 			String redisUserinfoKey = String.format("%s%s:%s", QR_CODE_PREV, "userinfo", qrCodeId);
-			UsernamePasswordAuthenticationToken authenticationToken = authenticationRedisOperator.get(redisUserinfoKey);
+			UsernamePasswordAuthenticationToken authenticationToken =
+					JsonHelpers.parse(redisHelpers.get(redisUserinfoKey), UsernamePasswordAuthenticationToken.class);
 			if (authenticationToken != null) {
 				// 获取当前request
 				RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
@@ -259,9 +266,9 @@ public class QrCodeLoginServiceImpl implements IQrCodeLoginService {
 					session.setAttribute(SPRING_SECURITY_CONTEXT_KEY, new SecurityContextImpl(authenticationToken));
 
 					// 操作成功后移除缓存
-					redisOperator.delete(QR_CODE_PREV + qrCodeId);
+					redisHelpers.delete(QR_CODE_PREV + qrCodeId);
 					// 删除用户信息,防止其它人重放请求
-					authenticationRedisOperator.delete(redisUserinfoKey);
+					redisHelpers.delete(redisUserinfoKey);
 
 					// 填充二维码数据,设置跳转到登录之前的请求路径、查询参数和是否授权申请请求
 					loginFetchResponse.setBeforeLoginRequestUri(info.getBeforeLoginRequestUri());
@@ -291,7 +298,7 @@ public class QrCodeLoginServiceImpl implements IQrCodeLoginService {
 			// jwt处理
 			String tokenValue = jwtToken.getToken().getTokenValue();
 			// 根据token获取授权登录时的认证信息(登录用户)
-			return authorizationService.findByToken(tokenValue, OAuth2TokenType.ACCESS_TOKEN);
+			return oauth2AuthorizationService.findByToken(tokenValue, OAuth2TokenType.ACCESS_TOKEN);
 		}
 		return null;
 	}

@@ -1,5 +1,7 @@
 package com.wy.mapper;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 
 import com.wy.entity.ResourceEntity;
@@ -17,5 +19,7 @@ import dream.flying.flower.framework.mybatis.plus.mapper.BaseMappers;
  */
 @Mapper
 public interface ResourceMapper extends BaseMappers<ResourceEntity, ResourceVO, ResourceQuery> {
+
+	List<ResourceEntity> getMenusByUserId(String id);
 
 }

@@ -10,7 +10,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolderStrategy;
 
 /**
- * 自定义Security上下文
+ * 自定义Security上下文,包外无法访问,直接复制框架中同类
  * 
  * {@link org.springframework.security.web.context.SupplierDeferredSecurityContext}
  *

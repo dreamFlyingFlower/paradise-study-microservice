@@ -1,8 +1,10 @@
 package com.wy.config;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -20,8 +22,6 @@ import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
 
-import com.itextpdf.text.pdf.security.SecurityConstants;
-
 import dream.flying.flower.framework.security.constant.ConstAuthorization;
 
 /**
@@ -33,10 +33,10 @@ import dream.flying.flower.framework.security.constant.ConstAuthorization;
  */
 public class FederatedIdentityIdTokenCustomizer implements OAuth2TokenCustomizer<JwtEncodingContext> {
 
-	private static final Set<String> ID_TOKEN_CLAIMS =
-			Set.of(IdTokenClaimNames.ISS, IdTokenClaimNames.SUB, IdTokenClaimNames.AUD, IdTokenClaimNames.EXP,
+	private static final Set<String> ID_TOKEN_CLAIMS = new HashSet<>(
+			Arrays.asList(IdTokenClaimNames.ISS, IdTokenClaimNames.SUB, IdTokenClaimNames.AUD, IdTokenClaimNames.EXP,
 					IdTokenClaimNames.IAT, IdTokenClaimNames.AUTH_TIME, IdTokenClaimNames.NONCE, IdTokenClaimNames.ACR,
-					IdTokenClaimNames.AMR, IdTokenClaimNames.AZP, IdTokenClaimNames.AT_HASH, IdTokenClaimNames.C_HASH);
+					IdTokenClaimNames.AMR, IdTokenClaimNames.AZP, IdTokenClaimNames.AT_HASH, IdTokenClaimNames.C_HASH));
 
 	@Override
 	public void customize(JwtEncodingContext context) {
@@ -55,7 +55,8 @@ public class FederatedIdentityIdTokenCustomizer implements OAuth2TokenCustomizer
 		}
 
 		// 检查登录用户信息是不是OAuth2User,在token中添加loginType属性
-		if (context.getPrincipal().getPrincipal() instanceof OAuth2User user) {
+		if (context.getPrincipal().getPrincipal() instanceof OAuth2User) {
+			OAuth2User user = (OAuth2User) context.getPrincipal().getPrincipal();
 			JwtClaimsSet.Builder claims = context.getClaims();
 			Object loginType = user.getAttribute("loginType");
 			if (loginType instanceof String) {
@@ -65,7 +66,8 @@ public class FederatedIdentityIdTokenCustomizer implements OAuth2TokenCustomizer
 		}
 
 		// 检查登录用户信息是不是UserDetails,排除掉没有用户参与的流程
-		if (context.getPrincipal().getPrincipal() instanceof UserDetails user) {
+		if (context.getPrincipal().getPrincipal() instanceof UserDetails) {
+			UserDetails user = (UserDetails) context.getPrincipal().getPrincipal();
 			// 获取申请的scopes
 			Set<String> scopes = context.getAuthorizedScopes();
 			// 获取用户的权限
@@ -92,10 +94,12 @@ public class FederatedIdentityIdTokenCustomizer implements OAuth2TokenCustomizer
 
 	private Map<String, Object> extractClaims(Authentication principal) {
 		Map<String, Object> claims;
-		if (principal.getPrincipal() instanceof OidcUser oidcUser) {
+		if (principal.getPrincipal() instanceof OidcUser) {
+			OidcUser oidcUser = (OidcUser) principal.getPrincipal();
 			OidcIdToken idToken = oidcUser.getIdToken();
 			claims = idToken.getClaims();
-		} else if (principal.getPrincipal() instanceof OAuth2User oauth2User) {
+		} else if (principal.getPrincipal() instanceof OAuth2User) {
+			OAuth2User oauth2User = (OAuth2User) principal.getPrincipal();
 			claims = oauth2User.getAttributes();
 		} else {
 			claims = Collections.emptyMap();
