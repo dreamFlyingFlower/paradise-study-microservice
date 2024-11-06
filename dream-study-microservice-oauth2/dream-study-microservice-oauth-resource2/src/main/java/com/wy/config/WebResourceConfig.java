@@ -27,7 +27,7 @@ import com.wy.oauth2.CustomizerBearerTokenResolver;
 import com.wy.properties.ConfigProperties;
 
 import dream.flying.flower.collection.CollectionHelper;
-import dream.flying.flower.framework.security.constant.ConstAuthorization;
+import dream.flying.flower.framework.security.constant.ConstSecurity;
 import lombok.AllArgsConstructor;
 
 /**
@@ -131,7 +131,7 @@ public class WebResourceConfig {
 		// 设置解析权限(scope)信息的前缀,设置为空是去掉前缀,如果不去掉,则scope参数从client传递时需带上SCOPE_
 		grantedAuthoritiesConverter.setAuthorityPrefix("");
 		// 设置权限信息在jwt claims中的key
-		grantedAuthoritiesConverter.setAuthoritiesClaimName(ConstAuthorization.AUTHORITIES_KEY);
+		grantedAuthoritiesConverter.setAuthoritiesClaimName(ConstSecurity.AUTHORITIES_KEY);
 
 		JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
 		jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);

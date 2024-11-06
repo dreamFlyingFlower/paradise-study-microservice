@@ -19,7 +19,7 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.security.web.util.UrlUtils;
 
 import dream.flying.flower.framework.core.json.JsonHelpers;
-import dream.flying.flower.framework.security.constant.ConstAuthorization;
+import dream.flying.flower.framework.security.constant.ConstSecurity;
 import dream.flying.flower.result.Result;
 
 /**
@@ -51,7 +51,7 @@ public class ConsentAuthenticationFailureHandler implements AuthenticationFailur
 
 		// 授权确认页面提交的请求,因为授权申请与授权确认提交公用一个过滤器,这里判断一下
 		if (request.getMethod().equals(HttpMethod.POST.name())
-				&& UrlUtils.isAbsoluteUrl(ConstAuthorization.CONSENT_PAGE_URI)) {
+				&& UrlUtils.isAbsoluteUrl(ConstSecurity.CONSENT_PAGE_URI)) {
 			// 写回json异常
 			Result<Object> result = Result.error(HttpStatus.BAD_REQUEST.value(), message);
 			response.setCharacterEncoding(StandardCharsets.UTF_8.name());

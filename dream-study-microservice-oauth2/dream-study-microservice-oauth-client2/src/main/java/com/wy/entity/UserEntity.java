@@ -10,7 +10,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import dream.flying.flower.framework.mybatis.plus.entity.AbstractStringEntity;
+import dream.flying.flower.framework.mybatis.plus.entity.AbstractEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,7 +32,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 @TableName("auth_user")
-public class UserEntity extends AbstractStringEntity implements UserDetails {
+public class UserEntity extends AbstractEntity implements UserDetails {
 
 	private static final long serialVersionUID = -3601222345418102072L;
 
@@ -524,16 +524,15 @@ public class UserEntity extends AbstractStringEntity implements UserDetails {
 	 */
 	private Date quitDate;
 
-	public UserEntity(String username) {
-		super();
-		this.username = username;
-	}
+	/**
+	 * 头像地址
+	 */
+	private String avatarUrl;
 
-	public UserEntity(String username, String password) {
-		super();
-		this.username = username;
-		this.password = password;
-	}
+	/**
+	 * 用户来源
+	 */
+	private String sourceFrom;
 
 	/**
 	 * 权限信息 非数据库字段

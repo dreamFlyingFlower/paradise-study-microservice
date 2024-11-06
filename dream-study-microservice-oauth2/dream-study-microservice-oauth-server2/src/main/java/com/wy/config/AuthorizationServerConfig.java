@@ -59,7 +59,7 @@ import com.wy.grant.SmsAuthenticationProvider;
 import com.wy.service.UserService;
 
 import dream.flying.flower.framework.core.json.JsonHelpers;
-import dream.flying.flower.framework.security.constant.ConstAuthorization;
+import dream.flying.flower.framework.security.constant.ConstSecurity;
 import dream.flying.flower.framework.security.entrypoint.LoginRedirectAuthenticationEntryPoint;
 import dream.flying.flower.framework.security.handler.CustomizerAuthenticationFailureHandler;
 import dream.flying.flower.framework.security.handler.CustomizerAuthenticationSuccessHandler;
@@ -184,7 +184,7 @@ public class AuthorizationServerConfig {
 		http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
 				// 让认证服务器元数据中有自定义的认证方式,这样访问/.well-known/oauth-authorization-server时返回的元数据中有自定义的grant_type
 				.authorizationServerMetadataEndpoint(metadata -> metadata.authorizationServerMetadataCustomizer(
-						customizer -> customizer.grantType(ConstAuthorization.GRANT_TYPE_SMS_CODE)))
+						customizer -> customizer.grantType(ConstSecurity.GRANT_TYPE_SMS_CODE)))
 				// 添加自定义grant_type-短信认证登录
 				.tokenEndpoint(tokenEndpoint -> tokenEndpoint.accessTokenRequestConverter(converter)
 						.authenticationProvider(provider)
@@ -278,7 +278,7 @@ public class AuthorizationServerConfig {
 
 			OAuth2TokenClaimsSet.Builder claims = context.getClaims();
 			// 将权限信息或其他信息放入jwt的claims中,可以从context中拿到client_id
-			claims.claim(ConstAuthorization.AUTHORITIES_KEY, "自定义参数");
+			claims.claim(ConstSecurity.AUTHORITIES_KEY, "自定义参数");
 		};
 	}
 
@@ -339,7 +339,7 @@ public class AuthorizationServerConfig {
 
 				JwtClaimsSet.Builder claims = context.getClaims();
 				// 将权限信息放入jwt的claims中,也可以生成一个以指定字符分割的字符串放入
-				claims.claim(ConstAuthorization.AUTHORITIES_KEY, authoritySet);
+				claims.claim(ConstSecurity.AUTHORITIES_KEY, authoritySet);
 				// 放入其它自定内容.如角色、头像...
 			}
 		};
@@ -356,7 +356,7 @@ public class AuthorizationServerConfig {
 		// 设置解析权限(scope)信息的前缀,设置为空是去掉前缀,如果不去掉,则scope参数从client传递时需带上SCOPE_
 		grantedAuthoritiesConverter.setAuthorityPrefix("");
 		// 设置权限信息在jwt claims中的key
-		grantedAuthoritiesConverter.setAuthoritiesClaimName(ConstAuthorization.AUTHORITIES_KEY);
+		grantedAuthoritiesConverter.setAuthoritiesClaimName(ConstSecurity.AUTHORITIES_KEY);
 
 		JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
 		jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);

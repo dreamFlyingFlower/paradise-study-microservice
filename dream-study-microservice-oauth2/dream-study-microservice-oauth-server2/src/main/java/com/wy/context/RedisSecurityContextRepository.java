@@ -21,7 +21,7 @@ import com.wy.constant.ConstAuthorizationServerRedis;
 
 import dream.flying.flower.autoconfigure.redis.helper.RedisHelpers;
 import dream.flying.flower.framework.core.json.JsonHelpers;
-import dream.flying.flower.framework.security.constant.ConstAuthorization;
+import dream.flying.flower.framework.security.constant.ConstSecurity;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -112,9 +112,9 @@ public class RedisSecurityContextRepository implements SecurityContextRepository
 	 * @return 随机字符串(sessionId),这个字符串本来是前端生成,现在改为后端获取的sessionId
 	 */
 	private String getNonce(HttpServletRequest request) {
-		String nonce = request.getHeader(ConstAuthorization.NONCE_HEADER_NAME);
+		String nonce = request.getHeader(ConstSecurity.NONCE_HEADER_NAME);
 		if (ObjectUtils.isEmpty(nonce)) {
-			nonce = request.getParameter(ConstAuthorization.NONCE_HEADER_NAME);
+			nonce = request.getParameter(ConstSecurity.NONCE_HEADER_NAME);
 			HttpSession session = request.getSession(Boolean.FALSE);
 			if (ObjectUtils.isEmpty(nonce) && session != null) {
 				nonce = session.getId();

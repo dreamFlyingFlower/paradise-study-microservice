@@ -34,7 +34,7 @@ import com.nimbusds.jose.proc.SecurityContext;
 
 import dream.flying.flower.ConstDigest;
 import dream.flying.flower.digest.RsaHelper;
-import dream.flying.flower.framework.security.constant.ConstAuthorization;
+import dream.flying.flower.framework.security.constant.ConstSecurity;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -83,7 +83,7 @@ public class AuthorizationClientConfig {
 				.authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
 				.authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
 				// 客户端添加自定义认证
-				.authorizationGrantType(new AuthorizationGrantType(ConstAuthorization.GRANT_TYPE_SMS_CODE))
+				.authorizationGrantType(new AuthorizationGrantType(ConstSecurity.GRANT_TYPE_SMS_CODE))
 				// 授权码模式回调地址,oauth2.1已改为精准匹配,不能只设置域名,并且屏蔽了localhost,本机使用127.0.0.1访问
 				.redirectUri("http://127.0.0.1:8080/login/oauth2/code/messaging-client-oidc")
 				.redirectUri("https://www.baidu.com")

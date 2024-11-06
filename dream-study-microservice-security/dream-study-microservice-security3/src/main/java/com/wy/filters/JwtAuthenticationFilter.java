@@ -13,11 +13,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.wy.common.ConstSecurity;
 import com.wy.properties.DreamSecurityProperties;
 
 import dream.flying.flower.collection.ListHelper;
 import dream.flying.flower.framework.core.helper.JwtHelpers;
+import dream.flying.flower.framework.security.constant.ConstSecurity;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

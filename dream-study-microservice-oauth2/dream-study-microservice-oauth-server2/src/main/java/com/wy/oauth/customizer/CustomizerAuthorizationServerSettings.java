@@ -1,0 +1,365 @@
+package com.wy.oauth.customizer;
+
+import java.util.Map;
+
+import org.springframework.security.oauth2.server.authorization.context.AuthorizationServerContext;
+import org.springframework.security.oauth2.server.authorization.settings.AbstractSettings;
+import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
+import org.springframework.util.Assert;
+
+/**
+ * 复制SpringSecurity6{@link AuthorizationServerSettings}
+ *
+ * @author 飞花梦影
+ * @date 2024-11-06 08:44:49
+ * @git {@link https://github.com/dreamFlyingFlower}
+ */
+public class CustomizerAuthorizationServerSettings extends AbstractSettings {
+
+	private static final long serialVersionUID = -7456770038509455434L;
+
+	private CustomizerAuthorizationServerSettings(Map<String, Object> settings) {
+		super(settings);
+	}
+
+	/**
+	 * Returns the URL of the Authorization Server's Issuer Identifier.
+	 * 
+	 * @return the URL of the Authorization Server's Issuer Identifier
+	 */
+	public String getIssuer() {
+		return getSetting(CustomizerConfigurationSettingNames.AuthorizationServer.ISSUER);
+	}
+
+	/**
+	 * Returns {@code true} if multiple issuers are allowed per host. The default is
+	 * {@code false}. Using path components in the URL of the issuer identifier
+	 * enables supporting multiple issuers per host in a multi-tenant hosting
+	 * configuration.
+	 *
+	 * <p>
+	 * For example:
+	 * <ul>
+	 * <li>{@code https://example.com/issuer1}</li>
+	 * <li>{@code https://example.com/authz/issuer2}</li>
+	 * </ul>
+	 * 
+	 * @return {@code true} if multiple issuers are allowed per host, {@code false}
+	 *         otherwise
+	 * @since 1.3
+	 * @see AuthorizationServerContext#getIssuer()
+	 */
+	public boolean isMultipleIssuersAllowed() {
+		return getSetting(CustomizerConfigurationSettingNames.AuthorizationServer.MULTIPLE_ISSUERS_ALLOWED);
+	}
+
+	/**
+	 * Returns the OAuth 2.0 Authorization endpoint. The default is
+	 * {@code /oauth2/authorize}.
+	 * 
+	 * @return the Authorization endpoint
+	 */
+	public String getAuthorizationEndpoint() {
+		return getSetting(CustomizerConfigurationSettingNames.AuthorizationServer.AUTHORIZATION_ENDPOINT);
+	}
+
+	/**
+	 * Returns the OAuth 2.0 Device Authorization endpoint. The default is
+	 * {@code /oauth2/device_authorization}.
+	 * 
+	 * @return the Device Authorization endpoint
+	 * @since 1.1
+	 */
+	public String getDeviceAuthorizationEndpoint() {
+		return getSetting(CustomizerConfigurationSettingNames.AuthorizationServer.DEVICE_AUTHORIZATION_ENDPOINT);
+	}
+
+	/**
+	 * Returns the OAuth 2.0 Device Verification endpoint. The default is
+	 * {@code /oauth2/device_verification}.
+	 * 
+	 * @return the Device Verification endpoint
+	 * @since 1.1
+	 */
+	public String getDeviceVerificationEndpoint() {
+		return getSetting(CustomizerConfigurationSettingNames.AuthorizationServer.DEVICE_VERIFICATION_ENDPOINT);
+	}
+
+	/**
+	 * Returns the OAuth 2.0 Token endpoint. The default is {@code /oauth2/token}.
+	 * 
+	 * @return the Token endpoint
+	 */
+	public String getTokenEndpoint() {
+		return getSetting(CustomizerConfigurationSettingNames.AuthorizationServer.TOKEN_ENDPOINT);
+	}
+
+	/**
+	 * Returns the JWK Set endpoint. The default is {@code /oauth2/jwks}.
+	 * 
+	 * @return the JWK Set endpoint
+	 */
+	public String getJwkSetEndpoint() {
+		return getSetting(CustomizerConfigurationSettingNames.AuthorizationServer.JWK_SET_ENDPOINT);
+	}
+
+	/**
+	 * Returns the OAuth 2.0 Token Revocation endpoint. The default is
+	 * {@code /oauth2/revoke}.
+	 * 
+	 * @return the Token Revocation endpoint
+	 */
+	public String getTokenRevocationEndpoint() {
+		return getSetting(CustomizerConfigurationSettingNames.AuthorizationServer.TOKEN_REVOCATION_ENDPOINT);
+	}
+
+	/**
+	 * Returns the OAuth 2.0 Token Introspection endpoint. The default is
+	 * {@code /oauth2/introspect}.
+	 * 
+	 * @return the Token Introspection endpoint
+	 */
+	public String getTokenIntrospectionEndpoint() {
+		return getSetting(CustomizerConfigurationSettingNames.AuthorizationServer.TOKEN_INTROSPECTION_ENDPOINT);
+	}
+
+	/**
+	 * Returns the OpenID Connect 1.0 Client Registration endpoint. The default is
+	 * {@code /connect/register}.
+	 * 
+	 * @return the OpenID Connect 1.0 Client Registration endpoint
+	 */
+	public String getOidcClientRegistrationEndpoint() {
+		return getSetting(CustomizerConfigurationSettingNames.AuthorizationServer.OIDC_CLIENT_REGISTRATION_ENDPOINT);
+	}
+
+	/**
+	 * Returns the OpenID Connect 1.0 UserInfo endpoint. The default is
+	 * {@code /userinfo}.
+	 * 
+	 * @return the OpenID Connect 1.0 UserInfo endpoint
+	 */
+	public String getOidcUserInfoEndpoint() {
+		return getSetting(CustomizerConfigurationSettingNames.AuthorizationServer.OIDC_USER_INFO_ENDPOINT);
+	}
+
+	/**
+	 * Returns the OpenID Connect 1.0 Logout endpoint. The default is
+	 * {@code /connect/logout}.
+	 * 
+	 * @return the OpenID Connect 1.0 Logout endpoint
+	 * @since 1.1
+	 */
+	public String getOidcLogoutEndpoint() {
+		return getSetting(CustomizerConfigurationSettingNames.AuthorizationServer.OIDC_LOGOUT_ENDPOINT);
+	}
+
+	/**
+	 * Constructs a new {@link Builder} with the default settings.
+	 * 
+	 * @return the {@link Builder}
+	 */
+	public static Builder builder() {
+		return new Builder().multipleIssuersAllowed(false)
+				.authorizationEndpoint("/oauth2/authorize")
+				.deviceAuthorizationEndpoint("/oauth2/device_authorization")
+				.deviceVerificationEndpoint("/oauth2/device_verification")
+				.tokenEndpoint("/oauth2/token")
+				.jwkSetEndpoint("/oauth2/jwks")
+				.tokenRevocationEndpoint("/oauth2/revoke")
+				.tokenIntrospectionEndpoint("/oauth2/introspect")
+				.oidcClientRegistrationEndpoint("/connect/register")
+				.oidcUserInfoEndpoint("/userinfo")
+				.oidcLogoutEndpoint("/connect/logout");
+	}
+
+	/**
+	 * Constructs a new {@link Builder} with the provided settings.
+	 * 
+	 * @param settings the settings to initialize the builder
+	 * @return the {@link Builder}
+	 */
+	public static Builder withSettings(Map<String, Object> settings) {
+		Assert.notEmpty(settings, "settings cannot be empty");
+		return new Builder().settings((s) -> s.putAll(settings));
+	}
+
+	/**
+	 * A builder for {@link AuthorizationServerSettings}.
+	 */
+	public static final class Builder extends AbstractBuilder<CustomizerAuthorizationServerSettings, Builder> {
+
+		private Builder() {
+		}
+
+		/**
+		 * Sets the URL the Authorization Server uses as its Issuer Identifier.
+		 * 
+		 * @param issuer the URL the Authorization Server uses as its Issuer Identifier.
+		 * @return the {@link Builder} for further configuration
+		 */
+		public Builder issuer(String issuer) {
+			return setting(CustomizerConfigurationSettingNames.AuthorizationServer.ISSUER, issuer);
+		}
+
+		/**
+		 * Set to {@code true} if multiple issuers are allowed per host. Using path
+		 * components in the URL of the issuer identifier enables supporting multiple
+		 * issuers per host in a multi-tenant hosting configuration.
+		 *
+		 * <p>
+		 * For example:
+		 * <ul>
+		 * <li>{@code https://example.com/issuer1}</li>
+		 * <li>{@code https://example.com/authz/issuer2}</li>
+		 * </ul>
+		 *
+		 * <p>
+		 * <b>NOTE:</b> Explicitly configuring the issuer identifier via
+		 * {@link #issuer(String)} forces to a single-tenant configuration. Avoid
+		 * configuring the issuer identifier when using a multi-tenant hosting
+		 * configuration, allowing the issuer identifier to be resolved from the
+		 * <i>"current"</i> request.
+		 * 
+		 * @param multipleIssuersAllowed {@code true} if multiple issuers are allowed
+		 *        per host, {@code false} otherwise
+		 * @return the {@link Builder} for further configuration
+		 * @since 1.3
+		 * @see AuthorizationServerContext#getIssuer()
+		 */
+		public Builder multipleIssuersAllowed(boolean multipleIssuersAllowed) {
+			return setting(CustomizerConfigurationSettingNames.AuthorizationServer.MULTIPLE_ISSUERS_ALLOWED,
+					multipleIssuersAllowed);
+		}
+
+		/**
+		 * Sets the OAuth 2.0 Authorization endpoint.
+		 * 
+		 * @param authorizationEndpoint the Authorization endpoint
+		 * @return the {@link Builder} for further configuration
+		 */
+		public Builder authorizationEndpoint(String authorizationEndpoint) {
+			return setting(CustomizerConfigurationSettingNames.AuthorizationServer.AUTHORIZATION_ENDPOINT,
+					authorizationEndpoint);
+		}
+
+		/**
+		 * Sets the OAuth 2.0 Device Authorization endpoint.
+		 * 
+		 * @param deviceAuthorizationEndpoint the Device Authorization endpoint
+		 * @return the {@link Builder} for further configuration
+		 * @since 1.1
+		 */
+		public Builder deviceAuthorizationEndpoint(String deviceAuthorizationEndpoint) {
+			return setting(CustomizerConfigurationSettingNames.AuthorizationServer.DEVICE_AUTHORIZATION_ENDPOINT,
+					deviceAuthorizationEndpoint);
+		}
+
+		/**
+		 * Sets the OAuth 2.0 Device Verification endpoint.
+		 * 
+		 * @param deviceVerificationEndpoint the Device Verification endpoint
+		 * @return the {@link Builder} for further configuration
+		 * @since 1.1
+		 */
+		public Builder deviceVerificationEndpoint(String deviceVerificationEndpoint) {
+			return setting(CustomizerConfigurationSettingNames.AuthorizationServer.DEVICE_VERIFICATION_ENDPOINT,
+					deviceVerificationEndpoint);
+		}
+
+		/**
+		 * Sets the OAuth 2.0 Token endpoint.
+		 * 
+		 * @param tokenEndpoint the Token endpoint
+		 * @return the {@link Builder} for further configuration
+		 */
+		public Builder tokenEndpoint(String tokenEndpoint) {
+			return setting(CustomizerConfigurationSettingNames.AuthorizationServer.TOKEN_ENDPOINT, tokenEndpoint);
+		}
+
+		/**
+		 * Sets the JWK Set endpoint.
+		 * 
+		 * @param jwkSetEndpoint the JWK Set endpoint
+		 * @return the {@link Builder} for further configuration
+		 */
+		public Builder jwkSetEndpoint(String jwkSetEndpoint) {
+			return setting(CustomizerConfigurationSettingNames.AuthorizationServer.JWK_SET_ENDPOINT, jwkSetEndpoint);
+		}
+
+		/**
+		 * Sets the OAuth 2.0 Token Revocation endpoint.
+		 * 
+		 * @param tokenRevocationEndpoint the Token Revocation endpoint
+		 * @return the {@link Builder} for further configuration
+		 */
+		public Builder tokenRevocationEndpoint(String tokenRevocationEndpoint) {
+			return setting(CustomizerConfigurationSettingNames.AuthorizationServer.TOKEN_REVOCATION_ENDPOINT,
+					tokenRevocationEndpoint);
+		}
+
+		/**
+		 * Sets the OAuth 2.0 Token Introspection endpoint.
+		 * 
+		 * @param tokenIntrospectionEndpoint the Token Introspection endpoint
+		 * @return the {@link Builder} for further configuration
+		 */
+		public Builder tokenIntrospectionEndpoint(String tokenIntrospectionEndpoint) {
+			return setting(CustomizerConfigurationSettingNames.AuthorizationServer.TOKEN_INTROSPECTION_ENDPOINT,
+					tokenIntrospectionEndpoint);
+		}
+
+		/**
+		 * Sets the OpenID Connect 1.0 Client Registration endpoint.
+		 * 
+		 * @param oidcClientRegistrationEndpoint the OpenID Connect 1.0 Client
+		 *        Registration endpoint
+		 * @return the {@link Builder} for further configuration
+		 */
+		public Builder oidcClientRegistrationEndpoint(String oidcClientRegistrationEndpoint) {
+			return setting(CustomizerConfigurationSettingNames.AuthorizationServer.OIDC_CLIENT_REGISTRATION_ENDPOINT,
+					oidcClientRegistrationEndpoint);
+		}
+
+		/**
+		 * Sets the OpenID Connect 1.0 UserInfo endpoint.
+		 * 
+		 * @param oidcUserInfoEndpoint the OpenID Connect 1.0 UserInfo endpoint
+		 * @return the {@link Builder} for further configuration
+		 */
+		public Builder oidcUserInfoEndpoint(String oidcUserInfoEndpoint) {
+			return setting(CustomizerConfigurationSettingNames.AuthorizationServer.OIDC_USER_INFO_ENDPOINT,
+					oidcUserInfoEndpoint);
+		}
+
+		/**
+		 * Sets the OpenID Connect 1.0 Logout endpoint.
+		 * 
+		 * @param oidcLogoutEndpoint the OpenID Connect 1.0 Logout endpoint
+		 * @return the {@link Builder} for further configuration
+		 * @since 1.1
+		 */
+		public Builder oidcLogoutEndpoint(String oidcLogoutEndpoint) {
+			return setting(CustomizerConfigurationSettingNames.AuthorizationServer.OIDC_LOGOUT_ENDPOINT,
+					oidcLogoutEndpoint);
+		}
+
+		/**
+		 * Builds the {@link AuthorizationServerSettings}.
+		 * 
+		 * @return the {@link AuthorizationServerSettings}
+		 */
+		@Override
+		public CustomizerAuthorizationServerSettings build() {
+			CustomizerAuthorizationServerSettings authorizationServerSettings =
+					new CustomizerAuthorizationServerSettings(getSettings());
+			if (authorizationServerSettings.getIssuer() != null
+					&& authorizationServerSettings.isMultipleIssuersAllowed()) {
+				throw new IllegalArgumentException("The issuer identifier (" + authorizationServerSettings.getIssuer()
+						+ ") cannot be set when isMultipleIssuersAllowed() is true.");
+			}
+			return authorizationServerSettings;
+		}
+
+	}
+}

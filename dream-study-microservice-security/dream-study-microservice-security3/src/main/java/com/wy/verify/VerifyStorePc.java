@@ -5,7 +5,7 @@ import org.springframework.social.connect.web.HttpSessionSessionStrategy;
 import org.springframework.social.connect.web.SessionStrategy;
 import org.springframework.web.context.request.ServletWebRequest;
 
-import com.wy.common.ConstSecurity;
+import dream.flying.flower.framework.security.constant.ConstSecurity;
 
 /**
  * 电脑端存储验证码

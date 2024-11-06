@@ -15,9 +15,9 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.wy.common.ConstRedisSecurity;
-import com.wy.common.ConstSecurity;
 
 import dream.flying.flower.autoconfigure.redis.helper.RedisStrHelpers;
+import dream.flying.flower.framework.security.constant.ConstSecurity;
 import dream.flying.flower.result.ResultException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;

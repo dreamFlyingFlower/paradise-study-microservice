@@ -33,7 +33,7 @@ import org.springframework.web.util.UriUtils;
 
 import com.wy.core.CustomizerOAuth2ParameterNames;
 
-import dream.flying.flower.framework.security.constant.ConstAuthorization;
+import dream.flying.flower.framework.security.constant.ConstSecurity;
 import dream.flying.flower.result.Result;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -62,20 +62,20 @@ public class DeviceController {
 			@RequestParam(OAuth2ParameterNames.SCOPE) String scope,
 			@RequestParam(OAuth2ParameterNames.STATE) String state,
 			@RequestParam(OAuth2ParameterNames.CLIENT_ID) String clientId,
-			@RequestHeader(name = ConstAuthorization.NONCE_HEADER_NAME, required = false) String nonceId,
+			@RequestHeader(name = ConstSecurity.NONCE_HEADER_NAME, required = false) String nonceId,
 			@RequestParam(name = CustomizerOAuth2ParameterNames.USER_CODE, required = false) String userCode) {
 
 		// 携带当前请求参数与nonceId重定向至前端页面
-		UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(ConstAuthorization.CONSENT_PAGE_URI)
+		UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(ConstSecurity.CONSENT_PAGE_URI)
 				.queryParam(OAuth2ParameterNames.SCOPE, UriUtils.encode(scope, StandardCharsets.UTF_8))
 				.queryParam(OAuth2ParameterNames.STATE, UriUtils.encode(state, StandardCharsets.UTF_8))
 				.queryParam(OAuth2ParameterNames.CLIENT_ID, clientId)
 				.queryParam(CustomizerOAuth2ParameterNames.USER_CODE, userCode)
-				.queryParam(ConstAuthorization.NONCE_HEADER_NAME,
+				.queryParam(ConstSecurity.NONCE_HEADER_NAME,
 						ObjectUtils.isEmpty(nonceId) ? session.getId() : nonceId);
 
 		String uriString = uriBuilder.build(Boolean.TRUE).toUriString();
-		if (ObjectUtils.isEmpty(userCode) || !UrlUtils.isAbsoluteUrl(ConstAuthorization.DEVICE_ACTIVATE_URI)) {
+		if (ObjectUtils.isEmpty(userCode) || !UrlUtils.isAbsoluteUrl(ConstSecurity.DEVICE_ACTIVATE_URI)) {
 			// 不是设备码模式或者设备码验证页面不是前后端分离的,无需返回json,直接重定向
 			redirectStrategy.sendRedirect(request, response, uriString);
 			return null;
@@ -178,9 +178,9 @@ public class DeviceController {
 	public String activateRedirect(HttpSession session,
 			@RequestParam(value = "user_code", required = false) String userCode) {
 
-		UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(ConstAuthorization.DEVICE_ACTIVATE_URI)
+		UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(ConstSecurity.DEVICE_ACTIVATE_URI)
 				.queryParam("userCode", userCode)
-				.queryParam(ConstAuthorization.NONCE_HEADER_NAME, session.getId());
+				.queryParam(ConstSecurity.NONCE_HEADER_NAME, session.getId());
 		return "redirect:" + uriBuilder.build(Boolean.TRUE).toUriString();
 	}
 

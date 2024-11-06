@@ -45,6 +45,7 @@ import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import com.wy.core.CustomizerAuthorizationGrantType;
+import com.wy.oauth.customizer.CustomizerAuthorizationServerSettings;
 
 /**
  * 设备授权码认证服务器配置
@@ -101,7 +102,7 @@ public class AuthorizationServerConfig {
 	@Bean
 	public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http,
 			RegisteredClientRepository registeredClientRepository,
-			AuthorizationServerSettings authorizationServerSettings) throws Exception {
+			CustomizerAuthorizationServerSettings authorizationServerSettings) throws Exception {
 		// 配置默认的设置,忽略认证端点的csrf校验
 		OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
 

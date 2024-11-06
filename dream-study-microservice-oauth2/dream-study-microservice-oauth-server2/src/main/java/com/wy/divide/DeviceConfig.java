@@ -74,11 +74,12 @@ import com.wy.core.CustomizerAuthorizationGrantType;
 import com.wy.grant.SmsAuthenticationConverter;
 import com.wy.grant.SmsAuthenticationProvider;
 import com.wy.helpers.SecurityContextOAuth2Helpers;
+import com.wy.oauth.customizer.CustomizerAuthorizationServerSettings;
 import com.wy.provider.device.DeviceClientAuthenticationConverter;
 import com.wy.provider.device.DeviceClientAuthenticationProvider;
 
 import dream.flying.flower.autoconfigure.redis.helper.RedisStrHelpers;
-import dream.flying.flower.framework.security.constant.ConstAuthorization;
+import dream.flying.flower.framework.security.constant.ConstSecurity;
 import dream.flying.flower.framework.security.handler.CustomizerAuthenticationFailureHandler;
 import dream.flying.flower.framework.security.handler.CustomizerAuthenticationSuccessHandler;
 import lombok.RequiredArgsConstructor;
@@ -134,7 +135,7 @@ public class DeviceConfig {
 	@Bean
 	public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http,
 			RegisteredClientRepository registeredClientRepository,
-			AuthorizationServerSettings authorizationServerSettings) throws Exception {
+			CustomizerAuthorizationServerSettings authorizationServerSettings) throws Exception {
 		// 配置默认的设置,忽略认证端点的csrf校验
 		OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
 
@@ -159,10 +160,10 @@ public class DeviceConfig {
 				// 设置自定义用户确认授权页
 				.authorizationEndpoint(authorizationEndpoint -> {
 					// 校验授权确认页面是否为完整路径；是否是前后端分离的页面
-					boolean absoluteUrl = UrlUtils.isAbsoluteUrl(ConstAuthorization.CONSENT_PAGE_URI);
+					boolean absoluteUrl = UrlUtils.isAbsoluteUrl(ConstSecurity.CONSENT_PAGE_URI);
 					// 如果是分离页面则重定向,否则转发请求
 					authorizationEndpoint.consentPage(
-							absoluteUrl ? CUSTOM_CONSENT_REDIRECT_URI : ConstAuthorization.CONSENT_PAGE_URI);
+							absoluteUrl ? CUSTOM_CONSENT_REDIRECT_URI : ConstSecurity.CONSENT_PAGE_URI);
 					if (absoluteUrl) {
 						// 适配前后端分离的授权确认页面,成功/失败响应json
 						authorizationEndpoint.errorResponseHandler(new ConsentAuthenticationFailureHandler());
@@ -209,7 +210,7 @@ public class DeviceConfig {
 		http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
 				// 让认证服务器元数据中有自定义的认证方式
 				.authorizationServerMetadataEndpoint(metadata -> metadata.authorizationServerMetadataCustomizer(
-						customizer -> customizer.grantType(ConstAuthorization.GRANT_TYPE_SMS_CODE)))
+						customizer -> customizer.grantType(ConstSecurity.GRANT_TYPE_SMS_CODE)))
 				// 添加自定义grant_type——短信认证登录
 				.tokenEndpoint(tokenEndpoint -> tokenEndpoint.accessTokenRequestConverter(converter)
 						.authenticationProvider(provider));
@@ -387,7 +388,7 @@ public class DeviceConfig {
 		// 设置解析权限信息的前缀,设置为空是去掉前缀
 		grantedAuthoritiesConverter.setAuthorityPrefix("");
 		// 设置权限信息在jwt claims中的key
-		grantedAuthoritiesConverter.setAuthoritiesClaimName(ConstAuthorization.AUTHORITIES_KEY);
+		grantedAuthoritiesConverter.setAuthoritiesClaimName(ConstSecurity.AUTHORITIES_KEY);
 
 		JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
 		jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
@@ -438,7 +439,7 @@ public class DeviceConfig {
 				.authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
 				.authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
 				// 客户端添加自定义认证
-				.authorizationGrantType(new AuthorizationGrantType(ConstAuthorization.GRANT_TYPE_SMS_CODE))
+				.authorizationGrantType(new AuthorizationGrantType(ConstSecurity.GRANT_TYPE_SMS_CODE))
 				// 授权码模式回调地址,oauth2.1已改为精准匹配,不能只设置域名,并且屏蔽了localhost,本机使用127.0.0.1访问
 				.redirectUri("http://127.0.0.1:8080/login/oauth2/code/messaging-client-oidc")
 				.redirectUri("https://www.baidu.com")

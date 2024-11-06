@@ -11,8 +11,7 @@ import org.springframework.security.web.authentication.LoginUrlAuthenticationEnt
 import org.springframework.security.web.util.UrlUtils;
 import org.springframework.util.ObjectUtils;
 
-import com.wy.common.ConstSecurity;
-
+import dream.flying.flower.framework.security.constant.ConstSecurity;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

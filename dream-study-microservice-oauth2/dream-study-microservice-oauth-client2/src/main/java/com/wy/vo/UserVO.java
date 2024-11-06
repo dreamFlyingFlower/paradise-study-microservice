@@ -45,7 +45,7 @@ public class UserVO implements Serializable, TransPojo {
 
 	@Schema(description = "编号")
 	@NotNull(message = "id不能为空", groups = { ValidEdit.class })
-	private String id;
+	private Long id;
 
 	@Schema(description = "登录名")
 	@NotBlank(message = "登录名不能为空", groups = { ValidAdd.class })
@@ -460,13 +460,13 @@ public class UserVO implements Serializable, TransPojo {
 
 	String originId2;
 
-	private String roleId;
+	private Long roleId;
 
 	private String roleName;
 
 	private String category;
 
-	private String memberId;
+	private Long memberId;
 
 	public UserVO(String username) {
 		super();

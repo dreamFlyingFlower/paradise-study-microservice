@@ -12,10 +12,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
 import com.wy.common.ConstRedisSecurity;
-import com.wy.common.ConstSecurity;
 
 import dream.flying.flower.autoconfigure.redis.helper.RedisStrHelpers;
 import dream.flying.flower.framework.core.json.JsonHelpers;
+import dream.flying.flower.framework.security.constant.ConstSecurity;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;

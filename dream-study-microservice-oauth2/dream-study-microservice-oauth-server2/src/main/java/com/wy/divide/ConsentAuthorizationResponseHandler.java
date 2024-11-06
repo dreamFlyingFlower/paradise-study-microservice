@@ -25,7 +25,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import org.springframework.web.util.UriUtils;
 
 import dream.flying.flower.framework.core.json.JsonHelpers;
-import dream.flying.flower.framework.security.constant.ConstAuthorization;
+import dream.flying.flower.framework.security.constant.ConstSecurity;
 import dream.flying.flower.result.Result;
 
 /**
@@ -45,7 +45,7 @@ public class ConsentAuthorizationResponseHandler implements AuthenticationSucces
 		// 获取将要重定向的回调地址
 		String redirectUri = this.getAuthorizationResponseUri(authentication);
 		if (request.getMethod().equals(HttpMethod.POST.name())
-				&& UrlUtils.isAbsoluteUrl(ConstAuthorization.CONSENT_PAGE_URI)) {
+				&& UrlUtils.isAbsoluteUrl(ConstSecurity.CONSENT_PAGE_URI)) {
 			// 如果是post请求并且CONSENT_PAGE_URI是完整的地址,则响应json
 			Result<String> success = Result.ok(redirectUri);
 			response.setCharacterEncoding(StandardCharsets.UTF_8.name());

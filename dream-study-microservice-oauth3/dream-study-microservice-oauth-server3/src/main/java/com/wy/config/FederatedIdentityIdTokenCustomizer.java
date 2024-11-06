@@ -20,7 +20,7 @@ import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
 
-import dream.flying.flower.framework.security.constant.ConstAuthorization;
+import dream.flying.flower.framework.security.constant.ConstSecurity;
 
 /**
  * 编写联合身份认证自定义token处理,当使用openId Connect登录时将用户信息写入idToken中
@@ -82,7 +82,7 @@ public class FederatedIdentityIdTokenCustomizer implements OAuth2TokenCustomizer
 
 			JwtClaimsSet.Builder claims = context.getClaims();
 			// 将权限信息放入jwt的claims中（也可以生成一个以指定字符分割的字符串放入）
-			claims.claim(ConstAuthorization.AUTHORITIES_KEY, authoritySet);
+			claims.claim(ConstSecurity.AUTHORITIES_KEY, authoritySet);
 			// 放入其它自定内容
 			// 角色、头像...
 		}

@@ -15,9 +15,9 @@ import org.springframework.security.web.authentication.AuthenticationConverter;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 
-import com.wy.common.ConstSecurity;
 import com.wy.util.SecurityHelpers;
 
+import dream.flying.flower.framework.security.constant.ConstSecurity;
 import jakarta.servlet.http.HttpServletRequest;
 
 /**

@@ -62,11 +62,11 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
-import com.wy.common.ConstSecurity;
 import com.wy.security.LoginFailureHandler;
 import com.wy.security.LoginSuccessHandler;
 import com.wy.util.SecurityHelpers;
 
+import dream.flying.flower.framework.security.constant.ConstSecurity;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 

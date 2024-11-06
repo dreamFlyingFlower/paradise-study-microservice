@@ -19,7 +19,7 @@ import org.springframework.util.StringUtils;
 
 import com.wy.helpers.SecurityContextOAuth2Helpers;
 
-import dream.flying.flower.framework.security.constant.ConstAuthorization;
+import dream.flying.flower.framework.security.constant.ConstSecurity;
 
 /**
  * 短信验证码登录Token转换器
@@ -36,7 +36,7 @@ public class SmsAuthenticationConverter implements AuthenticationConverter {
 	public Authentication convert(HttpServletRequest request) {
 		// grant_type (REQUIRED)
 		String grantType = request.getParameter(OAuth2ParameterNames.GRANT_TYPE);
-		if (!ConstAuthorization.GRANT_TYPE_SMS_CODE.equals(grantType)) {
+		if (!ConstSecurity.GRANT_TYPE_SMS_CODE.equals(grantType)) {
 			return null;
 		}
 
@@ -58,20 +58,20 @@ public class SmsAuthenticationConverter implements AuthenticationConverter {
 		}
 
 		// Mobile phone number (REQUIRED)
-		String username = parameters.getFirst(ConstAuthorization.OAUTH_PARAMETER_NAME_PHONE);
+		String username = parameters.getFirst(ConstSecurity.OAUTH_PARAMETER_NAME_PHONE);
 		if (!StringUtils.hasText(username)
-				|| parameters.get(ConstAuthorization.OAUTH_PARAMETER_NAME_PHONE).size() != 1) {
+				|| parameters.get(ConstSecurity.OAUTH_PARAMETER_NAME_PHONE).size() != 1) {
 			SecurityContextOAuth2Helpers.throwError(OAuth2ErrorCodes.INVALID_REQUEST,
-					"OAuth 2.0 Parameter: " + ConstAuthorization.OAUTH_PARAMETER_NAME_PHONE,
+					"OAuth 2.0 Parameter: " + ConstSecurity.OAUTH_PARAMETER_NAME_PHONE,
 					ACCESS_TOKEN_REQUEST_ERROR_URI);
 		}
 
 		// SMS verification code (REQUIRED)
-		String password = parameters.getFirst(ConstAuthorization.OAUTH_PARAMETER_NAME_SMS_CAPTCHA);
+		String password = parameters.getFirst(ConstSecurity.OAUTH_PARAMETER_NAME_SMS_CAPTCHA);
 		if (!StringUtils.hasText(password)
-				|| parameters.get(ConstAuthorization.OAUTH_PARAMETER_NAME_SMS_CAPTCHA).size() != 1) {
+				|| parameters.get(ConstSecurity.OAUTH_PARAMETER_NAME_SMS_CAPTCHA).size() != 1) {
 			SecurityContextOAuth2Helpers.throwError(OAuth2ErrorCodes.INVALID_REQUEST,
-					"OAuth 2.0 Parameter: " + ConstAuthorization.OAUTH_PARAMETER_NAME_SMS_CAPTCHA,
+					"OAuth 2.0 Parameter: " + ConstSecurity.OAUTH_PARAMETER_NAME_SMS_CAPTCHA,
 					ACCESS_TOKEN_REQUEST_ERROR_URI);
 		}
 
@@ -84,7 +84,7 @@ public class SmsAuthenticationConverter implements AuthenticationConverter {
 		});
 
 		// 构建AbstractAuthenticationToken子类实例并返回
-		return new SmsAuthenticationToken(new AuthorizationGrantType(ConstAuthorization.GRANT_TYPE_SMS_CODE),
+		return new SmsAuthenticationToken(new AuthorizationGrantType(ConstSecurity.GRANT_TYPE_SMS_CODE),
 				clientPrincipal, requestedScopes, additionalParameters);
 	}
 }

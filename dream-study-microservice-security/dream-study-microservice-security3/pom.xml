@@ -17,12 +17,11 @@
 	<dependencies>
 		<dependency>
 			<groupId>dream.flying.flower</groupId>
-			<artifactId>dream-framework-core3</artifactId>
+			<artifactId>dream-framework-security3</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>dream.flying.flower</groupId>
-			<artifactId>dream-spring-boot-starter-redis</artifactId>
-			<version>0.0.1</version>
+			<artifactId>dream-spring-boot-starter-redis3</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

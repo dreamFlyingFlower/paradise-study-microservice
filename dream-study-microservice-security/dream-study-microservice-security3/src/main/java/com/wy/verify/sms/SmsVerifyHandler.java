@@ -6,10 +6,10 @@ import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.ServletRequestUtils;
 import org.springframework.web.context.request.ServletWebRequest;
 
-import com.wy.common.ConstSecurity;
 import com.wy.verify.AbstractVerify;
 import com.wy.verify.VerifyEntity;
 
+import dream.flying.flower.framework.security.constant.ConstSecurity;
 import dream.flying.flower.result.ResultException;
 
 /**

@@ -15,7 +15,7 @@ import com.wy.constant.ConstAuthorizationServerRedis;
 import com.wy.exception.AuthException;
 
 import dream.flying.flower.autoconfigure.redis.helper.RedisStrHelpers;
-import dream.flying.flower.framework.security.constant.ConstAuthorization;
+import dream.flying.flower.framework.security.constant.ConstSecurity;
 import dream.flying.flower.framework.web.helper.WebHelpers;
 import lombok.Getter;
 import lombok.Setter;
@@ -70,24 +70,24 @@ public class CaptchaTypeAuthenticationProvider extends DaoAuthenticationProvider
 		}
 
 		// 获取当前登录方式
-		String loginType = request.getParameter(ConstAuthorization.LOGIN_TYPE_NAME);
+		String loginType = request.getParameter(ConstSecurity.LOGIN_TYPE_NAME);
 		// 如果自定义的grant_type模式也需要校验图形验证码的可以不修改
 		// if (!Objects.equals(loginType, ConstAuthorization.SMS_LOGIN_TYPE)) {
 		// 只要不是密码登录都不需要校验图形验证码
-		if (!Objects.equals(loginType, ConstAuthorization.PASSWORD_LOGIN_TYPE)) {
+		if (!Objects.equals(loginType, ConstSecurity.PASSWORD_LOGIN_TYPE)) {
 			log.info("It isn't necessary captcha authenticate.");
 			return super.authenticate(authentication);
 		}
 
 		// 获取参数中的验证码
-		String code = request.getParameter(ConstAuthorization.CAPTCHA_CODE_NAME);
+		String code = request.getParameter(ConstSecurity.CAPTCHA_CODE_NAME);
 		if (ObjectUtils.isEmpty(code)) {
 			throw new AuthException("The captcha cannot be empty.");
 		}
 
 		if ("session".equals(storeType)) {
 			// 获取session中存储的验证码
-			Object captchaCode = request.getSession(Boolean.FALSE).getAttribute(ConstAuthorization.CAPTCHA_ID_NAME);
+			Object captchaCode = request.getSession(Boolean.FALSE).getAttribute(ConstSecurity.CAPTCHA_ID_NAME);
 			if (captchaCode instanceof String) {
 				String sessionCode = (String) captchaCode;
 				if (!sessionCode.equalsIgnoreCase(code)) {
@@ -97,7 +97,7 @@ public class CaptchaTypeAuthenticationProvider extends DaoAuthenticationProvider
 				throw new AuthException("The captcha is abnormal. Obtain it again.");
 			}
 		} else {
-			String captchaId = request.getParameter(ConstAuthorization.CAPTCHA_ID_NAME);
+			String captchaId = request.getParameter(ConstSecurity.CAPTCHA_ID_NAME);
 			// 获取缓存中存储的验证码
 			String captchaCode =
 					redisStrHelpers.get(ConstAuthorizationServerRedis.IMAGE_CAPTCHA_PREFIX_KEY + captchaId);

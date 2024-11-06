@@ -38,9 +38,9 @@ import org.springframework.security.oauth2.server.authorization.token.OAuth2Toke
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
-import com.wy.common.ConstSecurity;
 import com.wy.util.SecurityHelpers;
 
+import dream.flying.flower.framework.security.constant.ConstSecurity;
 import lombok.extern.slf4j.Slf4j;
 
 /**
