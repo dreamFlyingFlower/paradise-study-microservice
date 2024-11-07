@@ -201,9 +201,9 @@ public class AuthorizationServerConfig {
 		OAuth2TokenGenerator<?> tokenGenerator = http.getSharedObject(OAuth2TokenGenerator.class);
 		AuthenticationManager authenticationManager = http.getSharedObject(AuthenticationManager.class);
 		OAuth2AuthorizationService authorizationService = http.getSharedObject(OAuth2AuthorizationService.class);
-		// 以上三个bean在build()方法之后调用是因为调用build方法时框架会尝试获取这些类,
-		// 如果获取不到则初始化一个实例放入SharedObject中,所以要在build方法调用之后获取
-		// 在通过set方法设置进provider中,但是如果在build方法之后调用authenticationProvider(provider)
+		// 以上三个bean在build()方法之后调用是因为调用build()时框架会尝试获取这些类,
+		// 如果获取不到则初始化一个实例放入SharedObject中,所以要在build()调用之后获取.
+		// 在通过set方法设置进provider中,但是如果在build()之后调用authenticationProvider(provider),
 		// 框架会提示unsupported_grant_type,因为已经初始化完了,在添加就不会生效了
 		provider.setTokenGenerator(tokenGenerator);
 		provider.setAuthorizationService(authorizationService);

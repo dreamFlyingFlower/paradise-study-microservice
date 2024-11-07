@@ -16,6 +16,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.security.jackson2.CoreJackson2Module;
 import org.springframework.security.jackson2.SecurityJackson2Modules;
 
@@ -30,17 +31,21 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import dream.flying.flower.ConstDate;
+import lombok.RequiredArgsConstructor;
 
 /**
- * Redis配置
+ * Redis序列化,不能直接使用Redis包中的RedisConfig,因为无法序列化SpringSecurity相关类
  * 
  * @author 飞花梦影
  * @date 2024-11-01 23:31:35
  * @git {@link https://github.com/dreamFlyingFlower}
  */
 @Configuration
+@RequiredArgsConstructor
 @ConditionalOnClass(RedisOperations.class)
 public class RedisConfig {
+
+	private final Jackson2ObjectMapperBuilder builder;
 
 	@Bean
 	@ConditionalOnMissingBean
@@ -58,7 +63,10 @@ public class RedisConfig {
 	}
 
 	private Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer() {
-		ObjectMapper objectMapper = new ObjectMapper();
+		// ObjectMapper objectMapper = new ObjectMapper();
+
+		// 创建ObjectMapper并添加默认配置
+		ObjectMapper objectMapper = builder.createXmlMapper(false).build();
 		// 序列化所有字段
 		objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
 		// 防止对象中还有对象,出现ClassCastException

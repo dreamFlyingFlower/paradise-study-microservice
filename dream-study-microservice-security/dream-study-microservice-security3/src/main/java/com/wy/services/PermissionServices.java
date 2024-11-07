@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import com.wy.common.AuthException;
-import com.wy.common.ConstSecurity;
 import com.wy.entity.PermissionVo;
 import com.wy.entity.Role;
 import com.wy.entity.User;
@@ -17,6 +16,7 @@ import com.wy.util.SecurityHelpers;
 
 import dream.flying.flower.collection.ListHelper;
 import dream.flying.flower.enums.TipEnum;
+import dream.flying.flower.framework.security.constant.ConstSecurity;
 import dream.flying.flower.lang.StrHelper;
 
 /**

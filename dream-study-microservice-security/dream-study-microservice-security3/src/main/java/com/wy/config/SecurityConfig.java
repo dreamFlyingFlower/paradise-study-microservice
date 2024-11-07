@@ -60,6 +60,7 @@ import com.wy.service.UserService;
 import com.wy.sms.SmsSecurityConfigurer;
 import com.wy.social.qq.QqSocialSecurityConfigurer;
 
+import dream.flying.flower.framework.security.handler.CustomizerAuthenticationFailureHandler;
 import jakarta.servlet.DispatcherType;
 import lombok.RequiredArgsConstructor;
 
@@ -93,7 +94,7 @@ public class SecurityConfig {
 
 	private final LoginSuccessHandler loginSuccessHandler;
 
-	private final LoginFailureHandler loginFailureHandler;
+	private final CustomizerAuthenticationFailureHandler customizerAuthenticationFailureHandler;
 
 	private final LogoutSuccessHandler logoutSuccessHandler;
 
@@ -278,7 +279,7 @@ public class SecurityConfig {
 						// 登录成功的自定义处理
 						.successHandler(loginSuccessHandler)
 						// 登录失败的自定义处理
-						.failureHandler(loginFailureHandler)
+						.failureHandler(customizerAuthenticationFailureHandler)
 						// 访问login页面不需要认证和鉴权
 						.permitAll());
 

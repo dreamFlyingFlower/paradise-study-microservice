@@ -17,7 +17,6 @@ import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
 import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.JdbcRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
@@ -61,7 +60,7 @@ public class AuthorizationClientConfig {
 	 * 
 	 * 获取授权码:http://localhost:17127/oauth2/authorize?response_type=code&client_id=oidc-client&scope=profile&redirect_uri=http://www.baidu.com
 	 * 
-	 * @param jdbcTemplate db 数据源信息
+	 * @param jdbcTemplate db数据源信息
 	 * @param passwordEncoder 密码解析器
 	 * @return 基于数据库的repository
 	 */
@@ -115,7 +114,7 @@ public class AuthorizationClientConfig {
 						// refresh_token是否可以重用:true->可重用,refresh_token不变,可一直使用
 						.reuseRefreshTokens(true)
 						// refresh_token有效时长
-						.refreshTokenTimeToLive(null)
+						.refreshTokenTimeToLive(Duration.ofDays(7))
 						// id_token的加密算法
 						.idTokenSignatureAlgorithm(SignatureAlgorithm.RS256)
 						// 设备码有效时长
@@ -123,10 +122,7 @@ public class AuthorizationClientConfig {
 						.build())
 				.build();
 
-		// 基于内存的InMemoryRegisteredClientRepository
-		new InMemoryRegisteredClientRepository(registeredClient);
-
-		// 基于db存储客户端
+		// 基于db存储客户端,基于内存的InMemoryRegisteredClientRepository(registeredClient);
 		JdbcRegisteredClientRepository registeredClientRepository = new JdbcRegisteredClientRepository(jdbcTemplate);
 
 		// 初始化客户端:如果没有该客户端信息,则存入客户端

@@ -67,6 +67,7 @@ import com.wy.security.LoginSuccessHandler;
 import com.wy.util.SecurityHelpers;
 
 import dream.flying.flower.framework.security.constant.ConstSecurity;
+import dream.flying.flower.framework.security.handler.CustomizerAuthenticationFailureHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
@@ -197,7 +198,7 @@ public class AuthorizationServerConfig {
 					if (UrlUtils.isAbsoluteUrl(LOGIN_URL)) {
 						// 绝对路径代表是前后端分离,登录成功和失败改为写回json,不重定向了
 						formLogin.successHandler(new LoginSuccessHandler());
-						formLogin.failureHandler(new LoginFailureHandler());
+						formLogin.failureHandler(new CustomizerAuthenticationFailureHandler());
 					}
 				});
 		// 添加BearerTokenAuthenticationFilter,将认证服务当做一个资源服务,解析请求头中的token

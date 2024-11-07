@@ -78,6 +78,7 @@ import com.wy.provider.device.DeviceClientAuthenticationProvider;
 
 import dream.flying.flower.autoconfigure.redis.helper.RedisStrHelpers;
 import dream.flying.flower.framework.security.constant.ConstSecurity;
+import dream.flying.flower.framework.security.entrypoint.DeviceLoginAuthenticationEntryPoint;
 import dream.flying.flower.framework.security.handler.CustomizerAuthenticationFailureHandler;
 import dream.flying.flower.framework.security.handler.CustomizerAuthenticationSuccessHandler;
 import lombok.RequiredArgsConstructor;
@@ -197,7 +198,7 @@ public class DeviceConfig {
 		http
 				// 当未登录时访问认证端点时重定向至login页面
 				.exceptionHandling((exceptions) -> exceptions.defaultAuthenticationEntryPointFor(
-						new LoginTargetAuthenticationEntryPoint(LOGIN_URL),
+						new DeviceLoginAuthenticationEntryPoint(LOGIN_URL),
 						new MediaTypeRequestMatcher(MediaType.TEXT_HTML)))
 				// 处理使用access token访问用户信息端点和客户端注册端点
 				.oauth2ResourceServer((resourceServer) -> resourceServer.jwt(Customizer.withDefaults()));
@@ -270,7 +271,7 @@ public class DeviceConfig {
 		http
 				// 当未登录时访问认证端点时重定向至login页面
 				.exceptionHandling((exceptions) -> exceptions.defaultAuthenticationEntryPointFor(
-						new LoginTargetAuthenticationEntryPoint(LOGIN_URL),
+						new DeviceLoginAuthenticationEntryPoint(LOGIN_URL),
 						new MediaTypeRequestMatcher(MediaType.TEXT_HTML)));
 		// 联合身份认证
 		http.oauth2Login(oauth2Login -> oauth2Login.loginPage(LOGIN_URL)
