@@ -61,6 +61,7 @@ public class QrCodeLoginServiceImpl implements IQrCodeLoginService {
 
 	private final CustomSecurityProperties customSecurityProperties;
 
+	// 利用redis保存OAuth2Authorization,类似于内存和数据库
 	// private final RedisOAuth2AuthorizationService oauth2AuthorizationService;
 	private final OAuth2AuthorizationService oauth2AuthorizationService;
 

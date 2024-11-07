@@ -46,6 +46,7 @@ import org.springframework.security.oauth2.server.authorization.InMemoryOAuth2Au
 import org.springframework.security.oauth2.server.authorization.InMemoryOAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationConsentService;
 import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationService;
+import org.springframework.security.oauth2.server.authorization.OAuth2Authorization;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationConsentService;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenIntrospection;
@@ -113,6 +114,7 @@ import org.springframework.web.accept.ContentNegotiationStrategy;
 import org.springframework.web.filter.CorsFilter;
 
 import com.nimbusds.jose.jwk.source.JWKSource;
+import com.wy.repository.RedisOAuth2AuthorizationService;
 
 /**
  * SpringSecurity6认证服务器,抛弃了EnableAuthorizationServer等相关注解,直接使用拦截器SecurityFilterChain
@@ -281,9 +283,10 @@ import com.nimbusds.jose.jwk.source.JWKSource;
  * 
  * {@link BearerTokenAuthenticationFilter}:Bearer Token拦截器
  * 
- * {@link OAuth2AuthorizationService}:OAuth2认证服务接口,自定义操作需实现该接口
- * {@link JdbcOAuth2AuthorizationService}:基于数据库的OAuth2认证服务
- * {@link InMemoryOAuth2AuthorizationService}:基于内存的OAuth2认证服务
+ * {@link OAuth2AuthorizationService}:OAuth2认证服务接口,自定义操作需实现该接口,保存{@link OAuth2Authorization}
+ * {@link JdbcOAuth2AuthorizationService}:基于数据库的OAuth2认证服务,保存{@link OAuth2Authorization}
+ * {@link InMemoryOAuth2AuthorizationService}:基于内存的OAuth2认证服务,保存{@link OAuth2Authorization}
+ * {@link RedisOAuth2AuthorizationService}:基于Redis的OAuth2认证服务,保存{@link OAuth2Authorization}
  * 
  * {@link OAuth2AuthorizationConsentService}:授权确认管理服务,自定义操作需实现该接口
  * {@link JdbcOAuth2AuthorizationConsentService}:基于数据库的授权确认管理服务
