@@ -225,7 +225,7 @@ import com.wy.repository.RedisOAuth2AuthorizationService;
  * {@link ClientRegistrationRepository}:ClientRegistration的存储仓库
  * {@link OAuth2AuthorizedClient}:已授权过的客户端
  * {@link OAuth2AuthorizedClientRepository}:已授权过的客户端存储库持久化
- * {@link OAuth2AuthorizationRequestRedirectFilter}:该过滤器处理 /oauth2/authorization 路径,转发给 认证中心 对应的路径 /oauth2/authorize
+ * {@link OAuth2AuthorizationRequestRedirectFilter}:该过滤器处理/oauth2/authorization 路径,转发给认证中心对应的路径/oauth2/authorize
  * {@link OAuth2AuthorizationCodeGrantFilter}:负责处理 认证中心 的授权码回调请求,如地址重定向
  * {@link OAuth2LoginAuthenticationFilter}:处理第三方认证的回调(该回调有授权码),拿着授权码到第三方认证服务器获取access_token和refresh_token
  * {@link RegisteredClientRepository}:认证的客户端数据操作,自定义操作需实现该接口
@@ -478,10 +478,10 @@ import com.wy.repository.RedisOAuth2AuthorizationService;
  * 
  * 6.授权服务器客户端回调(redirect_uri)地址,并带上授权码(code)
  * 
- * 7.获取token:POST(oauth2/token):http://localhost:17127/oauth2/token?grant_type=authorization_code&code=
+ * 7.获取token:POST(oauth2/token):http://localhost:8888/oauth2/token?grant_type=authorization_code&code=
  * 请求头:
  * 		Authorization:Basic Base64编码的({client_id}:{client_secret})
- * 		Content-Type:application/x-www-form-urlencoded
+ * 		Content-Type:form-data
  * 请求参数:
  * 		grant_type:授权模式,固定为authorization_code
  * 		code:上一步中获得的授权码

@@ -28,8 +28,8 @@ import com.wy.properties.OAuthServerSecurityProperties;
 import com.wy.provider.captcha.CaptchaAuthenticationFilter;
 
 import dream.flying.flower.framework.security.entrypoint.LoginRedirectAuthenticationEntryPoint;
-import dream.flying.flower.framework.security.handler.CustomizerAuthenticationFailureHandler;
-import dream.flying.flower.framework.security.handler.CustomizerAuthenticationSuccessHandler;
+import dream.flying.flower.framework.security.handler.LoginFailureHandler;
+import dream.flying.flower.framework.security.handler.LoginSuccessHandler;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -53,8 +53,6 @@ public class SecurityConfig {
 	private final RedisSecurityContextRepository redisSecurityContextRepository;
 
 	private final OAuthServerSecurityProperties oauthServerSecurityProperties;
-
-	private final CustomizerAuthenticationSuccessHandler loginSuccessHandler;
 
 	/**
 	 * 配置密码解析器,注意重复注入
@@ -107,11 +105,17 @@ public class SecurityConfig {
 				.authenticated())
 				// 指定登录页面
 				.formLogin(formLogin -> {
-					formLogin.loginPage("/login");
+					formLogin
+							// 登录页页面
+							.loginPage("/login")
+							// 登录API
+							.loginProcessingUrl("/login")
+							// 登录成功转发地址,如果使用了自定义登录方式,需要处理刷新时的认证流程
+							.successForwardUrl(LOGIN_URL);
 					if (UrlUtils.isAbsoluteUrl(LOGIN_URL)) {
 						// 绝对路径代表是前后端分离,登录成功和失败改为写回json,不重定向了
-						formLogin.successHandler(loginSuccessHandler);
-						formLogin.failureHandler(new CustomizerAuthenticationFailureHandler());
+						formLogin.successHandler(new LoginSuccessHandler());
+						formLogin.failureHandler(new LoginFailureHandler());
 					}
 				});
 

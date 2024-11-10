@@ -78,9 +78,9 @@ import com.wy.provider.device.DeviceClientAuthenticationProvider;
 
 import dream.flying.flower.autoconfigure.redis.helper.RedisStrHelpers;
 import dream.flying.flower.framework.security.constant.ConstSecurity;
-import dream.flying.flower.framework.security.entrypoint.DeviceLoginAuthenticationEntryPoint;
-import dream.flying.flower.framework.security.handler.CustomizerAuthenticationFailureHandler;
-import dream.flying.flower.framework.security.handler.CustomizerAuthenticationSuccessHandler;
+import dream.flying.flower.framework.security.entrypoint.UnauthorizedAuthenticationEntryPoint;
+import dream.flying.flower.framework.security.handler.LoginSuccessHandler;
+import dream.flying.flower.framework.security.handler.LoginFailureHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
@@ -161,8 +161,8 @@ public class DeviceConfig {
 					// 校验授权确认页面是否为完整路径；是否是前后端分离的页面
 					boolean absoluteUrl = UrlUtils.isAbsoluteUrl(ConstSecurity.CONSENT_PAGE_URI);
 					// 如果是分离页面则重定向,否则转发请求
-					authorizationEndpoint.consentPage(
-							absoluteUrl ? CUSTOM_CONSENT_REDIRECT_URI : ConstSecurity.CONSENT_PAGE_URI);
+					authorizationEndpoint
+							.consentPage(absoluteUrl ? CUSTOM_CONSENT_REDIRECT_URI : ConstSecurity.CONSENT_PAGE_URI);
 					if (absoluteUrl) {
 						// 适配前后端分离的授权确认页面,成功/失败响应json
 						authorizationEndpoint.errorResponseHandler(new ConsentAuthenticationFailureHandler());
@@ -178,8 +178,8 @@ public class DeviceConfig {
 					// 校验授权确认页面是否为完整路径；是否是前后端分离的页面
 					boolean absoluteUrl = UrlUtils.isAbsoluteUrl(ConstSecurity.CONSENT_PAGE_URI);
 					// 如果是分离页面则重定向,否则转发请求
-					deviceVerificationEndpoint.consentPage(
-							absoluteUrl ? CUSTOM_CONSENT_REDIRECT_URI : ConstSecurity.CONSENT_PAGE_URI);
+					deviceVerificationEndpoint
+							.consentPage(absoluteUrl ? CUSTOM_CONSENT_REDIRECT_URI : ConstSecurity.CONSENT_PAGE_URI);
 					if (absoluteUrl) {
 						// 适配前后端分离的授权确认页面,失败响应json
 						deviceVerificationEndpoint.errorResponseHandler(new ConsentAuthenticationFailureHandler());
@@ -198,7 +198,7 @@ public class DeviceConfig {
 		http
 				// 当未登录时访问认证端点时重定向至login页面
 				.exceptionHandling((exceptions) -> exceptions.defaultAuthenticationEntryPointFor(
-						new DeviceLoginAuthenticationEntryPoint(LOGIN_URL),
+						new UnauthorizedAuthenticationEntryPoint(LOGIN_URL),
 						new MediaTypeRequestMatcher(MediaType.TEXT_HTML)))
 				// 处理使用access token访问用户信息端点和客户端注册端点
 				.oauth2ResourceServer((resourceServer) -> resourceServer.jwt(Customizer.withDefaults()));
@@ -259,8 +259,8 @@ public class DeviceConfig {
 					formLogin.loginPage("/login");
 					if (UrlUtils.isAbsoluteUrl(LOGIN_URL)) {
 						// 绝对路径代表是前后端分离,登录成功和失败改为写回json,不重定向了
-						formLogin.successHandler(new CustomizerAuthenticationSuccessHandler());
-						formLogin.failureHandler(new CustomizerAuthenticationFailureHandler());
+						formLogin.successHandler(new LoginSuccessHandler());
+						formLogin.failureHandler(new LoginFailureHandler());
 					}
 				});
 		// 添加BearerTokenAuthenticationFilter,将认证服务当做一个资源服务,解析请求头中的token
@@ -271,7 +271,7 @@ public class DeviceConfig {
 		http
 				// 当未登录时访问认证端点时重定向至login页面
 				.exceptionHandling((exceptions) -> exceptions.defaultAuthenticationEntryPointFor(
-						new DeviceLoginAuthenticationEntryPoint(LOGIN_URL),
+						new UnauthorizedAuthenticationEntryPoint(LOGIN_URL),
 						new MediaTypeRequestMatcher(MediaType.TEXT_HTML)));
 		// 联合身份认证
 		http.oauth2Login(oauth2Login -> oauth2Login.loginPage(LOGIN_URL)

@@ -60,8 +60,8 @@ import com.wy.service.UserService;
 import dream.flying.flower.framework.core.json.JsonHelpers;
 import dream.flying.flower.framework.security.constant.ConstSecurity;
 import dream.flying.flower.framework.security.entrypoint.LoginRedirectAuthenticationEntryPoint;
-import dream.flying.flower.framework.security.handler.CustomizerAuthenticationFailureHandler;
-import dream.flying.flower.framework.security.handler.CustomizerAuthenticationSuccessHandler;
+import dream.flying.flower.framework.security.handler.LoginSuccessHandler;
+import dream.flying.flower.framework.security.handler.LoginFailureHandler;
 import jakarta.annotation.security.DenyAll;
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
@@ -146,16 +146,16 @@ public class AuthorizationServerConfig {
 				.oidc((oidc) -> {
 					oidc.userInfoEndpoint((userInfo) -> {
 						userInfo.userInfoMapper(userInfoMapper);
-						userInfo.userInfoResponseHandler(new CustomizerAuthenticationSuccessHandler());
+						userInfo.userInfoResponseHandler(new LoginSuccessHandler());
 					});
 				})
 				.authorizationEndpoint(authorizationEndpoint -> authorizationEndpoint
 						// 设置自定义用户确认授权页
 						.consentPage(CUSTOM_CONSENT_PAGE_URI))
 				// 设置客户端授权中失败的handler处理
-				.clientAuthentication(auth -> auth.errorResponseHandler(new CustomizerAuthenticationFailureHandler()))
+				.clientAuthentication(auth -> auth.errorResponseHandler(new LoginFailureHandler()))
 				// token 相关配置,如/oauth2/token接口
-				.tokenEndpoint(token -> token.errorResponseHandler(new CustomizerAuthenticationFailureHandler()))
+				.tokenEndpoint(token -> token.errorResponseHandler(new LoginFailureHandler()))
 
 				// 设置设备码用户验证url(自定义用户验证页)
 				.deviceAuthorizationEndpoint(

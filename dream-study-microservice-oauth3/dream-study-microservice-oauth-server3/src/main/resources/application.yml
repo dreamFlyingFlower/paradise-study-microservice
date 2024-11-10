@@ -1,7 +1,5 @@
 server:
-  port: 55100
-  servlet:
-    context-path: /oauthServer
+  port: 8888
     
 spring:
   devtools:
