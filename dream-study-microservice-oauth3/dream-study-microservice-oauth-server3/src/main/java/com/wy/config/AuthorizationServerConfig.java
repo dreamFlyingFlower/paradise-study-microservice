@@ -53,15 +53,14 @@ import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
 import com.wy.context.RedisSecurityContextRepository;
 import com.wy.grant.SmsAuthenticationConverter;
 import com.wy.grant.SmsAuthenticationProvider;
+import com.wy.oidc.CustomizerIdTokenCustomizer;
 import com.wy.provider.device.DeviceClientAuthenticationConverter;
 import com.wy.provider.device.DeviceClientAuthenticationProvider;
-import com.wy.service.UserService;
 
-import dream.flying.flower.framework.core.json.JsonHelpers;
 import dream.flying.flower.framework.security.constant.ConstSecurity;
 import dream.flying.flower.framework.security.entrypoint.LoginRedirectAuthenticationEntryPoint;
-import dream.flying.flower.framework.security.handler.LoginSuccessHandler;
 import dream.flying.flower.framework.security.handler.LoginFailureHandler;
+import dream.flying.flower.framework.security.handler.LoginSuccessHandler;
 import jakarta.annotation.security.DenyAll;
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
@@ -82,7 +81,7 @@ import lombok.SneakyThrows;
  * @date 2024-09-18 22:02:11
  * @git {@link https://github.com/dreamFlyingFlower}
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @EnableWebSecurity
 @RequiredArgsConstructor
 @EnableMethodSecurity(jsr250Enabled = true, securedEnabled = true)
@@ -97,11 +96,7 @@ public class AuthorizationServerConfig {
 
 	private final RedisSecurityContextRepository redisSecurityContextRepository;
 
-	private final UserService userService;
-
-	private final DeviceClientAuthenticationConverter deviceClientAuthenticationConverter;
-
-	private final DeviceClientAuthenticationProvider deviceClientAuthenticationProvider;
+	// private final UserService userService;
 
 	/**
 	 * 配置认证相关的端点过滤器链,用于处理与协议端点相关的请求和响应
@@ -122,11 +117,10 @@ public class AuthorizationServerConfig {
 		OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
 
 		// 新建设备码converter和provider
-		// DeviceClientAuthenticationConverter deviceClientAuthenticationConverter =
-		// new
-		// DeviceClientAuthenticationConverter(authorizationServerSettings.getDeviceAuthorizationEndpoint());
-		// DeviceClientAuthenticationProvider deviceClientAuthenticationProvider =
-		// new DeviceClientAuthenticationProvider(registeredClientRepository);
+		DeviceClientAuthenticationConverter deviceClientAuthenticationConverter =
+				new DeviceClientAuthenticationConverter(authorizationServerSettings.getDeviceAuthorizationEndpoint());
+		DeviceClientAuthenticationProvider deviceClientAuthenticationProvider =
+				new DeviceClientAuthenticationProvider(registeredClientRepository);
 
 		// 使用redis存储、读取登录的认证信息
 		http.securityContext(context -> context.securityContextRepository(redisSecurityContextRepository));
@@ -135,7 +129,11 @@ public class AuthorizationServerConfig {
 		Function<OidcUserInfoAuthenticationContext, OidcUserInfo> userInfoMapper = (context) -> {
 			OidcUserInfoAuthenticationToken authentication = context.getAuthentication();
 			JwtAuthenticationToken principal = (JwtAuthenticationToken) authentication.getPrincipal();
-			return new OidcUserInfo(JsonHelpers.parseMap(userService.loadUserByUsername(principal.getName())));
+			// 从数据库重新取值
+			// return new
+			// OidcUserInfo(JsonHelpers.parseMap(userService.loadUserByUsername(principal.getName())));
+			// 直接从已登录的授权信息中获得信息
+			return new OidcUserInfo(principal.getToken().getClaims());
 		};
 
 		// 获得第一步应用的OAuth2AuthorizationServerConfigurer
@@ -180,7 +178,7 @@ public class AuthorizationServerConfig {
 
 		// 使用JWT处理令牌用于用户信息和/或客户端注册,同时将认证服务器做为一个资源服务器
 		http.oauth2ResourceServer(resourceServer -> resourceServer.jwt(Customizer.withDefaults()));
-		
+
 		// 添加自定义短信认证登录转换器
 		SmsAuthenticationConverter converter = new SmsAuthenticationConverter();
 		// 添加自定义短信认证登录认证提供

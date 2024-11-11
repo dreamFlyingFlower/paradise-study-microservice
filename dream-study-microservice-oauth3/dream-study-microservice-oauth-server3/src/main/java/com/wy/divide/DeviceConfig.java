@@ -67,12 +67,12 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
-import com.wy.config.CustomizerIdTokenCustomizer;
 import com.wy.constant.ConstAuthorizationServerRedis;
 import com.wy.context.RedisSecurityContextRepository;
 import com.wy.grant.SmsAuthenticationConverter;
 import com.wy.grant.SmsAuthenticationProvider;
 import com.wy.helpers.SecurityContextOAuth2Helpers;
+import com.wy.oidc.CustomizerIdTokenCustomizer;
 import com.wy.provider.device.DeviceClientAuthenticationConverter;
 import com.wy.provider.device.DeviceClientAuthenticationProvider;
 
