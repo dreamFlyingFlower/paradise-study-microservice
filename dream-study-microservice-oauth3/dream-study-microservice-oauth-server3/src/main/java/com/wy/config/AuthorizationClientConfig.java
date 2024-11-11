@@ -68,7 +68,7 @@ public class AuthorizationClientConfig {
 	RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbcTemplate, PasswordEncoder passwordEncoder) {
 		RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
 				// 客户端id
-				.clientId("test-client")
+				.clientId("messaging-client")
 				// 客户端秘钥,使用密码解析器加密
 				.clientSecret(passwordEncoder.encode("123456"))
 				// {noop}开头,表示密码以明文存储
@@ -86,7 +86,7 @@ public class AuthorizationClientConfig {
 				// 授权码模式回调地址,oauth2.1已改为精准匹配,不能只设置域名,并且屏蔽了localhost,本机使用127.0.0.1访问
 				.redirectUri("http://127.0.0.1:8080/login/oauth2/code/messaging-client-oidc")
 				.redirectUri("https://www.baidu.com")
-				// 该客户端的授权范围,OPENID与PROFILE是IdToken的scope,获取授权时请求OPENID的scope时认证服务会返回IdToken
+				// 该客户端的授权范围,OPENID与PROFILE是IdToken的scope,获取授权时请求OPENID的scope时认证服务会返回id_token
 				.scope(OidcScopes.OPENID)
 				.scope(OidcScopes.PROFILE)
 				// 自定scope,客户端如果带了scope必须带上SCOPE_前缀,可以去掉,见AuthorizationServerConfig#jwtAuthenticationConverter()

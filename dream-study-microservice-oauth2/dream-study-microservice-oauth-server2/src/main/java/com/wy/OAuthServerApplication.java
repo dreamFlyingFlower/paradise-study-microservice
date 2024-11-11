@@ -110,9 +110,13 @@ import org.springframework.web.accept.ContentNegotiationStrategy;
 import org.springframework.web.filter.CorsFilter;
 
 import com.nimbusds.jose.jwk.source.JWKSource;
+import com.wy.config.AuthorizationClientConfig;
+import com.wy.config.AuthorizationServerConfig;
 
 /**
  * SpringSecurity认证服务器,5.7以上版本已经抛弃了EnableAuthorizationServer等相关注解,直接使用拦截器SecurityFilterChain
+ * 
+ * 文档:https://www.spring-doc.cn/spring-authorization-server/1.3.1/protocol-endpoints.html
  * 
  * 自定义授权模式:https://docs.spring.io/spring-authorization-server/reference/guides/how-to-ext-grant-type.html
  * 
@@ -433,7 +437,7 @@ import com.nimbusds.jose.jwk.source.JWKSource;
  * 请求参数:
  * 		client_id:客户端ID
  * 		response_type:授权码模式固定为code
- * 		scope:授权的scope编码,多个用空格隔开
+ * 		scope:授权的scope编码,多个用空格隔开.虽然scope不传或为空仍可以继续调用,但是后续需要授权的地方无法通过,所以此处必传
  * 		redirect_uri:客户端获取授权码的回调URI.draft-ietf-oauth-v2-1-01地址中本机不能是localhost,可使用127.0.0.1,且和客户端中的redirect_uri一致
  * 
  * 2.未登录则重定向用户登录页面:POST(/login):http://localhost:17127/login,可自定义
@@ -482,10 +486,11 @@ import com.nimbusds.jose.jwk.source.JWKSource;
  * 		redirect_uri:与第一步请求授权时携带的redirect_uri一致,并且是严格匹配模式,客户端配置中不能只配置一个域名
  * 请求响应:
  * 		access_token:访问token,格式为uuid
+ * 		refresh_token:刷新token,用来请求下一次的access_token
  * 		scope:申请并获得授权的scope
+ * 		id_token:如果认证服务器开启了OIDC,且当前scope中有openid权限,才会返回该参数
  * 		token_type:token的类型,固定值Bearer
  * 		expires_in:访问token有效期,单位为秒
- * 		refresh_token:刷新token,用来请求下一次的access_token
  * 
  * 主要流程:
  * {@link OAuth2ClientAuthenticationFilter#doFilterInternal()}:判断是否已认证,对传入的client_id和client_secret进行判断.
@@ -513,11 +518,12 @@ import com.nimbusds.jose.jwk.source.JWKSource;
  * 		grant_type:授权模式,固定为refresh_token
  * 		refresh_token:上一步中获得的授权码
  * 请求响应:
- * 		access_token:访问token,格式为uuid
+ * 		access_token:访问token,格式类似uuid
+ * 		refresh_token:刷新token,用来请求下一次的access_token
  * 		scope:申请并获得授权的 scope
+ * 		id_token:如果认证服务器开启了OIDC,且当前scope中有openid权限,才会返回该参数
  * 		token_type:token的类型,固定值Bearer
  * 		expires_in:访问token有效期,单位为秒
- * 		refresh_token:刷新token,用来请求下一次的access_token
  * 
  * {@link OAuth2ClientAuthenticationFilter#doFilterInternal()}:同获取token
  * {@link ClientSecretAuthenticationProvider#authenticate()}:同获取token
@@ -650,6 +656,14 @@ import com.nimbusds.jose.jwk.source.JWKSource;
  * 		redirect_uri:获取授权的回调地址
  * 		code:授权码
  * 		code_verifier:和code_challenge一对的code
+ * </pre>
+ * 
+ * 调用OIDC的/userinfo接口:
+ * 
+ * <pre>
+ * 1.认证服务必须开启OIDC功能,{@link AuthorizationServerConfig#authorizationServerSecurityFilterChain}
+ * 2.客户端被授权的scope中必须有openid权限,{@link AuthorizationClientConfig#registeredClientRepository}中客户端messaging-client的配置
+ * 3.客户端调用/oauth2/authorize进行认证时,scope必须带上openid
  * </pre>
  * 
  * @author 飞花梦影

@@ -114,10 +114,14 @@ import org.springframework.web.accept.ContentNegotiationStrategy;
 import org.springframework.web.filter.CorsFilter;
 
 import com.nimbusds.jose.jwk.source.JWKSource;
+import com.wy.config.AuthorizationClientConfig;
+import com.wy.config.AuthorizationServerConfig;
 import com.wy.repository.RedisOAuth2AuthorizationService;
 
 /**
  * SpringSecurity6认证服务器,抛弃了EnableAuthorizationServer等相关注解,直接使用拦截器SecurityFilterChain
+ * 
+ * 文档:https://www.spring-doc.cn/spring-authorization-server/1.3.1/protocol-endpoints.html
  * 
  * 自定义授权模式:https://docs.spring.io/spring-authorization-server/reference/guides/how-to-ext-grant-type.html
  * 
@@ -153,13 +157,13 @@ import com.wy.repository.RedisOAuth2AuthorizationService;
  * <code>
  * {
 		// 认证服务器地址
-	    "issuer": "http://127.0.0.1:17127",
+	    "issuer": "http://127.0.0.1:8888",
 	    // 认证地址
-	    "authorization_endpoint": "http://127.0.0.1:17127/oauth2/authorize",
+	    "authorization_endpoint": "http://127.0.0.1:8888/oauth2/authorize",
 	    // 设备认证地址
-	    "device_authorization_endpoint": "http://127.0.0.1:17127/oauth2/device_authorization",
+	    "device_authorization_endpoint": "http://127.0.0.1:8888/oauth2/device_authorization",
 	    // Token获取地址
-	    "token_endpoint": "http://127.0.0.1:17127/oauth2/token",
+	    "token_endpoint": "http://127.0.0.1:8888/oauth2/token",
 	    // 支持的客户端获取Token请求方式
 	    "token_endpoint_auth_methods_supported": [
 	        "client_secret_basic",
@@ -168,11 +172,11 @@ import com.wy.repository.RedisOAuth2AuthorizationService;
 	        "private_key_jwt"
 	    ],
 	    // JWKS地址
-	    "jwks_uri": "http://127.0.0.1:17127/oauth2/jwks",
+	    "jwks_uri": "http://127.0.0.1:8888/oauth2/jwks",
 	    // 用户信息地址
-	    "userinfo_endpoint": "http://127.0.0.1:17127/userinfo",
+	    "userinfo_endpoint": "http://127.0.0.1:8888/userinfo",
 	    // 登出地址
-	    "end_session_endpoint": "http://127.0.0.1:17127/connect/logout",
+	    "end_session_endpoint": "http://127.0.0.1:8888/connect/logout",
 	    // 支持的授权类型
 	    "response_types_supported": [
 	        "code"
@@ -185,7 +189,7 @@ import com.wy.repository.RedisOAuth2AuthorizationService;
 	        "urn:ietf:params:oauth:grant-type:device_code"
 	    ],
 	    // 移除Token地址
-	    "revocation_endpoint": "http://127.0.0.1:17127/oauth2/revoke",
+	    "revocation_endpoint": "http://127.0.0.1:8888/oauth2/revoke",
 	    // 支持移除Token的客户端请求方式
 	    "revocation_endpoint_auth_methods_supported": [
 	        "client_secret_basic",
@@ -194,7 +198,7 @@ import com.wy.repository.RedisOAuth2AuthorizationService;
 	        "private_key_jwt"
 	    ],
 	    // 客户端调用资源服务器,资源服务器调用认证服务器校验Token的接口
-	    "introspection_endpoint": "http://127.0.0.1:17127/oauth2/introspect",
+	    "introspection_endpoint": "http://127.0.0.1:8888/oauth2/introspect",
 	    // 支持的客户端请求方式
 	    "introspection_endpoint_auth_methods_supported": [
 	        "client_secret_basic",
@@ -433,16 +437,16 @@ import com.wy.repository.RedisOAuth2AuthorizationService;
  * 授权码模式
  * 
  * <pre>
- * 1.客户端授权:GET/POST(oauth2/authorize):http://localhost:17127/oauth2/authorize?response_type=code&client_id=guest&scope=guest&redirect_url=http://www.baidu.com
+ * 1.客户端认证:GET/POST(/oauth2/authorize):http://ip:port/oauth2/authorize?response_type=code&client_id=messaging-client&scope=message.read&redirect_url=http://www.baidu.com
  * 请求头:
  * 		Content-Type:application/x-www-form-urlencoded
  * 请求参数:
  * 		client_id:客户端ID
  * 		response_type:授权码模式固定为code
- * 		scope:授权的scope编码,多个用空格隔开
+ * 		scope:授权的scope编码,多个用空格隔开.虽然scope不传或为空仍可以继续调用,但是后续需要授权的地方无法通过,所以此处必传
  * 		redirect_uri:客户端获取授权码的回调URI.draft-ietf-oauth-v2-1-01地址中本机不能是localhost,可使用127.0.0.1,且和客户端中的redirect_uri一致
  * 
- * 2.未登录则重定向用户登录页面:POST(/login):http://localhost:17127/login,可自定义
+ * 2.未登录则重定向用户登录页面:POST(/login):http://ip:port/login,可自定义
  * 请求头:
  * 		Content-Type:application/x-www-form-urlencoded
  * 请求参数:
@@ -457,7 +461,7 @@ import com.wy.repository.RedisOAuth2AuthorizationService;
  * 对于第三方的客户端,最好都要求开启授权页面的展示.如果是受信任的第一方客户端,则可以自行决定是否展示
  * 如果客户端配置表中的require_user_consent=1,用户登录成功后的下一步,前端应当展现授权页面
  * 
- * 3.用户授权:GET(oauth2/authorize):http://localhost:17127/oauth2/authorize
+ * 3.用户授权:GET(/oauth2/authorize):http://ip:port/oauth2/authorize
  * 请求参数:
  * 		client_id:客户端ID
  * 		response_type:授权码凭证许可固定值为code
@@ -466,9 +470,9 @@ import com.wy.repository.RedisOAuth2AuthorizationService;
  * 		如果需要用户授权,会转发到用户授权页面,同时调用用户授权数据API获取授权信息
  *		http://ip:port/oauth2/consent?client_id={{client}}&scope={{scope}}&state={{consentState}}
  *
- *	4.请求用户授权数据:GET(oauth2/consent):http://ip:port/oauth2/consent?client_id={{client}}&scope={{scope}}&state={{consentState}}
+ *	4.重定向至授权页面:GET(oauth2/consent):http://ip:port/oauth2/consent?client_id={{client}}&scope={{scope}}&state={{consentState}}
  *
- * 5.用户确认授权:POST(oauth2/authorize):http://localhost:17127/oauth2/authorize
+ * 5.用户确认授权:POST(oauth2/authorize):http://ip:port/oauth2/authorize
  * 请求头:
  * 		Content-Type:application/x-www-form-urlencoded
  * 请求参数:
@@ -476,9 +480,9 @@ import com.wy.repository.RedisOAuth2AuthorizationService;
  * 		state:授权页面响应的json中的state值
  * 		scope:授权的scope编码,分配多个则参数名有多个同名的scope键.不再是用空格分割,而是会在form表单中用相同的键(键值就是scope)来填写多个不同的scope
  * 
- * 6.授权服务器客户端回调(redirect_uri)地址,并带上授权码(code)
+ * 6.授权服务器客户端回调(redirect_uri)地址,并带上授权码(code).注意:调用回调地址之前会检查oauth2_authorization_consent表中的登录用户是否有scope中的权限,若么有,抛异常
  * 
- * 7.获取token:POST(oauth2/token):http://localhost:8888/oauth2/token?grant_type=authorization_code&code=
+ * 7.获取token:POST(oauth2/token):http://ip:port/oauth2/token?grant_type=authorization_code&code=
  * 请求头:
  * 		Authorization:Basic Base64编码的({client_id}:{client_secret})
  * 		Content-Type:form-data
@@ -488,10 +492,11 @@ import com.wy.repository.RedisOAuth2AuthorizationService;
  * 		redirect_uri:与第一步请求授权时携带的redirect_uri一致,并且是严格匹配模式,客户端配置中不能只配置一个域名
  * 请求响应:
  * 		access_token:访问token,格式为uuid
+ * 		refresh_token:刷新token,用来请求下一次的access_token
  * 		scope:申请并获得授权的scope
+ * 		id_token:如果认证服务器开启了OIDC,且当前scope中有openid权限,才会返回该参数
  * 		token_type:token的类型,固定值Bearer
  * 		expires_in:访问token有效期,单位为秒
- * 		refresh_token:刷新token,用来请求下一次的access_token
  * 
  * 主要流程:
  * {@link OAuth2ClientAuthenticationFilter#doFilterInternal()}:判断是否已认证,对传入的client_id和client_secret进行判断.
@@ -511,19 +516,20 @@ import com.wy.repository.RedisOAuth2AuthorizationService;
  * 		结合OAuth2AccessToken和jwtAccessToken构建OAuth2Authorization(包含客户端信息,token 信息,GrantType,authorizedScopes信息,token中的所有 Claims 信息的集合)
  * {@link OAuth2AuthorizationCodeAuthenticationProvider}:返回新的OAuth2AccessTokenAuthenticationToken对象到OAuth2TokenEndpointFilter,
  * 
- *	8.刷新token:POST(oauth2/token):http://localhost:17127/oauth2/token?grant_type=refresh_token&refresh_token=
+ *	8.刷新token:POST(oauth2/token):http://ip:port/oauth2/token?grant_type=refresh_token&refresh_token=
  * 请求头:
  * 		Authorization:Basic Base64编码的({client_id}:{client_secret})
- * 		Content-Type:application/x-www-form-urlencoded
+ * 		Content-Type:form-data
  * 请求参数:
  * 		grant_type:授权模式,固定为refresh_token
  * 		refresh_token:上一步中获得的授权码
  * 请求响应:
  * 		access_token:访问token,格式为uuid
+ * 		refresh_token:刷新token,用来请求下一次的access_token
  * 		scope:申请并获得授权的 scope
+ * 		id_token:如果认证服务器开启了OIDC,且当前scope中有openid权限,才会返回该参数
  * 		token_type:token的类型,固定值Bearer
  * 		expires_in:访问token有效期,单位为秒
- * 		refresh_token:刷新token,用来请求下一次的access_token
  * 
  * {@link OAuth2ClientAuthenticationFilter#doFilterInternal()}:同获取token
  * {@link ClientSecretAuthenticationProvider#authenticate()}:同获取token
@@ -537,7 +543,7 @@ import com.wy.repository.RedisOAuth2AuthorizationService;
  * 客户端模式
  * 
  * <pre>
- * 客户端授权:POST(/oauth2/token):http://localhost:17127/oauth2/token?grant_type=client_credentials&scope=test1
+ * 客户端授权:POST(/oauth2/token):http://ip:port/oauth2/token?grant_type=client_credentials&scope=test1
  * 请求头:
  * 		Authorization:Basic Base64编码的({client_id}:{client_secret})
  * 		Content-Type:application/x-www-form-urlencoded
@@ -589,7 +595,7 @@ import com.wy.repository.RedisOAuth2AuthorizationService;
  * Token校验过程:若是单体服务,则客户端调用认证服务器后自行校验;若是微服务,则是从客户端到资源服务器,再调用认证服务器的/oauth2/introspect
  * 
  * <pre>
- * POST(/oauth2/introspect):http://localhost:17127/oauth2/introspect?token=
+ * POST(/oauth2/introspect):http://ip:port/oauth2/introspect?token=
  * 请求头:
  * 		Authorization:Basic Base64编码的({client_id}:{client_secret})
  * 		Content-Type:application/x-www-form-urlencoded
@@ -616,7 +622,7 @@ import com.wy.repository.RedisOAuth2AuthorizationService;
  * Token注销过程:
  * 
  * <pre>
- * POST(/oauth2/revoke):http://localhost:17127/oauth2/revoke?token=
+ * POST(/oauth2/revoke):http://ip:port/oauth2/revoke?token=
  * 请求头:
  * 		Authorization:Basic Base64编码的({client_id}:{client_secret})
  * 		Content-Type:application/x-www-form-urlencoded
@@ -656,6 +662,14 @@ import com.wy.repository.RedisOAuth2AuthorizationService;
  * 		redirect_uri:获取授权的回调地址
  * 		code:授权码
  * 		code_verifier:和code_challenge一对的code
+ * </pre>
+ * 
+ * 调用OIDC的/userinfo接口:
+ * 
+ * <pre>
+ * 1.认证服务必须开启OIDC功能,{@link AuthorizationServerConfig#authorizationServerSecurityFilterChain}
+ * 2.客户端被授权的scope中必须有openid权限,{@link AuthorizationClientConfig#registeredClientRepository}中客户端messaging-client的配置
+ * 3.客户端调用/oauth2/authorize进行认证时,scope必须带上openid
  * </pre>
  * 
  * @author 飞花梦影

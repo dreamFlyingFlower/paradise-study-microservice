@@ -68,7 +68,7 @@ public class AuthorizationClientConfig {
 	RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbcTemplate, PasswordEncoder passwordEncoder) {
 		RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
 				// 客户端id
-				.clientId("test-client")
+				.clientId("messaging-client")
 				// 客户端秘钥,使用密码解析器加密
 				.clientSecret(passwordEncoder.encode("123456"))
 				// {noop}开头,表示密码以明文存储

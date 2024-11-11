@@ -23,13 +23,13 @@ import org.springframework.security.oauth2.server.authorization.token.OAuth2Toke
 import dream.flying.flower.framework.security.constant.ConstSecurity;
 
 /**
- * 编写联合身份认证自定义token处理,当使用openId Connect登录时将用户信息写入idToken中
+ * 自定义JWT,将权限信息放至JWT中.联合身份认证自定义token处理,当使用openId Connect登录时将用户信息写入id_token中
  *
  * @author 飞花梦影
  * @date 2024-11-04 15:15:44
  * @git {@link https://github.com/dreamFlyingFlower}
  */
-public class FederatedIdentityIdTokenCustomizer implements OAuth2TokenCustomizer<JwtEncodingContext> {
+public class CustomizerIdTokenCustomizer implements OAuth2TokenCustomizer<JwtEncodingContext> {
 
 	private static final Set<String> ID_TOKEN_CLAIMS =
 			Set.of(IdTokenClaimNames.ISS, IdTokenClaimNames.SUB, IdTokenClaimNames.AUD, IdTokenClaimNames.EXP,
@@ -53,38 +53,23 @@ public class FederatedIdentityIdTokenCustomizer implements OAuth2TokenCustomizer
 		}
 
 		// 检查登录用户信息是不是OAuth2User,在token中添加loginType属性
-		if (context.getPrincipal().getPrincipal() instanceof OAuth2User user) {
+		if (context.getPrincipal().getPrincipal() instanceof OAuth2User oauth2User) {
 			JwtClaimsSet.Builder claims = context.getClaims();
-			Object loginType = user.getAttribute("loginType");
-			if (loginType instanceof String) {
-				// 同时检验是否为String和是否不为空
-				claims.claim("loginType", loginType);
-			}
+			Object loginType = oauth2User.getAttribute(ConstSecurity.OAUTH_LOGIN_TYPE);
+			// 同时检验是否为String和是否不为空
+			claims.claim(ConstSecurity.OAUTH_LOGIN_TYPE, loginType);
 		}
 
 		// 检查登录用户信息是不是UserDetails,排除掉没有用户参与的流程
 		if (context.getPrincipal().getPrincipal() instanceof UserDetails user) {
-			// 获取申请的scopes
-			Set<String> scopes = context.getAuthorizedScopes();
-			// 获取用户的权限
-			Collection<? extends GrantedAuthority> authorities = user.getAuthorities();
-			// 提取权限并转为字符串
-			Set<String> authoritySet = Optional.ofNullable(authorities)
-					.orElse(Collections.emptyList())
-					.stream()
-					// 获取权限字符串
-					.map(GrantedAuthority::getAuthority)
-					// 去重
-					.collect(Collectors.toSet());
-
-			// 合并scope与用户信息
-			authoritySet.addAll(scopes);
+			// 获取用户权限
+			Set<String> authoritySet = transferToContext(user.getAuthorities(), context);
 
 			JwtClaimsSet.Builder claims = context.getClaims();
-			// 将权限信息放入jwt的claims中（也可以生成一个以指定字符分割的字符串放入）
+			// 将权限信息放入jwt的claims中(也可以生成一个以指定字符分割的字符串放入)
 			claims.claim(ConstSecurity.AUTHORITIES_KEY, authoritySet);
 			// 放入其它自定内容
-			// 角色、头像...
+			claims.claim("username", user.getUsername());
 		}
 	}
 
@@ -100,5 +85,23 @@ public class FederatedIdentityIdTokenCustomizer implements OAuth2TokenCustomizer
 		}
 
 		return new HashMap<>(claims);
+	}
+
+	private Set<String> transferToContext(Collection<? extends GrantedAuthority> authorities,
+			JwtEncodingContext context) {
+		// 获取申请的scopes
+		Set<String> scopes = context.getAuthorizedScopes();
+		// 提取权限并转为字符串
+		Set<String> authoritySet = Optional.ofNullable(authorities)
+				.orElse(Collections.emptyList())
+				.stream()
+				// 获取权限字符串
+				.map(GrantedAuthority::getAuthority)
+				// 去重
+				.collect(Collectors.toSet());
+
+		// 合并scope与用户信息
+		authoritySet.addAll(scopes);
+		return authoritySet;
 	}
 }

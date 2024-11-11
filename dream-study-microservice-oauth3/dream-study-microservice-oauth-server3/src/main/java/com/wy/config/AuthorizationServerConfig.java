@@ -140,7 +140,7 @@ public class AuthorizationServerConfig {
 
 		// 获得第一步应用的OAuth2AuthorizationServerConfigurer
 		http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
-				// 开启OpenID Connect 1.0协议相关端点
+				// 开启OpenID Connect 1.0(OIDC)协议相关端点,可访问/userinfo接口
 				.oidc(Customizer.withDefaults())
 				// 开启OpenID Connect 1.0协议相关端点,并使用自定义的UserInfo映射器
 				.oidc((oidc) -> {
@@ -180,7 +180,7 @@ public class AuthorizationServerConfig {
 
 		// 使用JWT处理令牌用于用户信息和/或客户端注册,同时将认证服务器做为一个资源服务器
 		http.oauth2ResourceServer(resourceServer -> resourceServer.jwt(Customizer.withDefaults()));
-
+		
 		// 添加自定义短信认证登录转换器
 		SmsAuthenticationConverter converter = new SmsAuthenticationConverter();
 		// 添加自定义短信认证登录认证提供
@@ -293,7 +293,7 @@ public class AuthorizationServerConfig {
 	 */
 	@Bean
 	OAuth2TokenCustomizer<JwtEncodingContext> oAuth2TokenCustomizer() {
-		return new FederatedIdentityIdTokenCustomizer();
+		return new CustomizerIdTokenCustomizer();
 	}
 
 	/**

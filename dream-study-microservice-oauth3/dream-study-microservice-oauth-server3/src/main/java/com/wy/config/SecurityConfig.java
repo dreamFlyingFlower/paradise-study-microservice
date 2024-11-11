@@ -78,6 +78,7 @@ public class SecurityConfig {
 		// 禁用 csrf 与 cors
 		http.csrf(AbstractHttpConfigurer::disable);
 		http.cors(AbstractHttpConfigurer::disable);
+
 		// 添加跨域过滤器
 		http.addFilter(corsFilter());
 		// 在UsernamePasswordAuthenticationFilter拦截器之前添加验证码校验拦截器，并拦截POST的登录接口
@@ -135,8 +136,45 @@ public class SecurityConfig {
 						new LoginRedirectAuthenticationEntryPoint(LOGIN_URL),
 						new MediaTypeRequestMatcher(MediaType.TEXT_HTML)));
 
-		// 使用redis存储、读取登录的认证信息
+		// 在HttpServletRequests之间的SecurityContextHolder上设置SecurityContext的管理.当使用WebSecurityConfifigurerAdapter时,将自动运用
+		// 使用redis存储、读取登录的认证信息,有BUG
 		http.securityContext(context -> context.securityContextRepository(redisSecurityContextRepository));
+
+		// 将安全标头添加到响应
+		http.headers(header -> header.xssProtection(null));
+
+		// session管理
+		http.sessionManagement(session -> session.disable());
+
+		// 配置基于x509的认证
+		http.x509(Customizer.withDefaults());
+
+		// 记住我
+		http.rememberMe(Customizer.withDefaults());
+
+		// 允许配置请求缓存
+		http.requestCache(Customizer.withDefaults());
+
+		// 配置基于容器的预认证,此时认证由Servlet容器管理
+		http.jee(Customizer.withDefaults());
+
+		// 将HttpServletRequest方法与在其上找到的值集成到SecurityContext中,当使用WebSecurityConfifigurerAdapter时,将自动应用
+		http.servletApi(Customizer.withDefaults());
+
+		// 允许配置匿名用户的表示方法.当与WebSecurityConfifigurerAdapter结合使用时,将自动应用.默认情况下,匿名用户将使用
+		http.anonymous(Customizer.withDefaults());
+
+		// 根据外部OAuth 2.0或OpenID Connect 1.0提供程序配置身份验证
+		http.oauth2Login(Customizer.withDefaults());
+
+		// 配置通道安全.为了使该配置有用,必须提供至少一个到所需信道的映射
+		http.requiresChannel(Customizer.withDefaults());
+
+		// 配置 Http Basic 验证
+		http.httpBasic(Customizer.withDefaults());
+
+		// 在指定的Filter类的位置添加过滤器
+		http.addFilterAt(null, null);
 
 		return http.build();
 	}

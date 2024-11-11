@@ -67,7 +67,7 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
-import com.wy.config.FederatedIdentityIdTokenCustomizer;
+import com.wy.config.CustomizerIdTokenCustomizer;
 import com.wy.constant.ConstAuthorizationServerRedis;
 import com.wy.context.RedisSecurityContextRepository;
 import com.wy.grant.SmsAuthenticationConverter;
@@ -374,7 +374,7 @@ public class DeviceConfig {
 	 */
 	@Bean
 	public OAuth2TokenCustomizer<JwtEncodingContext> oAuth2TokenCustomizer() {
-		return new FederatedIdentityIdTokenCustomizer();
+		return new CustomizerIdTokenCustomizer();
 	}
 
 	/**
