@@ -72,9 +72,9 @@ import com.wy.context.RedisSecurityContextRepository;
 import com.wy.grant.SmsAuthenticationConverter;
 import com.wy.grant.SmsAuthenticationProvider;
 import com.wy.helpers.SecurityContextOAuth2Helpers;
-import com.wy.oidc.CustomizerIdTokenCustomizer;
 import com.wy.provider.device.DeviceClientAuthenticationConverter;
 import com.wy.provider.device.DeviceClientAuthenticationProvider;
+import com.wy.token.CustomizerTokenCustomizer;
 
 import dream.flying.flower.autoconfigure.redis.helper.RedisStrHelpers;
 import dream.flying.flower.framework.security.constant.ConstSecurity;
@@ -374,7 +374,7 @@ public class DeviceConfig {
 	 */
 	@Bean
 	public OAuth2TokenCustomizer<JwtEncodingContext> oAuth2TokenCustomizer() {
-		return new CustomizerIdTokenCustomizer();
+		return new CustomizerTokenCustomizer();
 	}
 
 	/**

@@ -1,11 +1,6 @@
 package com.wy.config;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Optional;
-import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,17 +16,13 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
-import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationConsentService;
 import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationConsentService;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
-import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
@@ -53,9 +44,9 @@ import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
 import com.wy.context.RedisSecurityContextRepository;
 import com.wy.grant.SmsAuthenticationConverter;
 import com.wy.grant.SmsAuthenticationProvider;
-import com.wy.oidc.CustomizerIdTokenCustomizer;
 import com.wy.provider.device.DeviceClientAuthenticationConverter;
 import com.wy.provider.device.DeviceClientAuthenticationProvider;
+import com.wy.token.CustomizerTokenCustomizer;
 
 import dream.flying.flower.framework.security.constant.ConstSecurity;
 import dream.flying.flower.framework.security.entrypoint.LoginRedirectAuthenticationEntryPoint;
@@ -68,7 +59,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
 /**
- * SpringSecurity6认证服务器配置
+ * SpringSecurity6认证服务器配置.当前配置只写了主要配置,其他配置类见各个功能模块中以AuthorizationServerConfig结尾的类
  * 
  * <pre>
  * {@link EnableWebSecurity}:加载{@link WebSecurityConfiguration},配置安全认证策略,加载{@link AuthenticationConfiguration},配置认证信息
@@ -176,8 +167,14 @@ public class AuthorizationServerConfig {
 						// 从浏览器发出的请求肯定会带accept:text/html请求头,根据mediaType,可以用来判断请求是否来自浏览器,只有浏览器请求重定向到登录页面,其他异常返回json
 						new MediaTypeRequestMatcher(MediaType.TEXT_HTML)));
 
-		// 使用JWT处理令牌用于用户信息和/或客户端注册,同时将认证服务器做为一个资源服务器
-		http.oauth2ResourceServer(resourceServer -> resourceServer.jwt(Customizer.withDefaults()));
+		// 将认证服务器做为一个资源服务器,并使用指定方式存储客户端和用户信息.JWT和OPAQUE只能使用一种
+		http.oauth2ResourceServer((resourceServer) -> resourceServer
+				// 如果不使用jwt或opaque,需要自定义AuthenticationManagerResolver
+				.authenticationManagerResolver(null)
+				// jwt校验,客户端的配置tokenSettings.accessTokenFormat必须为OAuth2TokenFormat.SELF_CONTAINED
+				.jwt(Customizer.withDefaults())
+				// opaque校验,客户端的配置tokenSettings.accessTokenFormat必须为OAuth2TokenFormat.REFERENCE
+				.opaqueToken(Customizer.withDefaults()));
 
 		// 添加自定义短信认证登录转换器
 		SmsAuthenticationConverter converter = new SmsAuthenticationConverter();
@@ -291,60 +288,7 @@ public class AuthorizationServerConfig {
 	 */
 	@Bean
 	OAuth2TokenCustomizer<JwtEncodingContext> oAuth2TokenCustomizer() {
-		return new CustomizerIdTokenCustomizer();
-	}
-
-	/**
-	 * JWT方式向token中自定义存数据,自定义的数据可以从Authentication中获取
-	 * 
-	 * {@link SecurityContextHolder#getContext()}->{@link SecurityContext#getAuthentication()}
-	 * 
-	 * @return OAuth2TokenCustomizer
-	 */
-	@Bean
-	OAuth2TokenCustomizer<JwtEncodingContext> oauth2TokenCustomizer() {
-		return context -> {
-			// 根据token类型添加信息
-			OAuth2TokenType tokenType = context.getTokenType();
-			System.out.println(context.getTokenType());
-			if (tokenType.getValue().equals("id_token")) {
-				context.getClaims().claim("Test", "Test Id Token");
-			}
-			if (tokenType.getValue().equals("access_token")) {
-				context.getClaims().claim("Test", "Test Access Token");
-				Set<String> authorities = context.getPrincipal()
-						.getAuthorities()
-						.stream()
-						.map(GrantedAuthority::getAuthority)
-						.collect(Collectors.toSet());
-				context.getClaims().claim("authorities", authorities).claim("user", context.getPrincipal().getName());
-			}
-
-			// 检查登录用户信息是不是UserDetails,排除掉没有用户参与的流程
-			if (context.getPrincipal().getPrincipal() instanceof UserDetails) {
-				UserDetails user = (UserDetails) context.getPrincipal().getPrincipal();
-				// 获取申请的scopes
-				Set<String> scopes = context.getAuthorizedScopes();
-				// 获取用户的权限
-				Collection<? extends GrantedAuthority> authorities = user.getAuthorities();
-				// 提取权限并转为字符串
-				Set<String> authoritySet = Optional.ofNullable(authorities)
-						.orElse(Collections.emptyList())
-						.stream()
-						// 获取权限字符串
-						.map(GrantedAuthority::getAuthority)
-						// 去重
-						.collect(Collectors.toSet());
-
-				// 合并scope与用户信息
-				authoritySet.addAll(scopes);
-
-				JwtClaimsSet.Builder claims = context.getClaims();
-				// 将权限信息放入jwt的claims中,也可以生成一个以指定字符分割的字符串放入
-				claims.claim(ConstSecurity.AUTHORITIES_KEY, authoritySet);
-				// 放入其它自定内容.如角色、头像...
-			}
-		};
+		return new CustomizerTokenCustomizer();
 	}
 
 	/**

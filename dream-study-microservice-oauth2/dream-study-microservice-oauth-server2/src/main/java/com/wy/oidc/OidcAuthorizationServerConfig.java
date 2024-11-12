@@ -73,7 +73,7 @@ public class OidcAuthorizationServerConfig {
 				// 如果需要其他属性,需要在RegisteredClient中添加自定义属性名或者直接使用上方的userInfoMapper,自定义返回数据
 				.oidc(Customizer.withDefaults())
 				// 开启OpenID Connect 1.0协议相关端点,并使用自定义的UserInfo映射器
-				.oidc(oidc -> {
+				.oidc((oidc) -> {
 					oidc.userInfoEndpoint((userInfo) -> {
 						userInfo.userInfoMapper(userInfoMapper);
 					});

@@ -126,7 +126,7 @@ import com.wy.config.AuthorizationServerConfig;
  * Spring Authorization Server
  * 
  * <pre>
- * 是Spring Security OAuth的进化版本,引入了对OAuth 2.1和OpenID Connect 1.0规范的支持.
+ * 是Spring Security OAuth的进化版本,引入了对OAuth 2.1和OpenID Connect 1.0(OIDC)规范的支持.
  * 基于Spring Security,为构建OpenID Connect 1.0身份提供者和OAuth2授权服务器产品提供了安全、轻量级和可定制的基础.
  * OAuth 2.1和OpenID Connect 1.0是用于身份验证和授权的行业标准协议,被广泛应用于各种应用程序和系统,以实现安全的用户身份验证和授权流程.
  * 
@@ -145,6 +145,7 @@ import com.wy.config.AuthorizationServerConfig;
  * refresh_token: 刷新token
  * authorization_code: 根据授权码模式的授权码获取
  * client_credentials: 客户端模式获取
+ * id_token:当开启OIDC时,用户的基本信息将保存在该字段中,也是JWT格式
  * </pre>
  * 
  * 如果认证服务器开启了oidc,可调用该URL查询认证服务器相关端点以及配置信息:http://ip:port/{context-path}/.well-known/openid-configuration.

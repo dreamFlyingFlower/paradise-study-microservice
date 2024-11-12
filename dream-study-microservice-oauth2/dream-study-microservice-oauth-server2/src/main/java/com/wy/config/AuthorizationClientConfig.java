@@ -109,7 +109,8 @@ public class AuthorizationClientConfig {
 						.authorizationCodeTimeToLive(Duration.ofSeconds(60))
 						// access_token有效期
 						.accessTokenTimeToLive(Duration.ofMinutes(60))
-						// access_token格式,SELF_CONTAINED是token(jwt格式),REFERENCE是不透明token,相当于token元数据的一个id,通过id找到对应数据(自省令牌时)
+						// access_token格式,SELF_CONTAINED是jwt格式,REFERENCE是opaque格式,相当于token元数据的一个id,通过id找到对应数据(自省令牌时)
+						// 不同格式需要http.oauth2ResourceServer()进行不同配置,见AuthorizationServerConfig关于oauth2ResourceServer的部分
 						.accessTokenFormat(OAuth2TokenFormat.REFERENCE)
 						// refresh_token是否可以重用:true->可重用,refresh_token不变,可一直使用
 						.reuseRefreshTokens(true)

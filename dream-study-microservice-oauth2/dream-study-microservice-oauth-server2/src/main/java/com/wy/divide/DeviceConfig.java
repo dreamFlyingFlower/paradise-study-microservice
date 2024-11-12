@@ -21,6 +21,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
@@ -67,7 +68,6 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
-import com.wy.config.CustomizerIdTokenCustomizer;
 import com.wy.constant.ConstAuthorizationServerRedis;
 import com.wy.context.RedisSecurityContextRepository;
 import com.wy.core.CustomizerAuthorizationGrantType;
@@ -77,6 +77,7 @@ import com.wy.helpers.SecurityContextOAuth2Helpers;
 import com.wy.oauth.customizer.CustomizerAuthorizationServerSettings;
 import com.wy.provider.device.DeviceClientAuthenticationConverter;
 import com.wy.provider.device.DeviceClientAuthenticationProvider;
+import com.wy.token.CustomizerTokenCustomizer;
 
 import dream.flying.flower.autoconfigure.redis.helper.RedisStrHelpers;
 import dream.flying.flower.framework.security.constant.ConstSecurity;
@@ -134,7 +135,7 @@ public class DeviceConfig {
 	 * @throws Exception 抛出
 	 */
 	@Bean
-	public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http,
+	SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http,
 			RegisteredClientRepository registeredClientRepository,
 			CustomizerAuthorizationServerSettings authorizationServerSettings) throws Exception {
 		// 配置默认的设置,忽略认证端点的csrf校验
@@ -163,8 +164,8 @@ public class DeviceConfig {
 					// 校验授权确认页面是否为完整路径；是否是前后端分离的页面
 					boolean absoluteUrl = UrlUtils.isAbsoluteUrl(ConstSecurity.CONSENT_PAGE_URI);
 					// 如果是分离页面则重定向,否则转发请求
-					authorizationEndpoint.consentPage(
-							absoluteUrl ? CUSTOM_CONSENT_REDIRECT_URI : ConstSecurity.CONSENT_PAGE_URI);
+					authorizationEndpoint
+							.consentPage(absoluteUrl ? CUSTOM_CONSENT_REDIRECT_URI : ConstSecurity.CONSENT_PAGE_URI);
 					if (absoluteUrl) {
 						// 适配前后端分离的授权确认页面,成功/失败响应json
 						authorizationEndpoint.errorResponseHandler(new ConsentAuthenticationFailureHandler());
@@ -241,7 +242,7 @@ public class DeviceConfig {
 	 * @throws Exception 抛出
 	 */
 	@Bean
-	public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http,
+	SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http,
 			ClientRegistrationRepository clientRegistrationRepository) throws Exception {
 		// 添加跨域过滤器
 		http.addFilter(corsFilter());
@@ -341,7 +342,7 @@ public class DeviceConfig {
 	 * @return CorsFilter
 	 */
 	@Bean
-	public CorsFilter corsFilter() {
+	CorsFilter corsFilter() {
 
 		// 初始化cors配置对象
 		CorsConfiguration configuration = new CorsConfiguration();
@@ -369,22 +370,12 @@ public class DeviceConfig {
 	}
 
 	/**
-	 * 自定义jwt,将权限信息放至jwt中
-	 *
-	 * @return OAuth2TokenCustomizer的实例
-	 */
-	@Bean
-	public OAuth2TokenCustomizer<JwtEncodingContext> oAuth2TokenCustomizer() {
-		return new CustomizerIdTokenCustomizer();
-	}
-
-	/**
 	 * 自定义jwt解析器,设置解析出来的权限信息的前缀与在jwt中的key
 	 *
 	 * @return jwt解析器 JwtAuthenticationConverter
 	 */
 	@Bean
-	public JwtAuthenticationConverter jwtAuthenticationConverter() {
+	JwtAuthenticationConverter jwtAuthenticationConverter() {
 		JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
 		// 设置解析权限信息的前缀,设置为空是去掉前缀
 		grantedAuthoritiesConverter.setAuthorityPrefix("");
@@ -404,7 +395,7 @@ public class DeviceConfig {
 	 */
 	@Bean
 	@SneakyThrows
-	public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) {
+	AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) {
 		return authenticationConfiguration.getAuthenticationManager();
 	}
 
@@ -414,7 +405,7 @@ public class DeviceConfig {
 	 * @return BCryptPasswordEncoder
 	 */
 	@Bean
-	public PasswordEncoder passwordEncoder() {
+	PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
 
@@ -426,8 +417,7 @@ public class DeviceConfig {
 	 * @return 基于数据库的repository
 	 */
 	@Bean
-	public RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbcTemplate,
-			PasswordEncoder passwordEncoder) {
+	RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbcTemplate, PasswordEncoder passwordEncoder) {
 		RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
 				// 客户端id
 				.clientId("messaging-client")
@@ -503,6 +493,18 @@ public class DeviceConfig {
 	}
 
 	/**
+	 * 自定义JWT方式向token以及id_token中自定义存数据,自定义的数据可以从Authentication中获取.定义后会自动注入并应用
+	 * 
+	 * {@link SecurityContextHolder#getContext()}->{@link SecurityContext#getAuthentication()}
+	 * 
+	 * @return OAuth2TokenCustomizer的实例
+	 */
+	@Bean
+	OAuth2TokenCustomizer<JwtEncodingContext> oauth2TokenCustomizer() {
+		return new CustomizerTokenCustomizer();
+	}
+
+	/**
 	 * 配置基于db的oauth2的授权管理服务
 	 *
 	 * @param jdbcTemplate db数据源信息
@@ -510,7 +512,7 @@ public class DeviceConfig {
 	 * @return JdbcOAuth2AuthorizationService
 	 */
 	@Bean
-	public OAuth2AuthorizationService authorizationService(JdbcTemplate jdbcTemplate,
+	OAuth2AuthorizationService authorizationService(JdbcTemplate jdbcTemplate,
 			RegisteredClientRepository registeredClientRepository) {
 		// 基于db的oauth2认证服务,还有一个基于内存的服务实现InMemoryOAuth2AuthorizationService
 		return new JdbcOAuth2AuthorizationService(jdbcTemplate, registeredClientRepository);
@@ -524,7 +526,7 @@ public class DeviceConfig {
 	 * @return JdbcOAuth2AuthorizationConsentService
 	 */
 	@Bean
-	public OAuth2AuthorizationConsentService authorizationConsentService(JdbcTemplate jdbcTemplate,
+	OAuth2AuthorizationConsentService authorizationConsentService(JdbcTemplate jdbcTemplate,
 			RegisteredClientRepository registeredClientRepository) {
 		// 基于db的授权确认管理服务,还有一个基于内存的服务实现InMemoryOAuth2AuthorizationConsentService
 		return new JdbcOAuth2AuthorizationConsentService(jdbcTemplate, registeredClientRepository);
@@ -537,7 +539,7 @@ public class DeviceConfig {
 	 */
 	@Bean
 	@SneakyThrows
-	public JWKSource<SecurityContext> jwkSource() {
+	JWKSource<SecurityContext> jwkSource() {
 		// 先从redis获取
 		String jwkSetCache = redisStrHelpers.get(ConstAuthorizationServerRedis.AUTHORIZATION_JWS_PREFIX_KEY);
 		if (ObjectUtils.isEmpty(jwkSetCache)) {
@@ -593,15 +595,14 @@ public class DeviceConfig {
 	 * @return AuthorizationServerSettings
 	 */
 	@Bean
-	public AuthorizationServerSettings authorizationServerSettings() {
+	AuthorizationServerSettings authorizationServerSettings() {
 		return AuthorizationServerSettings.builder()
 				/*
 				 * 设置token签发地址(http(s)://{ip}:{port}/context-path,
 				 * http(s)://domain.com/context-path)
 				 * 如果需要通过ip访问这里就是ip,如果是有域名映射就填域名,通过什么方式访问该服务这里就填什么
 				 */
-				.issuer("http://192.168.1.102:8080")
+				.issuer("http://127.0.0.1:8888")
 				.build();
 	}
-
 }

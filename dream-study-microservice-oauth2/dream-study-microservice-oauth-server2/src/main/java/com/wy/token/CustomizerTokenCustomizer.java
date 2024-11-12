@@ -1,8 +1,10 @@
-package com.wy.oidc;
+package com.wy.token;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -25,19 +27,19 @@ import dream.flying.flower.framework.security.constant.ConstSecurity;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 自定义JWT,将权限信息放至JWT中.联合身份认证自定义token处理,当使用openId Connect登录时将用户信息写入id_token中
+ * 自定义JWT,IdToken,将权限以及其他通用信息放至其中
  *
  * @author 飞花梦影
  * @date 2024-11-04 15:15:44
  * @git {@link https://github.com/dreamFlyingFlower}
  */
 @Slf4j
-public class CustomizerIdTokenCustomizer implements OAuth2TokenCustomizer<JwtEncodingContext> {
+public class CustomizerTokenCustomizer implements OAuth2TokenCustomizer<JwtEncodingContext> {
 
-	private static final Set<String> ID_TOKEN_CLAIMS =
-			Set.of(IdTokenClaimNames.ISS, IdTokenClaimNames.SUB, IdTokenClaimNames.AUD, IdTokenClaimNames.EXP,
+	private static final Set<String> ID_TOKEN_CLAIMS = new HashSet<>(
+			Arrays.asList(IdTokenClaimNames.ISS, IdTokenClaimNames.SUB, IdTokenClaimNames.AUD, IdTokenClaimNames.EXP,
 					IdTokenClaimNames.IAT, IdTokenClaimNames.AUTH_TIME, IdTokenClaimNames.NONCE, IdTokenClaimNames.ACR,
-					IdTokenClaimNames.AMR, IdTokenClaimNames.AZP, IdTokenClaimNames.AT_HASH, IdTokenClaimNames.C_HASH);
+					IdTokenClaimNames.AMR, IdTokenClaimNames.AZP, IdTokenClaimNames.AT_HASH, IdTokenClaimNames.C_HASH));
 
 	@Override
 	public void customize(JwtEncodingContext context) {
@@ -66,7 +68,8 @@ public class CustomizerIdTokenCustomizer implements OAuth2TokenCustomizer<JwtEnc
 		}
 
 		// 检查登录用户信息是不是OAuth2User,在token中添加loginType属性
-		if (context.getPrincipal().getPrincipal() instanceof OAuth2User oauth2User) {
+		if (context.getPrincipal().getPrincipal() instanceof OAuth2User) {
+			OAuth2User oauth2User = (OAuth2User) context.getPrincipal().getPrincipal();
 			JwtClaimsSet.Builder claims = context.getClaims();
 			Object loginType = oauth2User.getAttribute(ConstSecurity.OAUTH_LOGIN_TYPE);
 			// 同时检验是否为String和是否不为空
@@ -74,7 +77,8 @@ public class CustomizerIdTokenCustomizer implements OAuth2TokenCustomizer<JwtEnc
 		}
 
 		// 检查登录用户信息是不是UserDetails,排除掉没有用户参与的流程
-		if (context.getPrincipal().getPrincipal() instanceof UserDetails user) {
+		if (context.getPrincipal().getPrincipal() instanceof UserDetails) {
+			UserDetails user = (UserDetails) context.getPrincipal().getPrincipal();
 			// 获取用户权限
 			Set<String> authoritySet = transferToContext(user.getAuthorities(), context);
 
@@ -89,10 +93,12 @@ public class CustomizerIdTokenCustomizer implements OAuth2TokenCustomizer<JwtEnc
 
 	private Map<String, Object> extractClaims(Authentication principal) {
 		Map<String, Object> claims;
-		if (principal.getPrincipal() instanceof OidcUser oidcUser) {
+		if (principal.getPrincipal() instanceof OidcUser) {
+			OidcUser oidcUser = (OidcUser) principal.getPrincipal();
 			OidcIdToken idToken = oidcUser.getIdToken();
 			claims = idToken.getClaims();
-		} else if (principal.getPrincipal() instanceof OAuth2User oauth2User) {
+		} else if (principal.getPrincipal() instanceof OAuth2User) {
+			OAuth2User oauth2User = (OAuth2User) principal.getPrincipal();
 			claims = oauth2User.getAttributes();
 		} else {
 			claims = Collections.emptyMap();

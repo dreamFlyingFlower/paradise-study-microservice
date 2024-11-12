@@ -1,10 +1,8 @@
-package com.wy.config;
+package com.wy.token;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -19,28 +17,37 @@ import org.springframework.security.oauth2.core.oidc.endpoint.OidcParameterNames
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
+import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
 import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
 
 import dream.flying.flower.framework.security.constant.ConstSecurity;
+import lombok.extern.slf4j.Slf4j;
 
 /**
- * 自定义JWT,将权限信息放至JWT中.联合身份认证自定义token处理,当使用openId Connect登录时将用户信息写入id_token中
+ * 自定义JWT,IdToken,将权限以及其他通用信息放至其中
  *
  * @author 飞花梦影
  * @date 2024-11-04 15:15:44
  * @git {@link https://github.com/dreamFlyingFlower}
  */
-public class CustomizerIdTokenCustomizer implements OAuth2TokenCustomizer<JwtEncodingContext> {
+@Slf4j
+public class CustomizerTokenCustomizer implements OAuth2TokenCustomizer<JwtEncodingContext> {
 
-	private static final Set<String> ID_TOKEN_CLAIMS = new HashSet<>(
-			Arrays.asList(IdTokenClaimNames.ISS, IdTokenClaimNames.SUB, IdTokenClaimNames.AUD, IdTokenClaimNames.EXP,
+	private static final Set<String> ID_TOKEN_CLAIMS =
+			Set.of(IdTokenClaimNames.ISS, IdTokenClaimNames.SUB, IdTokenClaimNames.AUD, IdTokenClaimNames.EXP,
 					IdTokenClaimNames.IAT, IdTokenClaimNames.AUTH_TIME, IdTokenClaimNames.NONCE, IdTokenClaimNames.ACR,
-					IdTokenClaimNames.AMR, IdTokenClaimNames.AZP, IdTokenClaimNames.AT_HASH, IdTokenClaimNames.C_HASH));
+					IdTokenClaimNames.AMR, IdTokenClaimNames.AZP, IdTokenClaimNames.AT_HASH, IdTokenClaimNames.C_HASH);
 
 	@Override
 	public void customize(JwtEncodingContext context) {
-		if (OidcParameterNames.ID_TOKEN.equals(context.getTokenType().getValue())) {
+		// 根据token类型添加信息
+		OAuth2TokenType tokenType = context.getTokenType();
+		if (log.isDebugEnabled()) {
+			log.debug("客户端{}当前认证类型为:{}", context.getRegisteredClient().getClientId(), tokenType.getValue());
+		}
+
+		if (OidcParameterNames.ID_TOKEN.equals(tokenType.getValue())) {
 			Map<String, Object> thirdPartyClaims = extractClaims(context.getPrincipal());
 			context.getClaims().claims(existingClaims -> {
 				// Remove conflicting claims set by this authorization server
@@ -54,9 +61,12 @@ public class CustomizerIdTokenCustomizer implements OAuth2TokenCustomizer<JwtEnc
 			});
 		}
 
+		if (OAuth2TokenType.ACCESS_TOKEN.equals(tokenType)) {
+			context.getClaims().claim("Test", "Test Access Token");
+		}
+
 		// 检查登录用户信息是不是OAuth2User,在token中添加loginType属性
-		if (context.getPrincipal().getPrincipal() instanceof OAuth2User) {
-			OAuth2User oauth2User = (OAuth2User) context.getPrincipal().getPrincipal();
+		if (context.getPrincipal().getPrincipal() instanceof OAuth2User oauth2User) {
 			JwtClaimsSet.Builder claims = context.getClaims();
 			Object loginType = oauth2User.getAttribute(ConstSecurity.OAUTH_LOGIN_TYPE);
 			// 同时检验是否为String和是否不为空
@@ -64,28 +74,25 @@ public class CustomizerIdTokenCustomizer implements OAuth2TokenCustomizer<JwtEnc
 		}
 
 		// 检查登录用户信息是不是UserDetails,排除掉没有用户参与的流程
-		if (context.getPrincipal().getPrincipal() instanceof UserDetails) {
-			UserDetails user = (UserDetails) context.getPrincipal().getPrincipal();
-
+		if (context.getPrincipal().getPrincipal() instanceof UserDetails user) {
 			// 获取用户权限
 			Set<String> authoritySet = transferToContext(user.getAuthorities(), context);
 
 			JwtClaimsSet.Builder claims = context.getClaims();
 			// 将权限信息放入jwt的claims中(也可以生成一个以指定字符分割的字符串放入)
 			claims.claim(ConstSecurity.AUTHORITIES_KEY, authoritySet);
-			// 放入其它自定内容
+			// 放入其它自定义内容,不能存放Long和Integer类型,否则无法反序列化
+			// 具体可使用类型见JdbcOAuth2AuthorizationService.OAuth2AuthorizationRowMapper.objectMapper
 			claims.claim("username", user.getUsername());
 		}
 	}
 
 	private Map<String, Object> extractClaims(Authentication principal) {
 		Map<String, Object> claims;
-		if (principal.getPrincipal() instanceof OidcUser) {
-			OidcUser oidcUser = (OidcUser) principal.getPrincipal();
+		if (principal.getPrincipal() instanceof OidcUser oidcUser) {
 			OidcIdToken idToken = oidcUser.getIdToken();
 			claims = idToken.getClaims();
-		} else if (principal.getPrincipal() instanceof OAuth2User) {
-			OAuth2User oauth2User = (OAuth2User) principal.getPrincipal();
+		} else if (principal.getPrincipal() instanceof OAuth2User oauth2User) {
 			claims = oauth2User.getAttributes();
 		} else {
 			claims = Collections.emptyMap();
