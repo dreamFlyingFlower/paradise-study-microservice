@@ -63,7 +63,7 @@ public class CustomizerTokenCustomizer implements OAuth2TokenCustomizer<JwtEncod
 		// 根据token类型添加信息
 		OAuth2TokenType tokenType = context.getTokenType();
 		if (log.isDebugEnabled()) {
-			log.debug("客户端{}当前认证类型为:{}", context.getRegisteredClient().getClientId(), tokenType.getValue());
+			log.debug("客户端{}当前认证Token类型为:{}", context.getRegisteredClient().getClientId(), tokenType.getValue());
 		}
 
 		if (OidcParameterNames.ID_TOKEN.equals(tokenType.getValue())) {

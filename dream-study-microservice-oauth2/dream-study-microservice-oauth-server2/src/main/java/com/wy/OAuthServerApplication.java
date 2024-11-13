@@ -1,10 +1,20 @@
 package com.wy;
 
+import java.util.function.Function;
+
+import javax.annotation.security.DenyAll;
+import javax.annotation.security.PermitAll;
+
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.expression.SecurityExpressionRoot;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PostFilter;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.prepost.PreFilter;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
@@ -664,6 +674,49 @@ import com.wy.config.AuthorizationServerConfig;
  * 1.认证服务必须开启OIDC功能,{@link AuthorizationServerConfig#authorizationServerSecurityFilterChain}
  * 2.客户端被授权的scope中必须有openid权限,{@link AuthorizationClientConfig#registeredClientRepository}中客户端messaging-client的配置
  * 3.客户端调用/oauth2/authorize进行认证时,scope必须带上openid
+ * </pre>
+ * 
+* 相关权限拦截注解,SpringSecurity6和之前版本不一样,参照{@link SecurityExpressionRoot}中相关方法:
+ * 
+ * <pre>
+ * 文档:https://www.spring-doc.cn/spring-security/6.3.3/reactive_authorization_method.html
+ * 
+ * {@link DenyAll}:拒绝所有的访问
+ * {@link PermitAll}:允许所有访问
+ * {@link RolesAllowed({"USER","ADMIN"})}:该方法只允许有ROLE_USER或ROLE_ADMIN角色的用户访问
+ * {@link Secured("ROLE_TELLER","ROLE_ADMIN")}:该方法只允许ROLE_TELLER或ROLE_ADMIN角色的用户访问
+ * {@link Secured("IS_AUTHENTICATED_ANONYMOUSLY")}:该方法允许匿名用户访问
+ * 
+ * {@link PreAuthorize}:在方法调用之前, 基于表达式结果来限制方法的使用,支持SPEL表达式
+ * {@link PreAuthorize("#authentication.authorities.contains('message.read')")}:当前认证客户端是否有某个权限,该值从认证信息的authorities中取值
+ * {@link PreAuthorize("#oauth2.hasAuthority('message.read')")}:当前认证客户端是否有某个权限,低版本使用,效果同上
+ * 
+ * {@link PreAuthorize("hasAuthority('message.read')")}:当前认证客户端是否有某个权限,任何版本都可用
+ * {@link PreAuthorize("hasAnyAuthority('message.read','message.write')")}:当前认证客户端是否有多个权限种的任何一个,任何版本都可用
+ * {@link PreAuthorize("hasRole('admin')")}:当前认证客户端是否有admin角色,任何版本都可用
+ * {@link PreAuthorize("hasAnyRole('admin','guest')")}:当前认证客户端是否有多个角色中的任意一个,任何版本都可用
+ * 
+ * {@link PreAuthorize("#authentication.oauth2Request.scope.contains('message.read')")}:当前认证客户端是否有某个scope,该值从认证信息的scope中取值
+ * {@link PreAuthorize("#oauth2.hasScope('message.read')")}:当前认证客户端是否有某个scope,低版本使用,效果同上
+ * 
+ * {@link PreAuthorize("@func.apply(#account)")}:在方法上使用.@func为{@link Function},#account为方法形参,只要返回值为true即可
+ * {@link PreAuthorize("#account.name == 'admin'")}:#account为方法形参,只要account中的name属性为admin即可访问
+ * {@link PreAuthorize("#permissionService.hasPermission(request,authentication)")}:#permissionService为PermissionService的组件,调用hasPermission()
+ * 
+ * {@link PreAuthorize("principal.name == 'admin'")}:获取当前用户的principal主体对象
+ * {@link PreAuthorize("authentication.name == 'admin'")}:获取当前用户的authentication对象
+ * {@link PreAuthorize("isAnonymous()")}:如果是匿名访问,返回true
+ * {@link PreAuthorize("isRememberMe()")}:如果是remember-me自动认证,则返回true
+ * {@link PreAuthorize("isAuthenticated()")}:如果不是匿名访问,则返回true
+ * {@link PreAuthorize("isFullAuthenticated()")}:如果不是匿名访问或remember-me认证登陆,则返回true
+ * {@link PreAuthorize("hasPermission('target','permission')")}:如果有指定权限,当前全部返回的都是false
+ * {@link PreAuthorize("hasPermission('target','targetType','permission')")}:如果有指定权限,当前全部返回的都是false
+ * 
+ * {@link PostAuthorize}:允许方法调用,但是如果表达式结果为false,将抛出一个安全性异常
+ * {@link PostAuthorize("returnObject.owner == authentication.name")}:returnObject为固定参数,表示方法返回对象,只能在当前注解和PostFilter中使用
+ * 
+ * {@link PostFilter}:允许方法调用,但必要按照表达式来过滤方法的结果
+ * {@link PreFilter}:允许方法调用,但必须在进入方法之前过滤输入值
  * </pre>
  * 
  * @author 飞花梦影
