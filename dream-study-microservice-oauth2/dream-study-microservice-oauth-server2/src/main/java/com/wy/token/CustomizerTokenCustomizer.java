@@ -36,10 +36,29 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CustomizerTokenCustomizer implements OAuth2TokenCustomizer<JwtEncodingContext> {
 
-	private static final Set<String> ID_TOKEN_CLAIMS = new HashSet<>(
-			Arrays.asList(IdTokenClaimNames.ISS, IdTokenClaimNames.SUB, IdTokenClaimNames.AUD, IdTokenClaimNames.EXP,
-					IdTokenClaimNames.IAT, IdTokenClaimNames.AUTH_TIME, IdTokenClaimNames.NONCE, IdTokenClaimNames.ACR,
-					IdTokenClaimNames.AMR, IdTokenClaimNames.AZP, IdTokenClaimNames.AT_HASH, IdTokenClaimNames.C_HASH));
+	private static final Set<String> ID_TOKEN_CLAIMS = new HashSet<>(Arrays.asList(
+			// 令牌颁发者
+			IdTokenClaimNames.ISS,
+			// 用户id
+			IdTokenClaimNames.SUB,
+			// 令牌接收者,OAuth应用ID
+			IdTokenClaimNames.AUD,
+			// 令牌过期时间戳
+			IdTokenClaimNames.EXP,
+			// 令牌颁发时间戳
+			IdTokenClaimNames.IAT, IdTokenClaimNames.AUTH_TIME,
+			// 随机字符串,用来防止重放攻击
+			IdTokenClaimNames.NONCE,
+			// 身份验证上下文类引用
+			IdTokenClaimNames.ACR,
+			// 身份验证方法参考
+			IdTokenClaimNames.AMR,
+			// ID令牌发放给的授权方
+			IdTokenClaimNames.AZP,
+			// 访问令牌哈希值
+			IdTokenClaimNames.AT_HASH,
+			// 授权码哈希值
+			IdTokenClaimNames.C_HASH));
 
 	@Override
 	public void customize(JwtEncodingContext context) {

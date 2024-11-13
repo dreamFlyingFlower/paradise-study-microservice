@@ -52,8 +52,10 @@ import org.springframework.security.oauth2.server.authorization.OAuth2Authorizat
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenIntrospection;
 import org.springframework.security.oauth2.server.authorization.authentication.ClientSecretAuthenticationProvider;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AccessTokenAuthenticationToken;
+import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AuthorizationCodeAuthenticationProvider;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2ClientAuthenticationToken;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2ClientCredentialsAuthenticationProvider;
+import org.springframework.security.oauth2.server.authorization.authentication.OAuth2RefreshTokenAuthenticationProvider;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2TokenIntrospectionAuthenticationProvider;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2TokenIntrospectionAuthenticationToken;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2TokenRevocationAuthenticationProvider;
@@ -135,7 +137,7 @@ import com.wy.repository.RedisOAuth2AuthorizationService;
  * 基于Spring Security,为构建OpenID Connect 1.0身份提供者和OAuth2授权服务器产品提供了安全、轻量级和可定制的基础.
  * OAuth 2.1和OpenID Connect 1.0是用于身份验证和授权的行业标准协议,被广泛应用于各种应用程序和系统,以实现安全的用户身份验证和授权流程.
  * 
- * JWT和Opaque:Jwt是公开的,直接在线就可以解析看到里面的数据,但不能修改.Opaque一个不透明的token,在看起来就是一个字符串
+ * Jwt和Opaque:Jwt是公开的,直接在线就可以解析看到里面的数据,但不能修改.Opaque一个不透明的token,在看起来就是一个字符串
  * 
  * 相关参数:
  * client_id: 客户端的id
@@ -492,7 +494,7 @@ import com.wy.repository.RedisOAuth2AuthorizationService;
  * 		code:上一步中获得的授权码
  * 		redirect_uri:与第一步请求授权时携带的redirect_uri一致,并且是严格匹配模式,客户端配置中不能只配置一个域名
  * 请求响应:
- * 		access_token:访问token,格式为uuid
+ * 		access_token:访问token,根据设置不同可能为Jwt或Opaque
  * 		refresh_token:刷新token,用来请求下一次的access_token
  * 		scope:申请并获得授权的scope
  * 		id_token:如果认证服务器开启了OIDC,且当前scope中有openid权限,才会返回该参数
@@ -525,7 +527,7 @@ import com.wy.repository.RedisOAuth2AuthorizationService;
  * 		grant_type:授权模式,固定为refresh_token
  * 		refresh_token:上一步中获得的授权码
  * 请求响应:
- * 		access_token:访问token,格式为uuid
+ * 		access_token:访问token,根据设置不同可能为Jwt或Opaque
  * 		refresh_token:刷新token,用来请求下一次的access_token
  * 		scope:申请并获得授权的 scope
  * 		id_token:如果认证服务器开启了OIDC,且当前scope中有openid权限,才会返回该参数
@@ -544,19 +546,18 @@ import com.wy.repository.RedisOAuth2AuthorizationService;
  * 客户端模式
  * 
  * <pre>
- * 客户端授权:POST(/oauth2/token):http://ip:port/oauth2/token?grant_type=client_credentials&scope=test1
+ * 客户端无需授权,直接获取token:POST(/oauth2/token):http://ip:port/oauth2/token?grant_type=client_credentials&scope=openid profile message.read
  * 请求头:
  * 		Authorization:Basic Base64编码的({client_id}:{client_secret})
  * 		Content-Type:application/x-www-form-urlencoded
  * 请求参数:
  * 		grant_type:授权类型,固定为client_credentials
- * 		scope:可选.申请的权限范围
+ * 		scope:可选,申请的权限范围.若不传,无法调用其他接口
  * 请求响应:
- * 		access_token:访问token,格式为uuid
+ * 		access_token:访问token,根据设置不同可能为Jwt或Opaque
  * 		scope:申请并获得授权的 scope
  * 		token_type:token的类型,固定值Bearer
  * 		expires_in:访问token有效期,单位为秒
- * 		refresh_token:无该参数.若token过期,需要重新请求
  * 
  * 拦截器流程:
  * {@link OAuth2ClientAuthenticationFilter#doFilterInternal()}
@@ -665,7 +666,7 @@ import com.wy.repository.RedisOAuth2AuthorizationService;
  * 		code_verifier:和code_challenge一对的code
  * </pre>
  * 
- * 调用OIDC的/userinfo接口:
+ * 调用OIDC的/userinfo接口,只有授权码模式才能调用该接口:
  * 
  * <pre>
  * 1.认证服务必须开启OIDC功能,{@link AuthorizationServerConfig#authorizationServerSecurityFilterChain}
