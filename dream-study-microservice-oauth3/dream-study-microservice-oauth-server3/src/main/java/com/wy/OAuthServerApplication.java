@@ -653,7 +653,7 @@ import jakarta.annotation.security.PermitAll;
  * </pre>
  * 
  * PKCE:授权码扩展模式.授权服务器需要对客户端开启proofkey:RegisteredClient.clientSettings(ClientSettings.builder().requireProofKey(Boolean.TRUE).build()),
- * 同时需要生成CodeVerifier和CodeChallenge,可以在网上生成.随机生成的CodeVerifier和CodeChallenge可以保证流程的安全,无法让他人拆包获取clientId和clientSecret来伪造登录信息
+ * 同时需要生成CodeVerifier和CodeChallenge,可以在网上生成.随机生成的CodeVerifier和CodeChallenge可以保证流程的安全,无法让他人拆包获取clientSecret来伪造登录信息
  * 
  * <pre>
  * POST(/oauth2/authorize):http://ip:port/oauth2/authorize?response_type=code&client_id=pkce-message-client&redirect_uri=https://baidu.com&scope=message.read
@@ -663,7 +663,9 @@ import jakarta.annotation.security.PermitAll;
  * 		client_id:客户端id
  * 		redirect_uri:获取授权的回调地址
  * 		scope:请求授权的范围
- * 		code_challenge:在CodeVerifier的SHA256值基础上,再用BASE64URL编码
+ * 		code_challenge:根据code_verifier和不同code_challenge_method生成的随机值
+ * 		code_challenge_method:必传,通过code_verifier生成code_challenge的算法类型.默认plain,即code_challenge和code_verifier一样;
+ * 			S256:在CodeVerifier的SHA256值基础上,再用BASE64URL编码.code_challenge=BASE64URL-ENCODE(SHA256(ASCII(code_verifier)))
  * 
  * 其他流程和授权码模式一样,只有获取token时传递的参数不一样
  * 
@@ -674,6 +676,38 @@ import jakarta.annotation.security.PermitAll;
  * 		redirect_uri:获取授权的回调地址
  * 		code:授权码
  * 		code_verifier:和code_challenge一对的code
+ * 		scope:请求授权的范围
+ * </pre>
+ * 
+ * 设备授权码模式
+ * 
+ * <pre>
+ * POST(/oauth2/device_authorization):http://ip:port/oauth2/device_authorization
+ * 请求参数:
+ * 		client_id:客户端id
+ * 		scope:请求授权的范围
+ * 请求响应:
+ *		user_code: 用户需要输入的验证码
+ *		device_code:设备验证码
+ *		verification_uri_complete:用户提交之后的验证URI,其中包含user_code或与user_coder功能相同的其他信息,专为非文本传输而设计
+ *		verification_uri:授权服务器上的用户验证URI,用户需要手动输入user_code到浏览器中
+ *		expires_in:user_code和device_code过期时间,单位秒
+ *	
+ *	在浏览器调用verification_uri或verification_uri_complete
+ *
+ *	POST(/oauth2/token):http://ip:port/oauth2/device_authorization
+ * 请求参数:
+ * 		client_id:客户端id
+ * 		scope:请求授权的范围
+ * 		device_code:第一步中的device_code
+ * 		grant_type:固定为urn:ietf:params:oauth:grant-type:device_code,参照{@link AuthorizationGrantType#DEVICE_CODE}
+ * 		
+ * 请求响应:
+ * 		access_token:访问token,根据设置不同可能为Jwt或Opaque
+ * 		refresh_token:刷新token,用来请求下一次的access_token
+ * 		scope:申请并获得授权的scope
+ * 		token_type:token的类型,固定值Bearer
+ * 		expires_in:访问token有效期,单位为秒
  * </pre>
  * 
  * 调用OIDC的/userinfo接口,只有授权码模式才能调用该接口:
@@ -688,6 +722,8 @@ import jakarta.annotation.security.PermitAll;
  * 
  * <pre>
  * 文档:https://www.spring-doc.cn/spring-security/6.3.3/reactive_authorization_method.html
+ * 文档:https://docs.spring.io/spring-security/reference/servlet/authorization/method-security.html
+ * 文档:https://docs.spring.io/spring-security/reference/servlet/authorization/method-security.html#authorization-expressions
  * 
  * {@link DenyAll}:拒绝所有的访问
  * {@link PermitAll}:允许所有访问
@@ -696,29 +732,27 @@ import jakarta.annotation.security.PermitAll;
  * {@link Secured("IS_AUTHENTICATED_ANONYMOUSLY")}:该方法允许匿名用户访问
  * 
  * {@link PreAuthorize}:在方法调用之前, 基于表达式结果来限制方法的使用,支持SPEL表达式
- * {@link PreAuthorize("#authentication.authorities.contains('message.read')")}:当前认证客户端是否有某个权限,该值从认证信息的authorities中取值
- * {@link PreAuthorize("#oauth2.hasAuthority('message.read')")}:当前认证客户端是否有某个权限,低版本使用,效果同上
- * 
- * {@link PreAuthorize("hasAuthority('message.read')")}:当前认证客户端是否有某个权限,任何版本都可用
- * {@link PreAuthorize("hasAnyAuthority('message.read','message.write')")}:当前认证客户端是否有多个权限种的任何一个,任何版本都可用
+ * {@link PreAuthorize("hasAuthority('read')")}:当前认证客户端是否有某个权限,任何版本都可用
+ * {@link PreAuthorize("hasAnyAuthority('read','write')")}:当前认证客户端是否有多个权限种的任何一个,任何版本都可用
  * {@link PreAuthorize("hasRole('admin')")}:当前认证客户端是否有admin角色,任何版本都可用
  * {@link PreAuthorize("hasAnyRole('admin','guest')")}:当前认证客户端是否有多个角色中的任意一个,任何版本都可用
- * 
- * {@link PreAuthorize("#authentication.oauth2Request.scope.contains('message.read')")}:当前认证客户端是否有某个scope,该值从认证信息的scope中取值
- * {@link PreAuthorize("#oauth2.hasScope('message.read')")}:当前认证客户端是否有某个scope,低版本使用,效果同上
- * 
- * {@link PreAuthorize("@func.apply(#account)")}:在方法上使用.@func为{@link Function},#account为方法形参,只要返回值为true即可
- * {@link PreAuthorize("#account.name == 'admin'")}:#account为方法形参,只要account中的name属性为admin即可访问
- * {@link PreAuthorize("#permissionService.hasPermission(request,authentication)")}:#permissionService为PermissionService的组件,调用hasPermission()
- * 
- * {@link PreAuthorize("principal.name == 'admin'")}:获取当前用户的principal主体对象
- * {@link PreAuthorize("authentication.name == 'admin'")}:获取当前用户的authentication对象
  * {@link PreAuthorize("isAnonymous()")}:如果是匿名访问,返回true
  * {@link PreAuthorize("isRememberMe()")}:如果是remember-me自动认证,则返回true
  * {@link PreAuthorize("isAuthenticated()")}:如果不是匿名访问,则返回true
  * {@link PreAuthorize("isFullAuthenticated()")}:如果不是匿名访问或remember-me认证登陆,则返回true
  * {@link PreAuthorize("hasPermission('target','permission')")}:如果有指定权限,当前全部返回的都是false
  * {@link PreAuthorize("hasPermission('target','targetType','permission')")}:如果有指定权限,当前全部返回的都是false
+ * 
+ * {@link PreAuthorize("authentication.name == 'admin'")}:获取当前用户的authentication对象
+ * {@link PreAuthorize("authentication.authorities.contains('read')")}:当前认证客户端是否有某个权限,该值从认证信息的authorities中取值
+ * {@link PreAuthorize("oauth2.hasAuthority('read')")}:当前认证客户端是否有某个权限,低版本使用,效果同上
+ * {@link PreAuthorize("authentication.credentials.claims['scope'].contains('read')")}:当前认证客户端是否有某个scope,该值从认证信息的scope中取值.claims为Map类型
+ * {@link PreAuthorize("oauth2.hasScope('read')")}:当前认证客户端是否有某个scope,低版本使用,效果同上
+ * {@link PreAuthorize("principal.name == 'admin'")}:获取当前用户的principal主体对象
+ * 
+ * {@link PreAuthorize("#account.name == 'admin'")}:#account为方法形参,只要account中的name属性为admin即可访问
+ * {@link PreAuthorize("@func.apply(#account)")}:在方法上使用.@func为{@link Function},#account为方法形参,只要返回值为true即可
+ * {@link PreAuthorize("@permissionService.hasPermission(request,authentication)")}:@permissionService为PermissionService的组件,调用hasPermission()
  * 
  * {@link PostAuthorize}:允许方法调用,但是如果表达式结果为false,将抛出一个安全性异常
  * {@link PostAuthorize("returnObject.owner == authentication.name")}:returnObject为固定参数,表示方法返回对象,只能在当前注解和PostFilter中使用

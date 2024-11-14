@@ -8,7 +8,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 import dream.flying.flower.framework.core.json.JsonHelpers;
-import dream.flying.flower.framework.security.constant.ConstSecurity;
 import dream.flying.flower.result.Result;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,11 +22,20 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class DeviceAuthorizationResponseHandler implements AuthenticationSuccessHandler {
 
+	/**
+	 * 设备授权成功后重定向页面
+	 */
+	private final String deviceActivatedUri;
+
+	public DeviceAuthorizationResponseHandler(String deviceActivatedUri) {
+		this.deviceActivatedUri = deviceActivatedUri;
+	}
+
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
 			Authentication authentication) throws IOException, ServletException {
 		// 写回json数据
-		Result<Object> result = Result.ok(ConstSecurity.DEVICE_ACTIVATED_URI);
+		Result<Object> result = Result.ok(deviceActivatedUri);
 		response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 		response.getWriter().write(JsonHelpers.toString(result));

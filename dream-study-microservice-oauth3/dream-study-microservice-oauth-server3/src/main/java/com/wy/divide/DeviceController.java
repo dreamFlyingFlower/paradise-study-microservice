@@ -68,11 +68,10 @@ public class DeviceController {
 				.queryParam(OAuth2ParameterNames.STATE, UriUtils.encode(state, StandardCharsets.UTF_8))
 				.queryParam(OAuth2ParameterNames.CLIENT_ID, clientId)
 				.queryParam(OAuth2ParameterNames.USER_CODE, userCode)
-				.queryParam(ConstSecurity.NONCE_HEADER_NAME,
-						ObjectUtils.isEmpty(nonceId) ? session.getId() : nonceId);
+				.queryParam(ConstSecurity.NONCE_HEADER_NAME, ObjectUtils.isEmpty(nonceId) ? session.getId() : nonceId);
 
 		String uriString = uriBuilder.build(Boolean.TRUE).toUriString();
-		if (ObjectUtils.isEmpty(userCode) || !UrlUtils.isAbsoluteUrl(ConstSecurity.DEVICE_ACTIVATE_URI)) {
+		if (ObjectUtils.isEmpty(userCode) || !UrlUtils.isAbsoluteUrl(DeviceConfig.DEVICE_ACTIVATE_URI)) {
 			// 不是设备码模式或者设备码验证页面不是前后端分离的,无需返回json,直接重定向
 			redirectStrategy.sendRedirect(request, response, uriString);
 			return null;
@@ -211,10 +210,9 @@ public class DeviceController {
 	public String activateRedirect(HttpSession session,
 			@RequestParam(value = "user_code", required = false) String userCode) {
 
-		UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(ConstSecurity.DEVICE_ACTIVATE_URI)
+		UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(DeviceConfig.DEVICE_ACTIVATE_URI)
 				.queryParam("userCode", userCode)
 				.queryParam(ConstSecurity.NONCE_HEADER_NAME, session.getId());
 		return "redirect:" + uriBuilder.build(Boolean.TRUE).toUriString();
 	}
-
 }

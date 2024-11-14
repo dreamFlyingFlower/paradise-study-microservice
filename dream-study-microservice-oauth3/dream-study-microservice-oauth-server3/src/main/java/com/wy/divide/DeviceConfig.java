@@ -79,8 +79,8 @@ import com.wy.token.CustomizerTokenCustomizer;
 import dream.flying.flower.autoconfigure.redis.helper.RedisStrHelpers;
 import dream.flying.flower.framework.security.constant.ConstSecurity;
 import dream.flying.flower.framework.security.entrypoint.UnauthorizedAuthenticationEntryPoint;
-import dream.flying.flower.framework.security.handler.LoginSuccessHandler;
 import dream.flying.flower.framework.security.handler.LoginFailureHandler;
+import dream.flying.flower.framework.security.handler.LoginSuccessHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
@@ -123,6 +123,10 @@ public class DeviceConfig {
 	private static final String CUSTOM_DEVICE_REDIRECT_URI = "/activate/redirect";
 
 	private final RedisSecurityContextRepository redisSecurityContextRepository;
+
+	public static final String DEVICE_ACTIVATE_URI = "http://127.0.0.1:8888/activate";
+
+	public static final String DEVICE_ACTIVATED_URI = "http://127.0.0.1:8888/activated";
 
 	/**
 	 * 配置端点的过滤器链
@@ -171,8 +175,7 @@ public class DeviceConfig {
 				})
 				// 设置设备码用户验证url(自定义用户验证页)
 				.deviceAuthorizationEndpoint(deviceAuthorizationEndpoint -> deviceAuthorizationEndpoint.verificationUri(
-						UrlUtils.isAbsoluteUrl(ConstSecurity.DEVICE_ACTIVATE_URI) ? CUSTOM_DEVICE_REDIRECT_URI
-								: ConstSecurity.DEVICE_ACTIVATE_URI))
+						UrlUtils.isAbsoluteUrl(DEVICE_ACTIVATE_URI) ? CUSTOM_DEVICE_REDIRECT_URI : DEVICE_ACTIVATE_URI))
 				// 设置验证设备码用户确认页面
 				.deviceVerificationEndpoint(deviceVerificationEndpoint -> {
 					// 校验授权确认页面是否为完整路径；是否是前后端分离的页面
@@ -185,10 +188,10 @@ public class DeviceConfig {
 						deviceVerificationEndpoint.errorResponseHandler(new ConsentAuthenticationFailureHandler());
 					}
 					// 如果授权码验证页面或者授权确认页面是前后端分离的
-					if (UrlUtils.isAbsoluteUrl(ConstSecurity.DEVICE_ACTIVATE_URI) || absoluteUrl) {
+					if (UrlUtils.isAbsoluteUrl(DEVICE_ACTIVATE_URI) || absoluteUrl) {
 						// 添加响应json处理
-						deviceVerificationEndpoint
-								.deviceVerificationResponseHandler(new DeviceAuthorizationResponseHandler());
+						deviceVerificationEndpoint.deviceVerificationResponseHandler(
+								new DeviceAuthorizationResponseHandler(DEVICE_ACTIVATED_URI));
 					}
 				})
 				.clientAuthentication(clientAuthentication ->
