@@ -48,6 +48,7 @@ import com.wy.provider.device.DeviceClientAuthenticationConverter;
 import com.wy.provider.device.DeviceClientAuthenticationProvider;
 import com.wy.token.CustomizerTokenCustomizer;
 
+import dream.flying.flower.framework.security.constant.ConstOAuthGrantType;
 import dream.flying.flower.framework.security.constant.ConstSecurity;
 import dream.flying.flower.framework.security.entrypoint.LoginRedirectAuthenticationEntryPoint;
 import dream.flying.flower.framework.security.handler.LoginFailureHandler;
@@ -183,7 +184,7 @@ public class AuthorizationServerConfig {
 		http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
 				// 让认证服务器元数据中有自定义的认证方式,这样访问/.well-known/oauth-authorization-server时返回的元数据中有自定义的grant_type
 				.authorizationServerMetadataEndpoint(metadata -> metadata.authorizationServerMetadataCustomizer(
-						customizer -> customizer.grantType(ConstSecurity.GRANT_TYPE_SMS_CODE)))
+						customizer -> customizer.grantType(ConstOAuthGrantType.SMS_CODE.getValue())))
 				// 添加自定义grant_type-短信认证登录
 				.tokenEndpoint(tokenEndpoint -> tokenEndpoint.accessTokenRequestConverter(converter)
 						.authenticationProvider(provider)

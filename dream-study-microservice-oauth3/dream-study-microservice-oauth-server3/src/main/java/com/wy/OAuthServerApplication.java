@@ -90,6 +90,7 @@ import org.springframework.security.oauth2.server.authorization.web.NimbusJwkSet
 import org.springframework.security.oauth2.server.authorization.web.OAuth2AuthorizationEndpointFilter;
 import org.springframework.security.oauth2.server.authorization.web.OAuth2AuthorizationServerMetadataEndpointFilter;
 import org.springframework.security.oauth2.server.authorization.web.OAuth2ClientAuthenticationFilter;
+import org.springframework.security.oauth2.server.authorization.web.OAuth2DeviceAuthorizationEndpointFilter;
 import org.springframework.security.oauth2.server.authorization.web.OAuth2TokenEndpointFilter;
 import org.springframework.security.oauth2.server.authorization.web.OAuth2TokenIntrospectionEndpointFilter;
 import org.springframework.security.oauth2.server.authorization.web.OAuth2TokenRevocationEndpointFilter;
@@ -683,6 +684,7 @@ import jakarta.annotation.security.PermitAll;
  * 
  * <pre>
  * POST(/oauth2/device_authorization):http://ip:port/oauth2/device_authorization
+ * {@link OAuth2DeviceAuthorizationEndpointFilter}:URL拦截器,认证类为匿名内部类
  * 请求参数:
  * 		client_id:客户端id
  * 		scope:请求授权的范围

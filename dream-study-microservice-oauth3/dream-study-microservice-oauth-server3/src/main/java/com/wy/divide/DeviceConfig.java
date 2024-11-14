@@ -77,6 +77,7 @@ import com.wy.provider.device.DeviceClientAuthenticationProvider;
 import com.wy.token.CustomizerTokenCustomizer;
 
 import dream.flying.flower.autoconfigure.redis.helper.RedisStrHelpers;
+import dream.flying.flower.framework.security.constant.ConstOAuthGrantType;
 import dream.flying.flower.framework.security.constant.ConstSecurity;
 import dream.flying.flower.framework.security.entrypoint.UnauthorizedAuthenticationEntryPoint;
 import dream.flying.flower.framework.security.handler.LoginFailureHandler;
@@ -213,7 +214,7 @@ public class DeviceConfig {
 		http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
 				// 让认证服务器元数据中有自定义的认证方式
 				.authorizationServerMetadataEndpoint(metadata -> metadata.authorizationServerMetadataCustomizer(
-						customizer -> customizer.grantType(ConstSecurity.GRANT_TYPE_SMS_CODE)))
+						customizer -> customizer.grantType(ConstOAuthGrantType.SMS_CODE.getValue())))
 				// 添加自定义grant_type——短信认证登录
 				.tokenEndpoint(tokenEndpoint -> tokenEndpoint.accessTokenRequestConverter(converter)
 						.authenticationProvider(provider));
@@ -442,7 +443,7 @@ public class DeviceConfig {
 				.authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
 				.authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
 				// 客户端添加自定义认证
-				.authorizationGrantType(new AuthorizationGrantType(ConstSecurity.GRANT_TYPE_SMS_CODE))
+				.authorizationGrantType(ConstOAuthGrantType.SMS_CODE)
 				// 授权码模式回调地址,oauth2.1已改为精准匹配,不能只设置域名,并且屏蔽了localhost,本机使用127.0.0.1访问
 				.redirectUri("http://127.0.0.1:8080/login/oauth2/code/messaging-client-oidc")
 				.redirectUri("https://www.baidu.com")

@@ -27,7 +27,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import dream.flying.flower.framework.security.constant.ConstSecurity;
+import dream.flying.flower.framework.security.constant.ConstOAuthGrantType;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -233,13 +233,9 @@ public class RedisRegisteredClientRepository implements RegisteredClientReposito
 				.authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
 				.authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
 				.authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
-				.authorizationGrantType(new AuthorizationGrantType(ConstSecurity.GRANT_TYPE_SMS_CODE))
+				.authorizationGrantType(ConstOAuthGrantType.SMS_CODE)
 				// 授权码模式回调地址,oauth2.1已改为精准匹配,不能只设置域名,并且屏蔽了localhost,本机使用127.0.0.1访问
 				.redirectUri("http://127.0.0.1:5173/OAuth2Redirect")
-				.redirectUri("https://j1zr8ren8w.51xd.pub/OAuth2Redirect")
-				.redirectUri("https://j1zr8ren8w.51xd.pub/demonstrate/OAuth2Redirect")
-				.redirectUri("https://flow-cloud.love/OAuth2Redirect")
-				.redirectUri("https://authorization-example.vercel.app/OAuth2Redirect")
 				.redirectUri("http://127.0.0.1:8000/login/oauth2/code/messaging-client-oidc")
 				// 该客户端的授权范围,OPENID与PROFILE是IdToken的scope,获取授权时请求OPENID的scope时认证服务会返回IdToken
 				.scope(OidcScopes.OPENID)

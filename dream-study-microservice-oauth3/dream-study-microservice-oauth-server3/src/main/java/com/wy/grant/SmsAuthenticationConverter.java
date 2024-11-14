@@ -8,7 +8,6 @@ import java.util.Set;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.security.web.authentication.AuthenticationConverter;
@@ -17,6 +16,7 @@ import org.springframework.util.StringUtils;
 
 import com.wy.helpers.SecurityContextOAuth2Helpers;
 
+import dream.flying.flower.framework.security.constant.ConstOAuthGrantType;
 import dream.flying.flower.framework.security.constant.ConstSecurity;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -35,7 +35,7 @@ public class SmsAuthenticationConverter implements AuthenticationConverter {
 	public Authentication convert(HttpServletRequest request) {
 		// grant_type (REQUIRED)
 		String grantType = request.getParameter(OAuth2ParameterNames.GRANT_TYPE);
-		if (!ConstSecurity.GRANT_TYPE_SMS_CODE.equals(grantType)) {
+		if (!ConstOAuthGrantType.SMS_CODE.getValue().equals(grantType)) {
 			return null;
 		}
 
@@ -58,11 +58,9 @@ public class SmsAuthenticationConverter implements AuthenticationConverter {
 
 		// Mobile phone number (REQUIRED)
 		String username = parameters.getFirst(ConstSecurity.OAUTH_PARAMETER_NAME_PHONE);
-		if (!StringUtils.hasText(username)
-				|| parameters.get(ConstSecurity.OAUTH_PARAMETER_NAME_PHONE).size() != 1) {
+		if (!StringUtils.hasText(username) || parameters.get(ConstSecurity.OAUTH_PARAMETER_NAME_PHONE).size() != 1) {
 			SecurityContextOAuth2Helpers.throwError(OAuth2ErrorCodes.INVALID_REQUEST,
-					"OAuth 2.0 Parameter: " + ConstSecurity.OAUTH_PARAMETER_NAME_PHONE,
-					ACCESS_TOKEN_REQUEST_ERROR_URI);
+					"OAuth 2.0 Parameter: " + ConstSecurity.OAUTH_PARAMETER_NAME_PHONE, ACCESS_TOKEN_REQUEST_ERROR_URI);
 		}
 
 		// SMS verification code (REQUIRED)
@@ -83,7 +81,6 @@ public class SmsAuthenticationConverter implements AuthenticationConverter {
 		});
 
 		// 构建AbstractAuthenticationToken子类实例并返回
-		return new SmsAuthenticationToken(new AuthorizationGrantType(ConstSecurity.GRANT_TYPE_SMS_CODE),
-				clientPrincipal, requestedScopes, additionalParameters);
+		return new SmsAuthenticationToken(ConstOAuthGrantType.SMS_CODE, clientPrincipal, requestedScopes, additionalParameters);
 	}
 }

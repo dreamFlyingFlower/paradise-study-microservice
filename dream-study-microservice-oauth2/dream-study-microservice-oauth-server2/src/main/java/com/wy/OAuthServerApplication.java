@@ -671,10 +671,11 @@ import com.wy.config.AuthorizationServerConfig;
  * 		scope:请求授权的范围
  * </pre>
  * 
- * 设备授权码模式
+ * 设备授权码模式,当前版本无该模式
  * 
  * <pre>
  * POST(/oauth2/device_authorization):http://ip:port/oauth2/device_authorization
+ * {@link OAuth2DeviceAuthorizationEndpointFilter}:URL拦截器,认证类为匿名内部类
  * 请求参数:
  * 		client_id:客户端id
  * 		scope:请求授权的范围
@@ -687,7 +688,7 @@ import com.wy.config.AuthorizationServerConfig;
  *	
  *	在浏览器调用verification_uri或verification_uri_complete
  *
- *	POST(/oauth2/token):http://ip:port/oauth2/device_authorization
+ *	POST(/oauth2/token):http://ip:port/oauth2/token
  * 请求参数:
  * 		client_id:客户端id
  * 		scope:请求授权的范围
@@ -710,7 +711,7 @@ import com.wy.config.AuthorizationServerConfig;
  * 3.客户端调用/oauth2/authorize进行认证时,scope必须带上openid
  * </pre>
  * 
-* 相关权限拦截注解,SpringSecurity6和之前版本不一样,参照{@link SecurityExpressionRoot}中相关方法:
+ * 相关权限拦截注解,SpringSecurity6和之前版本不一样,参照{@link SecurityExpressionRoot}中相关方法:
  * 
  * <pre>
  * 文档:https://www.spring-doc.cn/spring-security/6.3.3/reactive_authorization_method.html
