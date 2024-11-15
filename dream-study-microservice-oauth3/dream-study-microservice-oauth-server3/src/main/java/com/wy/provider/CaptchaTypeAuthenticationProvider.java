@@ -7,6 +7,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.util.ObjectUtils;
 
 import com.wy.constant.ConstAuthorizationServerRedis;
@@ -79,7 +80,7 @@ public class CaptchaTypeAuthenticationProvider extends DaoAuthenticationProvider
 		}
 
 		// 获取参数中的验证码
-		String code = request.getParameter(ConstSecurity.CAPTCHA_CODE_NAME);
+		String code = request.getParameter(OAuth2ParameterNames.CODE);
 		if (ObjectUtils.isEmpty(code)) {
 			throw new AuthException("The captcha cannot be empty.");
 		}

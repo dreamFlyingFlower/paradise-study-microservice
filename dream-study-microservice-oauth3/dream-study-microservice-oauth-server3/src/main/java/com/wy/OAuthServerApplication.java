@@ -712,6 +712,16 @@ import jakarta.annotation.security.PermitAll;
  * 		expires_in:访问token有效期,单位为秒
  * </pre>
  * 
+ * 短信验证码模式
+ * 
+ * <pre>
+ * 先调用验证码生成接口获取验证码
+ * 1.如果是直接用服务器调用短信认证,需要加loginType参数,值为sms_code
+ * 2.如果是浏览器调用,无需添加loginType,页面自带loginType
+ * 
+ *	POST(/oauth2/token):http://ip:port/oauth2/token,同授权码认证
+ * </pre>
+ * 
  * 调用OIDC的/userinfo接口,只有授权码模式才能调用该接口:
  * 
  * <pre>

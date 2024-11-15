@@ -17,7 +17,7 @@ import org.springframework.util.StringUtils;
 import com.wy.helpers.SecurityContextOAuth2Helpers;
 
 import dream.flying.flower.framework.security.constant.ConstOAuthGrantType;
-import dream.flying.flower.framework.security.constant.ConstSecurity;
+import dream.flying.flower.framework.security.constant.ConstOAuthParameter;
 import jakarta.servlet.http.HttpServletRequest;
 
 /**
@@ -57,19 +57,17 @@ public class SmsAuthenticationConverter implements AuthenticationConverter {
 		}
 
 		// Mobile phone number (REQUIRED)
-		String username = parameters.getFirst(ConstSecurity.OAUTH_PARAMETER_NAME_PHONE);
-		if (!StringUtils.hasText(username) || parameters.get(ConstSecurity.OAUTH_PARAMETER_NAME_PHONE).size() != 1) {
+		String username = parameters.getFirst(ConstOAuthParameter.PHONE);
+		if (!StringUtils.hasText(username) || parameters.get(ConstOAuthParameter.PHONE).size() != 1) {
 			SecurityContextOAuth2Helpers.throwError(OAuth2ErrorCodes.INVALID_REQUEST,
-					"OAuth 2.0 Parameter: " + ConstSecurity.OAUTH_PARAMETER_NAME_PHONE, ACCESS_TOKEN_REQUEST_ERROR_URI);
+					"OAuth 2.0 Parameter: " + ConstOAuthParameter.PHONE, ACCESS_TOKEN_REQUEST_ERROR_URI);
 		}
 
 		// SMS verification code (REQUIRED)
-		String password = parameters.getFirst(ConstSecurity.OAUTH_PARAMETER_NAME_SMS_CAPTCHA);
-		if (!StringUtils.hasText(password)
-				|| parameters.get(ConstSecurity.OAUTH_PARAMETER_NAME_SMS_CAPTCHA).size() != 1) {
+		String password = parameters.getFirst(OAuth2ParameterNames.CODE);
+		if (!StringUtils.hasText(password) || parameters.get(OAuth2ParameterNames.CODE).size() != 1) {
 			SecurityContextOAuth2Helpers.throwError(OAuth2ErrorCodes.INVALID_REQUEST,
-					"OAuth 2.0 Parameter: " + ConstSecurity.OAUTH_PARAMETER_NAME_SMS_CAPTCHA,
-					ACCESS_TOKEN_REQUEST_ERROR_URI);
+					"OAuth 2.0 Parameter: " + OAuth2ParameterNames.CODE, ACCESS_TOKEN_REQUEST_ERROR_URI);
 		}
 
 		// 提取附加参数
@@ -81,6 +79,7 @@ public class SmsAuthenticationConverter implements AuthenticationConverter {
 		});
 
 		// 构建AbstractAuthenticationToken子类实例并返回
-		return new SmsAuthenticationToken(ConstOAuthGrantType.SMS_CODE, clientPrincipal, requestedScopes, additionalParameters);
+		return new SmsAuthenticationToken(ConstOAuthGrantType.SMS_CODE, clientPrincipal, requestedScopes,
+				additionalParameters);
 	}
 }

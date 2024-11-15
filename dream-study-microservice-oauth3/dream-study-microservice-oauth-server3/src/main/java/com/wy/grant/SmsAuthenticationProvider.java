@@ -41,7 +41,7 @@ import org.springframework.util.ObjectUtils;
 
 import com.wy.helpers.SecurityContextOAuth2Helpers;
 
-import dream.flying.flower.framework.security.constant.ConstSecurity;
+import dream.flying.flower.framework.security.constant.ConstOAuthParameter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -226,8 +226,8 @@ public class SmsAuthenticationProvider implements AuthenticationProvider {
 	public Authentication getAuthenticatedUser(SmsAuthenticationToken authenticationToken) {
 		// 获取手机号密码
 		Map<String, Object> additionalParameters = authenticationToken.getAdditionalParameters();
-		String phone = (String) additionalParameters.get(ConstSecurity.OAUTH_PARAMETER_NAME_PHONE);
-		String smsCaptcha = (String) additionalParameters.get(ConstSecurity.OAUTH_PARAMETER_NAME_SMS_CAPTCHA);
+		String phone = (String) additionalParameters.get(ConstOAuthParameter.PHONE);
+		String smsCaptcha = (String) additionalParameters.get(OAuth2ParameterNames.CODE);
 		// 构建UsernamePasswordAuthenticationToken通过AbstractUserDetailsAuthenticationProvider及其子类对手机号与验证码进行校验
 		// 这里就是我说的短信验证与密码模式区别不大,如果是短信验证模式则在SmsCaptchaLoginAuthenticationProvider中加一个校验,
 		// 使框架支持手机号、验证码校验,反之不加就是账号密码登录
