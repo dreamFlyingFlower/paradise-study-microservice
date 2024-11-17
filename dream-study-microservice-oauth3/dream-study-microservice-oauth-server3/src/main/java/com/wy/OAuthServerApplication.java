@@ -1,11 +1,17 @@
 package com.wy;
 
+import java.util.Arrays;
 import java.util.function.Function;
 
 import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.aot.hint.MemberCategory;
+import org.springframework.aot.hint.RuntimeHints;
+import org.springframework.aot.hint.RuntimeHintsRegistrar;
+import org.springframework.aot.hint.TypeReference;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.ImportRuntimeHints;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.expression.SecurityExpressionRoot;
 import org.springframework.security.access.prepost.PostAuthorize;
@@ -122,10 +128,12 @@ import org.springframework.security.web.servletapi.SecurityContextHolderAwareReq
 import org.springframework.security.web.session.SessionManagementFilter;
 import org.springframework.web.accept.ContentNegotiationStrategy;
 import org.springframework.web.filter.CorsFilter;
+import org.thymeleaf.expression.Lists;
 
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.wy.config.AuthorizationClientConfig;
 import com.wy.config.AuthorizationServerConfig;
+import com.wy.endpoint.AuthorizationServerEndpoint;
 import com.wy.repository.RedisOAuth2AuthorizationService;
 
 import jakarta.annotation.security.DenyAll;
@@ -134,7 +142,8 @@ import jakarta.annotation.security.PermitAll;
 /**
  * SpringSecurity6认证服务器,抛弃了EnableAuthorizationServer等相关注解,直接使用拦截器SecurityFilterChain
  * 
- * 文档:https://www.spring-doc.cn/spring-authorization-server/1.3.1/protocol-endpoints.html
+ * 中文文档:https://www.spring-doc.cn/spring-authorization-server/1.3.2/protocol-endpoints.html
+ * 英文文档:https://docs.spring.io/spring-authorization-server/reference/overview.html
  * 
  * 自定义授权模式:https://docs.spring.io/spring-authorization-server/reference/guides/how-to-ext-grant-type.html
  * 
@@ -147,8 +156,6 @@ import jakarta.annotation.security.PermitAll;
  * 是Spring Security OAuth的进化版本,引入了对OAuth 2.1和OpenID Connect 1.0(OIDC)规范的支持.
  * 基于Spring Security,为构建OpenID Connect 1.0身份提供者和OAuth2授权服务器产品提供了安全、轻量级和可定制的基础.
  * OAuth 2.1和OpenID Connect 1.0是用于身份验证和授权的行业标准协议,被广泛应用于各种应用程序和系统,以实现安全的用户身份验证和授权流程.
- * 
- * Jwt和Opaque:Jwt是公开的,直接在线就可以解析看到里面的数据,但不能修改.Opaque一个不透明的token,在看起来就是一个字符串
  * 
  * 相关参数:
  * client_id: 客户端的id
@@ -164,6 +171,18 @@ import jakarta.annotation.security.PermitAll;
  * authorization_code: 根据授权码模式的授权码获取
  * client_credentials: 客户端模式获取
  * id_token:当开启OIDC时,用户的基本信息将保存在该字段中,也是JWT格式
+ * </pre>
+ * 
+ * Jwt和Opaque
+ * 
+ * <pre>
+ * Jwt是公开的,直接在线就可以解析看到里面的数据,但不能修改,存储的数据多
+ * Opaque一个不透明的token,看起来就是一个无意义的字符串,和JWT的区别在于存储数据量的多少
+ * Opaque方式向token中自定义存数据,自定义的数据可以从Authentication中获取,解决的是token存储信息过多的问题
+ * 
+ * 要使用Opaque,客户端和认证服务器的资源服务器都要进行配置
+ * 客户端设置TokenSettings.builder().accessTokenFormat(OAuth2TokenFormat.REFERENCE),默认为OAuth2TokenFormat.SELF_CONTAINED
+ * 认证服务器配置httpSecurity.oauth2ResourceServer(resourceServer->resourceServer.opaqueToken(Customizer.withDefaults()));,默认为jwt
  * </pre>
  * 
  * 如果认证服务器开启了oidc,可调用该URL查询认证服务器相关端点以及配置信息:http://ip:port/{context-path}/.well-known/openid-configuration.
@@ -533,10 +552,11 @@ import jakarta.annotation.security.PermitAll;
  *	8.刷新token:POST(oauth2/token):http://ip:port/oauth2/token?grant_type=refresh_token&refresh_token=
  * 请求头:
  * 		Authorization:Basic Base64编码的({client_id}:{client_secret})
- * 		Content-Type:form-data
+ * 		Content-Type:application/x-www-form-urlencoded
  * 请求参数:
  * 		grant_type:授权模式,固定为refresh_token
- * 		refresh_token:上一步中获得的授权码
+ * 		refresh_token:上一步中获得的refresh_token
+ * 		scope:可选
  * 请求响应:
  * 		access_token:访问token,根据设置不同可能为Jwt或Opaque
  * 		refresh_token:刷新token,用来请求下一次的access_token
@@ -685,6 +705,8 @@ import jakarta.annotation.security.PermitAll;
  * <pre>
  * POST(/oauth2/device_authorization):http://ip:port/oauth2/device_authorization
  * {@link OAuth2DeviceAuthorizationEndpointFilter}:URL拦截器,认证类为匿名内部类
+ * 请求头:
+ *		Content-Type:application/x-www-form-urlencoded
  * 请求参数:
  * 		client_id:客户端id
  * 		scope:请求授权的范围
@@ -694,10 +716,13 @@ import jakarta.annotation.security.PermitAll;
  *		verification_uri_complete:用户提交之后的验证URI,其中包含user_code或与user_coder功能相同的其他信息,专为非文本传输而设计
  *		verification_uri:授权服务器上的用户验证URI,用户需要手动输入user_code到浏览器中
  *		expires_in:user_code和device_code过期时间,单位秒
+ *		interval:客户端在向令牌端点发出轮询请求之间应等待的最短时间(秒),默认5秒
  *	
- *	在浏览器调用verification_uri或verification_uri_complete
+ *	在浏览器调用verification_uri或verification_uri_complete,如果未登录,需要先登录
  *
- *	POST(/oauth2/token):http://ip:port/oauth2/device_authorization
+ *	POST(/oauth2/token):http://ip:port/oauth2/token
+ * 请求头:
+ *		Content-Type:application/x-www-form-urlencoded
  * 请求参数:
  * 		client_id:客户端id
  * 		scope:请求授权的范围
@@ -779,7 +804,23 @@ import jakarta.annotation.security.PermitAll;
  */
 @SpringBootApplication
 @MapperScan(basePackages = "com.wy.mapper")
+@ImportRuntimeHints(OAuthServerApplication.OAuthServerApplicationRuntimeHintsRegistrar.class)
 public class OAuthServerApplication {
+
+	static class OAuthServerApplicationRuntimeHintsRegistrar implements RuntimeHintsRegistrar {
+
+		@Override
+		public void registerHints(RuntimeHints hints, ClassLoader classLoader) {
+			// Thymeleaf
+			hints.reflection()
+					.registerTypes(
+							Arrays.asList(TypeReference.of(AuthorizationServerEndpoint.ScopeWithDescription.class),
+									TypeReference.of(Lists.class)),
+							builder -> builder.withMembers(MemberCategory.DECLARED_FIELDS,
+									MemberCategory.INVOKE_DECLARED_CONSTRUCTORS,
+									MemberCategory.INVOKE_DECLARED_METHODS));
+		}
+	}
 
 	public static void main(String[] args) {
 		SpringApplication.run(OAuthServerApplication.class, args);

@@ -46,7 +46,7 @@ import com.wy.grant.SmsAuthenticationConverter;
 import com.wy.grant.SmsAuthenticationProvider;
 import com.wy.provider.device.DeviceClientAuthenticationConverter;
 import com.wy.provider.device.DeviceClientAuthenticationProvider;
-import com.wy.token.CustomizerTokenCustomizer;
+import com.wy.token.FederatedIdentityIdTokenCustomizer;
 
 import dream.flying.flower.framework.security.constant.ConstOAuthGrantType;
 import dream.flying.flower.framework.security.constant.ConstSecurity;
@@ -289,7 +289,7 @@ public class AuthorizationServerConfig {
 	 */
 	@Bean
 	OAuth2TokenCustomizer<JwtEncodingContext> oAuth2TokenCustomizer() {
-		return new CustomizerTokenCustomizer();
+		return new FederatedIdentityIdTokenCustomizer();
 	}
 
 	/**

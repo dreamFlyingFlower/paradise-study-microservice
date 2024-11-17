@@ -7,10 +7,10 @@ import java.util.Map;
 import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
 import org.springframework.stereotype.Service;
 
-import com.wy.token.CustomizerTokenCustomizer;
+import com.wy.token.FederatedIdentityIdTokenCustomizer;
 
 /**
- * 自定义OIDC用户信息,和{@link CustomizerTokenCustomizer}不同,当前类需要从数据库重新获取用户信息
+ * 自定义OIDC用户信息,和{@link FederatedIdentityIdTokenCustomizer}不同,当前类需要从数据库重新获取用户信息
  *
  * @author 飞花梦影
  * @date 2024-11-12 00:00:51

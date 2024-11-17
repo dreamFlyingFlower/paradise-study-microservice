@@ -74,7 +74,7 @@ import com.wy.grant.SmsAuthenticationProvider;
 import com.wy.helpers.SecurityContextOAuth2Helpers;
 import com.wy.provider.device.DeviceClientAuthenticationConverter;
 import com.wy.provider.device.DeviceClientAuthenticationProvider;
-import com.wy.token.CustomizerTokenCustomizer;
+import com.wy.token.FederatedIdentityIdTokenCustomizer;
 
 import dream.flying.flower.autoconfigure.redis.helper.RedisStrHelpers;
 import dream.flying.flower.framework.security.constant.ConstOAuthGrantType;
@@ -378,7 +378,7 @@ public class DeviceConfig {
 	 */
 	@Bean
 	public OAuth2TokenCustomizer<JwtEncodingContext> oAuth2TokenCustomizer() {
-		return new CustomizerTokenCustomizer();
+		return new FederatedIdentityIdTokenCustomizer();
 	}
 
 	/**

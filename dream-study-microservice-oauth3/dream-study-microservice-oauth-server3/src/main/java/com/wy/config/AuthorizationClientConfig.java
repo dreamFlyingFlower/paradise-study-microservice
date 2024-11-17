@@ -9,6 +9,9 @@ import java.util.UUID;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -173,6 +176,41 @@ public class AuthorizationClientConfig {
 		if (findPkceClient == null) {
 			registeredClientRepository.save(pkceClient);
 		}
+
+		// token交换客户端
+		RegisteredClient tokenExchangeClient = RegisteredClient.withId(UUID.randomUUID().toString())
+				.clientId("guest-token-client")
+				.clientSecret("{noop}123456")
+				.clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+				.authorizationGrantType(AuthorizationGrantType.TOKEN_EXCHANGE)
+				.scope("message.read")
+				.scope("message.write")
+				.build();
+		RegisteredClient tokenRegisteredClient =
+				registeredClientRepository.findByClientId(tokenExchangeClient.getClientId());
+		if (tokenRegisteredClient == null) {
+			registeredClientRepository.save(tokenRegisteredClient);
+		}
+
+		// 长连接认证
+		RegisteredClient mtlsDemoClient = RegisteredClient.withId(UUID.randomUUID().toString())
+				.clientId("guest-mtls-client")
+				.clientAuthenticationMethod(ClientAuthenticationMethod.TLS_CLIENT_AUTH)
+				.clientAuthenticationMethod(ClientAuthenticationMethod.SELF_SIGNED_TLS_CLIENT_AUTH)
+				.authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
+				.scope("message.read")
+				.scope("message.write")
+				.clientSettings(ClientSettings.builder()
+						.x509CertificateSubjectDN("CN=demo-client-sample,OU=Spring Samples,O=Spring,C=US")
+						.jwkSetUrl("http://127.0.0.1:8080/jwks")
+						.build())
+				.tokenSettings(TokenSettings.builder().x509CertificateBoundAccessTokens(true).build())
+				.build();
+		RegisteredClient mtlsRegisteredClient = registeredClientRepository.findByClientId(mtlsDemoClient.getClientId());
+		if (mtlsRegisteredClient == null) {
+			registeredClientRepository.save(mtlsRegisteredClient);
+		}
+
 		return registeredClientRepository;
 	}
 
@@ -205,5 +243,27 @@ public class AuthorizationClientConfig {
 	@Bean
 	JwtDecoder jwtDecoder(JWKSource<SecurityContext> jwkSource) {
 		return OAuth2AuthorizationServerConfiguration.jwtDecoder(jwkSource);
+	}
+
+	/**
+	 * 如果使用指定数据库,可以自动新增如下3张表
+	 * 
+	 * @return EmbeddedDatabase
+	 */
+	@Bean
+	EmbeddedDatabase embeddedDatabase() {
+		// @formatter:off
+		return new EmbeddedDatabaseBuilder().generateUniqueName(true)
+				.setType(EmbeddedDatabaseType.H2)
+				// 自定义使用其他类型数据库
+				.setDataSourceFactory(null)
+				.setScriptEncoding("UTF-8")
+				.addScript("org/springframework/security/oauth2/server/authorization/oauth2-authorization-schema.sql")
+				.addScript(
+						"org/springframework/security/oauth2/server/authorization/oauth2-authorization-consent-schema.sql")
+				.addScript(
+						"org/springframework/security/oauth2/server/authorization/client/oauth2-registered-client-schema.sql")
+				.build();
+		// @formatter:on
 	}
 }

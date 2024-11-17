@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.nimbusds.jose.jwk.JWKSet;
+
 import dream.flying.flower.lang.StrHelper;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
@@ -43,6 +45,19 @@ public class AuthorizationServerEndpoint {
 
 	private final OAuth2AuthorizationConsentService authorizationConsentService;
 
+	private final JWKSet jwkSet;
+
+	@GetMapping(value = "token_key", produces = "application/json; charset=UTF-8")
+	public String keys() {
+		return this.jwkSet.toString();
+	}
+
+	/**
+	 * 自定义的用户信息接口,需要客户端自定配置调用.若认证服务器不配置,则默认调用SpringSecurity的/userInfo接口
+	 * 
+	 * @param principal
+	 * @return
+	 */
 	@ResponseBody
 	@GetMapping("/user")
 	public Map<String, Object> user(Principal principal) {

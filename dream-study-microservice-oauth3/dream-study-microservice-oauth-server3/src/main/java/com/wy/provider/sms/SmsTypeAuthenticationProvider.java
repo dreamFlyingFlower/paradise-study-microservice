@@ -16,9 +16,11 @@ import com.wy.exception.AuthException;
 import com.wy.provider.CaptchaTypeAuthenticationProvider;
 
 import dream.flying.flower.autoconfigure.redis.helper.RedisStrHelpers;
+import dream.flying.flower.framework.core.enums.LoginType;
 import dream.flying.flower.framework.security.constant.ConstOAuthGrantType;
 import dream.flying.flower.framework.security.constant.ConstSecurity;
 import dream.flying.flower.framework.web.helper.WebHelpers;
+import dream.flying.flower.lang.StrHelper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 
@@ -61,14 +63,14 @@ public class SmsTypeAuthenticationProvider extends CaptchaTypeAuthenticationProv
 		}
 
 		// 获取当前登录方式
-		String loginType = request.getParameter(ConstSecurity.LOGIN_TYPE_NAME);
+		String loginType = request.getParameter(ConstSecurity.PARAMETER_NAME_LOGIN_TYPE);
 		// 获取grant_type
 		String grantType = request.getParameter(OAuth2ParameterNames.GRANT_TYPE);
 		// 如果是自定义密码模式则下方的认证判断只要判断下loginType即可
 		// if (Objects.equals(loginType, SecurityConstants.SMS_LOGIN_TYPE)) {}
 		// 短信登录和自定义短信认证grant_type会走下方认证
-		if (Objects.equals(loginType, ConstSecurity.SMS_LOGIN_TYPE)
-				|| Objects.equals(grantType, ConstOAuthGrantType.SMS_CODE.getValue())) {
+		if (StrHelper.equalsIgnoreCase(loginType, LoginType.NONE.getValue() + "")
+				|| StrHelper.equalsIgnoreCase(grantType, ConstOAuthGrantType.SMS_CODE.getValue())) {
 			if ("session".equals(storeType)) {
 				// 获取存入session的验证码(UsernamePasswordAuthenticationToken的principal中现在存入的是手机号)
 				String smsCaptcha =

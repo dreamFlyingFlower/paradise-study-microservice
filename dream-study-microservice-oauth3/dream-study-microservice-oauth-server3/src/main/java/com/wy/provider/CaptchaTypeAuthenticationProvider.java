@@ -14,6 +14,7 @@ import com.wy.constant.ConstAuthorizationServerRedis;
 import com.wy.exception.AuthException;
 
 import dream.flying.flower.autoconfigure.redis.helper.RedisStrHelpers;
+import dream.flying.flower.framework.core.enums.LoginType;
 import dream.flying.flower.framework.security.constant.ConstSecurity;
 import dream.flying.flower.framework.web.helper.WebHelpers;
 import jakarta.servlet.http.HttpServletRequest;
@@ -70,11 +71,11 @@ public class CaptchaTypeAuthenticationProvider extends DaoAuthenticationProvider
 		}
 
 		// 获取当前登录方式
-		String loginType = request.getParameter(ConstSecurity.LOGIN_TYPE_NAME);
+		String loginType = request.getParameter(ConstSecurity.PARAMETER_NAME_LOGIN_TYPE);
 		// 如果自定义的grant_type模式也需要校验图形验证码的可以不修改
 		// if (!Objects.equals(loginType, ConstAuthorization.SMS_LOGIN_TYPE)) {
 		// 只要不是密码登录都不需要校验图形验证码
-		if (!Objects.equals(loginType, ConstSecurity.PASSWORD_LOGIN_TYPE)) {
+		if (!Objects.equals(loginType, LoginType.PASSWORD.getValue() + "")) {
 			log.info("It isn't necessary captcha authenticate.");
 			return super.authenticate(authentication);
 		}
@@ -87,7 +88,8 @@ public class CaptchaTypeAuthenticationProvider extends DaoAuthenticationProvider
 
 		if ("session".equals(storeType)) {
 			// 获取session中存储的验证码
-			Object captchaCode = request.getSession(Boolean.FALSE).getAttribute(ConstSecurity.CAPTCHA_ID_NAME);
+			Object captchaCode =
+					request.getSession(Boolean.FALSE).getAttribute(ConstSecurity.PARAMETER_NAME_CAPTCHA_ID);
 			if (captchaCode instanceof String) {
 				String sessionCode = (String) captchaCode;
 				if (!sessionCode.equalsIgnoreCase(code)) {
@@ -97,7 +99,7 @@ public class CaptchaTypeAuthenticationProvider extends DaoAuthenticationProvider
 				throw new AuthException("The captcha is abnormal. Obtain it again.");
 			}
 		} else {
-			String captchaId = request.getParameter(ConstSecurity.CAPTCHA_ID_NAME);
+			String captchaId = request.getParameter(ConstSecurity.PARAMETER_NAME_CAPTCHA_ID);
 			// 获取缓存中存储的验证码
 			String captchaCode =
 					redisStrHelpers.get(ConstAuthorizationServerRedis.IMAGE_CAPTCHA_PREFIX_KEY + captchaId);

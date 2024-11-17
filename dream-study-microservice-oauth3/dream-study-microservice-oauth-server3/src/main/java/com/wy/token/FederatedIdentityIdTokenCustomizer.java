@@ -32,7 +32,7 @@ import lombok.extern.slf4j.Slf4j;
  * @git {@link https://github.com/dreamFlyingFlower}
  */
 @Slf4j
-public class CustomizerTokenCustomizer implements OAuth2TokenCustomizer<JwtEncodingContext> {
+public class FederatedIdentityIdTokenCustomizer implements OAuth2TokenCustomizer<JwtEncodingContext> {
 
 	private static final Set<String> ID_TOKEN_CLAIMS = Set.of(
 			// iss：令牌颁发者

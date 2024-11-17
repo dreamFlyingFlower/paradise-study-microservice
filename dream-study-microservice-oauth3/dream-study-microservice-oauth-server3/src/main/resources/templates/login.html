@@ -27,7 +27,7 @@
 
     <form class="form-signin" method="post" th:action="@{/login}">
         <input type="hidden" id="captchaId" name="captchaId" value=""/>
-        <input type="hidden" id="loginType" name="loginType" value="passwordLogin"/>
+        <input type="hidden" id="loginType" name="loginType" value="1"/>
         <!-- <div th:if="${param.error}" class="alert alert-danger" role="alert" th:text="${param}">
 Invalid username or password.
 </div>
@@ -99,7 +99,7 @@ Sign in with Gitee
         codeContainer.style.display = 'none';
         // 设置登录类型为短信验证码
         let loginType = document.getElementById('loginType');
-        loginType.value = 'smsCaptcha';
+        loginType.value = 0;
         // 显示获取短信验证码按钮与输入框
         let smsContainer = document.getElementById('smsContainer');
         smsContainer.style.display = '';
@@ -123,7 +123,7 @@ Sign in with Gitee
         codeContainer.style.display = '';
         // 设置登录类型为账号密码
         let loginType = document.getElementById('loginType');
-        loginType.value = 'passwordLogin';
+        loginType.value = 1;
         // 隐藏获取短信验证码按钮与输入框
         let smsContainer = document.getElementById('smsContainer');
         smsContainer.style.display = 'none';
