@@ -5,13 +5,13 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 import org.mapstruct.factory.Mappers;
 
-import com.wy.entity.OAuth2ClientEntity;
-import com.wy.vo.OAuth2ClientVO;
+import com.wy.entity.ThirdUserEntity;
+import com.wy.vo.ThirdUserVO;
 
 import dream.flying.flower.framework.web.convert.BaseConvert;
 
 /**
- * 注册到其他认证服务器的信息
+ * 第三方认证服务用户表
  *
  * @author 飞花梦影
  * @date 2024-08-01
@@ -19,7 +19,7 @@ import dream.flying.flower.framework.web.convert.BaseConvert;
  */
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
 		unmappedSourcePolicy = ReportingPolicy.IGNORE, unmappedTargetPolicy = ReportingPolicy.IGNORE)
-public interface OAuth2ClientConvert extends BaseConvert<OAuth2ClientEntity, OAuth2ClientVO> {
+public interface ThirdUserConvert extends BaseConvert<ThirdUserEntity, ThirdUserVO> {
 
-	OAuth2ClientConvert INSTANCE = Mappers.getMapper(OAuth2ClientConvert.class);
+	ThirdUserConvert INSTANCE = Mappers.getMapper(ThirdUserConvert.class);
 }

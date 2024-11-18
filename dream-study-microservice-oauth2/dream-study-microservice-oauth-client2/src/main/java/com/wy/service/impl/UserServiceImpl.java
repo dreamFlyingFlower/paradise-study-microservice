@@ -20,24 +20,24 @@ import org.springframework.util.ObjectUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.wy.convert.UserConvert;
-import com.wy.entity.OAuth2ClientEntity;
 import com.wy.entity.ResourceEntity;
 import com.wy.entity.RoleMemberEntity;
+import com.wy.entity.ThirdUserEntity;
 import com.wy.entity.UserEntity;
 import com.wy.enums.RoleMemberType;
-import com.wy.mapper.OAuth2ClientMapper;
 import com.wy.mapper.ResourceMapper;
 import com.wy.mapper.RoleMemberMapper;
+import com.wy.mapper.ThirdUserMapper;
 import com.wy.mapper.UserMapper;
 import com.wy.query.UserQuery;
 import com.wy.service.UserService;
-import com.wy.vo.OAuth2ClientVO;
 import com.wy.vo.OAuth2UserinfoVO;
+import com.wy.vo.ThirdUserVO;
 import com.wy.vo.UserVO;
 
 import dream.flying.flower.framework.mybatis.plus.service.impl.AbstractServiceImpl;
-import dream.flying.flower.framework.security.constant.ConstSecurity;
 import dream.flying.flower.framework.security.constant.ConstOAuthClient;
+import dream.flying.flower.framework.security.constant.ConstSecurity;
 import lombok.AllArgsConstructor;
 
 /**
@@ -56,7 +56,7 @@ public class UserServiceImpl extends AbstractServiceImpl<UserEntity, UserVO, Use
 
 	private final ResourceMapper resourceMapper;
 
-	private final OAuth2ClientMapper oauth2ClientMapper;
+	private final ThirdUserMapper oauth2ClientMapper;
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -111,11 +111,11 @@ public class UserServiceImpl extends AbstractServiceImpl<UserEntity, UserVO, Use
 	}
 
 	@Override
-	public Long saveByThirdAccount(OAuth2ClientVO oauth2ClientVo) {
+	public Long saveByThirdAccount(ThirdUserVO oauth2ClientVo) {
 		UserEntity basicUser = new UserEntity();
-		basicUser.setUsername(oauth2ClientVo.getClientName());
+		basicUser.setUsername(oauth2ClientVo.getThirdUsername());
 		basicUser.setAvatarUrl(oauth2ClientVo.getAvatarUrl());
-		basicUser.setSourceFrom(oauth2ClientVo.getAuthorizationGrantTypes());
+		basicUser.setSourceFrom(oauth2ClientVo.getType());
 		this.save(basicUser);
 		return basicUser.getId();
 	}
@@ -151,10 +151,10 @@ public class UserServiceImpl extends AbstractServiceImpl<UserEntity, UserVO, Use
 		// 如果登录类型不为空则代表是三方登录,获取三方用户信息
 		if (!org.springframework.util.ObjectUtils.isEmpty(loginType)) {
 			// 根据三方登录类型与三方用户的唯一Id查询用户信息
-			LambdaQueryWrapper<OAuth2ClientEntity> wrapper = Wrappers.lambdaQuery(OAuth2ClientEntity.class)
-					.eq(OAuth2ClientEntity::getUniqueId, uniqueId)
-					.eq(OAuth2ClientEntity::getAuthorizationGrantTypes, loginType);
-			OAuth2ClientEntity oauth2ThirdAccount = oauth2ClientMapper.selectOne(wrapper);
+			LambdaQueryWrapper<ThirdUserEntity> wrapper = Wrappers.lambdaQuery(ThirdUserEntity.class)
+					.eq(ThirdUserEntity::getUniqueId, uniqueId)
+					.eq(ThirdUserEntity::getType, loginType);
+			ThirdUserEntity oauth2ThirdAccount = oauth2ClientMapper.selectOne(wrapper);
 			if (oauth2ThirdAccount != null) {
 				basicUserId = oauth2ThirdAccount.getUserId();
 				// 复制三方用户信息

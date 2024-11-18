@@ -28,7 +28,7 @@ public class AuthException extends AuthenticationException {
 	}
 
 	public AuthException(TipEnum tipEnum) {
-		this(tipEnum.getCode(), tipEnum.getMsg(), null);
+		this(tipEnum.getValue(), tipEnum.getMsg(), null);
 	}
 
 	public AuthException(CharSequence message) {

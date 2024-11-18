@@ -3,8 +3,12 @@ package com.wy;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.oauth2.client.servlet.OAuth2ClientAutoConfiguration;
+import org.springframework.http.RequestEntity;
 import org.springframework.security.config.annotation.web.configurers.oauth2.client.OAuth2LoginConfigurer;
 import org.springframework.security.config.oauth2.client.CommonOAuth2Provider;
+import org.springframework.security.oauth2.client.InMemoryOAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.InMemoryReactiveOAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.JdbcOAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthorizationCodeAuthenticationProvider;
 import org.springframework.security.oauth2.client.authentication.OAuth2LoginAuthenticationProvider;
@@ -13,6 +17,8 @@ import org.springframework.security.oauth2.client.oidc.authentication.OidcAuthor
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequestEntityConverter;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.client.web.AuthenticatedPrincipalOAuth2AuthorizedClientRepository;
 import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizationRequestResolver;
@@ -31,6 +37,17 @@ import com.wy.wechat.WechatAuthorizationRequestConsumer;
 import com.wy.wechat.WechatCodeGrantRequestEntityConverter;
 
 /**
+ * OAuth2客户端,文档:https://docs.spring.io/spring-security/reference/servlet/oauth2/client/core.html
+ * 
+ * 内置API:
+ * 
+ * <pre>
+ * /oauth2/authorization/{registrationId}:{@link OAuth2AuthorizationRequestRedirectFilter}拦截,重定向至第三方服务器认证地址.
+ * 		registrationId为配置文件中spring.security.oauth2.client.provider[registrationId]的值,由当前客户端系统调用
+ *	/login/oauth2/code/{registrationId}:由{@link OAuth2LoginAuthenticationFilter}拦截,获取第三方认证服务器发送的授权码code.
+ *		授权码模式时,客户端调用第三方认证服务器,认证服务器回调客户端发送授权码的地址.
+ * </pre>
+ * 
  * OAuth2相关类:
  * 
  * <pre>
@@ -38,6 +55,10 @@ import com.wy.wechat.WechatCodeGrantRequestEntityConverter;
  * {@link #OAuth2ClientRegistrationRepositoryConfiguration}:将配置文件中注册的client构造成ClientRegistration保存到内存中.
  * ->{@link CommonOAuth2Provider}:事先定义好了几种常用的三方登录授权服务器的各种参数
  * {@link OAuth2WebSecurityConfiguration}:配置web相关的类,如怎么样保存和获取已经授权过的客户端,以及默认的oauth2客户端相关的配置
+ * {@link InMemoryOAuth2AuthorizedClientService}:Web内存版存储已认证客户端配置服务
+ * {@link InMemoryReactiveOAuth2AuthorizedClientService}:WebFlux内存版存储已认证客户端配置服务
+ * {@link JdbcOAuth2AuthorizedClientService}:内存版存储已认证客户端配置服务,需要手动新增表oauth2_client,表结构在spring-security-oauth2-client下
+ * {@link OAuth2UserRequestEntityConverter}:将{@link OAuth2UserRequest}转换为{@link RequestEntity}获取认证服务器已认证用户信息
  * </pre>
  * 
  * OAuth2 Client相关流程:
@@ -83,7 +104,7 @@ import com.wy.wechat.WechatCodeGrantRequestEntityConverter;
  * </pre>
  * 
  * 注意:认证服务器和客户端在同一个机器上时不能使用同一个ip,例如127.0.0.1,在存储cookie时不会区分端口的,他们的cookie是同一个的,后者会覆盖前者.
- * 如果配置认证服务的地址是127.0.0.1:17127,然后通过127.0.0.1:55300去访问客户端则会在登录后出现[authorization_request_not_found]异常
+ * 如果配置认证服务的地址是127.0.0.1:8888,然后通过127.0.0.1:8889去访问客户端则会在登录后出现[authorization_request_not_found]异常
  * 
  * 客户端在OAuth2角色解释中是第三方的一个应用,一般会配合资源服务一起使用
  * 
@@ -109,7 +130,7 @@ import com.wy.wechat.WechatCodeGrantRequestEntityConverter;
  * </pre>
  * 
  * {@link OAuth2AuthorizationCodeGrantFilter}:拦截授权码模式的授权码接口,其中的OAuth2ParameterNames.REGISTRATION_ID参数,
- * 和配置文件中的spring.security.oauth2.client.registration.[registration_id]对应,故该registration_id不能重复
+ * 和配置文件中的spring.security.oauth2.client.registration.[registrationId]对应,故该registrationId不能重复
  * {@link OAuth2AuthorizationCodeGrantWebFilter}:功能和上述类相同,但是是WebFlux的类
  * 
  * {@link WechatAuthorizationRequestConsumer}:自定义微信授权获取code,官方文档:

@@ -11,7 +11,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
-import com.wy.vo.OAuth2ClientVO;
+import com.wy.vo.ThirdUserVO;
 
 import dream.flying.flower.helper.DateTimeHelper;
 import lombok.RequiredArgsConstructor;
@@ -56,17 +56,17 @@ public class OAuth2UserConverterContext {
 	 * @param oAuth2User 三方登录获取到的认证信息
 	 * @return {@link Oauth2ThirdAccount}
 	 */
-	public OAuth2ClientVO convert(OAuth2UserRequest userRequest, OAuth2User oAuth2User) {
+	public ThirdUserVO convert(OAuth2UserRequest userRequest, OAuth2User oAuth2User) {
 		// 获取三方登录配置的registrationId,这里将他当做登录方式
 		String registrationId = userRequest.getClientRegistration().getRegistrationId();
 		// 转换用户信息
-		OAuth2ClientVO oauth2ClientVo = this.getInstance(registrationId).convert(oAuth2User);
+		ThirdUserVO oauth2ClientVo = this.getInstance(registrationId).convert(oAuth2User);
 		// 获取AccessToken
 		OAuth2AccessToken accessToken = userRequest.getAccessToken();
 		// 设置token
 		oauth2ClientVo.setCredentials(accessToken.getTokenValue());
 		// 设置账号的方式
-		oauth2ClientVo.setAuthorizationGrantTypes(registrationId);
+		oauth2ClientVo.setType(registrationId);
 		Instant expiresAt = accessToken.getExpiresAt();
 		if (expiresAt != null) {
 			LocalDateTime tokenExpiresAt = expiresAt.atZone(ZoneId.of("UTC")).toLocalDateTime();

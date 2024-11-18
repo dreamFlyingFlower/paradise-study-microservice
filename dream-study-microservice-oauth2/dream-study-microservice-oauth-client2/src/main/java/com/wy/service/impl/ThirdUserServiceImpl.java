@@ -2,13 +2,13 @@ package com.wy.service.impl;
 
 import org.springframework.util.ObjectUtils;
 
-import com.wy.convert.OAuth2ClientConvert;
-import com.wy.entity.OAuth2ClientEntity;
-import com.wy.mapper.OAuth2ClientMapper;
-import com.wy.query.OAuth2ClientQuery;
-import com.wy.service.OAuth2ClientService;
+import com.wy.convert.ThirdUserConvert;
+import com.wy.entity.ThirdUserEntity;
+import com.wy.mapper.ThirdUserMapper;
+import com.wy.query.ThirdUserQuery;
+import com.wy.service.ThirdUserService;
 import com.wy.service.UserService;
-import com.wy.vo.OAuth2ClientVO;
+import com.wy.vo.ThirdUserVO;
 
 import dream.flying.flower.framework.mybatis.plus.service.impl.AbstractServiceImpl;
 import lombok.RequiredArgsConstructor;
@@ -21,17 +21,18 @@ import lombok.RequiredArgsConstructor;
  * @git {@link https://github.com/dreamFlyingFlower}
  */
 @RequiredArgsConstructor
-public class OAuth2ClientServiceImpl extends AbstractServiceImpl<OAuth2ClientEntity, OAuth2ClientVO, OAuth2ClientQuery,
-		OAuth2ClientConvert, OAuth2ClientMapper> implements OAuth2ClientService {
+public class ThirdUserServiceImpl
+		extends AbstractServiceImpl<ThirdUserEntity, ThirdUserVO, ThirdUserQuery, ThirdUserConvert, ThirdUserMapper>
+		implements ThirdUserService {
 
 	private final UserService userService;
 
 	@Override
-	public void checkAndSaveUser(OAuth2ClientVO oauth2ClientVo) {
+	public void checkAndSaveUser(ThirdUserVO oauth2ClientVo) {
 		// 构建三方唯一id和三方登录方式的查询条件
-		OAuth2ClientEntity oauth2ClientEntity = this.lambdaQuery()
-				.eq(OAuth2ClientEntity::getAuthorizationGrantTypes, oauth2ClientVo.getAuthorizationGrantTypes())
-				.eq(OAuth2ClientEntity::getUniqueId, oauth2ClientVo.getUniqueId())
+		ThirdUserEntity oauth2ClientEntity = this.lambdaQuery()
+				.eq(ThirdUserEntity::getType, oauth2ClientVo.getType())
+				.eq(ThirdUserEntity::getUniqueId, oauth2ClientVo.getUniqueId())
 				.one();
 		if (oauth2ClientEntity == null) {
 			// 生成用户信息

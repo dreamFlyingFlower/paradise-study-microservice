@@ -20,7 +20,7 @@ import org.springframework.security.web.SecurityFilterChain;
  * @git {@link https://github.com/dreamFlyingFlower}
  */
 @EnableWebSecurity
-public class SecurtiyConfig {
+public class ClientSecurityConfig {
 
 	@Bean
 	WebSecurityCustomizer webSecurityCustomizer() {

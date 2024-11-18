@@ -12,7 +12,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * 注册到其他认证服务器的信息
+ * 第三方认证服务用户表
  *
  * @author 飞花梦影
  * @date 2024-08-01
@@ -24,8 +24,8 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "资源查询")
-public class OAuth2ClientQuery extends AbstractQuery {
+@Schema(description = "第三方认证服务用户查询")
+public class ThirdUserQuery extends AbstractQuery {
 
 	private static final long serialVersionUID = 1L;
 
@@ -39,19 +39,15 @@ public class OAuth2ClientQuery extends AbstractQuery {
 
 	@Schema(description = "三方用户的账号")
 	@Query(type = QueryType.LIKE)
-	private String clientName;
+	private String thirdUsername;
 
 	@Schema(description = "三方登录获取的认证信息(token)")
 	@Query
 	private String credentials;
 
-	@Schema(description = "认证方法")
+	@Schema(description = "三方登录类型")
 	@Query(type = QueryType.LIKE)
-	private Long clientAuthenticationMethods;
-
-	@Schema(description = "认证模式")
-	@Query(type = QueryType.LIKE)
-	private String authorizationGrantTypes;
+	private String type;
 
 	@Schema(description = "博客")
 	@Query(type = QueryType.LIKE)

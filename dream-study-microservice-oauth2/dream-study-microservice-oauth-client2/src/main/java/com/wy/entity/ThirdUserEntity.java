@@ -13,7 +13,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
- * 注册到其他认证服务器的信息
+ * 第三方认证服务用户表
  *
  * @author 飞花梦影
  * @date 2024-08-01
@@ -25,8 +25,8 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@TableName("oauth2_client")
-public class OAuth2ClientEntity extends AbstractEntity {
+@TableName("auth_third_user")
+public class ThirdUserEntity extends AbstractEntity {
 
 	private static final long serialVersionUID = -3601222345418102072L;
 
@@ -43,7 +43,7 @@ public class OAuth2ClientEntity extends AbstractEntity {
 	/**
 	 * 三方用户的账号
 	 */
-	private String clientName;
+	private String thirdUsername;
 
 	/**
 	 * 三方登录获取的认证信息(token)
@@ -56,14 +56,9 @@ public class OAuth2ClientEntity extends AbstractEntity {
 	private Date credentialsExpiresAt;
 
 	/**
-	 * 认证方法
+	 * 三方登录类型
 	 */
-	private String clientAuthenticationMethods;
-
-	/**
-	 * 认证模式
-	 */
-	private String authorizationGrantTypes;
+	private String type;
 
 	/**
 	 * 博客

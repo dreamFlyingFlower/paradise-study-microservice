@@ -4,7 +4,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 
 import com.wy.entity.UserEntity;
 import com.wy.query.UserQuery;
-import com.wy.vo.OAuth2ClientVO;
+import com.wy.vo.ThirdUserVO;
 import com.wy.vo.OAuth2UserinfoVO;
 import com.wy.vo.UserVO;
 
@@ -25,7 +25,7 @@ public interface UserService extends BaseServices<UserEntity, UserVO, UserQuery>
 	 * @param thirdAccount 三方用户信息
 	 * @return 用户id
 	 */
-	Long saveByThirdAccount(OAuth2ClientVO thirdAccount);
+	Long saveByThirdAccount(ThirdUserVO thirdAccount);
 
 	/**
 	 * 获取当前登录用户的信息

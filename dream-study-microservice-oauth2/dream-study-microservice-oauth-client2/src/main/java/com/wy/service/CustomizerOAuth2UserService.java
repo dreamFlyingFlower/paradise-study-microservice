@@ -17,10 +17,11 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import com.wy.strategy.OAuth2UserConverterContext;
-import com.wy.vo.OAuth2ClientVO;
+import com.wy.vo.ThirdUserVO;
 import com.wy.wechat.WechatUserRequestEntityConverter;
 import com.wy.wechat.WechatUserResponseConverter;
 
@@ -31,13 +32,14 @@ import com.wy.wechat.WechatUserResponseConverter;
  * @date 2024-11-03 10:48:04
  * @git {@link https://github.com/dreamFlyingFlower}
  */
+@Component
 public class CustomizerOAuth2UserService extends DefaultOAuth2UserService {
 
-	private final OAuth2ClientService oauth2ClientService;
+	private final ThirdUserService oauth2ClientService;
 
 	private final OAuth2UserConverterContext oauth2UserConverterContext;
 
-	public CustomizerOAuth2UserService(OAuth2ClientService oauth2ClientService,
+	public CustomizerOAuth2UserService(ThirdUserService oauth2ClientService,
 			OAuth2UserConverterContext oauth2UserConverterContext) {
 		this.oauth2ClientService = oauth2ClientService;
 		this.oauth2UserConverterContext = oauth2UserConverterContext;
@@ -64,7 +66,7 @@ public class CustomizerOAuth2UserService extends DefaultOAuth2UserService {
 	public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
 		OAuth2User oAuth2User = super.loadUser(userRequest);
 		// 转为项目中的三方用户信息
-		OAuth2ClientVO oauth2ThirdAccount = oauth2UserConverterContext.convert(userRequest, oAuth2User);
+		ThirdUserVO oauth2ThirdAccount = oauth2UserConverterContext.convert(userRequest, oAuth2User);
 		// 检查用户信息
 		oauth2ClientService.checkAndSaveUser(oauth2ThirdAccount);
 		// 将loginType设置至attributes中

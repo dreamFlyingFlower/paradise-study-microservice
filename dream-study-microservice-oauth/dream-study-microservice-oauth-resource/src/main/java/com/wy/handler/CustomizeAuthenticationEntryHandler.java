@@ -48,7 +48,7 @@ public class CustomizeAuthenticationEntryHandler implements AuthenticationEntryP
 			Throwable cause = e.getCause();
 			if (cause instanceof InvalidTokenException) {
 				message = TipEnum.TIP_AUTH_TOKEN_ERROR.getMsg();
-				code = TipEnum.TIP_AUTH_TOKEN_ERROR.getCode();
+				code = TipEnum.TIP_AUTH_TOKEN_ERROR.getValue();
 			}
 		}
 		WebHelpers.writeError(response, code, message);

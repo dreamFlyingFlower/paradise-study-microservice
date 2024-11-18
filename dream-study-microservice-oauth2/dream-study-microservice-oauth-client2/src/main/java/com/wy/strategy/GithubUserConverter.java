@@ -3,7 +3,7 @@ package com.wy.strategy;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Component;
 
-import com.wy.vo.OAuth2ClientVO;
+import com.wy.vo.ThirdUserVO;
 
 import dream.flying.flower.framework.security.constant.ConstOAuthClient;
 import lombok.RequiredArgsConstructor;
@@ -22,14 +22,14 @@ public class GithubUserConverter implements OAuth2UserConverterStrategy {
 	private final GiteeUserConverter giteeUserConverter;
 
 	@Override
-	public OAuth2ClientVO convert(OAuth2User oauth2User) {
+	public ThirdUserVO convert(OAuth2User oauth2User) {
 		// github与gitee目前所取字段一致,直接调用gitee的解析
-		OAuth2ClientVO oauthClientVo = giteeUserConverter.convert(oauth2User);
+		ThirdUserVO oauthClientVo = giteeUserConverter.convert(oauth2User);
 		// 提取location
 		Object location = oauth2User.getAttributes().get("location");
 		oauthClientVo.setLocation(String.valueOf(location));
 		// 设置登录类型
-		oauthClientVo.setAuthorizationGrantTypes(ConstOAuthClient.OAUTH2_CLIENT_LOGIN_GITHUB);
+		oauthClientVo.setType(ConstOAuthClient.OAUTH2_CLIENT_LOGIN_GITHUB);
 		return oauthClientVo;
 	}
 }

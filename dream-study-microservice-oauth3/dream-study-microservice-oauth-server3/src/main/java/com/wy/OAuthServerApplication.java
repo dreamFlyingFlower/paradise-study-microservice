@@ -281,8 +281,8 @@ import jakarta.annotation.security.PermitAll;
  * spring-security-oauth2-client的JAR包下有多个SQL文件
  * 
  * <pre>
- * oauth2-client-schema.sql:认证服务器签发的配置文件,操作类为 JdbcOAuth2AuthorizedClientService
- * oauth2-client-schema-postgres.sql:认证服务器签发的配置文件
+ * oauth2-client-schema.sql:客户端存储认证服务器签发的配置文件,操作类为 JdbcOAuth2AuthorizedClientService
+ * oauth2-client-schema-postgres.sql:客户端存储认证服务器签发的配置文件
  * </pre>
  * 
  * 相关类

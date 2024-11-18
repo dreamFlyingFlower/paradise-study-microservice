@@ -38,6 +38,24 @@ spring:
               #userNameAttributeName: UserInfo响应中返回的属性的名称,该属性引用最终用户的名称或标识符
         # 当前客户端注册到不同认证服务器的信息,由认证服务器颁发
         registration:
+          gitee:
+            # 指定oauth登录提供者,该oauth登录由provider中的gitee来处理
+            provider: gitee
+            # 客户端名字
+            client-name: Sign in with Gitee
+            # 认证方式
+            authorization-grant-type: authorization_code
+            # 客户端id,使用自己的gitee的客户端id
+            client-id: 67ab3a464c3e96ad2a60ef03a5dde0839d6bfabe1c68904f6966dbbbd6ad7574
+            # 客户端秘钥,使用自己的gitee的客户端秘钥
+            client-secret: 1a07bd8b3d84b7c9e39bed199b3e956a4c09c983361ccfa22abaed3508d66129
+            # 回调地址
+            redirect-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/login/oauth2/code/gitee
+            # 申请scope列表
+            scope:
+              - emails
+              - projects
+              - user_info
           # 本应用注册在facebook的参数,系统已经内置,其他参数可不写
           facebook: 
             client-id: facebook_client_id

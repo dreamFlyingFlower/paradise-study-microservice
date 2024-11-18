@@ -3,6 +3,10 @@ package com.wy.core;
 import java.io.IOException;
 import java.util.function.Consumer;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
@@ -10,12 +14,8 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 /**
- * 用户登录成功时,根据authentication类型来返回不同类型的用户信息,如Oidc和OAuth2
+ * 客户端调用第三方认证服务器成功时,根据authentication类型来返回不同类型的用户信息,如Oidc和OAuth2
  *
  * @author 飞花梦影
  * @date 2024-11-17 23:24:18

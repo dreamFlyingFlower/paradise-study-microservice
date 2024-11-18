@@ -10,10 +10,11 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.oidc.OidcIdToken;
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import com.wy.strategy.OAuth2UserConverterContext;
-import com.wy.vo.OAuth2ClientVO;
+import com.wy.vo.ThirdUserVO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,10 +25,11 @@ import lombok.RequiredArgsConstructor;
  * @date 2024-11-03 10:48:04
  * @git {@link https://github.com/dreamFlyingFlower}
  */
+@Component
 @RequiredArgsConstructor
 public class CustomizerOidcUserService extends OidcUserService {
 
-	private final OAuth2ClientService oauth2ClientService;
+	private final ThirdUserService oauth2ClientService;
 
 	private final OAuth2UserConverterContext oauth2UserConverterContext;
 
@@ -36,7 +38,7 @@ public class CustomizerOidcUserService extends OidcUserService {
 		// 获取三方用户信息
 		OidcUser oidcUser = super.loadUser(userRequest);
 		// 转为项目中的三方用户信息
-		OAuth2ClientVO oauth2ThirdAccount = oauth2UserConverterContext.convert(userRequest, oidcUser);
+		ThirdUserVO oauth2ThirdAccount = oauth2UserConverterContext.convert(userRequest, oidcUser);
 		// 检查用户信息
 		oauth2ClientService.checkAndSaveUser(oauth2ThirdAccount);
 		OidcIdToken oidcIdToken = oidcUser.getIdToken();

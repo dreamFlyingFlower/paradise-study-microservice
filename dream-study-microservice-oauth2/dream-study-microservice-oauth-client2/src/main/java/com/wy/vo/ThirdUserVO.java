@@ -33,8 +33,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "注册到其他认证服务器的信息")
-public class OAuth2ClientVO implements Serializable, TransPojo, OAuth2User {
+@Schema(description = "第三方认证服务用户表")
+public class ThirdUserVO implements Serializable, TransPojo, OAuth2User {
 
 	private static final long serialVersionUID = 1L;
 
@@ -54,7 +54,7 @@ public class OAuth2ClientVO implements Serializable, TransPojo, OAuth2User {
 	@Schema(description = "三方用户的账号")
 	@NotBlank(message = "三方用户的账号不能为空", groups = { ValidEdit.class })
 	@Size(max = 64, message = "三方用户的账号最大长度不能超过64", groups = { ValidAdd.class, ValidEdit.class })
-	private String clientName;
+	private String thirdUsername;
 
 	@Schema(description = "三方登录获取的认证信息(token)")
 	@Size(max = 256, message = "三方登录获取的认证信息(token)最大长度不能超过256", groups = { ValidAdd.class, ValidEdit.class })
@@ -63,14 +63,10 @@ public class OAuth2ClientVO implements Serializable, TransPojo, OAuth2User {
 	@Schema(description = "三方登录获取的认证信息过期时间")
 	private Date credentialsExpiresAt;
 
-	@Schema(description = "认证方法")
-	@Size(max = 256, message = "认证方法最大长度不能超过256", groups = { ValidAdd.class, ValidEdit.class })
-	private String clientAuthenticationMethods;
-
-	@Schema(description = "认证模式")
-	@NotBlank(message = "认证模式不能为空", groups = { ValidEdit.class })
-	@Size(max = 256, message = "认证模式最大长度不能超过256", groups = { ValidAdd.class, ValidEdit.class })
-	private String authorizationGrantTypes;
+	@Schema(description = "第三方登录类型")
+	@NotBlank(message = "第三方登录类型", groups = { ValidEdit.class })
+	@Size(max = 256, message = "第三方登录类型最大长度不能超过256", groups = { ValidAdd.class, ValidEdit.class })
+	private String type;
 
 	@Schema(description = "博客")
 	@Size(max = 256, message = "博客最大长度不能超过256", groups = { ValidAdd.class, ValidEdit.class })

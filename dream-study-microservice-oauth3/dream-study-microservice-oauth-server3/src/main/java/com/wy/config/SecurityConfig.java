@@ -23,7 +23,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
 import com.wy.context.RedisSecurityContextRepository;
-import com.wy.core.FederatedIdentityAuthenticationSuccessHandler;
 import com.wy.helpers.SecurityContextOAuth2Helpers;
 import com.wy.properties.OAuthServerSecurityProperties;
 import com.wy.provider.captcha.CaptchaAuthenticationFilter;
@@ -165,9 +164,8 @@ public class SecurityConfig {
 		// 允许配置匿名用户的表示方法.当与WebSecurityConfifigurerAdapter结合使用时,将自动应用.默认情况下,匿名用户将使用
 		http.anonymous(Customizer.withDefaults());
 
-		// 根据OAuth或OpenID Connect 1.0类型配置用户身份验证
-		http.oauth2Login(
-				oauth2login -> oauth2login.successHandler(new FederatedIdentityAuthenticationSuccessHandler()));
+		// 根据OAuth或OpenID Connect 1.0类型配置用户身份验证,主要用于客户端向第三方认证服务器认证
+		http.oauth2Login(Customizer.withDefaults());
 
 		// 配置通道安全.为了使该配置有用,必须提供至少一个到所需信道的映射
 		http.requiresChannel(Customizer.withDefaults());

@@ -108,7 +108,7 @@ public class OAuthClientConfig {
 	 * 这里同样会将用户信息存入Authentication中,因为用户信息是在oauth2UserService()中被处理的,最终会被封装成一个OidcUser对象.
 	 * OidcUser实现了SpringSecurity的Authentication接口,因此可以将其作为认证信息存储在SecurityContext中,用于后续的授权访问
 	 * 
-	 * @return
+	 * @return OAuth2UserService
 	 */
 	@Bean
 	OAuth2UserService<OidcUserRequest, OidcUser> oidcUserService() {
@@ -164,6 +164,7 @@ public class OAuthClientConfig {
 				.oauth2Login(oauth2Login -> {
 					oauth2Login.loginPage("/oauth2/authorization/login");
 					oauth2Login.authorizationEndpoint().authorizationRequestResolver(resolver);
+					// 配置自定义的oidc用户服务
 					oauth2Login.userInfoEndpoint(userInfo -> userInfo.oidcUserService(this.oidcUserService()));
 				})
 
