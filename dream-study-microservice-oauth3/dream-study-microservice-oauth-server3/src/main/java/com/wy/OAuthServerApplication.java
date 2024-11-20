@@ -142,13 +142,19 @@ import jakarta.annotation.security.PermitAll;
 /**
  * SpringSecurity6认证服务器,抛弃了EnableAuthorizationServer等相关注解,直接使用拦截器SecurityFilterChain
  * 
- * 中文文档:https://www.spring-doc.cn/spring-authorization-server/1.3.2/protocol-endpoints.html
- * 英文文档:https://docs.spring.io/spring-authorization-server/reference/overview.html
+ * 相关文档:
  * 
- * 自定义授权模式:https://docs.spring.io/spring-authorization-server/reference/guides/how-to-ext-grant-type.html
+ * <pre>
+ * AuthorizationServer中文文档:https://www.spring-doc.cn/spring-authorization-server/1.3.2/protocol-endpoints.html
+ * AuthorizationServer英文文档:https://docs.spring.io/spring-authorization-server/reference/overview.html
+ * AuthorizationServer自定义授权模式:https://docs.spring.io/spring-authorization-server/reference/guides/how-to-ext-grant-type.html
+ * SpringSecurity:https://docs.spring.io/spring-security/reference/6.3/index.html
+ * SpringSecurity OAuth2 Client:https://docs.spring.io/spring-security/reference/6.3/servlet/oauth2/client/index.html
+ * SpringSecurity Resource Server:https://docs.spring.io/spring-security/reference/6.3/servlet/oauth2/resource-server/index.html
  * 
  * https://juejin.cn/post/7258466145653096504 :17,18
  * https://juejin.cn/post/7430748937147432970:基于Session的前后端分离
+ * </pre>
  * 
  * Spring Authorization Server
  * 
