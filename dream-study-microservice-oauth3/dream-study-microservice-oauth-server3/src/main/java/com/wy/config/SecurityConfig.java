@@ -103,22 +103,36 @@ public class SecurityConfig {
 				.permitAll()
 				// 其他请求都要认证
 				.anyRequest()
-				.authenticated())
-				// 指定登录页面
-				.formLogin(formLogin -> {
-					formLogin
-							// 登录页页面
-							.loginPage("/login")
-							// 登录API
-							.loginProcessingUrl("/login")
-							// 登录成功转发地址,如果使用了自定义登录方式,需要处理刷新时的认证流程
-							.successForwardUrl(LOGIN_URL);
-					if (UrlUtils.isAbsoluteUrl(LOGIN_URL)) {
-						// 绝对路径代表是前后端分离,登录成功和失败改为写回json,不重定向了
-						formLogin.successHandler(new LoginSuccessHandler());
-						formLogin.failureHandler(new LoginFailureHandler());
-					}
-				});
+				.authenticated());
+
+		// 指定登录相关参数
+		http.formLogin(formLogin -> {
+			formLogin
+					// 登录页页面
+					.loginPage("/login")
+					// 登录API
+					.loginProcessingUrl("/login")
+					// 登录成功转发地址,如果使用了自定义登录方式,需要处理刷新时的认证流程
+					.successForwardUrl(LOGIN_URL);
+			if (UrlUtils.isAbsoluteUrl(LOGIN_URL)) {
+				// 绝对路径代表是前后端分离,登录成功和失败改为写回json,不重定向了
+				formLogin.successHandler(new LoginSuccessHandler());
+				formLogin.failureHandler(new LoginFailureHandler());
+			}
+		});
+
+		// 指定登出相关参数
+		http.logout(logout -> {
+			logout
+					// 指定登出的URL
+					.logoutUrl("/logout")
+					// 登出成功后的重定向URL
+					.logoutSuccessUrl("/login?logout")
+					// 登出时使http会话失效
+					.invalidateHttpSession(true)
+					// 登出时删除指定cookie
+					.deleteCookies("JESSIONID");
+		});
 
 		// 添加BearerTokenAuthenticationFilter,将认证服务当做一个资源服务,解析请求头中的token
 		// 资源服务器配置,处理使用access_token访问用户信息端点和客户端注册端点
@@ -132,7 +146,7 @@ public class SecurityConfig {
 
 		http
 				// 当未登录时访问认证端点时重定向至login页面
-				.exceptionHandling((exceptions) -> exceptions.defaultAuthenticationEntryPointFor(
+				.exceptionHandling(exceptions -> exceptions.defaultAuthenticationEntryPointFor(
 						new LoginRedirectAuthenticationEntryPoint(LOGIN_URL),
 						new MediaTypeRequestMatcher(MediaType.TEXT_HTML)));
 
