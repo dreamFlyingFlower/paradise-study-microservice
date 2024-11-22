@@ -71,7 +71,7 @@ import com.wy.constant.ConstAuthorizationServerRedis;
 import com.wy.context.RedisSecurityContextRepository;
 import com.wy.grant.SmsAuthenticationConverter;
 import com.wy.grant.SmsAuthenticationProvider;
-import com.wy.helpers.SecurityContextOAuth2Helpers;
+import com.wy.helpers.SecurityOAuth2Helpers;
 import com.wy.provider.device.DeviceClientAuthenticationConverter;
 import com.wy.provider.device.DeviceClientAuthenticationProvider;
 import com.wy.token.FederatedIdentityIdTokenCustomizer;
@@ -269,8 +269,8 @@ public class DeviceConfig {
 				});
 		// 添加BearerTokenAuthenticationFilter,将认证服务当做一个资源服务,解析请求头中的token
 		http.oauth2ResourceServer((resourceServer) -> resourceServer.jwt(Customizer.withDefaults())
-				.accessDeniedHandler(SecurityContextOAuth2Helpers::exceptionHandler)
-				.authenticationEntryPoint(SecurityContextOAuth2Helpers::exceptionHandler));
+				.accessDeniedHandler(SecurityOAuth2Helpers::exceptionHandler)
+				.authenticationEntryPoint(SecurityOAuth2Helpers::exceptionHandler));
 		// 兼容前后端分离与不分离配置
 		http
 				// 当未登录时访问认证端点时重定向至login页面

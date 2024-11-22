@@ -23,7 +23,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
 import com.wy.context.RedisSecurityContextRepository;
-import com.wy.helpers.SecurityContextOAuth2Helpers;
+import com.wy.helpers.SecurityOAuth2Helpers;
 import com.wy.properties.OAuthServerSecurityProperties;
 import com.wy.provider.captcha.CaptchaAuthenticationFilter;
 
@@ -140,9 +140,9 @@ public class SecurityConfig {
 				// 可自定义JWT设置
 				.jwt(Customizer.withDefaults())
 				// 权限不足时的异常处理
-				.accessDeniedHandler(SecurityContextOAuth2Helpers::exceptionHandler)
+				.accessDeniedHandler(SecurityOAuth2Helpers::exceptionHandler)
 				// 未携带token的异常处理
-				.authenticationEntryPoint(SecurityContextOAuth2Helpers::exceptionHandler));
+				.authenticationEntryPoint(SecurityOAuth2Helpers::exceptionHandler));
 
 		http
 				// 当未登录时访问认证端点时重定向至login页面

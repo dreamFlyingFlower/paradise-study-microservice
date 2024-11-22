@@ -39,7 +39,7 @@ import org.springframework.security.oauth2.server.authorization.token.OAuth2Toke
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
-import com.wy.helpers.SecurityContextOAuth2Helpers;
+import com.wy.helpers.SecurityOAuth2Helpers;
 
 import dream.flying.flower.framework.security.constant.ConstOAuthParameter;
 import lombok.extern.slf4j.Slf4j;
@@ -70,7 +70,7 @@ public class SmsAuthenticationProvider implements AuthenticationProvider {
 
 		// Ensure the client is authenticated
 		OAuth2ClientAuthenticationToken clientPrincipal =
-				SecurityContextOAuth2Helpers.getAuthenticatedClientElseThrowInvalidClient(authenticationToken);
+				SecurityOAuth2Helpers.getAuthenticatedClientElseThrowInvalidClient(authenticationToken);
 		RegisteredClient registeredClient = clientPrincipal.getRegisteredClient();
 		// Ensure the client is configured to use this authorization grant type
 		if (registeredClient == null || !registeredClient.getAuthorizationGrantTypes()
@@ -204,7 +204,7 @@ public class SmsAuthenticationProvider implements AuthenticationProvider {
 					.filter(requestedScope -> !registeredClient.getScopes().contains(requestedScope))
 					.collect(Collectors.toSet());
 			if (!ObjectUtils.isEmpty(unauthorizedScopes)) {
-				SecurityContextOAuth2Helpers.throwError(OAuth2ErrorCodes.INVALID_REQUEST,
+				SecurityOAuth2Helpers.throwError(OAuth2ErrorCodes.INVALID_REQUEST,
 						"OAuth 2.0 Parameter: " + OAuth2ParameterNames.SCOPE, ERROR_URI);
 			}
 
@@ -239,7 +239,7 @@ public class SmsAuthenticationProvider implements AuthenticationProvider {
 		} catch (Exception e) {
 			// 这里抛出OAuth2AuthenticationException是为了让/oauth2/token接口可以获取具体异常然后写回json,会被OAuth2TokenEndpointFilter#sendErrorResponse捕获,
 			// 最后是写回了异常信息,如果不手动抛出异常则会被AbstractAuthenticationProcessingFilter处理,最终响应一个登陆页面
-			SecurityContextOAuth2Helpers.throwError(OAuth2ErrorCodes.INVALID_REQUEST, "认证失败：手机号或验证码错误.", ERROR_URI);
+			SecurityOAuth2Helpers.throwError(OAuth2ErrorCodes.INVALID_REQUEST, "认证失败：手机号或验证码错误.", ERROR_URI);
 		}
 		return authenticate;
 	}

@@ -8,7 +8,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
-import com.wy.helpers.SecurityContextOAuth2Helpers;
+import com.wy.helpers.SecurityOAuth2Helpers;
 
 /**
  * SpringSecurity5.8.14资源服务器配置
@@ -32,8 +32,8 @@ public class ResourceServerConfig {
 						// 可在此处添加自定义解析设置
 						.jwt(Customizer.withDefaults())
 						// 添加未携带token和权限不足异常处理(已在第五篇文章中说过)
-						.accessDeniedHandler(SecurityContextOAuth2Helpers::exceptionHandler)
-						.authenticationEntryPoint(SecurityContextOAuth2Helpers::exceptionHandler));
+						.accessDeniedHandler(SecurityOAuth2Helpers::exceptionHandler)
+						.authenticationEntryPoint(SecurityOAuth2Helpers::exceptionHandler));
 		return http.build();
 	}
 }

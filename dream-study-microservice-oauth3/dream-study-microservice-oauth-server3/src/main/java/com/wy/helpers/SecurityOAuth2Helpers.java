@@ -12,14 +12,18 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
+import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2ClientAuthenticationToken;
 import org.springframework.security.oauth2.server.resource.BearerTokenError;
 import org.springframework.security.oauth2.server.resource.BearerTokenErrorCodes;
 import org.springframework.security.oauth2.server.resource.authentication.AbstractOAuth2TokenAuthenticationToken;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.StringUtils;
 
 import dream.flying.flower.framework.core.json.JsonHelpers;
+import dream.flying.flower.framework.web.helper.WebHelpers;
+import dream.flying.flower.lang.ObjectHelper;
 import dream.flying.flower.lang.StrHelper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -33,7 +37,29 @@ import lombok.extern.slf4j.Slf4j;
  * @git {@link https://github.com/dreamFlyingFlower}
  */
 @Slf4j
-public class SecurityContextOAuth2Helpers {
+public class SecurityOAuth2Helpers {
+
+	/**
+	 * 从请求中获取当前客户端ID
+	 * 
+	 * @param httpServletRequest 请求
+	 * @return clientId
+	 */
+	public static String getClientId(HttpServletRequest httpServletRequest) {
+		httpServletRequest = ObjectHelper.defaultIfNull(httpServletRequest, WebHelpers.getRequest());
+		MultiValueMap<String, String> parameters = WebHelpers.getParameters(httpServletRequest);
+
+		String clientId = parameters.getFirst(OAuth2ParameterNames.CLIENT_ID);
+		if (!StringUtils.hasText(clientId)) {
+			return null;
+		}
+
+		if (parameters.get(OAuth2ParameterNames.CLIENT_ID).size() != 1) {
+			throw new OAuth2AuthenticationException(OAuth2ErrorCodes.INVALID_REQUEST);
+		}
+
+		return clientId;
+	}
 
 	/**
 	 * 生成放入请求头的错误信息

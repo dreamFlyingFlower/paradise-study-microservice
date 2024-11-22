@@ -170,11 +170,14 @@ public class AuthorizationServerConfig {
 
 		// 将认证服务器做为一个资源服务器,并使用指定方式存储客户端和用户信息.JWT和OPAQUE只能使用一种
 		http.oauth2ResourceServer((resourceServer) -> resourceServer
+				// 自定义判断使用JWT或opaque
+				// .authenticationManagerResolver(new
+				// MultitenancyAuthenticationManagerResolver())
 				// 如果不使用jwt或opaque,需要自定义AuthenticationManagerResolver
 				.authenticationManagerResolver(null)
-				// jwt校验,客户端的配置tokenSettings.accessTokenFormat必须为OAuth2TokenFormat.SELF_CONTAINED
+				// jwt校验
 				.jwt(Customizer.withDefaults())
-				// opaque校验,客户端的配置tokenSettings.accessTokenFormat必须为OAuth2TokenFormat.REFERENCE
+				// opaque校验,需要配置spring.security.oauth2.resourceserver.opaquetoken.introspection-uri,client-id,client-secret
 				.opaqueToken(Customizer.withDefaults()));
 
 		// 添加自定义短信认证登录转换器
