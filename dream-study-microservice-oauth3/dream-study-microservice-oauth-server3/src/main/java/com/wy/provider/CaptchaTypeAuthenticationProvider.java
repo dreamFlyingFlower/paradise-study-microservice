@@ -14,7 +14,7 @@ import com.wy.constant.ConstAuthorizationServerRedis;
 import com.wy.exception.AuthException;
 
 import dream.flying.flower.autoconfigure.redis.helper.RedisStrHelpers;
-import dream.flying.flower.framework.core.enums.LoginType;
+import dream.flying.flower.framework.core.enums.LoginPasswordType;
 import dream.flying.flower.framework.security.constant.ConstSecurity;
 import dream.flying.flower.framework.web.helper.WebHelpers;
 import jakarta.servlet.http.HttpServletRequest;
@@ -75,7 +75,7 @@ public class CaptchaTypeAuthenticationProvider extends DaoAuthenticationProvider
 		// 如果自定义的grant_type模式也需要校验图形验证码的可以不修改
 		// if (!Objects.equals(loginType, ConstAuthorization.SMS_LOGIN_TYPE)) {
 		// 只要不是密码登录都不需要校验图形验证码
-		if (!Objects.equals(loginType, LoginType.PASSWORD.getValue() + "")) {
+		if (!Objects.equals(loginType, LoginPasswordType.PASSWORD.getValue() + "")) {
 			log.info("It isn't necessary captcha authenticate.");
 			return super.authenticate(authentication);
 		}

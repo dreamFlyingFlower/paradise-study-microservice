@@ -16,7 +16,7 @@ import com.wy.exception.AuthException;
 import com.wy.provider.CaptchaTypeAuthenticationProvider;
 
 import dream.flying.flower.autoconfigure.redis.helper.RedisStrHelpers;
-import dream.flying.flower.framework.core.enums.LoginType;
+import dream.flying.flower.framework.core.enums.LoginPasswordType;
 import dream.flying.flower.framework.security.constant.ConstOAuthGrantType;
 import dream.flying.flower.framework.security.constant.ConstSecurity;
 import dream.flying.flower.framework.web.helper.WebHelpers;
@@ -69,7 +69,7 @@ public class SmsTypeAuthenticationProvider extends CaptchaTypeAuthenticationProv
 		// 如果是自定义密码模式则下方的认证判断只要判断下loginType即可
 		// if (Objects.equals(loginType, SecurityConstants.SMS_LOGIN_TYPE)) {}
 		// 短信登录和自定义短信认证grant_type会走下方认证
-		if (StrHelper.equalsIgnoreCase(loginType, LoginType.NONE.getValue() + "")
+		if (StrHelper.equalsIgnoreCase(loginType, LoginPasswordType.NONE.getValue() + "")
 				|| StrHelper.equalsIgnoreCase(grantType, ConstOAuthGrantType.SMS_CODE.getValue())) {
 			if ("session".equals(storeType)) {
 				// 获取存入session的验证码(UsernamePasswordAuthenticationToken的principal中现在存入的是手机号)
