@@ -97,6 +97,7 @@ import org.springframework.security.oauth2.server.authorization.web.OAuth2Author
 import org.springframework.security.oauth2.server.authorization.web.OAuth2AuthorizationServerMetadataEndpointFilter;
 import org.springframework.security.oauth2.server.authorization.web.OAuth2ClientAuthenticationFilter;
 import org.springframework.security.oauth2.server.authorization.web.OAuth2DeviceAuthorizationEndpointFilter;
+import org.springframework.security.oauth2.server.authorization.web.OAuth2DeviceVerificationEndpointFilter;
 import org.springframework.security.oauth2.server.authorization.web.OAuth2TokenEndpointFilter;
 import org.springframework.security.oauth2.server.authorization.web.OAuth2TokenIntrospectionEndpointFilter;
 import org.springframework.security.oauth2.server.authorization.web.OAuth2TokenRevocationEndpointFilter;
@@ -725,6 +726,7 @@ import jakarta.annotation.security.PermitAll;
  *		interval:客户端在向令牌端点发出轮询请求之间应等待的最短时间(秒),默认5秒
  *	
  *	在浏览器调用verification_uri或verification_uri_complete,如果未登录,需要先登录
+ * {@link OAuth2DeviceVerificationEndpointFilter}:拦截/oauth2/device_verification,对用户码进行验证
  *
  *	POST(/oauth2/token):http://ip:port/oauth2/token
  * 请求头:
