@@ -1,0 +1,6 @@
+spring:
+  cloud:
+    circuitbreaker:
+      bulkhead:
+        resilience4j:
+          enabled: true

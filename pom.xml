@@ -28,6 +28,7 @@
 	<modules>
 		<module>dream-study-microservice-async</module>
 		<module>dream-study-microservice-cache</module>
+		<module>dream-study-microservice-circuit3</module>
 		<module>dream-study-microservice-config</module>
 		<module>dream-study-microservice-gateway</module>
 		<module>dream-study-microservice-invocation</module>
@@ -39,6 +40,8 @@
 		<module>dream-study-microservice-server</module>
 		<module>dream-study-microservice-sleuth</module>
 		<module>dream-study-microservice-stream</module>
+		<!-- 连接追踪SpringBoot3 -->
+		<module>dream-study-microservice-trace3</module>
 		<module>dream-study-microservice-zuul</module>
 	</modules>
 </project>

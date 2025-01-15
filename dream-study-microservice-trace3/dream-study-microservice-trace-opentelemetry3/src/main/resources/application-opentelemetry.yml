@@ -1,0 +1,65 @@
+# Sampling Configuration
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+
+# Logging Pattern (includes trace and span IDs)
+logging:
+  pattern:
+    level: '[%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]]'
+
+# OpenTelemetry Core Configuration
+otel:
+  service:
+    name: ${spring.application.name}
+  exporter:
+    otlp:
+      endpoint: http://localhost:4317
+      
+  traces:
+    exporter: otlp
+  metrics:
+    exporter: otlp
+  logs:
+    exporter: otlp
+  instrumentation:
+    spring-webmvc.enabled: true
+    spring-webflux.enabled: true
+  resource:
+    attributes: 
+      '[deployment.environment]': development
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+# OpenTelemetry收集器配置
+processors:
+  batch:
+    timeout: 1s
+    send_batch_size: 1024
+  attributes:
+    actions:
+      - key: service.name
+        action: upsert
+        from_attribute: service.name
+
+exporters:
+  logging:
+    loglevel: debug
+  jaeger:
+    endpoint: jaeger:14250
+    tls:
+      insecure: true
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch, attributes]
+      exporters: [logging, jaeger]

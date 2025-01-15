@@ -1,0 +1,20 @@
+server: 
+  port: 55561
+
+spring:
+  application:
+    name: dream-study-microservice-feign
+  profiles:
+    active: circuit
+    
+# actuator的info信息,必须是配置文件中以info开头的自定义信息
+management: 
+  endpoints:
+    web: 
+      exposure: 
+        #*表示暴露info,health所有端点
+        include: "*"
+  endpoint:
+    health: 
+      #默认是never
+      show-details: always
