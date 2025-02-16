@@ -19,7 +19,7 @@ import com.wy.feign.RemoteService;
  * @date 2021-01-06 16:54:31
  * @git {@link https://github.com/dreamFlyingFlower}
  */
-public abstract class FeignCrl {
+public abstract class FeignController {
 
 	public abstract RemoteService getService();
 

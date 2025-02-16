@@ -4,3 +4,75 @@ spring:
       bulkhead:
         resilience4j:
           enabled: true
+
+resilience4j:
+  # 断路配置
+  circuitbreaker:
+    configs:
+      # 自定义所有断路器的默认配置
+      default:
+        # 以百分比配置失败率阈值.当失败率等于或大于阈值时,断路器状态并关闭变为开启,并进行服务降级
+        failure-rate-threshold: 100
+        # 配置滑动窗口的类型,当断路器关闭时,将调用的结果记录在滑动窗口中.滑动窗口的类型可以是count-based或time-based.
+        # 如果滑动窗口类型是COUNT_BASED,将会统计记录最近slidingWindowSize次调用的结果.
+        # 如果是TIME_BASED,将会统计记录最近slidingWindowSize秒的调用结果
+        sliding-window-type: count-based
+        # 配置滑动窗口的大小
+        sliding-window-size: 5
+        # 如果该值为10,则必须至少记录10个调用,然后才能计算失败率.如果只记录了9次调用,即使所有9次调用都失败,断路器也不会开启
+        minimum-number-of-calls: 5
+        # 断路器从开启过渡到半开应等待的时间
+        wait-duration-in-open-state: 10000
+    # 个性化断路器配置
+    instances:
+      # 配合CircuitBreaker注解使用,对应该注解中的name属性值
+      generalRule:
+        # 如果都是相同的配置,可以直接引用configs里面的.相同配置的个性配置优先级更高
+        base-config: default
+        # 失败阈值率
+        failure-rate-threshold: 50
+        # 断路后重连等待时间
+        wait-duration-in-open-state: 5S
+  # 隔离配置
+  bulkhead:
+    configs:
+      default:
+        # 隔离允许线程并发执行的最大数量.默认25
+        max-concurrent-calls: 2
+        # 当达到并发调用数量时,新的线程执行时将被阻塞,这个属性表示最长的等待时间.默认0
+        max-wait-duration: 2000
+  # 线程池配置
+  thread-pool-bulkhead:
+    configs:
+      default:
+        core-thread-pool-size: 2
+        max-thread-pool-size: 2
+        queue-capacity: 1
+  # 限流配置
+  timelimiter:
+    configs:
+      default:
+        # 超时时间
+        timeout-duration: 1s
+    instances:
+      # 配合TimeLimiter注解使用,对应注解中的name属性值
+      generalRule:
+        base-config: default
+  # 重试配置
+  retry:
+    instances:
+      # 配合Retry注解使用,对应注解中的name属性值
+      generalRule:
+        # 最大重试次数
+        max-attempts: 3
+        # 每次等待时间
+        wait-duration: 2S
+  ratelimiter:
+    configs:
+      default:
+        # 在一次刷新周期内,允许执行的最大请求数.默认50
+        limit-for-period: 50
+        # 限流器每隔limitRefreshPeriod刷新一次,将允许处理的最大请求数量重置为limitForPeriod.默认500ns
+        limit-refresh-period: 500ns
+        # 线程等待权限的默认等待时间;默认5s
+        timeout-duration: 5s
