@@ -108,7 +108,7 @@ public class SecurityConfig {
 		// 指定登录相关参数
 		http.formLogin(formLogin -> {
 			formLogin
-					// 登录页页面
+					// 自定义登录页页面.若不指定,则默认使用系统登录界面
 					.loginPage("/login")
 					// 登录API
 					.loginProcessingUrl("/login")
