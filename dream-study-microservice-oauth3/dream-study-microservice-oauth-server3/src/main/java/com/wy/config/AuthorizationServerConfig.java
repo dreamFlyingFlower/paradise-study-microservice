@@ -69,6 +69,8 @@ import lombok.SneakyThrows;
  * ->{@link EnableMethodSecurity#securedEnabled()}:为true启用{@link Secured}注解支持
  * </pre>
  * 
+ * 注意:SecurityConfig和AuthorizationServerConfig中的HttpSecurity不是同一个对象,HttpSecurity配置不互通
+ * 
  * @author 飞花梦影
  * @date 2024-09-18 22:02:11
  * @git {@link https://github.com/dreamFlyingFlower}

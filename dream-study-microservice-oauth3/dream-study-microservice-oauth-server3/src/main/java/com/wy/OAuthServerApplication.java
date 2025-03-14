@@ -260,6 +260,8 @@ import jakarta.annotation.security.PermitAll;
 	}
  * </code>
  * 
+ * 注意:SecurityConfig和AuthorizationServerConfig中的HttpSecurity不是同一个对象,HttpSecurity配置不互通
+ * 
  * 客户端向其他认证服务器进行认证:
  * 
  * <pre>
@@ -417,7 +419,7 @@ import jakarta.annotation.security.PermitAll;
  * {@link CsrfFilter}
  * {@link LogoutFilter}
  * 
- * {@link OAuth2AuthorizationEndpointFilter}:拦截/oauth2/authorize,处理授权码认证过程中获取 code 的请求
+ * {@link OAuth2AuthorizationEndpointFilter}:拦截/oauth2/authorize,处理授权码认证过程中获取 code 的请求;处理用户授权认证页面的跳转URL(consentPage)
  * 		eg:http://ip:port/oauth2/authorize?client_id=client&response_type=code&scope=testScope
  * 		若请求成功,返回302的跳转路径
  * 		eg:http://localhost:8080/callback?code=EuO9WT96cMPoTB7
@@ -507,12 +509,15 @@ import jakarta.annotation.security.PermitAll;
  * 		response_type:授权码凭证许可固定值为code
  * 		scope:授权的scope编码,分配多个则用空格分隔
  * 请求响应:
- * 		如果需要用户授权,会转发到用户授权页面,同时调用用户授权数据API获取授权信息
- *		http://ip:port/oauth2/consent?client_id={{client}}&scope={{scope}}&state={{consentState}}
+ * 		如果不需要授权,则直接跳到下一步.
+ * 		如果需要授权,经过{@link OAuth2AuthorizationEndpointFilter#sendAuthorizationConsent}判断后,分以下两种情况:
+ * 			1.1.如果未自定义授权页面,直接由DefaultConsentPage#displayConsent绘制授权页,直接写入到输出流中.
+ * 			1.2.如果自定义了授权页面,会重定向到用户自定义授权页,需要用户自定义授权页面展示逻辑.
+ * 		授权页设置由{@link OAuth2AuthorizationServerConfigurer#authorizationEndpoint}设置,实际是{@link OAuth2AuthorizationEndpointConfigurer#consentPage}设置.
+ * 		默认授权确认页面URL:http://ip:port/oauth2/authorize?client_id={{client}}&scope={{scope}}&state={{consentState}}
+ * 		自定义授权确认页面URL:http://ip:port/{自定义URL}?client_id={{client}}&scope={{scope}}&state={{consentState}}
  *
- *	4.重定向至授权页面:GET(oauth2/consent):http://ip:port/oauth2/consent?client_id={{client}}&scope={{scope}}&state={{consentState}}
- *
- * 5.用户确认授权:POST(oauth2/authorize):http://ip:port/oauth2/authorize
+ * 4.用户确认授权:POST(oauth2/authorize):http://ip:port/oauth2/authorize
  * 请求头:
  * 		Content-Type:application/x-www-form-urlencoded
  * 请求参数:
@@ -520,9 +525,9 @@ import jakarta.annotation.security.PermitAll;
  * 		state:授权页面响应的json中的state值
  * 		scope:授权的scope编码,分配多个则参数名有多个同名的scope键.不再是用空格分割,而是会在form表单中用相同的键(键值就是scope)来填写多个不同的scope
  * 
- * 6.授权服务器客户端回调(redirect_uri)地址,并带上授权码(code).注意:调用回调地址之前会检查oauth2_authorization_consent表中的登录用户是否有scope中的权限,若么有,抛异常
+ * 5.授权服务器客户端回调(redirect_uri)地址,并带上授权码(code).注意:调用回调地址之前会检查oauth2_authorization_consent表中的登录用户是否有scope中的权限,若么有,抛异常
  * 
- * 7.获取token:POST(oauth2/token):http://ip:port/oauth2/token?grant_type=authorization_code&code=
+ * 6.获取token:POST(oauth2/token):http://ip:port/oauth2/token?grant_type=authorization_code&code=
  * 请求头:
  * 		Authorization:Basic Base64编码的({client_id}:{client_secret})
  * 		Content-Type:form-data
@@ -556,7 +561,7 @@ import jakarta.annotation.security.PermitAll;
  * 		结合OAuth2AccessToken和jwtAccessToken构建OAuth2Authorization(包含客户端信息,token 信息,GrantType,authorizedScopes信息,token中的所有 Claims 信息的集合)
  * {@link OAuth2AuthorizationCodeAuthenticationProvider}:返回新的OAuth2AccessTokenAuthenticationToken对象到OAuth2TokenEndpointFilter,
  * 
- *	8.刷新token:POST(oauth2/token):http://ip:port/oauth2/token?grant_type=refresh_token&refresh_token=
+ *	7.刷新token:POST(oauth2/token):http://ip:port/oauth2/token?grant_type=refresh_token&refresh_token=
  * 请求头:
  * 		Authorization:Basic Base64编码的({client_id}:{client_secret})
  * 		Content-Type:application/x-www-form-urlencoded

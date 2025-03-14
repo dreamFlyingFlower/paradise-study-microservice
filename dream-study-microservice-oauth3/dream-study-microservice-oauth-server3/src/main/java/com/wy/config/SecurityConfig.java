@@ -35,6 +35,8 @@ import lombok.RequiredArgsConstructor;
 /**
  * SpringSecurity5.8.14安全配置,可以和{@link AuthorizationServerConfig}放在一个类中
  * 
+ * 注意:SecurityConfig和AuthorizationServerConfig中的HttpSecurity不是同一个对象,HttpSecurity配置不互通
+ * 
  * @author 飞花梦影
  * @date 2024-09-18 22:02:11
  * @git {@link https://github.com/dreamFlyingFlower}
