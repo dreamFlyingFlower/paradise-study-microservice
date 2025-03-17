@@ -3,7 +3,6 @@ package com.wy.config;
 import java.security.KeyPair;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
-import java.util.UUID;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -44,8 +43,10 @@ public class JwkSourceConfig {
 			KeyPair keyPair = RsaHelper.generateKeyPair(ConstDigest.KEY_SIZE_2048);
 			RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
 			RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
-			RSAKey rsaKey =
-					new RSAKey.Builder(publicKey).privateKey(privateKey).keyID(UUID.randomUUID().toString()).build();
+			RSAKey rsaKey = new RSAKey.Builder(publicKey).privateKey(privateKey)
+					// 若指定kid,则JWT的header里需要设置同样的kid,否则解析失败
+					// .keyID(UUID.randomUUID().toString())
+					.build();
 			// 生成jws
 			JWKSet jwkSet = new JWKSet(rsaKey);
 			// 转为json字符串

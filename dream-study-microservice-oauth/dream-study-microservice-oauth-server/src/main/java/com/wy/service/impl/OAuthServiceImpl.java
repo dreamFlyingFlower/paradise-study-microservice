@@ -12,7 +12,7 @@ import com.wy.entity.OAuthClientDetail;
 import com.wy.repository.OAuthRepository;
 import com.wy.service.OAuthService;
 
-import dream.flying.flower.framework.web.helper.IpHelpers;
+import dream.flying.flower.framework.web.helper.IpWebHelpers;
 import lombok.extern.slf4j.Slf4j;
 
 @Service("oauthService")
@@ -39,7 +39,7 @@ public class OAuthServiceImpl implements OAuthService {
 	@Transactional(propagation = Propagation.REQUIRED)
 	public void archiveOauthClientDetails(String clientId) {
 		oauthRepository.updateOauthClientDetailsArchive(clientId, true);
-		log.debug("{}|Update OauthClientDetails(clientId: {}) archive = true", IpHelpers.getIp(), clientId);
+		log.debug("{}|Update OauthClientDetails(clientId: {}) archive = true", IpWebHelpers.getIp(), clientId);
 	}
 
 	@Override
@@ -54,6 +54,6 @@ public class OAuthServiceImpl implements OAuthService {
 	public void registerClientDetails(OAuthClientDetailDTO formDto) {
 		OAuthClientDetail clientDetails = formDto.createDomain();
 		oauthRepository.saveOauthClientDetails(clientDetails);
-		log.debug("{}|Save OauthClientDetails: {}", IpHelpers.getIp(), clientDetails);
+		log.debug("{}|Save OauthClientDetails: {}", IpWebHelpers.getIp(), clientDetails);
 	}
 }
