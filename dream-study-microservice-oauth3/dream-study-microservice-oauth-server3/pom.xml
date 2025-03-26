@@ -22,11 +22,11 @@
 		</dependency>
 		<dependency>
 			<groupId>dream.flying.flower</groupId>
-			<artifactId>dream-spring-boot-starter-mybatis-plus3</artifactId>
+			<artifactId>dream-mybatis-plus3-spring-boot-starter</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>dream.flying.flower</groupId>
-			<artifactId>dream-spring-boot-starter-redis3</artifactId>
+			<artifactId>dream-redis3-spring-boot-starter</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.security</groupId>
