@@ -14,7 +14,7 @@ import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.util.UrlUtils;
 
-import dream.flying.flower.framework.core.json.JsonHelpers;
+import dream.flying.flower.framework.json.JsonHelpers;
 import dream.flying.flower.framework.security.constant.ConstSecurity;
 import dream.flying.flower.result.Result;
 import jakarta.servlet.ServletException;

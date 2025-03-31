@@ -20,7 +20,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.springframework.web.util.UriUtils;
 
-import dream.flying.flower.framework.core.json.JsonHelpers;
+import dream.flying.flower.framework.json.JsonHelpers;
 import dream.flying.flower.framework.security.constant.ConstSecurity;
 import dream.flying.flower.result.Result;
 import jakarta.servlet.ServletException;

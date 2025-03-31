@@ -7,9 +7,10 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.jackson2.SecurityJackson2Modules;
 import org.springframework.security.oauth2.server.authorization.jackson2.OAuth2AuthorizationServerJackson2Module;
+
 import com.fasterxml.jackson.databind.Module;
 
-import dream.flying.flower.framework.core.json.JsonHelpers;
+import dream.flying.flower.framework.json.JsonHelpers;
 
 /**
  * SpringSecurity中有很多类不在反序列化白名单中,需要自定义,不能使用通用的{@link JsonHelpers}

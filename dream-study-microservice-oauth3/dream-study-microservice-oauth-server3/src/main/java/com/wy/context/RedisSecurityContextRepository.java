@@ -16,7 +16,7 @@ import org.springframework.util.ObjectUtils;
 import com.wy.constant.ConstAuthorizationServerRedis;
 
 import dream.flying.flower.autoconfigure.redis.helper.RedisHelpers;
-import dream.flying.flower.framework.core.json.JsonHelpers;
+import dream.flying.flower.framework.json.JsonHelpers;
 import dream.flying.flower.framework.security.constant.ConstSecurity;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
