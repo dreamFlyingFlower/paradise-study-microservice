@@ -14,9 +14,9 @@ import com.wy.constant.ConstAuthorizationServerRedis;
 import com.wy.exception.AuthException;
 
 import dream.flying.flower.autoconfigure.redis.helper.RedisStrHelpers;
-import dream.flying.flower.framework.core.enums.LoginPasswordType;
+import dream.flying.flower.framework.constant.enums.LoginPasswordType;
 import dream.flying.flower.framework.security.constant.ConstSecurity;
-import dream.flying.flower.framework.web.helper.WebHelpers;
+import dream.flying.flower.framework.web.WebHelpers;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.Getter;
 import lombok.Setter;

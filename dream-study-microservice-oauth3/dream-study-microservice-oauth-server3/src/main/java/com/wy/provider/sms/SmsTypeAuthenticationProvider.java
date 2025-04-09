@@ -16,10 +16,10 @@ import com.wy.exception.AuthException;
 import com.wy.provider.CaptchaTypeAuthenticationProvider;
 
 import dream.flying.flower.autoconfigure.redis.helper.RedisStrHelpers;
-import dream.flying.flower.framework.core.enums.LoginPasswordType;
+import dream.flying.flower.framework.constant.enums.LoginPasswordType;
 import dream.flying.flower.framework.security.constant.ConstOAuthGrantType;
 import dream.flying.flower.framework.security.constant.ConstSecurity;
-import dream.flying.flower.framework.web.helper.WebHelpers;
+import dream.flying.flower.framework.web.WebHelpers;
 import dream.flying.flower.lang.StrHelper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
