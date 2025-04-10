@@ -2,8 +2,7 @@ package com.wy.entity.vo;
 
 import java.io.Serializable;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,7 +17,7 @@ import lombok.ToString;
  * @date 2021-01-20 23:22:51
  * @git {@link https://github.com/mygodness100}
  */
-@ApiModel("权限对象")
+@Schema(description = "权限对象")
 @Getter
 @Setter
 @Builder
@@ -32,42 +31,42 @@ public class PermissionVo implements Serializable {
 	/**
 	 * 角色编号
 	 */
-	@ApiModelProperty("角色编号")
+	@Schema(description = "角色编号")
 	private Long roleId;
 
 	/**
 	 * 角色编码
 	 */
-	@ApiModelProperty("角色编码")
+	@Schema(description = "角色编码")
 	private String roleCode;
 
 	/**
 	 * 菜单编号
 	 */
-	@ApiModelProperty("菜单编号")
+	@Schema(description = "菜单编号")
 	private Long menuId;
 
 	/**
 	 * 访问的url
 	 */
-	@ApiModelProperty("访问的url")
+	@Schema(description = "访问的url")
 	private String url;
 
 	/**
 	 * 访问的方法
 	 */
-	@ApiModelProperty("访问的方法")
+	@Schema(description = "访问的方法")
 	private String method;
 
 	/**
 	 * 可访问的角色
 	 */
-	@ApiModelProperty("可访问的角色")
+	@Schema(description = "可访问的角色")
 	private String roles;
 
 	/**
 	 * 权限字符串
 	 */
-	@ApiModelProperty("权限字符串")
+	@Schema(description = "权限字符串")
 	private String permissions;
 }

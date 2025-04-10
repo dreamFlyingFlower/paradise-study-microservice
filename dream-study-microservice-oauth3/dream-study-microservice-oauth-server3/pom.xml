@@ -67,16 +67,6 @@
 			<version>4.6.0</version>
 		</dependency>
 		<dependency>
-			<groupId>io.springfox</groupId>
-			<artifactId>springfox-boot-starter</artifactId>
-		</dependency>
-		<!-- Swagger2文档增强 -->
-		<!-- <dependency> -->
-		<!-- <groupId>com.github.xiaoymin</groupId> -->
-		<!-- <artifactId>knife4j-spring-boot-starter</artifactId> -->
-		<!-- <version>3.0.2</version> -->
-		<!-- </dependency> -->
-		<dependency>
 			<groupId>com.mysql</groupId>
 			<artifactId>mysql-connector-j</artifactId>
 			<scope>runtime</scope>
