@@ -21,7 +21,8 @@ import dream.flying.flower.lang.StrHelper;
 import reactor.core.publisher.Mono;
 
 /**
- * {@link GlobalFilter}:全局拦截器,应用到所有的路由上,可以实现权限统一校验,安全验证等 {@link GatewayFilter}:应用到单个或一个分组的路由上
+ * {@link GlobalFilter}:全局拦截器,应用到所有的路由上,可以实现权限统一校验,安全验证等
+ * {@link GatewayFilter}:应用到单个或一个分组的路由上
  * 
  * <pre>
  * {@link ReactiveLoadBalancerClientFilter}:通过负载均衡客户端根据路由URL解析转换成真实URL
@@ -52,8 +53,10 @@ public class MyGatewayFilter implements GlobalFilter {
 		if (StrHelper.isBlank(token)) {
 			System.out.println("鉴权失败");
 			exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-			// return exchange.getResponse().setComplete();
+			// 直接结束请求
+			// exchange.getResponse().setComplete();
 			DataBuffer buffer = exchange.getResponse().bufferFactory().wrap("登录失败".getBytes());
+			// 写入数据并结束请求
 			return exchange.getResponse().writeWith(Mono.just(buffer));
 		}
 		return chain.filter(exchange);

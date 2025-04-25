@@ -47,7 +47,7 @@ spring:
         uri: lb://dream-study-microservice-service/
         # 使用ip地址作为请求转发地址,要注意后面的/
         # uri: http://localhost:12345/
-        # 路由的优先级,数字越小级别越高
+        # 路由的优先级,相同的url时,数字越小级别越高
         order: 1
         # 断言,相当于匹配规则
         predicates: 
@@ -61,7 +61,7 @@ spring:
           # - Weight=group1,2
         # 过滤器,请求在传递过程中可以通过过滤器对其进行一定的修改,参照MyGatewayFilterFactory中的局部过滤器
         filters:
-        # 转发之前去掉1层路径前缀,如/api/product/**->/prodcut/**,注意等号前后不能有空格
+        # 转发之前去掉1层路径前缀,如/api/order/product/**->/order/prodcut/**.如果是2,则去掉2层路径为/product/**.注意等号前后不能有空格
         - StripPrefix=1
         # 使用内置的过滤器,修改返回状态
         - SetStatus=2000

@@ -11,6 +11,7 @@ import org.springframework.cloud.gateway.filter.factory.AddRequestParameterGatew
 import org.springframework.cloud.gateway.filter.factory.AddResponseHeaderGatewayFilterFactory;
 import org.springframework.cloud.gateway.filter.factory.DedupeResponseHeaderGatewayFilterFactory;
 import org.springframework.cloud.gateway.filter.factory.FallbackHeadersGatewayFilterFactory;
+import org.springframework.cloud.gateway.filter.factory.GatewayFilterFactory;
 import org.springframework.cloud.gateway.filter.factory.PrefixPathGatewayFilterFactory;
 import org.springframework.cloud.gateway.filter.factory.PreserveHostHeaderGatewayFilterFactory;
 import org.springframework.cloud.gateway.filter.factory.RedirectToGatewayFilterFactory;
@@ -37,7 +38,7 @@ import lombok.Setter;
 import reactor.core.publisher.Mono;
 
 /**
- * {@link GatewayFilter}:局部过滤器,应用到单个路由或者一个分组的路由上
+ * {@link GatewayFilterFactory}:局部过滤器,应用到单个路由或者一个分组的路由上
  * 
  * 自定义局部过滤器,类名结尾必须是GatewayFilterFactory
  * 
