@@ -4,8 +4,9 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.dream.result.Result;
 import com.wy.feign.FeignService;
+
+import dream.flying.flower.result.Result;
 
 public class FeignServiceImpl {
 

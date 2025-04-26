@@ -4,8 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
 
-import com.dream.result.Result;
 import com.wy.feign.FeignUserService;
+
+import dream.flying.flower.result.Result;
 
 @Service
 public class UserServiceImpl extends FeignServiceImpl implements FeignUserService {

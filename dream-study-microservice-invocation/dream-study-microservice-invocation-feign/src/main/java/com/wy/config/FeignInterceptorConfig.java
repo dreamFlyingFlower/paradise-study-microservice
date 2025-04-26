@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -37,9 +38,13 @@ public class FeignInterceptorConfig {
 			requestTemplate.header("Cookie", request.getHeader("Cookie"));
 			// 将请求头中所有数据进行同步
 			Enumeration<String> headerNames = request.getHeaderNames();
-			if (headerNames != null) {
-				while (headerNames.hasMoreElements()) {
-					String name = headerNames.nextElement();
+			if (null == headerNames) {
+				return;
+			}
+			while (headerNames.hasMoreElements()) {
+				String name = headerNames.nextElement();
+				// 当前请求的content-length不能传递到下游的服务提供方,否则请求可能一直返回不了,或者请求响应数据被截断
+				if (!name.equalsIgnoreCase(HttpHeaders.CONTENT_LENGTH)) {
 					String values = request.getHeader(name);
 					requestTemplate.header(name, values);
 				}

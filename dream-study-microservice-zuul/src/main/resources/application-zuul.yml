@@ -14,12 +14,14 @@ zuul:
     user: 
       # 该路由服务指向哪一个服务名
       service-id: dream-study-microservice-service
-      # 以URL进行访问
-      url: localhost:12345
+      # 以URL进行访问,可直接使用service-id
+      #url: localhost:12345
       # 网关代理路径./**表示所有层级的接口,/*表示只有一层
       path: /user/**
       # 同全局是strip-prefix,可不配置
       # strip-prefix: true
+    # 可以直接使用以微服务的名称为key,后面跟上path里面的值
+    dream-study-microservice-service: /user/**
   ignore-local-service: true
   # 禁止以服务名访问,即禁止默认的访问方式.*表示所有,也可以写多个服务名
   ignored-services: "*"

@@ -19,7 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.wy.service.UpdownService;
 
-import dream.framework.core.http.HttpHelpers;
+import dream.flying.flower.framework.core.http.HttpHelpers;
 import feign.Response;
 
 /**
