@@ -27,7 +27,7 @@ import lombok.Data;
  * Gateway内置的断言工厂
  * 
  * <pre>
- * {@link AfterRoutePredicateFactory}:接收一个日期参数,判断请求日期是否晚于指定日期,如:-After=2020-02-22T22:22:22
+ * {@link AfterRoutePredicateFactory}:接收一个日期参数,判断请求日期是否晚于指定日期,如:-After=2020-02-22T22:22:22,可直接复制ZonedDateTime.now()的输出
  * {@link BeforeRoutePredicateFactory}:接收一个日期参数,判断请求日期是否早于指定日期
  * {@link BetweenRoutePredicateFactory}:接收两个日期参数,判断请求日期是否在指定时间段内
  * {@link RemoteAddrRoutePredicateFactory}:接收一个IP地址段,判断请求主机地址是否在地址段中.如:-RemoteAddr=192.168.1.1/24
