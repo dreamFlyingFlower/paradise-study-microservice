@@ -6,11 +6,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.netflix.hystrix.HystrixCollapser.Scope;
 import com.netflix.hystrix.HystrixCommandProperties;
 import com.netflix.hystrix.HystrixThreadPoolProperties;
 import com.netflix.hystrix.contrib.javanica.annotation.DefaultProperties;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCollapser;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
+import com.netflix.hystrix.contrib.javanica.cache.annotation.CacheRemove;
+import com.netflix.hystrix.contrib.javanica.cache.annotation.CacheResult;
 import com.netflix.hystrix.strategy.concurrency.HystrixConcurrencyStrategy;
 import com.wy.service.UserService;
 
@@ -36,7 +40,8 @@ import dream.flying.flower.result.Result;
  * {@link HystrixCommand#threadPoolKey()}:线程隔离策略时,指定线程池标识,Hystrix会使用该标识来统计线程占用是否超过
  * {@link HystrixCommand#threadPoolProperties()}:线程隔离策略时,指定线程池属性{@link HystrixThreadPoolProperties},
  * 可以在配置文件中配置,前缀为hystrix.threadpool,default或hystrix.threadpool.threadPoolKey(自定义的key),
- * 多个配置时会覆盖掉默认(default)的配置,但是只会使用一种最先配置的自定义配置
+ * 多个配置时会覆盖掉默认(default)的配置,但是只会使用一种最先配置的自定义配置 {@link HystrixCommandProperties}:
+ * HystrixCommand中所有的属性都在该文件中进行配置和处理
  * 
  * Hystrix断路器发生的条件:5秒内调用接口失败超过20次,可调节
  * 
@@ -147,11 +152,33 @@ public class HystrixCrl {
 	@Autowired
 	private UserService userService;
 
-	@HystrixCommand(fallbackMethod = "fallbackMethod",
+	@HystrixCommand(
+			// 用于对 Hystrix 命令进行分组,分组之后便于统计展示在仪表盘,上传报告和预警等等
+			// 内部进行度量统计时候的分组标识,数据上报和统计的最小维度就是 groupKey
+			groupKey = "hystixGroup",
+			// HystrixCommand 的名字,默认是当前类的名字,主要方便 Hystrix 进行监控报警等
+			commandKey = "commandHystrix",
+			// 降级处理
+			fallbackMethod = "fallbackMethod",
+			// 断路器配置
 			commandProperties = {
-					@HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "3000") },
+					// 超时时间,毫秒,超时进行fallback
+					@HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "3000"),
+					// 判断熔断的最小请求数,默认20,只有在一定时间内请求数达到该值,才会进行成功率的计算
+					@HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "20"),
+					// 熔断的阈值默认值50,表示在一定时间内有50%的请求处理失败,会触发熔断
+					@HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = "50") },
+			// 线程池模式
 			threadPoolKey = "default", threadPoolProperties = { @HystrixProperty(name = "maxQueueSize", value = "10") })
 	@GetMapping("getById/{id}")
+	// 使用缓存.cacheKeyMethod:获取缓存key的方法,必须在同一个方法内
+	@CacheResult(cacheKeyMethod = "getCacheKey")
+	// 删除缓存结果.commandKey必须和@HystrixCommand中的commandKey相同
+	@CacheRemove(commandKey = "commandHystrix", cacheKeyMethod = "getCacheKey")
+	// 请求合并
+	@HystrixCollapser(batchMethod = "请求合并的方法,必须在和当前方法在同一类中",
+			// 全局合并请求.所有请求接口进来都合并
+			scope = Scope.GLOBAL)
 	public Object getById(@PathVariable("id") String id) {
 		// 当远程调用出现异常,超时时,会使用降级方法
 		return Result.ok(userService.getById(id));
@@ -175,5 +202,15 @@ public class HystrixCrl {
 	 */
 	public Result<?> defaultFallbackMethod() {
 		return Result.error();
+	}
+
+	/**
+	 * 获取缓存key的方法,参数必须和被@CacheResult标注的方法一样,返回值必须是string
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public String getCacheKey(String id) {
+		return id;
 	}
 }
