@@ -3,9 +3,11 @@
 # 指定从网易的镜像网站中下载镜像
 FROM hub.c.163.com/library/java:8-alpine
 # 标签信息,可写多个,key=value形式
-LABEL Author=DreamFlyingFlower
-LABEL Version=0.0.1
-# 复制需要制作的源文件到docker容易中,名字自定义
+LABEL author="DreamFlyingFlower"
+LABEL version="0.0.1"
+LABEL	env="prod"
+# 复制需要制作的源文件到docker容器中,名字自定义:本地文件;docker容器目录
+# 第一个参数可以是URL地址
 ADD dream-study-microservice.jar spring-cloud-test.jar
 # 容器对外映射的端口号
 EXPOSE 55555
